@@ -195,6 +195,9 @@ export function ScreenDesignPage() {
 export function ScreenDesignFullscreen() {
   const { sectionId, screenDesignName } = useParams<{ sectionId: string; screenDesignName: string }>()
 
+  // When loaded inside ShellPreview iframe, skip the shell to avoid double sidebar
+  const isEmbedded = new URLSearchParams(window.location.search).get('embed') === 'true'
+
   // Load screen design component
   const ScreenDesignComponent = useMemo(() => {
     if (!sectionId || !screenDesignName) return null
@@ -218,6 +221,9 @@ export function ScreenDesignFullscreen() {
 
   // Load AppShell component if it exists AND this section uses the shell
   const AppShellComponent = useMemo(() => {
+    // Skip shell when embedded inside ShellPreview to avoid double sidebar
+    if (isEmbedded) return null
+
     // Check if this section should use the shell (based on spec.md config)
     if (sectionId && !sectionUsesShell(sectionId)) {
       console.log('[ScreenDesignFullscreen] Section configured to not use shell')
@@ -294,7 +300,7 @@ export function ScreenDesignFullscreen() {
         return { default: ({ children }: { children?: React.ReactNode }) => <>{children}</> }
       }
     })
-  }, [sectionId]) // Depends on sectionId to check section-specific shell config
+  }, [sectionId, isEmbedded]) // Depends on sectionId to check section-specific shell config
 
   // Sync theme with parent window
   useEffect(() => {
