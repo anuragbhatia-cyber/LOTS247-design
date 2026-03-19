@@ -1,8 +1,15 @@
 {
   "buildCommand": "vite build",
+  "installCommand": "npm install",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
-  ]
+  ],
+  "git": {
+    "deploymentEnabled": true
+  },
+  "env": {
+    "VERCEL_FORCE_NO_BUILD_CACHE": "1"
+  }
 }
