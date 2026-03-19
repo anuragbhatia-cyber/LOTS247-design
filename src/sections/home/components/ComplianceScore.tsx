@@ -1,11 +1,22 @@
 import type { ComplianceScore as ComplianceScoreType, ComplianceStatus } from '@/../product/sections/home/types'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 interface ComplianceScoreProps {
   data: ComplianceScoreType
+  onViewDetails?: () => void
 }
 
-const statusConfig: Record<ComplianceStatus, {
-  label: string
+const statusLabels: Record<Language, Record<ComplianceStatus, string>> = {
+  en: { healthy: 'Healthy', warning: 'Needs Attention', critical: 'Critical' },
+  hi: { healthy: 'स्वस्थ', warning: 'ध्यान आवश्यक', critical: 'गंभीर' },
+}
+
+const translations: Record<Language, Record<string, string>> = {
+  en: { complianceHealth: 'Compliance Health', viewDetails: 'View Details' },
+  hi: { complianceHealth: 'अनुपालन स्वास्थ्य', viewDetails: 'विवरण देखें' },
+}
+
+const statusStyles: Record<ComplianceStatus, {
   color: string
   bg: string
   bar: string
@@ -13,7 +24,6 @@ const statusConfig: Record<ComplianceStatus, {
   ring: string
 }> = {
   healthy: {
-    label: 'Healthy',
     color: 'text-emerald-600 dark:text-emerald-400',
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     bar: 'bg-emerald-500',
@@ -21,7 +31,6 @@ const statusConfig: Record<ComplianceStatus, {
     ring: 'text-emerald-500',
   },
   warning: {
-    label: 'Needs Attention',
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
     bar: 'bg-amber-500',
@@ -29,7 +38,6 @@ const statusConfig: Record<ComplianceStatus, {
     ring: 'text-amber-500',
   },
   critical: {
-    label: 'Critical',
     color: 'text-red-600 dark:text-red-400',
     bg: 'bg-red-50 dark:bg-red-950/40',
     bar: 'bg-red-500',
@@ -38,8 +46,11 @@ const statusConfig: Record<ComplianceStatus, {
   },
 }
 
-export function ComplianceScore({ data }: ComplianceScoreProps) {
-  const overall = statusConfig[data.status]
+export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
+  const { language } = useLanguage()
+  const t = translations[language]
+  const overall = statusStyles[data.status]
+  const overallLabel = statusLabels[language][data.status]
 
   // SVG ring params
   const radius = 36
@@ -47,14 +58,14 @@ export function ComplianceScore({ data }: ComplianceScoreProps) {
   const strokeDashoffset = circumference - (data.overall / 100) * circumference
 
   return (
-    <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+    <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
       {/* Header */}
       <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex items-center justify-between">
-        <h2 className="text-xs font-semibold text-stone-400 dark:text-stone-500 uppercase tracking-widest">
-          Compliance Health
+        <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
+          {t.complianceHealth}
         </h2>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${overall.bg} ${overall.color}`}>
-          {overall.label}
+          {overallLabel}
         </span>
       </div>
 
@@ -88,18 +99,18 @@ export function ComplianceScore({ data }: ComplianceScoreProps) {
               <span className={`text-2xl sm:text-3xl font-bold tabular-nums leading-none ${overall.color}`}>
                 {data.overall}
               </span>
-              <span className="text-xs text-stone-400 dark:text-stone-500 leading-none mt-1">/ 100</span>
+              <span className="text-xs text-stone-500 dark:text-stone-400 leading-none mt-1">/ 100</span>
             </div>
           </div>
           <p className={`text-xs font-semibold sm:text-center ${overall.color}`}>
-            {overall.label}
+            {overallLabel}
           </p>
         </div>
 
         {/* Category breakdown */}
         <div className="flex-1 flex flex-col gap-3.5">
           {data.categories.map((cat) => {
-            const cfg = statusConfig[cat.status]
+            const cfg = statusStyles[cat.status]
             return (
               <div key={cat.id}>
                 <div className="flex items-center justify-between mb-1.5">
@@ -122,6 +133,13 @@ export function ComplianceScore({ data }: ComplianceScoreProps) {
           })}
         </div>
       </div>
+
+      <button
+        onClick={onViewDetails}
+        className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+      >
+        {t.viewDetails} &rarr;
+      </button>
     </div>
   )
 }

@@ -16,6 +16,8 @@ import {
   Pause,
   FileText,
   MoreVertical,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import type {
   ChallanListProps,
@@ -24,45 +26,196 @@ import type {
   Vehicle,
   Driver,
 } from '@/../product/sections/incident-management/types'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+
+// ---------------------------------------------------------------------------
+// Translations
+// ---------------------------------------------------------------------------
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    // Page header
+    pageTitle: 'Challans',
+    pageSubtitle: 'Track and manage traffic violation challans across your fleet',
+
+    // Summary cards
+    total: 'Total',
+    pending: 'Pending',
+    resolved: 'Resolved',
+    exposure: 'Exposure',
+    slaBreached: 'SLA breached',
+
+    // Search & filters
+    searchPlaceholder: 'Search by ID, vehicle, violation, location...',
+    filters: 'Filters',
+    status: 'Status',
+    vehicle: 'Vehicle',
+    allStatuses: 'All statuses',
+    allVehicles: 'All vehicles',
+    clearAll: 'Clear all',
+    filteredBy: 'Filtered by:',
+
+    // Sort options
+    dateNewest: 'Date (Newest)',
+    dateOldest: 'Date (Oldest)',
+    amountHigh: 'Amount (High)',
+    amountLow: 'Amount (Low)',
+
+    // Status labels
+    statusSubmitted: 'Submitted',
+    statusInProgress: 'In Progress',
+    statusResolved: 'Resolved',
+    statusOnHold: 'On Hold',
+    statusNotSettled: 'Not Settled',
+
+    // SLA labels
+    slaCompleted: 'Completed',
+    slaBreachedOverdue: 'SLA breached',
+    slaDaysOverdue: 'd overdue',
+    slaDaysRemaining: 'd remaining',
+
+    // Table headers
+    headerIncidentId: 'Incident ID',
+    headerVehicle: 'Vehicle',
+    headerViolation: 'Offence',
+    headerAmount: 'Amount',
+    headerStatus: 'Status',
+    headerSla: 'SLA',
+    headerActions: 'Actions',
+
+    // Actions
+    actionPayNow: 'Pay Now',
+    actionDispute: 'Dispute',
+    actionEscalate: 'Escalate',
+    actionReceipt: 'Receipt',
+    actionRefund: 'Refund',
+
+    // Mobile card labels
+    labelViolation: 'Offence',
+    labelVehicle: 'Vehicle',
+    labelLocation: 'Location',
+
+    // Results count
+    resultsOf: 'of',
+    resultsChallans: 'challans',
+
+    // Empty state
+    noChallansFound: 'No challans found',
+    tryAdjusting: 'Try adjusting your search or filters',
+  },
+  hi: {
+    // Page header
+    pageTitle: 'चालान',
+    pageSubtitle: 'अपने बेड़े में यातायात उल्लंघन चालान ट्रैक और प्रबंधित करें',
+
+    // Summary cards
+    total: 'कुल',
+    pending: 'लंबित',
+    resolved: 'निपटारा',
+    exposure: 'बकाया',
+    slaBreached: 'SLA उल्लंघन',
+
+    // Search & filters
+    searchPlaceholder: 'ID, वाहन, उल्लंघन, स्थान से खोजें...',
+    filters: 'फ़िल्टर',
+    status: 'स्थिति',
+    vehicle: 'वाहन',
+    allStatuses: 'सभी स्थितियां',
+    allVehicles: 'सभी वाहन',
+    clearAll: 'सभी साफ़ करें',
+    filteredBy: 'फ़िल्टर:',
+
+    // Sort options
+    dateNewest: 'तारीख (नवीनतम)',
+    dateOldest: 'तारीख (पुरानी)',
+    amountHigh: 'राशि (उच्च)',
+    amountLow: 'राशि (निम्न)',
+
+    // Status labels
+    statusSubmitted: 'प्रस्तुत',
+    statusInProgress: 'प्रगति में',
+    statusResolved: 'निपटारा',
+    statusOnHold: 'रोक पर',
+    statusNotSettled: 'अनसुलझा',
+
+    // SLA labels
+    slaCompleted: 'पूर्ण',
+    slaBreachedOverdue: 'SLA उल्लंघन',
+    slaDaysOverdue: 'दिन अतिदेय',
+    slaDaysRemaining: 'दिन शेष',
+
+    // Table headers
+    headerIncidentId: 'घटना ID',
+    headerVehicle: 'वाहन',
+    headerViolation: 'उल्लंघन',
+    headerAmount: 'राशि',
+    headerStatus: 'स्थिति',
+    headerSla: 'SLA',
+    headerActions: 'कार्रवाई',
+
+    // Actions
+    actionPayNow: 'अभी भुगतान करें',
+    actionDispute: 'विवाद करें',
+    actionEscalate: 'आगे बढ़ाएं',
+    actionReceipt: 'रसीद',
+    actionRefund: 'वापसी',
+
+    // Mobile card labels
+    labelViolation: 'उल्लंघन',
+    labelVehicle: 'वाहन',
+    labelLocation: 'स्थान',
+
+    // Results count
+    resultsOf: 'में से',
+    resultsChallans: 'चालान',
+
+    // Empty state
+    noChallansFound: 'कोई चालान नहीं मिला',
+    tryAdjusting: 'अपनी खोज या फ़िल्टर बदलकर देखें',
+  },
+}
 
 // ---------------------------------------------------------------------------
 // Status config
 // ---------------------------------------------------------------------------
 
-const STATUS_CONFIG: Record<
+const STATUS_STYLE: Record<
   ChallanStatus,
-  { label: string; bg: string; text: string; icon: typeof Clock }
+  { bg: string; text: string; icon: typeof Clock }
 > = {
   submitted: {
-    label: 'Submitted',
     bg: 'bg-blue-50 dark:bg-blue-950/40',
     text: 'text-blue-700 dark:text-blue-300',
     icon: FileText,
   },
   inProgress: {
-    label: 'In Progress',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
     text: 'text-amber-700 dark:text-amber-300',
     icon: Clock,
   },
   resolved: {
-    label: 'Resolved',
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     text: 'text-emerald-700 dark:text-emerald-300',
     icon: CheckCircle2,
   },
   onHold: {
-    label: 'On Hold',
     bg: 'bg-stone-100 dark:bg-stone-800/60',
     text: 'text-stone-600 dark:text-stone-300',
     icon: Pause,
   },
   notSettled: {
-    label: 'Not Settled',
     bg: 'bg-red-50 dark:bg-red-950/40',
     text: 'text-red-700 dark:text-red-300',
     icon: XCircle,
   },
+}
+
+const STATUS_LABEL_KEY: Record<ChallanStatus, string> = {
+  submitted: 'statusSubmitted',
+  inProgress: 'statusInProgress',
+  resolved: 'statusResolved',
+  onHold: 'statusOnHold',
+  notSettled: 'statusNotSettled',
 }
 
 // ---------------------------------------------------------------------------
@@ -73,16 +226,17 @@ function formatCurrency(amount: number): string {
   return `₹${amount.toLocaleString('en-IN')}`
 }
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-IN', {
+function formatDate(dateStr: string, language: Language): string {
+  const locale = language === 'hi' ? 'hi-IN' : 'en-IN'
+  return new Date(dateStr).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
 }
 
-function getSlaInfo(slaDeadline: string, status: ChallanStatus) {
-  if (status === 'resolved') return { label: 'Completed', color: 'text-emerald-600 dark:text-emerald-400', breached: false }
+function getSlaInfo(slaDeadline: string, status: ChallanStatus, t: Record<string, string>) {
+  if (status === 'resolved') return { label: t.slaCompleted, color: 'text-emerald-600 dark:text-emerald-400', breached: false }
 
   const now = new Date()
   const deadline = new Date(slaDeadline)
@@ -90,12 +244,12 @@ function getSlaInfo(slaDeadline: string, status: ChallanStatus) {
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
-    return { label: `SLA breached (${Math.abs(diffDays)}d overdue)`, color: 'text-red-600 dark:text-red-400', breached: true }
+    return { label: `${t.slaBreachedOverdue} (${Math.abs(diffDays)}${t.slaDaysOverdue})`, color: 'text-red-600 dark:text-red-400', breached: true }
   }
   if (diffDays <= 7) {
-    return { label: `${diffDays}d remaining`, color: 'text-amber-600 dark:text-amber-400', breached: false }
+    return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-amber-600 dark:text-amber-400', breached: false }
   }
-  return { label: `${diffDays}d remaining`, color: 'text-stone-500 dark:text-stone-400', breached: false }
+  return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-stone-500 dark:text-stone-400', breached: false }
 }
 
 function resolveVehicle(vehicleId: string, vehicles: Vehicle[]): Vehicle | undefined {
@@ -111,15 +265,15 @@ function resolveDriver(driverId: string | null, drivers: Driver[]): Driver | und
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function StatusBadge({ status }: { status: ChallanStatus }) {
-  const config = STATUS_CONFIG[status]
-  const Icon = config.icon
+function StatusBadge({ status, t }: { status: ChallanStatus; t: Record<string, string> }) {
+  const style = STATUS_STYLE[status]
+  const Icon = style.icon
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${style.bg} ${style.text}`}
     >
       <Icon className="w-3 h-3" />
-      {config.label}
+      {t[STATUS_LABEL_KEY[status]]}
     </span>
   )
 }
@@ -159,6 +313,9 @@ export function ChallanList({
   onDownloadReceipt,
   onRequestRefund,
 }: ChallanListProps) {
+  const { language } = useLanguage()
+  const t = translations[language]
+
   // Filter state
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<ChallanStatus | 'all'>('all')
@@ -167,6 +324,8 @@ export function ChallanList({
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 5
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -188,7 +347,7 @@ export function ChallanList({
     )
     const totalExposure = pending.reduce((sum, c) => sum + c.amount, 0)
     const breachedCount = challans.filter((c) => {
-      const sla = getSlaInfo(c.slaDeadline, c.status)
+      const sla = getSlaInfo(c.slaDeadline, c.status, t)
       return sla.breached
     }).length
 
@@ -199,7 +358,7 @@ export function ChallanList({
       totalExposure,
       breachedCount,
     }
-  }, [challans])
+  }, [challans, t])
 
   // Filter & sort
   const filtered = useMemo(() => {
@@ -241,11 +400,22 @@ export function ChallanList({
     return result
   }, [challans, searchQuery, statusFilter, vehicleFilter, sortBy, sortDir, vehicles])
 
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, statusFilter, vehicleFilter, sortBy, sortDir])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginatedItems = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
+
   const activeFilterCount =
     (statusFilter !== 'all' ? 1 : 0) + (vehicleFilter !== 'all' ? 1 : 0)
 
   function getRowActions(challan: Challan) {
-    const sla = getSlaInfo(challan.slaDeadline, challan.status)
+    const sla = getSlaInfo(challan.slaDeadline, challan.status, t)
     const actions: {
       label: string
       icon: typeof CreditCard
@@ -255,18 +425,18 @@ export function ChallanList({
 
     if (challan.status === 'submitted' || challan.status === 'inProgress') {
       actions.push({
-        label: 'Pay Now',
+        label: t.actionPayNow,
         icon: CreditCard,
         onClick: () => onPay?.(challan.id),
         variant: 'primary',
       })
       actions.push({
-        label: 'Dispute',
+        label: t.actionDispute,
         icon: Scale,
         onClick: () => onDispute?.(challan.id),
       })
       actions.push({
-        label: 'Escalate',
+        label: t.actionEscalate,
         icon: ArrowUpRight,
         onClick: () => onEscalateToCase?.(challan.id),
       })
@@ -274,7 +444,7 @@ export function ChallanList({
 
     if (challan.status === 'resolved' && challan.paymentReference) {
       actions.push({
-        label: 'Receipt',
+        label: t.actionReceipt,
         icon: Download,
         onClick: () => onDownloadReceipt?.(challan.id),
       })
@@ -282,7 +452,7 @@ export function ChallanList({
 
     if (sla.breached && challan.status !== 'resolved') {
       actions.push({
-        label: 'Refund',
+        label: t.actionRefund,
         icon: RotateCcw,
         onClick: () => onRequestRefund?.(challan.id),
         variant: 'danger',
@@ -293,60 +463,8 @@ export function ChallanList({
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
-      <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
-        {/* Page Header */}
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
-            Challans
-          </h1>
-          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-            Track and manage traffic violation challans across your fleet
-          </p>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4">
-            <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-              Total
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.total}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-stone-900 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4">
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-              Pending
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.pending}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-stone-900 border border-emerald-200 dark:border-emerald-900/40 rounded-xl p-4">
-            <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              Resolved
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.resolved}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4">
-            <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-              Exposure
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {formatCurrency(stats.totalExposure)}
-            </p>
-            {stats.breachedCount > 0 && (
-              <p className="mt-1 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3" />
-                {stats.breachedCount} SLA breached
-              </p>
-            )}
-          </div>
-        </div>
-
+    <div className="bg-stone-100 dark:bg-stone-950">
+      <div className="px-4 sm:px-6 lg:px-8">
         {/* Search + Filters */}
         <div className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
@@ -355,7 +473,7 @@ export function ChallanList({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
               <input
                 type="text"
-                placeholder="Search by ID, vehicle, violation, location..."
+                placeholder={t.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
@@ -368,11 +486,11 @@ export function ChallanList({
               className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
                 showFilters || activeFilterCount > 0
                   ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
-                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-600'
+                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
               }`}
             >
               <SlidersHorizontal className="w-4 h-4" />
-              Filters
+              {t.filters}
               {activeFilterCount > 0 && (
                 <span className="ml-1 w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">
                   {activeFilterCount}
@@ -391,10 +509,10 @@ export function ChallanList({
                 }}
                 className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
               >
-                <option value="date-desc">Date (Newest)</option>
-                <option value="date-asc">Date (Oldest)</option>
-                <option value="amount-desc">Amount (High)</option>
-                <option value="amount-asc">Amount (Low)</option>
+                <option value="date-desc">{t.dateNewest}</option>
+                <option value="date-asc">{t.dateOldest}</option>
+                <option value="amount-desc">{t.amountHigh}</option>
+                <option value="amount-asc">{t.amountLow}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
             </div>
@@ -406,7 +524,7 @@ export function ChallanList({
               {/* Status */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-                  Status
+                  {t.status}
                 </label>
                 <div className="relative">
                   <select
@@ -416,12 +534,12 @@ export function ChallanList({
                     }
                     className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                   >
-                    <option value="all">All statuses</option>
-                    <option value="submitted">Submitted</option>
-                    <option value="inProgress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                    <option value="onHold">On Hold</option>
-                    <option value="notSettled">Not Settled</option>
+                    <option value="all">{t.allStatuses}</option>
+                    <option value="submitted">{t.statusSubmitted}</option>
+                    <option value="inProgress">{t.statusInProgress}</option>
+                    <option value="resolved">{t.statusResolved}</option>
+                    <option value="onHold">{t.statusOnHold}</option>
+                    <option value="notSettled">{t.statusNotSettled}</option>
                   </select>
                   <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
                 </div>
@@ -430,7 +548,7 @@ export function ChallanList({
               {/* Vehicle */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-                  Vehicle
+                  {t.vehicle}
                 </label>
                 <div className="relative">
                   <select
@@ -438,7 +556,7 @@ export function ChallanList({
                     onChange={(e) => setVehicleFilter(e.target.value)}
                     className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                   >
-                    <option value="all">All vehicles</option>
+                    <option value="all">{t.allVehicles}</option>
                     {vehicles.map((v) => (
                       <option key={v.id} value={v.id}>
                         {v.registrationNumber}
@@ -456,9 +574,9 @@ export function ChallanList({
                     setStatusFilter('all')
                     setVehicleFilter('all')
                   }}
-                  className="self-end px-3 py-2 text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                  className="self-end px-3 py-2 min-h-11 text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
                 >
-                  Clear all
+                  {t.clearAll}
                 </button>
               )}
             </div>
@@ -467,12 +585,12 @@ export function ChallanList({
           {/* Active Filter Pills */}
           {activeFilterCount > 0 && !showFilters && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-stone-400 dark:text-stone-500">
-                Filtered by:
+              <span className="text-xs text-stone-500 dark:text-stone-400">
+                {t.filteredBy}
               </span>
               {statusFilter !== 'all' && (
                 <FilterPill
-                  label={STATUS_CONFIG[statusFilter].label}
+                  label={t[STATUS_LABEL_KEY[statusFilter]]}
                   onClear={() => setStatusFilter('all')}
                 />
               )}
@@ -489,46 +607,46 @@ export function ChallanList({
           )}
         </div>
 
-        {/* Results Count */}
-        <div className="mb-3 text-xs text-stone-400 dark:text-stone-500">
-          {filtered.length} of {challans.length} challans
-        </div>
-
         {/* ----------------------------------------------------------------- */}
         {/* Desktop Table */}
         {/* ----------------------------------------------------------------- */}
         <div className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
-          <table className="w-full">
+          <table className="w-full table-fixed">
+            <colgroup>
+              <col className="w-[15%]" />
+              <col className="w-[15%]" />
+              <col className="w-[30%]" />
+              <col className="w-[12%]" />
+              <col className="w-[16%]" />
+              <col className="w-[12%]" />
+            </colgroup>
             <thead>
               <tr className="border-b border-stone-100 dark:border-stone-800">
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Incident ID
+                  {t.headerIncidentId}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Vehicle
+                  {t.headerVehicle}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Violation
+                  {t.headerViolation}
                 </th>
                 <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Amount
+                  {t.headerAmount}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Status
-                </th>
-                <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  SLA
+                  {t.headerStatus}
                 </th>
                 <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Actions
+                  {t.headerActions}
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 dark:divide-stone-800/60">
-              {filtered.map((challan) => {
+              {paginatedItems.map((challan) => {
                 const vehicle = resolveVehicle(challan.vehicleId, vehicles)
                 const driver = resolveDriver(challan.driverId, drivers)
-                const sla = getSlaInfo(challan.slaDeadline, challan.status)
+                const sla = getSlaInfo(challan.slaDeadline, challan.status, t)
                 const actions = getRowActions(challan)
 
                 return (
@@ -542,29 +660,29 @@ export function ChallanList({
                       <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
                         {challan.displayId}
                       </p>
-                      <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-                        {formatDate(challan.issueDate)}
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                        {formatDate(challan.issueDate, language)}
                       </p>
                     </td>
 
-                    {/* Vehicle + Driver */}
+                    {/* Vehicle */}
                     <td className="px-5 py-4">
                       <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
                         {vehicle?.registrationNumber || '—'}
                       </p>
-                      {driver && (
-                        <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-                          {driver.name}
-                        </p>
-                      )}
                     </td>
 
                     {/* Violation + Location */}
-                    <td className="px-5 py-4 max-w-[200px]">
-                      <p className="text-sm text-stone-800 dark:text-stone-200 truncate">
-                        {challan.violationType}
-                      </p>
-                      <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5 truncate">
+                    <td className="px-5 py-4">
+                      <div className="group/tip relative">
+                        <p className="text-sm text-stone-800 dark:text-stone-200 truncate">
+                          {challan.violationType}
+                        </p>
+                        <div className="pointer-events-none absolute left-0 bottom-full mb-1.5 z-50 max-w-xs px-2.5 py-1.5 rounded-lg bg-stone-900 dark:bg-stone-100 text-xs text-white dark:text-stone-900 shadow-lg opacity-0 translate-y-1 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 transition-all duration-200 ease-out whitespace-normal">
+                          {challan.violationType}
+                        </div>
+                      </div>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 truncate">
                         {challan.location}
                       </p>
                     </td>
@@ -578,14 +696,7 @@ export function ChallanList({
 
                     {/* Status */}
                     <td className="px-5 py-4">
-                      <StatusBadge status={challan.status} />
-                    </td>
-
-                    {/* SLA */}
-                    <td className="px-5 py-4">
-                      <p className={`text-xs font-medium ${sla.color}`}>
-                        {sla.label}
-                      </p>
+                      <StatusBadge status={challan.status} t={t} />
                     </td>
 
                     {/* Actions */}
@@ -600,7 +711,7 @@ export function ChallanList({
                           onClick={() =>
                             setOpenDropdownId(openDropdownId === challan.id ? null : challan.id)
                           }
-                          className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                          className="p-3.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -616,7 +727,7 @@ export function ChallanList({
                                     action.onClick()
                                     setOpenDropdownId(null)
                                   }}
-                                  className={`w-full flex items-center gap-2.5 px-3.5 py-2 text-sm transition-colors ${
+                                  className={`w-full flex items-center gap-2.5 px-3.5 py-2 min-h-11 text-sm transition-colors ${
                                     action.variant === 'primary'
                                       ? 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
                                       : action.variant === 'danger'
@@ -647,10 +758,10 @@ export function ChallanList({
                 <Search className="w-5 h-5 text-stone-400 dark:text-stone-500" />
               </div>
               <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
-                No challans found
+                {t.noChallansFound}
               </p>
-              <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                Try adjusting your search or filters
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                {t.tryAdjusting}
               </p>
             </div>
           )}
@@ -660,10 +771,10 @@ export function ChallanList({
         {/* Mobile Card View */}
         {/* ----------------------------------------------------------------- */}
         <div className="md:hidden space-y-3">
-          {filtered.map((challan) => {
+          {paginatedItems.map((challan) => {
             const vehicle = resolveVehicle(challan.vehicleId, vehicles)
             const driver = resolveDriver(challan.driverId, drivers)
-            const sla = getSlaInfo(challan.slaDeadline, challan.status)
+            const sla = getSlaInfo(challan.slaDeadline, challan.status, t)
             const actions = getRowActions(challan)
 
             return (
@@ -678,31 +789,31 @@ export function ChallanList({
                     <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
                       {challan.displayId}
                     </p>
-                    <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-                      {formatDate(challan.issueDate)}
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                      {formatDate(challan.issueDate, language)}
                     </p>
                   </div>
-                  <StatusBadge status={challan.status} />
+                  <StatusBadge status={challan.status} t={t} />
                 </div>
 
                 {/* Middle: Details */}
                 <div className="space-y-1.5 mb-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-stone-400 dark:text-stone-500">
-                      Violation
+                    <span className="text-xs text-stone-500 dark:text-stone-400">
+                      {t.labelViolation}
                     </span>
                     <span className="text-sm text-stone-800 dark:text-stone-200 text-right">
                       {challan.violationType}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-stone-400 dark:text-stone-500">
-                      Vehicle
+                    <span className="text-xs text-stone-500 dark:text-stone-400">
+                      {t.labelVehicle}
                     </span>
                     <span className="text-sm font-medium text-stone-800 dark:text-stone-200">
                       {vehicle?.registrationNumber || '—'}
                       {driver && (
-                        <span className="font-normal text-stone-400 dark:text-stone-500">
+                        <span className="font-normal text-stone-500 dark:text-stone-400">
                           {' '}
                           · {driver.name}
                         </span>
@@ -710,8 +821,8 @@ export function ChallanList({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-stone-400 dark:text-stone-500">
-                      Location
+                    <span className="text-xs text-stone-500 dark:text-stone-400">
+                      {t.labelLocation}
                     </span>
                     <span className="text-sm text-stone-600 dark:text-stone-300 text-right">
                       {challan.location}
@@ -739,9 +850,9 @@ export function ChallanList({
                         <button
                           key={action.label}
                           onClick={action.onClick}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                          className={`flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 rounded-lg text-xs font-medium transition-colors ${
                             action.variant === 'primary'
-                              ? 'bg-emerald-600 text-white hover:bg-emerald-500'
+                              ? 'bg-emerald-600 text-white hover:bg-emerald-700'
                               : action.variant === 'danger'
                               ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-950/60'
                               : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
@@ -765,14 +876,52 @@ export function ChallanList({
                 <Search className="w-5 h-5 text-stone-400 dark:text-stone-500" />
               </div>
               <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
-                No challans found
+                {t.noChallansFound}
               </p>
-              <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                Try adjusting your search or filters
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                {t.tryAdjusting}
               </p>
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4 pb-4">
+            <p className="text-xs text-stone-500 dark:text-stone-400">
+              {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} {t.resultsOf} {filtered.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${
+                    page === currentPage
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

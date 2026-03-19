@@ -1,4 +1,16 @@
 import { ArrowLeft, AlertTriangle, FileWarning, ShieldCheck, CreditCard } from 'lucide-react'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    notifications: 'Notifications',
+    unread: 'unread',
+  },
+  hi: {
+    notifications: 'सूचनाएँ',
+    unread: 'अपठित',
+  },
+}
 
 interface Notification {
   id: string
@@ -56,6 +68,8 @@ interface NotificationsViewProps {
 }
 
 export function NotificationsView({ onBack }: NotificationsViewProps) {
+  const { language } = useLanguage()
+  const t = translations[language]
   const unreadCount = ALL_NOTIFICATIONS.filter((n) => !n.read).length
 
   return (
@@ -63,14 +77,14 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={onBack}
-          className="p-2 -ml-2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+          className="p-3 -ml-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-50">Notifications</h1>
+          <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-50">{t.notifications}</h1>
           {unreadCount > 0 && (
-            <p className="text-sm text-stone-500 dark:text-stone-400">{unreadCount} unread</p>
+            <p className="text-sm text-stone-500 dark:text-stone-400">{unreadCount} {t.unread}</p>
           )}
         </div>
       </div>
@@ -93,7 +107,7 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-3 mb-0.5">
                   <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 leading-snug">{notif.title}</p>
-                  <span className="flex-shrink-0 text-xs text-stone-400 dark:text-stone-500 mt-0.5">{notif.time}</span>
+                  <span className="flex-shrink-0 text-xs text-stone-500 dark:text-stone-400 mt-0.5">{notif.time}</span>
                 </div>
                 <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{notif.message}</p>
               </div>

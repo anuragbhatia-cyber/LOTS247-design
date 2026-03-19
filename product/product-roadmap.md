@@ -22,3 +22,9 @@ Vehicle overview, driver profiles, document storage, and audit-ready reporting.
 
 ### 7. Reports
 Fleet analytics, compliance trends, incident summaries, and challan reports with exportable data views.
+
+### 8. API Catalogue
+Browse available APIs, explore endpoints, and submit requests to the team for new APIs needed in the system.
+
+### 9. Wallet
+Credit and debit payment ledger used for challan settlements, subscription payments, and transaction history.

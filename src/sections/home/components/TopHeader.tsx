@@ -10,6 +10,26 @@ import {
   CreditCard,
 } from 'lucide-react'
 import type { Subscriber, Subscription } from '@/../product/sections/home/types'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+
+const headerTranslations: Record<Language, Record<string, string>> = {
+  en: {
+    notifications: 'Notifications',
+    new: 'new',
+    viewAllNotifications: 'View all notifications',
+    myProfile: 'My Profile',
+    plan: 'Plan',
+    logout: 'Logout',
+  },
+  hi: {
+    notifications: 'सूचनाएँ',
+    new: 'नई',
+    viewAllNotifications: 'सभी सूचनाएँ देखें',
+    myProfile: 'मेरी प्रोफ़ाइल',
+    plan: 'प्लान',
+    logout: 'लॉगआउट',
+  },
+}
 
 interface Notification {
   id: string
@@ -89,6 +109,8 @@ export function TopHeader({
   onLogout,
   onViewAllNotifications,
 }: TopHeaderProps) {
+  const { language } = useLanguage()
+  const t = headerTranslations[language]
   const [notifOpen, setNotifOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const notifRef = useRef<HTMLDivElement>(null)
@@ -124,7 +146,7 @@ export function TopHeader({
               setNotifOpen(!notifOpen)
               setProfileOpen(false)
             }}
-            className="relative p-1.5 sm:p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="relative p-3.5 sm:p-3 rounded-lg text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
             {unreadCount > 0 && (
@@ -137,11 +159,11 @@ export function TopHeader({
             <div className="absolute right-0 top-full mt-2 w-96 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden">
               <div className="px-5 py-3.5 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">
-                  Notifications
+                  {t.notifications}
                 </h3>
                 {unreadCount > 0 && (
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
-                    {unreadCount} new
+                    {unreadCount} {t.new}
                   </span>
                 )}
               </div>
@@ -166,7 +188,7 @@ export function TopHeader({
                           <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 leading-snug">
                             {notif.title}
                           </p>
-                          <span className="flex-shrink-0 text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+                          <span className="flex-shrink-0 text-xs text-stone-500 dark:text-stone-400 mt-0.5">
                             {notif.time}
                           </span>
                         </div>
@@ -188,9 +210,9 @@ export function TopHeader({
                     setNotifOpen(false)
                     onViewAllNotifications?.()
                   }}
-                  className="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                  className="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors min-h-11 inline-flex items-center"
                 >
-                  View all notifications →
+                  {t.viewAllNotifications} →
                 </button>
               </div>
             </div>
@@ -204,7 +226,7 @@ export function TopHeader({
               setProfileOpen(!profileOpen)
               setNotifOpen(false)
             }}
-            className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 sm:py-1.5 min-h-11 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
               <span className="text-xs font-bold text-white">{subscriber.avatarInitials}</span>
@@ -226,7 +248,7 @@ export function TopHeader({
                   {subscriber.name}
                 </p>
                 <span className="inline-flex items-center mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
-                  {subscription.planName} Plan
+                  {subscription.planName} {t.plan}
                 </span>
               </div>
 
@@ -237,10 +259,10 @@ export function TopHeader({
                     setProfileOpen(false)
                     onViewProfile?.()
                   }}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                 >
                   <User className="w-4 h-4 text-stone-400" />
-                  My Profile
+                  {t.myProfile}
                 </button>
 
                 <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
@@ -250,10 +272,10 @@ export function TopHeader({
                     setProfileOpen(false)
                     onLogout?.()
                   }}
-                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
-                  Logout
+                  {t.logout}
                 </button>
               </div>
             </div>

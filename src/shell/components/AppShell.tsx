@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard } from 'lucide-react'
+import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle } from 'lucide-react'
 import { MainNav } from './MainNav'
+import { useLanguage, type Language } from './LanguageContext'
 import { NotificationsView } from '@/sections/home/components/NotificationsView'
 import { AddVehicleModal } from '@/sections/vehicle-and-driver-management/components/AddVehicleModal'
 import { AddDriverModal } from '@/sections/vehicle-and-driver-management/components/AddDriverModal'
+import { CheckChallanModal } from '@/sections/home/components/CheckChallanModal'
+import { AddIncidentModal } from '@/sections/home/components/AddIncidentModal'
+import { ChallanResultsView } from '@/sections/home/components/ChallanResultsView'
 
 interface Notification {
   id: string
@@ -54,6 +58,56 @@ const NOTIF_CONFIG: Record<string, { icon: typeof AlertTriangle; style: string }
   challan: { icon: FileWarning, style: 'text-amber-500 bg-amber-50 dark:bg-amber-950/50' },
   compliance: { icon: ShieldCheck, style: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-950/50' },
   subscription: { icon: CreditCard, style: 'text-blue-500 bg-blue-50 dark:bg-blue-950/50' },
+}
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    quickActions: 'Quick Actions',
+    addIncident: 'Add Incident',
+    addIncidentDesc: 'Report an accident or legal issue',
+    addVehicle: 'Add Vehicle',
+    addVehicleDesc: 'Register a new vehicle to your fleet',
+    callLawyer: 'Call a Lawyer',
+    callLawyerDesc: '24/7 on-call legal support',
+    addDriver: 'Add Driver',
+    addDriverDesc: 'Add a driver and assign to a vehicle',
+    notifications: 'Notifications',
+    new: 'new',
+    viewAll: 'View all notifications →',
+    myProfile: 'My Profile',
+    plan: 'Plan',
+    logout: 'Logout',
+    collapse: 'Collapse',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+  },
+  hi: {
+    quickActions: 'त्वरित कार्य',
+    addIncident: 'घटना जोड़ें',
+    addIncidentDesc: 'दुर्घटना या कानूनी मुद्दे की रिपोर्ट करें',
+    addVehicle: 'वाहन जोड़ें',
+    addVehicleDesc: 'अपने बेड़े में नया वाहन पंजीकृत करें',
+    callLawyer: 'वकील से बात करें',
+    callLawyerDesc: '24/7 कानूनी सहायता उपलब्ध',
+    addDriver: 'ड्राइवर जोड़ें',
+    addDriverDesc: 'ड्राइवर जोड़ें और वाहन सौंपें',
+    notifications: 'सूचनाएँ',
+    new: 'नई',
+    viewAll: 'सभी सूचनाएँ देखें →',
+    myProfile: 'मेरी प्रोफ़ाइल',
+    plan: 'प्लान',
+    logout: 'लॉग आउट',
+    collapse: 'संक्षिप्त करें',
+    openMenu: 'मेनू खोलें',
+    closeMenu: 'मेनू बंद करें',
+  },
+}
+
+const QUICK_ACTION_KEYS: Record<string, { label: string; description: string }> = {
+  incident: { label: 'addIncident', description: 'addIncidentDesc' },
+  vehicle: { label: 'addVehicle', description: 'addVehicleDesc' },
+  lawyer: { label: 'callLawyer', description: 'callLawyerDesc' },
+  driver: { label: 'addDriver', description: 'addDriverDesc' },
 }
 
 export interface NavigationItem {
@@ -125,17 +179,24 @@ export function AppShell({
   onNavigate,
   onLogout,
 }: AppShellProps) {
+  const { language, setLanguage } = useLanguage()
+  const t = translations[language]
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [quickActionsOpen, setQuickActionsOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [langOpen, setLangOpen] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [showAddVehicle, setShowAddVehicle] = useState(false)
   const [showAddDriver, setShowAddDriver] = useState(false)
+  const [showCheckChallan, setShowCheckChallan] = useState(false)
+  const [showAddIncident, setShowAddIncident] = useState(false)
+  const [challanResultsVehicle, setChallanResultsVehicle] = useState<string | null>(null)
   const quickActionsRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
+  const langRef = useRef<HTMLDivElement>(null)
 
   const unreadCount = DUMMY_NOTIFICATIONS.filter((n) => !n.read).length
 
@@ -149,6 +210,9 @@ export function AppShell({
       }
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
         setNotifOpen(false)
+      }
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -164,6 +228,15 @@ export function AppShell({
       if (event.data?.type === 'openAddDriver') {
         setShowAddDriver(true)
       }
+      if (event.data?.type === 'openCheckChallan') {
+        setShowCheckChallan(true)
+      }
+      if (event.data?.type === 'openAddIncident') {
+        setShowAddIncident(true)
+      }
+      if (event.data?.type === 'openChallanResults' && event.data?.vehicleNumber) {
+        setChallanResultsVehicle(event.data.vehicleNumber)
+      }
     }
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
@@ -172,17 +245,27 @@ export function AppShell({
   return (
     <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-stone-900 border-b border-stone-800 flex items-center px-4">
-        <button
-          onClick={() => setIsMobileOpen(true)}
-          className="p-2 -ml-2 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-        <div className="ml-3">
-          <img src="/lots247-logo-white.png" alt="LOTS247" className="h-10 w-auto object-contain" />
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-stone-900 border-b border-stone-800 flex items-center justify-between px-4">
+        <div className="flex items-center">
+          <button
+            onClick={() => setIsMobileOpen(true)}
+            className="p-3 -ml-3 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors"
+            aria-label={t.openMenu}
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="ml-3">
+            <img src="/lots247-logo-white.png" alt="LOTS247" className="h-10 w-auto object-contain" />
+          </div>
         </div>
+        {/* Mobile Language Switcher */}
+        <button
+          onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-xs font-medium"
+        >
+          <Languages className="w-4 h-4" />
+          <span>{language === 'en' ? 'हिन्दी' : 'EN'}</span>
+        </button>
       </header>
 
       {/* Mobile Overlay */}
@@ -217,8 +300,8 @@ export function AppShell({
           {/* Mobile Close */}
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="lg:hidden p-1.5 text-stone-500 hover:text-stone-200 hover:bg-stone-800 rounded-lg transition-colors"
-            aria-label="Close menu"
+            className="lg:hidden p-3.5 text-stone-500 hover:text-stone-200 hover:bg-stone-800 rounded-lg transition-colors"
+            aria-label={t.closeMenu}
           >
             <X className="w-4 h-4" />
           </button>
@@ -227,68 +310,6 @@ export function AppShell({
         {/* Navigation */}
         <div className="flex flex-col h-[calc(100%-4rem)]">
           <div className="flex-1 overflow-y-auto py-5">
-
-            {/* Quick Actions Button */}
-            <div ref={quickActionsRef} className="relative px-3 mb-5">
-              <button
-                onClick={() => setQuickActionsOpen(!quickActionsOpen)}
-                className={`
-                  w-full flex items-center gap-2.5 px-3 py-2 rounded-lg
-                  bg-stone-800 hover:bg-stone-700/80 border border-stone-700/50
-                  text-stone-300 font-medium text-sm
-                  transition-all duration-150
-                  ${isCollapsed ? 'justify-center px-2' : ''}
-                `}
-                title={isCollapsed ? 'Quick Actions' : undefined}
-              >
-                <Plus className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${quickActionsOpen ? 'rotate-45' : ''}`} />
-                {!isCollapsed && <span>Quick Actions</span>}
-              </button>
-
-              {/* Flyout Panel */}
-              {quickActionsOpen && (
-                <div
-                  className={`
-                    fixed top-14 z-[200] w-64
-                    bg-stone-900 border border-stone-700 rounded-xl
-                    shadow-2xl shadow-black/40 overflow-hidden
-                    ${isCollapsed ? 'left-[4.5rem]' : 'left-[15.5rem]'}
-                  `}
-                >
-                  <div className="px-4 py-3 border-b border-stone-700">
-                    <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest">Quick Actions</p>
-                  </div>
-                  <div className="p-2">
-                    {QUICK_ACTIONS.map((action) => {
-                      const Icon = action.icon
-                      return (
-                        <button
-                          key={action.id}
-                          onClick={() => {
-                            setQuickActionsOpen(false)
-                            if (action.id === 'vehicle') setShowAddVehicle(true)
-                            if (action.id === 'driver') setShowAddDriver(true)
-                          }}
-                          className={`
-                            w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                            text-left transition-colors duration-150
-                            ${action.hoverBg}
-                          `}
-                        >
-                          <div className={`p-1.5 rounded-lg flex-shrink-0 ${action.bg}`}>
-                            <Icon className={`w-3.5 h-3.5 ${action.color}`} />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-stone-100 leading-snug">{action.label}</p>
-                            <p className="text-xs text-stone-400 leading-snug mt-0.5">{action.description}</p>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
 
             <MainNav
               items={navigationItems}
@@ -333,7 +354,7 @@ export function AppShell({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
               </svg>
-              {!isCollapsed && <span>Collapse</span>}
+              {!isCollapsed && <span>{t.collapse}</span>}
             </button>
           </div>
 
@@ -353,6 +374,14 @@ export function AppShell({
           className="hidden lg:flex fixed top-0 right-0 h-16 border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 z-40 items-center justify-end px-6 gap-4"
           style={{ left: isCollapsed ? '4rem' : '15rem' }}
         >
+          {/* Help */}
+          <button
+            className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium"
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span className="text-xs">{language === 'en' ? 'Help' : 'सहायता'}</span>
+          </button>
+
           {/* Notification Bell */}
           <div ref={notifRef} className="relative">
             <button
@@ -360,7 +389,7 @@ export function AppShell({
                 setNotifOpen(!notifOpen)
                 setProfileOpen(false)
               }}
-              className="relative p-2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+              className="relative p-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -372,10 +401,10 @@ export function AppShell({
             {notifOpen && (
               <div className="absolute right-0 top-full mt-2 w-96 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden">
                 <div className="px-5 py-3.5 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">Notifications</h3>
+                  <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">{t.notifications}</h3>
                   {unreadCount > 0 && (
                     <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
-                      {unreadCount} new
+                      {unreadCount} {t.new}
                     </span>
                   )}
                 </div>
@@ -397,7 +426,7 @@ export function AppShell({
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-3 mb-0.5">
                             <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 leading-snug">{notif.title}</p>
-                            <span className="flex-shrink-0 text-xs text-stone-400 dark:text-stone-500 mt-0.5">{notif.time}</span>
+                            <span className="flex-shrink-0 text-xs text-stone-500 dark:text-stone-400 mt-0.5">{notif.time}</span>
                           </div>
                           <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">{notif.message}</p>
                         </div>
@@ -416,8 +445,43 @@ export function AppShell({
                     }}
                     className="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
                   >
-                    View all notifications →
+                    {t.viewAll}
                   </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Language Switcher */}
+          <div ref={langRef} className="relative">
+            <button
+              onClick={() => {
+                setLangOpen(!langOpen)
+                setNotifOpen(false)
+                setProfileOpen(false)
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium"
+            >
+              <Languages className="w-4 h-4" />
+              <span className="text-xs">{language === 'en' ? 'EN' : 'हि'}</span>
+            </button>
+
+            {langOpen && (
+              <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden">
+                <div className="py-1">
+                  {([['en', 'English'], ['hi', 'हिन्दी']] as const).map(([code, label]) => (
+                    <button
+                      key={code}
+                      onClick={() => {
+                        setLanguage(code)
+                        setLangOpen(false)
+                      }}
+                      className="w-full flex items-center justify-between px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <span className={language === code ? 'font-semibold' : ''}>{label}</span>
+                      {language === code && <Check className="w-4 h-4 text-emerald-500" />}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -433,7 +497,7 @@ export function AppShell({
                   setProfileOpen(!profileOpen)
                   setNotifOpen(false)
                 }}
-                className="flex items-center gap-3 pl-1 pr-2 py-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="flex items-center gap-3 pl-1 pr-2 py-1.5 min-h-11 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.name} className="w-9 h-9 rounded-full object-cover" />
@@ -455,17 +519,17 @@ export function AppShell({
                     <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 truncate">{user.name}</p>
                     {user.plan && (
                       <span className="inline-flex items-center mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
-                        {user.plan} Plan
+                        {user.plan} {t.plan}
                       </span>
                     )}
                   </div>
                   <div className="py-1">
                     <button
                       onClick={() => setProfileOpen(false)}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                     >
                       <User className="w-4 h-4 text-stone-400" />
-                      My Profile
+                      {t.myProfile}
                     </button>
                     <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
                     <button
@@ -473,10 +537,10 @@ export function AppShell({
                         setProfileOpen(false)
                         onLogout?.()
                       }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
-                      Logout
+                      {t.logout}
                     </button>
                   </div>
                 </div>
@@ -487,6 +551,11 @@ export function AppShell({
         <div className="min-h-screen">
           {showNotifications ? (
             <NotificationsView onBack={() => setShowNotifications(false)} />
+          ) : challanResultsVehicle ? (
+            <ChallanResultsView
+              vehicleNumber={challanResultsVehicle}
+              onBack={() => setChallanResultsVehicle(null)}
+            />
           ) : (
             children
           )}
@@ -503,6 +572,19 @@ export function AppShell({
       <AddDriverModal
         isOpen={showAddDriver}
         onClose={() => setShowAddDriver(false)}
+      />
+
+      {/* Check Challan Modal */}
+      <CheckChallanModal
+        isOpen={showCheckChallan}
+        onClose={() => setShowCheckChallan(false)}
+        onShowResults={(vn) => setChallanResultsVehicle(vn)}
+      />
+
+      {/* Add Incident Modal */}
+      <AddIncidentModal
+        isOpen={showAddIncident}
+        onClose={() => setShowAddIncident(false)}
       />
     </div>
   )

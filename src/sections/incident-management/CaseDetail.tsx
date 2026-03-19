@@ -3,10 +3,14 @@ import { CaseDetail } from './components/CaseDetail'
 
 const BASE = '/sections/incident-management/screen-designs'
 
-function navigateToScreen(screenName: string) {
+function navigateToScreen(screenName: string, extraParams?: Record<string, string>) {
   const params = new URLSearchParams(window.location.search)
-  const embed = params.get('embed') === 'true' ? '?embed=true' : ''
-  window.location.href = `${BASE}/${screenName}/fullscreen${embed}`
+  const embed = params.get('embed') === 'true' ? 'embed=true' : ''
+  const extra = extraParams
+    ? Object.entries(extraParams).map(([k, v]) => `${k}=${v}`).join('&')
+    : ''
+  const qs = [embed, extra].filter(Boolean).join('&')
+  window.location.href = `${BASE}/${screenName}/fullscreen${qs ? `?${qs}` : ''}`
 }
 
 export default function CaseDetailPreview() {
@@ -34,7 +38,7 @@ export default function CaseDetailPreview() {
   )
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <CaseDetail
         caseData={caseItem}
         vehicle={vehicle}
@@ -46,7 +50,7 @@ export default function CaseDetailPreview() {
         comments={comments}
         onUploadDocument={(file) => console.log('Upload document:', file.name)}
         onAddComment={(msg) => console.log('Add comment:', msg)}
-        onBack={() => navigateToScreen('CaseList')}
+        onBack={() => navigateToScreen('IncidentManagement', { tab: 'cases' })}
       />
     </div>
   )

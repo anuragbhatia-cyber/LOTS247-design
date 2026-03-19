@@ -195,7 +195,7 @@ export function RegistrationStep({
       </div>
 
       {/* Right Panel - Form */}
-      <div className="flex-1 overflow-y-auto bg-stone-50 dark:bg-stone-950">
+      <div className="flex-1 overflow-y-auto bg-stone-100 dark:bg-stone-950">
         <div className="min-h-full flex items-start lg:items-center justify-center px-6 py-10 lg:py-12">
           <div className="w-full max-w-md">
             {/* Mobile Logo */}

@@ -3,24 +3,51 @@ import {
   Home,
   ShieldCheck,
   AlertTriangle,
-  FileWarning,
   Truck,
   Settings,
   HelpCircle,
-  Briefcase,
   BarChart3,
+  BookOpen,
+  Wallet,
 } from 'lucide-react'
 import { AppShell } from './components/AppShell'
+import { LanguageProvider, useLanguage, type Language } from './components/LanguageContext'
 import { getAllPreviewItems } from '@/lib/preview-helpers'
+
+const navTranslations: Record<Language, Record<string, string>> = {
+  en: {
+    home: 'Home',
+    compliance: 'Compliance',
+    incidents: 'Incidents',
+    vehiclesDrivers: 'Vehicles & Drivers',
+    reports: 'Reports',
+    apiCatalogue: 'API Catalogue',
+    wallet: 'Wallet',
+    settings: 'Settings',
+    help: 'Help',
+  },
+  hi: {
+    home: 'होम',
+    compliance: 'अनुपालन',
+    incidents: 'घटनाएँ',
+    vehiclesDrivers: 'वाहन और ड्राइवर',
+    reports: 'रिपोर्ट',
+    apiCatalogue: 'API कैटलॉग',
+    wallet: 'वॉलेट',
+    settings: 'सेटिंग्स',
+    help: 'सहायता',
+  },
+}
 
 // Map from nav href to section screen design
 // Format: sectionId:ScreenDesignName (matches the preview-helpers pattern)
 const hrefToScreen: Record<string, { sectionId: string; screenName?: string }> = {
   '/': { sectionId: 'home' },
   '/compliance': { sectionId: 'compliance-dashboard' },
-  '/incidents/challans': { sectionId: 'incident-management', screenName: 'ChallanList' },
-  '/incidents/cases': { sectionId: 'incident-management', screenName: 'CaseList' },
+  '/incidents': { sectionId: 'incident-management', screenName: 'IncidentManagement' },
   '/fleet': { sectionId: 'vehicle-and-driver-management', screenName: 'VehicleList' },
+  '/api-catalogue': { sectionId: 'api-catalogue' },
+  '/wallet': { sectionId: 'wallet' },
 }
 
 // Build lookup from all preview items
@@ -48,7 +75,9 @@ function getScreenUrl(href: string): string | null {
   return item?.iframeSrc || null
 }
 
-export default function ShellPreview() {
+function ShellContent() {
+  const { language } = useLanguage()
+  const t = navTranslations[language]
   const [activePath, setActivePath] = useState('/')
   const [extraParams, setExtraParams] = useState<Record<string, string>>({})
 
@@ -72,37 +101,17 @@ export default function ShellPreview() {
   }, [])
 
   const navigationItems = [
-    { label: 'Home', href: '/', icon: <Home className="w-5 h-5" />, isActive: activePath === '/' },
-    { label: 'Compliance', href: '/compliance', icon: <ShieldCheck className="w-5 h-5" />, isActive: activePath === '/compliance' },
-    {
-      label: 'Incidents',
-      href: '/incidents',
-      icon: <AlertTriangle className="w-5 h-5" />,
-      isActive: activePath.startsWith('/incidents'),
-      children: [
-        {
-          label: 'Challans',
-          href: '/incidents/challans',
-          icon: <FileWarning className="w-4 h-4" />,
-          isActive: activePath === '/incidents/challans',
-          badge: 5,
-        },
-        {
-          label: 'Cases',
-          href: '/incidents/cases',
-          icon: <Briefcase className="w-4 h-4" />,
-          isActive: activePath === '/incidents/cases',
-          badge: 3,
-        },
-      ],
-    },
-    { label: 'Vehicles & Drivers', href: '/fleet', icon: <Truck className="w-5 h-5" />, isActive: activePath === '/fleet' },
-    { label: 'Reports', href: '/reports', icon: <BarChart3 className="w-5 h-5" />, isActive: activePath === '/reports' },
+    { label: t.home, href: '/', icon: <Home className="w-5 h-5" />, isActive: activePath === '/' },
+    { label: t.compliance, href: '/compliance', icon: <ShieldCheck className="w-5 h-5" />, isActive: activePath === '/compliance' },
+    { label: t.incidents, href: '/incidents', icon: <AlertTriangle className="w-5 h-5" />, isActive: activePath === '/incidents' },
+    { label: t.vehiclesDrivers, href: '/fleet', icon: <Truck className="w-5 h-5" />, isActive: activePath === '/fleet' },
+    { label: t.reports, href: '/reports', icon: <BarChart3 className="w-5 h-5" />, isActive: activePath === '/reports' },
+    { label: t.apiCatalogue, href: '/api-catalogue', icon: <BookOpen className="w-5 h-5" />, isActive: activePath === '/api-catalogue' },
+    { label: t.wallet, href: '/wallet', icon: <Wallet className="w-5 h-5" />, isActive: activePath === '/wallet' },
   ]
 
   const secondaryItems = [
-    { label: 'Settings', href: '/settings', icon: <Settings className="w-5 h-5" />, isActive: activePath === '/settings' },
-    { label: 'Help', href: '/help', icon: <HelpCircle className="w-5 h-5" />, isActive: activePath === '/help' },
+    { label: t.settings, href: '/settings', icon: <Settings className="w-5 h-5" />, isActive: activePath === '/settings' },
   ]
 
   const user = {
@@ -131,8 +140,8 @@ export default function ShellPreview() {
     >
       {screenUrl ? (
         <iframe
-          key={`${screenUrl}-${JSON.stringify(extraParams)}`}
-          src={`${screenUrl}?embed=true${Object.entries(extraParams).map(([k, v]) => `&${k}=${v}`).join('')}`}
+          key={`${screenUrl}-${language}-${JSON.stringify(extraParams)}`}
+          src={`${screenUrl}?embed=true&lang=${language}${Object.entries(extraParams).map(([k, v]) => `&${k}=${v}`).join('')}`}
           className="w-full h-full border-0 min-h-screen"
           title="Section preview"
         />
@@ -140,5 +149,13 @@ export default function ShellPreview() {
         <div />
       )}
     </AppShell>
+  )
+}
+
+export default function ShellPreview() {
+  return (
+    <LanguageProvider>
+      <ShellContent />
+    </LanguageProvider>
   )
 }

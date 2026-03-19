@@ -1,6 +1,40 @@
 import type { ElementType } from 'react'
 import { AlertTriangle, PlusCircle, Phone, UserPlus, LockKeyhole, ArrowRight } from 'lucide-react'
 import type { Subscription } from '@/../product/sections/home/types'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+
+const qaTranslations: Record<Language, Record<string, string>> = {
+  en: {
+    addIncident: 'Add Incident',
+    addIncidentDesc: 'Report an accident, seizure, or legal issue',
+    addVehicle: 'Add Vehicle',
+    addVehicleDesc: 'Register a new vehicle to your fleet',
+    callLawyer: 'Call a Lawyer',
+    callLawyerDesc: '24/7 on-call legal support nationwide',
+    addDriver: 'Add Driver',
+    addDriverDesc: 'Add a driver and assign to a vehicle',
+    vehicleLimitReached: 'Vehicle limit reached — upgrade your plan',
+    legalNotIncluded: 'Legal support not included — upgrade plan',
+    getHelpNow: 'Get help now',
+    upgradePlan: 'Upgrade plan',
+    open: 'Open',
+  },
+  hi: {
+    addIncident: 'घटना जोड़ें',
+    addIncidentDesc: 'दुर्घटना, ज़ब्ती, या कानूनी मुद्दे की रिपोर्ट करें',
+    addVehicle: 'वाहन जोड़ें',
+    addVehicleDesc: 'अपने बेड़े में नया वाहन पंजीकृत करें',
+    callLawyer: 'वकील से बात करें',
+    callLawyerDesc: '24/7 देशभर में कानूनी सहायता',
+    addDriver: 'ड्राइवर जोड़ें',
+    addDriverDesc: 'ड्राइवर जोड़ें और वाहन सौंपें',
+    vehicleLimitReached: 'वाहन सीमा पूरी — प्लान अपग्रेड करें',
+    legalNotIncluded: 'कानूनी सहायता शामिल नहीं — प्लान अपग्रेड करें',
+    getHelpNow: 'अभी सहायता लें',
+    upgradePlan: 'प्लान अपग्रेड करें',
+    open: 'खोलें',
+  },
+}
 
 interface QuickActionsProps {
   subscription: Subscription
@@ -30,13 +64,15 @@ export function QuickActions({
   onCallLawyer,
   onAddDriver,
 }: QuickActionsProps) {
+  const { language } = useLanguage()
+  const t = qaTranslations[language]
   const legalRestricted = !subscription.includedLegalSupport
 
   const actions: ActionConfig[] = [
     {
       id: 'incident',
-      label: 'Add Incident',
-      description: 'Report an accident, seizure, or legal issue',
+      label: t.addIncident,
+      description: t.addIncidentDesc,
       icon: AlertTriangle,
       onClick: onAddIncident,
       priority: 'high',
@@ -45,28 +81,28 @@ export function QuickActions({
     },
     {
       id: 'vehicle',
-      label: 'Add Vehicle',
-      description: 'Register a new vehicle to your fleet',
+      label: t.addVehicle,
+      description: t.addVehicleDesc,
       icon: PlusCircle,
       onClick: onAddVehicle,
       priority: 'normal',
       restricted: vehicleLimitReached,
-      restrictedMessage: 'Vehicle limit reached — upgrade your plan',
+      restrictedMessage: t.vehicleLimitReached,
     },
     {
       id: 'lawyer',
-      label: 'Call a Lawyer',
-      description: '24/7 on-call legal support nationwide',
+      label: t.callLawyer,
+      description: t.callLawyerDesc,
       icon: Phone,
       onClick: onCallLawyer,
       priority: 'normal',
       restricted: legalRestricted,
-      restrictedMessage: 'Legal support not included — upgrade plan',
+      restrictedMessage: t.legalNotIncluded,
     },
     {
       id: 'driver',
-      label: 'Add Driver',
-      description: 'Add a driver and assign to a vehicle',
+      label: t.addDriver,
+      description: t.addDriverDesc,
       icon: UserPlus,
       onClick: onAddDriver,
       priority: 'normal',
@@ -90,7 +126,7 @@ export function QuickActions({
               className="
                 group relative flex flex-col items-start p-3 sm:p-4 lg:p-5 rounded-xl
                 bg-red-600 dark:bg-red-700 border border-red-600 dark:border-red-700
-                hover:bg-red-700 dark:hover:bg-red-600
+                hover:bg-red-700 dark:hover:bg-red-800
                 hover:shadow-lg hover:shadow-red-200 dark:hover:shadow-red-950/50
                 transition-all duration-200 text-left
               "
@@ -101,7 +137,7 @@ export function QuickActions({
               <p className="text-xs sm:text-sm font-semibold text-white mb-1">{action.label}</p>
               <p className="text-xs text-red-200 leading-relaxed flex-1">{action.description}</p>
               <div className="mt-2 sm:mt-4 flex items-center gap-1 text-xs font-semibold text-red-200 group-hover:text-white transition-colors duration-150">
-                <span>Get help now</span>
+                <span>{t.getHelpNow}</span>
                 <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-150" />
               </div>
             </button>
@@ -127,7 +163,7 @@ export function QuickActions({
                 {action.restrictedMessage}
               </p>
               <div className="mt-2 sm:mt-4 text-xs font-semibold text-emerald-600 dark:text-emerald-400 underline underline-offset-2 cursor-pointer hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-                Upgrade plan
+                {t.upgradePlan}
               </div>
             </div>
           )
@@ -151,8 +187,8 @@ export function QuickActions({
             </div>
             <p className="text-xs sm:text-sm font-semibold text-stone-900 dark:text-stone-50 mb-1">{action.label}</p>
             <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed flex-1">{action.description}</p>
-            <div className="mt-2 sm:mt-4 flex items-center gap-0.5 text-xs font-medium text-stone-400 dark:text-stone-500 group-hover:text-stone-700 dark:group-hover:text-stone-300 transition-colors duration-150">
-              <span>Open</span>
+            <div className="mt-2 sm:mt-4 flex items-center gap-0.5 text-xs font-medium text-stone-500 dark:text-stone-400 group-hover:text-stone-700 dark:group-hover:text-stone-300 transition-colors duration-150">
+              <span>{t.open}</span>
               <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-150" />
             </div>
           </button>

@@ -67,7 +67,7 @@ export function PlanSelectionStep({
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950 flex flex-col">
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex flex-col">
 
       {/* Top Navigation Header */}
       <header className="sticky top-0 z-50 w-full bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-10 py-3">

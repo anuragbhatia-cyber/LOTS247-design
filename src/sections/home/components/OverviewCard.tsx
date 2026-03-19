@@ -1,4 +1,10 @@
 import { Truck, Users, FileWarning, ShieldAlert, CreditCard, ChevronRight } from 'lucide-react'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+
+const cardTranslations: Record<Language, Record<string, string>> = {
+  en: { viewDetails: 'View details' },
+  hi: { viewDetails: 'विवरण देखें' },
+}
 
 const iconMap = {
   truck: Truck,
@@ -29,7 +35,7 @@ const variantConfig: Record<OverviewCardVariant, {
   badgeText: string
 }> = {
   default: {
-    border: 'border-stone-200 dark:border-stone-800 hover:border-emerald-300 dark:hover:border-emerald-700',
+    border: 'border-transparent',
     accent: 'bg-emerald-500',
     iconBg: 'bg-emerald-50 dark:bg-emerald-950/50',
     iconColor: 'text-emerald-600 dark:text-emerald-400',
@@ -37,7 +43,7 @@ const variantConfig: Record<OverviewCardVariant, {
     badgeText: 'text-emerald-700 dark:text-emerald-400',
   },
   warning: {
-    border: 'border-amber-200 dark:border-amber-900/50 hover:border-amber-400 dark:hover:border-amber-700',
+    border: 'border-transparent',
     accent: 'bg-amber-500',
     iconBg: 'bg-amber-50 dark:bg-amber-950/50',
     iconColor: 'text-amber-600 dark:text-amber-400',
@@ -45,7 +51,7 @@ const variantConfig: Record<OverviewCardVariant, {
     badgeText: 'text-amber-700 dark:text-amber-400',
   },
   danger: {
-    border: 'border-red-200 dark:border-red-900/50 hover:border-red-400 dark:hover:border-red-700',
+    border: 'border-transparent',
     accent: 'bg-red-500',
     iconBg: 'bg-red-50 dark:bg-red-950/50',
     iconColor: 'text-red-600 dark:text-red-400',
@@ -63,6 +69,8 @@ export function OverviewCard({
   variant = 'default',
   badge,
 }: OverviewCardProps) {
+  const { language } = useLanguage()
+  const ct = cardTranslations[language]
   const Icon = iconMap[icon]
   const styles = variantConfig[variant]
   const isClickable = !!onClick
@@ -73,6 +81,7 @@ export function OverviewCard({
       disabled={!isClickable}
       className={`
         group relative w-full text-left rounded-xl border bg-white dark:bg-stone-900
+        shadow-sm dark:shadow-stone-950/20
         transition-all duration-200 overflow-hidden
         ${styles.border}
         ${isClickable
@@ -81,8 +90,7 @@ export function OverviewCard({
         }
       `}
     >
-      {/* Top accent bar */}
-      <div className={`absolute top-0 left-0 right-0 h-1 ${styles.accent} opacity-60`} />
+{/* accent bar removed */}
 
       <div className="p-4 sm:p-5 lg:p-6">
         {/* Badge */}
@@ -111,8 +119,8 @@ export function OverviewCard({
 
         {/* View details link */}
         {isClickable && (
-          <div className="flex items-center gap-0.5 text-xs font-medium text-stone-400 dark:text-stone-500 group-hover:text-stone-700 dark:group-hover:text-stone-300 transition-colors duration-150">
-            <span>View details</span>
+          <div className="flex items-center gap-0.5 text-xs font-medium text-stone-500 dark:text-stone-400 group-hover:text-stone-700 dark:group-hover:text-stone-300 transition-colors duration-150">
+            <span>{ct.viewDetails}</span>
             <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
           </div>
         )}

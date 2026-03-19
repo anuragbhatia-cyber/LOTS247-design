@@ -15,7 +15,7 @@ function navigateToScreen(screenName: string, extraParams?: Record<string, strin
 
 export default function ChallanListPreview() {
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <ChallanList
         challans={data.challans}
         vehicles={data.vehicles}

@@ -89,7 +89,7 @@ export function DriverAdditionStep({
       </div>
 
       {/* Right Panel - Form */}
-      <div className="flex-1 flex items-center justify-center bg-stone-50 dark:bg-stone-950 px-6 py-12 lg:py-0">
+      <div className="flex-1 flex items-center justify-center bg-stone-100 dark:bg-stone-950 px-6 py-12 lg:py-0">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden mb-10 flex justify-center">

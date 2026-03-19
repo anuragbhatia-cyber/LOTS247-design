@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Search,
   SlidersHorizontal,
@@ -19,6 +19,8 @@ import {
   FileWarning,
   Gavel,
   ArrowUpRight,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import type {
   CaseListProps,
@@ -29,6 +31,183 @@ import type {
   Driver,
   Lawyer,
 } from '@/../product/sections/incident-management/types'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+
+// ---------------------------------------------------------------------------
+// Translations
+// ---------------------------------------------------------------------------
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    // Page header
+    cases: 'Cases',
+    casesSubtitle: 'Legal matters, disputes, and incident resolutions',
+    createCase: 'Create Case',
+
+    // Summary cards
+    total: 'Total',
+    active: 'Active',
+    docsPending: 'Docs Pending',
+    resolved: 'Resolved',
+
+    // Search
+    searchPlaceholder: 'Search by ID, type, vehicle, lawyer, description...',
+
+    // Filters
+    filters: 'Filters',
+    status: 'Status',
+    type: 'Type',
+    vehicle: 'Vehicle',
+    allStatuses: 'All statuses',
+    allTypes: 'All types',
+    allVehicles: 'All vehicles',
+    clearAll: 'Clear all',
+    filteredBy: 'Filtered by:',
+
+    // Status labels
+    statusSubmitted: 'Submitted',
+    statusInProgress: 'In Progress',
+    statusResolved: 'Resolved',
+    statusDocumentRequested: 'Document Requested',
+    statusExtended: 'Extended',
+
+    // Case type labels
+    typeAccident: 'Accident',
+    typeVehicleDetention: 'Vehicle Detention',
+    typeTheft: 'Theft',
+    typeVehicleImpounding: 'Vehicle Impounding',
+    typeInsuranceDispute: 'Insurance Dispute',
+    typeLegalComplaint: 'Legal Complaint',
+    typeRTOEscalation: 'RTO Escalation',
+    typeEscalatedChallan: 'Escalated Challan',
+
+    // Origin badges
+    originLawyerCall: 'Lawyer Call',
+    originEscalated: 'Escalated',
+
+    // Table headers
+    incidentId: 'Incident ID',
+    detail: 'Detail',
+    updated: 'Last Updated',
+
+    // Empty state
+    noCasesFound: 'No cases found',
+    tryAdjusting: 'Try adjusting your search or filters',
+    createFirstCase: 'Create your first case',
+
+    // Not assigned
+    notAssigned: 'Not assigned',
+
+    // Results count
+    of: 'of',
+    casesCount: 'cases',
+
+    // Time ago
+    today: 'Today',
+    yesterday: 'Yesterday',
+    dAgo: 'd ago',
+    wAgo: 'w ago',
+    moAgo: 'mo ago',
+  },
+  hi: {
+    // Page header
+    cases: 'मामले',
+    casesSubtitle: 'कानूनी मामले, विवाद, और घटना समाधान',
+    createCase: 'मामला बनाएं',
+
+    // Summary cards
+    total: 'कुल',
+    active: 'सक्रिय',
+    docsPending: 'दस्तावेज़ लंबित',
+    resolved: 'हल किया',
+
+    // Search
+    searchPlaceholder: 'आईडी, प्रकार, वाहन, वकील, विवरण से खोजें...',
+
+    // Filters
+    filters: 'फ़िल्टर',
+    status: 'स्थिति',
+    type: 'प्रकार',
+    vehicle: 'वाहन',
+    allStatuses: 'सभी स्थितियाँ',
+    allTypes: 'सभी प्रकार',
+    allVehicles: 'सभी वाहन',
+    clearAll: 'सभी साफ़ करें',
+    filteredBy: 'फ़िल्टर:',
+
+    // Status labels
+    statusSubmitted: 'प्रस्तुत',
+    statusInProgress: 'प्रगति में',
+    statusResolved: 'हल किया',
+    statusDocumentRequested: 'दस्तावेज़ अनुरोधित',
+    statusExtended: 'विस्तारित',
+
+    // Case type labels
+    typeAccident: 'दुर्घटना',
+    typeVehicleDetention: 'वाहन हिरासत',
+    typeTheft: 'चोरी',
+    typeVehicleImpounding: 'वाहन ज़ब्ती',
+    typeInsuranceDispute: 'बीमा विवाद',
+    typeLegalComplaint: 'कानूनी शिकायत',
+    typeRTOEscalation: 'आरटीओ एस्केलेशन',
+    typeEscalatedChallan: 'एस्केलेटेड चालान',
+
+    // Origin badges
+    originLawyerCall: 'वकील कॉल',
+    originEscalated: 'एस्केलेटेड',
+
+    // Table headers
+    incidentId: 'घटना आईडी',
+    detail: 'विवरण',
+    updated: 'अपडेट',
+
+    // Empty state
+    noCasesFound: 'कोई मामला नहीं मिला',
+    tryAdjusting: 'अपनी खोज या फ़िल्टर समायोजित करें',
+    createFirstCase: 'अपना पहला मामला बनाएं',
+
+    // Not assigned
+    notAssigned: 'नियुक्त नहीं',
+
+    // Results count
+    of: 'में से',
+    casesCount: 'मामले',
+
+    // Time ago
+    today: 'आज',
+    yesterday: 'कल',
+    dAgo: 'दिन पहले',
+    wAgo: 'सप्ताह पहले',
+    moAgo: 'महीने पहले',
+  },
+}
+
+// ---------------------------------------------------------------------------
+// Status label lookup by translation key
+// ---------------------------------------------------------------------------
+
+const STATUS_TRANSLATION_KEY: Record<CaseStatus, string> = {
+  submitted: 'statusSubmitted',
+  inProgress: 'statusInProgress',
+  resolved: 'statusResolved',
+  documentRequested: 'statusDocumentRequested',
+  extended: 'statusExtended',
+}
+
+// ---------------------------------------------------------------------------
+// Case type translation key lookup
+// ---------------------------------------------------------------------------
+
+const CASE_TYPE_TRANSLATION_KEY: Record<CaseType, string> = {
+  Accident: 'typeAccident',
+  'Vehicle Detention': 'typeVehicleDetention',
+  Theft: 'typeTheft',
+  'Vehicle Impounding': 'typeVehicleImpounding',
+  'Insurance Dispute': 'typeInsuranceDispute',
+  'Legal Complaint': 'typeLegalComplaint',
+  'RTO Escalation': 'typeRTOEscalation',
+  'Escalated Challan': 'typeEscalatedChallan',
+}
 
 // ---------------------------------------------------------------------------
 // Status config
@@ -36,34 +215,29 @@ import type {
 
 const STATUS_CONFIG: Record<
   CaseStatus,
-  { label: string; bg: string; text: string; icon: typeof Clock }
+  { bg: string; text: string; icon: typeof Clock }
 > = {
   submitted: {
-    label: 'Submitted',
     bg: 'bg-blue-50 dark:bg-blue-950/40',
     text: 'text-blue-700 dark:text-blue-300',
     icon: FileText,
   },
   inProgress: {
-    label: 'In Progress',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
     text: 'text-amber-700 dark:text-amber-300',
     icon: Clock,
   },
   resolved: {
-    label: 'Resolved',
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     text: 'text-emerald-700 dark:text-emerald-300',
     icon: CheckCircle2,
   },
   documentRequested: {
-    label: 'Document Requested',
     bg: 'bg-purple-50 dark:bg-purple-950/40',
     text: 'text-purple-700 dark:text-purple-300',
     icon: FileQuestion,
   },
   extended: {
-    label: 'Extended',
     bg: 'bg-orange-50 dark:bg-orange-950/40',
     text: 'text-orange-700 dark:text-orange-300',
     icon: Timer,
@@ -124,25 +298,25 @@ const CASE_TYPE_CONFIG: Record<
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-IN', {
+function formatDate(dateStr: string, language: Language): string {
+  return new Date(dateStr).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
   })
 }
 
-function timeAgo(dateStr: string): string {
+function timeAgo(dateStr: string, t: Record<string, string>): string {
   const now = new Date()
   const date = new Date(dateStr)
   const diffMs = now.getTime() - date.getTime()
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
-  if (diffDays === 0) return 'Today'
-  if (diffDays === 1) return 'Yesterday'
-  if (diffDays < 7) return `${diffDays}d ago`
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`
-  return `${Math.floor(diffDays / 30)}mo ago`
+  if (diffDays === 0) return t.today
+  if (diffDays === 1) return t.yesterday
+  if (diffDays < 7) return `${diffDays} ${t.dAgo}`
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} ${t.wAgo}`
+  return `${Math.floor(diffDays / 30)} ${t.moAgo}`
 }
 
 function resolveVehicle(vehicleId: string, vehicles: Vehicle[]): Vehicle | undefined {
@@ -163,37 +337,39 @@ function resolveLawyer(lawyerId: string | null, lawyers: Lawyer[]): Lawyer | und
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function StatusBadge({ status }: { status: CaseStatus }) {
+function StatusBadge({ status, t }: { status: CaseStatus; t: Record<string, string> }) {
   const config = STATUS_CONFIG[status]
   const Icon = config.icon
+  const label = t[STATUS_TRANSLATION_KEY[status]]
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}
     >
       <Icon className="w-3 h-3" />
-      {config.label}
+      {label}
     </span>
   )
 }
 
-function CaseTypeBadge({ caseType }: { caseType: CaseType }) {
+function CaseTypeBadge({ caseType, t }: { caseType: CaseType; t: Record<string, string> }) {
   const config = CASE_TYPE_CONFIG[caseType]
   const Icon = config.icon
+  const label = t[CASE_TYPE_TRANSLATION_KEY[caseType]]
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${config.bg} ${config.color}`}
     >
       <Icon className="w-3 h-3" />
-      {caseType}
+      {label}
     </span>
   )
 }
 
-function OriginBadge({ origin }: { origin: string }) {
+function OriginBadge({ origin, t }: { origin: string; t: Record<string, string> }) {
   if (origin === 'manual') return null
   return (
     <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
-      {origin === 'lawyerCall' ? 'Lawyer Call' : 'Escalated'}
+      {origin === 'lawyerCall' ? t.originLawyerCall : t.originEscalated}
     </span>
   )
 }
@@ -230,11 +406,16 @@ export function CaseList({
   onView,
   onCreate,
 }: CaseListProps) {
+  const { language } = useLanguage()
+  const t = translations[language]
+
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<CaseStatus | 'all'>('all')
   const [typeFilter, setTypeFilter] = useState<CaseType | 'all'>('all')
   const [vehicleFilter, setVehicleFilter] = useState<string>('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 5
 
   // Summary stats
   const stats = useMemo(() => {
@@ -288,6 +469,17 @@ export function CaseList({
     return result
   }, [cases, searchQuery, statusFilter, typeFilter, vehicleFilter, vehicles, lawyers])
 
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, statusFilter, typeFilter, vehicleFilter])
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginatedItems = filtered.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
+
   const activeFilterCount =
     (statusFilter !== 'all' ? 1 : 0) +
     (typeFilter !== 'all' ? 1 : 0) +
@@ -300,63 +492,8 @@ export function CaseList({
   )
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
-      <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
-              Cases
-            </h1>
-            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-              Legal matters, disputes, and incident resolutions
-            </p>
-          </div>
-          <button
-            onClick={onCreate}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors self-start sm:self-center"
-          >
-            <Plus className="w-4 h-4" />
-            Create Case
-          </button>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4">
-            <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-              Total
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.total}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-stone-900 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4">
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-              Active
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.active}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-stone-900 border border-purple-200 dark:border-purple-900/40 rounded-xl p-4">
-            <p className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-              Docs Pending
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.awaitingDocs}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-stone-900 border border-emerald-200 dark:border-emerald-900/40 rounded-xl p-4">
-            <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-              Resolved
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.resolved}
-            </p>
-          </div>
-        </div>
-
+    <div className="bg-stone-100 dark:bg-stone-950">
+      <div className="px-4 sm:px-6 lg:px-8">
         {/* Search + Filters */}
         <div className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
@@ -364,7 +501,7 @@ export function CaseList({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
               <input
                 type="text"
-                placeholder="Search by ID, type, vehicle, lawyer, description..."
+                placeholder={t.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
@@ -376,11 +513,11 @@ export function CaseList({
               className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
                 showFilters || activeFilterCount > 0
                   ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
-                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-600'
+                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
               }`}
             >
               <SlidersHorizontal className="w-4 h-4" />
-              Filters
+              {t.filters}
               {activeFilterCount > 0 && (
                 <span className="ml-1 w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">
                   {activeFilterCount}
@@ -395,7 +532,7 @@ export function CaseList({
               {/* Status */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-                  Status
+                  {t.status}
                 </label>
                 <div className="relative">
                   <select
@@ -405,12 +542,12 @@ export function CaseList({
                     }
                     className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                   >
-                    <option value="all">All statuses</option>
-                    <option value="submitted">Submitted</option>
-                    <option value="inProgress">In Progress</option>
-                    <option value="documentRequested">Document Requested</option>
-                    <option value="extended">Extended</option>
-                    <option value="resolved">Resolved</option>
+                    <option value="all">{t.allStatuses}</option>
+                    <option value="submitted">{t.statusSubmitted}</option>
+                    <option value="inProgress">{t.statusInProgress}</option>
+                    <option value="documentRequested">{t.statusDocumentRequested}</option>
+                    <option value="extended">{t.statusExtended}</option>
+                    <option value="resolved">{t.statusResolved}</option>
                   </select>
                   <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
                 </div>
@@ -419,7 +556,7 @@ export function CaseList({
               {/* Case Type */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-                  Type
+                  {t.type}
                 </label>
                 <div className="relative">
                   <select
@@ -429,10 +566,10 @@ export function CaseList({
                     }
                     className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                   >
-                    <option value="all">All types</option>
+                    <option value="all">{t.allTypes}</option>
                     {caseTypes.map((type) => (
                       <option key={type} value={type}>
-                        {type}
+                        {t[CASE_TYPE_TRANSLATION_KEY[type]]}
                       </option>
                     ))}
                   </select>
@@ -443,7 +580,7 @@ export function CaseList({
               {/* Vehicle */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-                  Vehicle
+                  {t.vehicle}
                 </label>
                 <div className="relative">
                   <select
@@ -451,7 +588,7 @@ export function CaseList({
                     onChange={(e) => setVehicleFilter(e.target.value)}
                     className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                   >
-                    <option value="all">All vehicles</option>
+                    <option value="all">{t.allVehicles}</option>
                     {vehicles.map((v) => (
                       <option key={v.id} value={v.id}>
                         {v.registrationNumber}
@@ -469,9 +606,9 @@ export function CaseList({
                     setTypeFilter('all')
                     setVehicleFilter('all')
                   }}
-                  className="self-end px-3 py-2 text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                  className="self-end px-3 py-2 min-h-11 text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
                 >
-                  Clear all
+                  {t.clearAll}
                 </button>
               )}
             </div>
@@ -480,18 +617,18 @@ export function CaseList({
           {/* Active Filter Pills */}
           {activeFilterCount > 0 && !showFilters && (
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs text-stone-400 dark:text-stone-500">
-                Filtered by:
+              <span className="text-xs text-stone-500 dark:text-stone-400">
+                {t.filteredBy}
               </span>
               {statusFilter !== 'all' && (
                 <FilterPill
-                  label={STATUS_CONFIG[statusFilter].label}
+                  label={t[STATUS_TRANSLATION_KEY[statusFilter]]}
                   onClear={() => setStatusFilter('all')}
                 />
               )}
               {typeFilter !== 'all' && (
                 <FilterPill
-                  label={typeFilter}
+                  label={t[CASE_TYPE_TRANSLATION_KEY[typeFilter]]}
                   onClear={() => setTypeFilter('all')}
                 />
               )}
@@ -508,11 +645,6 @@ export function CaseList({
           )}
         </div>
 
-        {/* Results Count */}
-        <div className="mb-3 text-xs text-stone-400 dark:text-stone-500">
-          {filtered.length} of {cases.length} cases
-        </div>
-
         {/* ================================================================= */}
         {/* Desktop Table */}
         {/* ================================================================= */}
@@ -521,27 +653,27 @@ export function CaseList({
             <thead>
               <tr className="border-b border-stone-100 dark:border-stone-800">
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Incident ID
+                  {t.incidentId}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Type
+                  {t.type}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Vehicle
+                  {t.vehicle}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Lawyer
+                  {t.detail}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Status
+                  {t.status}
                 </th>
                 <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  Updated
+                  {t.updated}
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100 dark:divide-stone-800/60">
-              {filtered.map((caseItem) => {
+              {paginatedItems.map((caseItem) => {
                 const vehicle = resolveVehicle(caseItem.vehicleId, vehicles)
                 const driver = resolveDriver(caseItem.driverId, drivers)
                 const lawyer = resolveLawyer(caseItem.assignedLawyerId, lawyers)
@@ -552,63 +684,49 @@ export function CaseList({
                     onClick={() => onView?.(caseItem.id)}
                     className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
                   >
-                    {/* Incident ID + Description */}
+                    {/* Incident ID + Date */}
                     <td className="px-5 py-4 max-w-[240px]">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
-                          {caseItem.displayId}
-                        </p>
-                        <OriginBadge origin={caseItem.origin} />
-                      </div>
-                      <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5 line-clamp-1">
-                        {caseItem.description}
+                      <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
+                        {caseItem.displayId}
+                      </p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                        {formatDate(caseItem.createdAt, language)}
                       </p>
                     </td>
 
                     {/* Type */}
                     <td className="px-5 py-4">
-                      <CaseTypeBadge caseType={caseItem.caseType} />
+                      <CaseTypeBadge caseType={caseItem.caseType} t={t} />
                     </td>
 
-                    {/* Vehicle + Driver */}
+                    {/* Vehicle */}
                     <td className="px-5 py-4">
                       <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
-                        {vehicle?.registrationNumber || '—'}
+                        {vehicle?.registrationNumber || '\u2014'}
                       </p>
-                      {driver && (
-                        <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-                          {driver.name}
-                        </p>
-                      )}
                     </td>
 
-                    {/* Lawyer */}
+                    {/* Detail */}
                     <td className="px-5 py-4">
-                      {lawyer ? (
-                        <div>
-                          <p className="text-sm text-stone-800 dark:text-stone-200">
-                            {lawyer.name}
-                          </p>
-                          <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-                            {lawyer.specialization}
-                          </p>
+                      <div className="group/tip relative">
+                        <p className="text-sm text-stone-800 dark:text-stone-200 truncate max-w-[220px]">
+                          {caseItem.description}
+                        </p>
+                        <div className="pointer-events-none absolute left-0 bottom-full mb-1.5 z-50 max-w-xs px-2.5 py-1.5 rounded-lg bg-stone-900 dark:bg-stone-100 text-xs text-white dark:text-stone-900 shadow-lg opacity-0 translate-y-1 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 transition-all duration-200 ease-out whitespace-normal">
+                          {caseItem.description}
                         </div>
-                      ) : (
-                        <span className="text-xs text-stone-400 dark:text-stone-500 italic">
-                          Not assigned
-                        </span>
-                      )}
+                      </div>
                     </td>
 
                     {/* Status */}
                     <td className="px-5 py-4">
-                      <StatusBadge status={caseItem.status} />
+                      <StatusBadge status={caseItem.status} t={t} />
                     </td>
 
                     {/* Updated */}
                     <td className="px-5 py-4 text-right">
                       <p className="text-sm text-stone-500 dark:text-stone-400">
-                        {timeAgo(caseItem.updatedAt)}
+                        {timeAgo(caseItem.updatedAt, t)}
                       </p>
                     </td>
                   </tr>
@@ -624,17 +742,17 @@ export function CaseList({
                 <Briefcase className="w-5 h-5 text-stone-400 dark:text-stone-500" />
               </div>
               <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
-                No cases found
+                {t.noCasesFound}
               </p>
-              <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                Try adjusting your search or filters
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                {t.tryAdjusting}
               </p>
               <button
                 onClick={onCreate}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 min-h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Create your first case
+                {t.createFirstCase}
               </button>
             </div>
           )}
@@ -644,7 +762,7 @@ export function CaseList({
         {/* Mobile Card View */}
         {/* ================================================================= */}
         <div className="md:hidden space-y-3">
-          {filtered.map((caseItem) => {
+          {paginatedItems.map((caseItem) => {
             const vehicle = resolveVehicle(caseItem.vehicleId, vehicles)
             const driver = resolveDriver(caseItem.driverId, drivers)
             const lawyer = resolveLawyer(caseItem.assignedLawyerId, lawyers)
@@ -662,18 +780,18 @@ export function CaseList({
                       <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
                         {caseItem.displayId}
                       </p>
-                      <OriginBadge origin={caseItem.origin} />
+                      <OriginBadge origin={caseItem.origin} t={t} />
                     </div>
-                    <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-                      {formatDate(caseItem.createdAt)}
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                      {formatDate(caseItem.createdAt, language)}
                     </p>
                   </div>
-                  <StatusBadge status={caseItem.status} />
+                  <StatusBadge status={caseItem.status} t={t} />
                 </div>
 
                 {/* Type badge */}
                 <div className="mb-3">
-                  <CaseTypeBadge caseType={caseItem.caseType} />
+                  <CaseTypeBadge caseType={caseItem.caseType} t={t} />
                 </div>
 
                 {/* Description */}
@@ -684,11 +802,11 @@ export function CaseList({
                 {/* Footer: Vehicle + Lawyer */}
                 <div className="flex items-center justify-between pt-3 border-t border-stone-100 dark:border-stone-800">
                   <div>
-                    <p className="text-xs text-stone-400 dark:text-stone-500">Vehicle</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">{t.vehicle}</p>
                     <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
-                      {vehicle?.registrationNumber || '—'}
+                      {vehicle?.registrationNumber || '\u2014'}
                       {driver && (
-                        <span className="font-normal text-stone-400 dark:text-stone-500">
+                        <span className="font-normal text-stone-500 dark:text-stone-400">
                           {' '}
                           · {driver.name}
                         </span>
@@ -696,14 +814,14 @@ export function CaseList({
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-stone-400 dark:text-stone-500">Lawyer</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">{t.lawyer}</p>
                     {lawyer ? (
                       <p className="text-sm text-stone-800 dark:text-stone-200">
                         {lawyer.name}
                       </p>
                     ) : (
-                      <p className="text-sm text-stone-400 dark:text-stone-500 italic">
-                        Not assigned
+                      <p className="text-sm text-stone-500 dark:text-stone-400 italic">
+                        {t.notAssigned}
                       </p>
                     )}
                   </div>
@@ -719,21 +837,59 @@ export function CaseList({
                 <Briefcase className="w-5 h-5 text-stone-400 dark:text-stone-500" />
               </div>
               <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
-                No cases found
+                {t.noCasesFound}
               </p>
-              <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                Try adjusting your search or filters
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                {t.tryAdjusting}
               </p>
               <button
                 onClick={onCreate}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 min-h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Create your first case
+                {t.createFirstCase}
               </button>
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4 pb-4">
+            <p className="text-xs text-stone-500 dark:text-stone-400">
+              {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} {t.of} {filtered.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${
+                    page === currentPage
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

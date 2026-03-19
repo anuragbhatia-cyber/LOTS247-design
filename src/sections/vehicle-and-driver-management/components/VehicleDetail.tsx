@@ -36,46 +36,326 @@ import type {
   DocumentStatus,
   VehicleDocument,
 } from '@/../product/sections/vehicle-and-driver-management/types'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+
+// ---------------------------------------------------------------------------
+// Translations
+// ---------------------------------------------------------------------------
+
+const translations: Record<Language, Record<string, string>> = {
+  en: {
+    // Back button
+    backToVehicles: 'Back to Vehicles',
+
+    // Hero / Header
+    active: 'Active',
+    inactive: 'Inactive',
+    editVehicle: 'Edit Vehicle',
+    changeDriver: 'Change Driver',
+    assignDriver: 'Assign Driver',
+    deactivate: 'Deactivate',
+
+    // Compliance ring
+    score: 'Score',
+    good: 'Good',
+    needsAttention: 'Needs Attention',
+    critical: 'Critical',
+
+    // Alert banners
+    documentExpired: 'document expired',
+    documentsExpired: 'documents expired',
+    documentExpiringSoon: 'document expiring soon',
+    documentsExpiringSoon: 'documents expiring soon',
+
+    // Tabs
+    tabDetails: 'Details',
+    tabDocuments: 'Documents',
+    tabCompliance: 'Compliance',
+    tabChallans: 'Challans',
+    tabAssignedDriver: 'Assigned Driver',
+
+    // Details tab
+    rcNumber: 'RC Number',
+    vehicleType: 'Vehicle Type',
+    make: 'Make',
+    model: 'Model',
+    year: 'Year',
+    category: 'Category',
+    status: 'Status',
+
+    // Category labels
+    owned: 'Owned',
+    leased: 'Leased',
+    rented: 'Rented',
+
+    // Document status labels
+    valid: 'Valid',
+    expiringSoon: 'Expiring Soon',
+    expired: 'Expired',
+
+    // Document type labels
+    motorInsurance: 'Motor Insurance',
+    motorInsuranceDesc: 'Third-party or comprehensive policy',
+    pucCertificate: 'PUC Certificate',
+    pucCertificateDesc: 'Pollution Under Control certificate',
+    fitnessCertificate: 'Fitness Certificate',
+    fitnessCertificateDesc: 'Vehicle fitness approval',
+    registrationCertificate: 'Registration Certificate',
+    registrationCertificateDesc: 'Vehicle registration document',
+    permit: 'Permit',
+    other: 'Other',
+
+    // Document card
+    expires: 'Expires',
+    expiredDaysAgo: 'days ago',
+    daysRemaining: 'days remaining',
+    monthsRemaining: 'months remaining',
+
+    // Documents tab
+    vehicleDocuments: 'Vehicle Documents',
+    uploadDocument: 'Upload Document',
+
+    // Compliance tab
+    overallComplianceScore: 'Overall compliance score based on document validity',
+    expiredLabel: 'expired',
+    expiringSoonLabel: 'expiring soon',
+    allDocumentsValid: 'All documents are valid and up to date',
+
+    // Challans tab — idle state
+    fetchChallansFor: 'Fetch Challans for',
+    challanIdleDescription: 'Check for pending traffic challans from Parivahan and other government databases against this vehicle.',
+    fetchChallans: 'Fetch Challans',
+
+    // Challans tab — fetching state
+    fetchingChallans: 'Fetching Challans...',
+    checkingDatabases: 'Checking Parivahan and government databases for',
+
+    // Challans tab — done state
+    pendingChallans: 'Pending Challans',
+    pending: 'Pending',
+    submitted: 'Submitted',
+    resolved: 'Resolved',
+    reFetch: 'Re-fetch',
+    totalPendingAmount: 'Total Pending Amount',
+    submitForResolution: 'Submit for Resolution',
+    sendProposal: 'Send Proposal',
+    submittedForResolution: 'Submitted for resolution — awaiting update',
+    noPendingChallans: 'No pending challans',
+    noPendingChallansDesc: 'This vehicle has no pending traffic challans',
+
+    // Driver tab
+    licenseNumber: 'License Number',
+    licenseExpiry: 'License Expiry',
+    licenseStatus: 'License Status',
+    vehiclesAssigned: 'Vehicles Assigned',
+    noDriverAssigned: 'No driver assigned',
+    noDriverAssignedDesc: 'Assign a driver to this vehicle to track their details here',
+
+    // Edit vehicle modal
+    saveChanges: 'Save Changes',
+    cancel: 'Cancel',
+    vehicleCategory: 'Vehicle Category',
+
+    // Vehicle type options
+    truck: 'Truck',
+    trailer: 'Trailer',
+    tanker: 'Tanker',
+    container: 'Container',
+    miniTruck: 'Mini Truck',
+
+    // Assign driver modal
+    selectDriverFromList: 'Select a driver from the list',
+    searchPlaceholder: 'Search by name, license, phone...',
+    current: 'Current',
+    noDriversFound: 'No drivers found',
+
+    // Upload document modal
+    documentType: 'Document Type',
+    selectDocumentType: 'Select document type',
+    uploadFile: 'Upload File',
+    dropFileHere: 'Drop your file here, or',
+    browse: 'browse',
+    fileFormats: 'PDF, JPG, PNG or WebP up to 10MB',
+    removeFile: 'Remove file',
+    upload: 'Upload',
+  },
+  hi: {
+    // Back button
+    backToVehicles: 'वाहनों पर वापस जाएं',
+
+    // Hero / Header
+    active: 'सक्रिय',
+    inactive: 'निष्क्रिय',
+    editVehicle: 'वाहन संपादित करें',
+    changeDriver: 'ड्राइवर बदलें',
+    assignDriver: 'ड्राइवर नियुक्त करें',
+    deactivate: 'निष्क्रिय करें',
+
+    // Compliance ring
+    score: 'स्कोर',
+    good: 'अच्छा',
+    needsAttention: 'ध्यान आवश्यक',
+    critical: 'गंभीर',
+
+    // Alert banners
+    documentExpired: 'दस्तावेज़ समाप्त',
+    documentsExpired: 'दस्तावेज़ समाप्त',
+    documentExpiringSoon: 'दस्तावेज़ जल्द समाप्त',
+    documentsExpiringSoon: 'दस्तावेज़ जल्द समाप्त',
+
+    // Tabs
+    tabDetails: 'विवरण',
+    tabDocuments: 'दस्तावेज़',
+    tabCompliance: 'अनुपालन',
+    tabChallans: 'चालान',
+    tabAssignedDriver: 'नियुक्त ड्राइवर',
+
+    // Details tab
+    rcNumber: 'आरसी नंबर',
+    vehicleType: 'वाहन प्रकार',
+    make: 'निर्माता',
+    model: 'मॉडल',
+    year: 'वर्ष',
+    category: 'श्रेणी',
+    status: 'स्थिति',
+
+    // Category labels
+    owned: 'स्वामित्व',
+    leased: 'पट्टे पर',
+    rented: 'किराए पर',
+
+    // Document status labels
+    valid: 'वैध',
+    expiringSoon: 'जल्द समाप्त',
+    expired: 'समाप्त',
+
+    // Document type labels
+    motorInsurance: 'मोटर बीमा',
+    motorInsuranceDesc: 'तृतीय-पक्ष या व्यापक पॉलिसी',
+    pucCertificate: 'पीयूसी प्रमाणपत्र',
+    pucCertificateDesc: 'प्रदूषण नियंत्रण प्रमाणपत्र',
+    fitnessCertificate: 'फिटनेस प्रमाणपत्र',
+    fitnessCertificateDesc: 'वाहन फिटनेस अनुमोदन',
+    registrationCertificate: 'पंजीकरण प्रमाणपत्र',
+    registrationCertificateDesc: 'वाहन पंजीकरण दस्तावेज़',
+    permit: 'परमिट',
+    other: 'अन्य',
+
+    // Document card
+    expires: 'समाप्ति',
+    expiredDaysAgo: 'दिन पहले समाप्त',
+    daysRemaining: 'दिन शेष',
+    monthsRemaining: 'महीने शेष',
+
+    // Documents tab
+    vehicleDocuments: 'वाहन दस्तावेज़',
+    uploadDocument: 'दस्तावेज़ अपलोड करें',
+
+    // Compliance tab
+    overallComplianceScore: 'दस्तावेज़ वैधता के आधार पर समग्र अनुपालन स्कोर',
+    expiredLabel: 'समाप्त',
+    expiringSoonLabel: 'जल्द समाप्त',
+    allDocumentsValid: 'सभी दस्तावेज़ वैध और अद्यतित हैं',
+
+    // Challans tab — idle state
+    fetchChallansFor: 'चालान प्राप्त करें',
+    challanIdleDescription: 'इस वाहन के लिए परिवहन और अन्य सरकारी डेटाबेस से लंबित यातायात चालान की जांच करें।',
+    fetchChallans: 'चालान प्राप्त करें',
+
+    // Challans tab — fetching state
+    fetchingChallans: 'चालान प्राप्त हो रहे हैं...',
+    checkingDatabases: 'परिवहन और सरकारी डेटाबेस की जांच हो रही है',
+
+    // Challans tab — done state
+    pendingChallans: 'लंबित चालान',
+    pending: 'लंबित',
+    submitted: 'जमा किया गया',
+    resolved: 'हल किया गया',
+    reFetch: 'पुनः प्राप्त करें',
+    totalPendingAmount: 'कुल लंबित राशि',
+    submitForResolution: 'समाधान के लिए जमा करें',
+    sendProposal: 'प्रस्ताव भेजें',
+    submittedForResolution: 'समाधान के लिए जमा किया गया — अपडेट की प्रतीक्षा है',
+    noPendingChallans: 'कोई लंबित चालान नहीं',
+    noPendingChallansDesc: 'इस वाहन पर कोई लंबित यातायात चालान नहीं है',
+
+    // Driver tab
+    licenseNumber: 'लाइसेंस नंबर',
+    licenseExpiry: 'लाइसेंस समाप्ति',
+    licenseStatus: 'लाइसेंस स्थिति',
+    vehiclesAssigned: 'नियुक्त वाहन',
+    noDriverAssigned: 'कोई ड्राइवर नियुक्त नहीं',
+    noDriverAssignedDesc: 'उनका विवरण यहां ट्रैक करने के लिए इस वाहन को एक ड्राइवर नियुक्त करें',
+
+    // Edit vehicle modal
+    saveChanges: 'परिवर्तन सहेजें',
+    cancel: 'रद्द करें',
+    vehicleCategory: 'वाहन श्रेणी',
+
+    // Vehicle type options
+    truck: 'ट्रक',
+    trailer: 'ट्रेलर',
+    tanker: 'टैंकर',
+    container: 'कंटेनर',
+    miniTruck: 'मिनी ट्रक',
+
+    // Assign driver modal
+    selectDriverFromList: 'सूची से एक ड्राइवर चुनें',
+    searchPlaceholder: 'नाम, लाइसेंस, फ़ोन से खोजें...',
+    current: 'वर्तमान',
+    noDriversFound: 'कोई ड्राइवर नहीं मिला',
+
+    // Upload document modal
+    documentType: 'दस्तावेज़ प्रकार',
+    selectDocumentType: 'दस्तावेज़ प्रकार चुनें',
+    uploadFile: 'फ़ाइल अपलोड करें',
+    dropFileHere: 'अपनी फ़ाइल यहां डालें, या',
+    browse: 'ब्राउज़ करें',
+    fileFormats: 'PDF, JPG, PNG या WebP 10MB तक',
+    removeFile: 'फ़ाइल हटाएं',
+    upload: 'अपलोड',
+  },
+}
 
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
-const CATEGORY_CONFIG: Record<VehicleCategory, { label: string; bg: string; text: string }> = {
+const CATEGORY_STYLE: Record<VehicleCategory, { bg: string; text: string }> = {
   owned: {
-    label: 'Owned',
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     text: 'text-emerald-700 dark:text-emerald-300',
   },
   leased: {
-    label: 'Leased',
     bg: 'bg-blue-50 dark:bg-blue-950/40',
     text: 'text-blue-700 dark:text-blue-300',
   },
   rented: {
-    label: 'Rented',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
     text: 'text-amber-700 dark:text-amber-300',
   },
 }
 
-const DOC_STATUS_CONFIG: Record<DocumentStatus, { label: string; bg: string; text: string; border: string; icon: typeof CheckCircle2 }> = {
+const CATEGORY_LABEL_KEY: Record<VehicleCategory, string> = {
+  owned: 'owned',
+  leased: 'leased',
+  rented: 'rented',
+}
+
+const DOC_STATUS_STYLE: Record<DocumentStatus, { bg: string; text: string; border: string; icon: typeof CheckCircle2 }> = {
   valid: {
-    label: 'Valid',
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     text: 'text-emerald-700 dark:text-emerald-300',
     border: 'border-emerald-200 dark:border-emerald-800',
     icon: CheckCircle2,
   },
   'expiring-soon': {
-    label: 'Expiring Soon',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
     text: 'text-amber-700 dark:text-amber-300',
     border: 'border-amber-200 dark:border-amber-800',
     icon: Clock,
   },
   expired: {
-    label: 'Expired',
     bg: 'bg-red-50 dark:bg-red-950/40',
     text: 'text-red-700 dark:text-red-300',
     border: 'border-red-200 dark:border-red-800',
@@ -83,19 +363,25 @@ const DOC_STATUS_CONFIG: Record<DocumentStatus, { label: string; bg: string; tex
   },
 }
 
-const DOC_TYPE_LABELS: Record<string, { label: string; description: string }> = {
-  insurance: { label: 'Motor Insurance', description: 'Third-party or comprehensive policy' },
-  puc: { label: 'PUC Certificate', description: 'Pollution Under Control certificate' },
-  fitness: { label: 'Fitness Certificate', description: 'Vehicle fitness approval' },
-  rc: { label: 'Registration Certificate', description: 'Vehicle registration document' },
+const DOC_STATUS_LABEL_KEY: Record<DocumentStatus, string> = {
+  valid: 'valid',
+  'expiring-soon': 'expiringSoon',
+  expired: 'expired',
+}
+
+const DOC_TYPE_LABEL_KEY: Record<string, { label: string; description: string }> = {
+  insurance: { label: 'motorInsurance', description: 'motorInsuranceDesc' },
+  puc: { label: 'pucCertificate', description: 'pucCertificateDesc' },
+  fitness: { label: 'fitnessCertificate', description: 'fitnessCertificateDesc' },
+  rc: { label: 'registrationCertificate', description: 'registrationCertificateDesc' },
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-IN', {
+function formatDate(dateStr: string, language: Language): string {
+  return new Date(dateStr).toLocaleDateString(language === 'hi' ? 'hi-IN' : 'en-IN', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -108,24 +394,24 @@ function daysUntil(dateStr: string): number {
   return Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 }
 
-function getComplianceColor(score: number): { text: string; bg: string; ring: string; label: string } {
+function getComplianceColor(score: number): { text: string; bg: string; ring: string; labelKey: string } {
   if (score >= 75) return {
     text: 'text-emerald-700 dark:text-emerald-300',
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     ring: 'stroke-emerald-500',
-    label: 'Good',
+    labelKey: 'good',
   }
   if (score >= 50) return {
     text: 'text-amber-700 dark:text-amber-300',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
     ring: 'stroke-amber-500',
-    label: 'Needs Attention',
+    labelKey: 'needsAttention',
   }
   return {
     text: 'text-red-700 dark:text-red-300',
     bg: 'bg-red-50 dark:bg-red-950/40',
     ring: 'stroke-red-500',
-    label: 'Critical',
+    labelKey: 'critical',
   }
 }
 
@@ -133,7 +419,7 @@ function getComplianceColor(score: number): { text: string; bg: string; ring: st
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function ComplianceRing({ score }: { score: number }) {
+function ComplianceRing({ score, t }: { score: number; t: Record<string, string> }) {
   const colors = getComplianceColor(score)
   const radius = 40
   const circumference = 2 * Math.PI * radius
@@ -164,63 +450,63 @@ function ComplianceRing({ score }: { score: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className={`text-2xl font-bold tabular-nums ${colors.text}`}>{score}</span>
-        <span className="text-[10px] text-stone-400 dark:text-stone-500 uppercase tracking-wider font-medium">Score</span>
+        <span className="text-[10px] text-stone-500 dark:text-stone-400 uppercase tracking-wider font-medium">{t.score}</span>
       </div>
     </div>
   )
 }
 
-function DocumentCard({ doc }: { doc: VehicleDocument }) {
-  const statusConfig = DOC_STATUS_CONFIG[doc.status]
-  const typeInfo = DOC_TYPE_LABELS[doc.type] || { label: doc.name, description: '' }
-  const StatusIcon = statusConfig.icon
+function DocumentCard({ doc, t, language }: { doc: VehicleDocument; t: Record<string, string>; language: Language }) {
+  const statusStyle = DOC_STATUS_STYLE[doc.status]
+  const typeKeys = DOC_TYPE_LABEL_KEY[doc.type] || { label: '', description: '' }
+  const typeLabel = typeKeys.label ? t[typeKeys.label] : doc.name
+  const typeDesc = typeKeys.description ? t[typeKeys.description] : ''
+  const statusLabel = t[DOC_STATUS_LABEL_KEY[doc.status]]
+  const StatusIcon = statusStyle.icon
   const days = daysUntil(doc.expiry)
 
   return (
     <div className={`rounded-xl border p-4 border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${statusConfig.bg}`}>
-            <FileText className={`w-4.5 h-4.5 ${statusConfig.text}`} />
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${statusStyle.bg}`}>
+            <FileText className={`w-4.5 h-4.5 ${statusStyle.text}`} />
           </div>
           <div>
             <p className="text-sm font-semibold text-stone-900 dark:text-stone-50">
-              {typeInfo.label}
-            </p>
-            <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-              {typeInfo.description}
+              {typeLabel}
             </p>
           </div>
         </div>
-        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
+        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${statusStyle.bg} ${statusStyle.text}`}>
           <StatusIcon className="w-3 h-3" />
-          {statusConfig.label}
+          {statusLabel}
         </span>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
           <Calendar className="w-3.5 h-3.5" />
-          Expires {formatDate(doc.expiry)}
+          {t.expires} {formatDate(doc.expiry, language)}
         </div>
         {doc.status === 'expired' && (
           <span className="text-xs font-medium text-red-600 dark:text-red-400">
-            Expired {Math.abs(days)} days ago
+            {Math.abs(days)} {t.expiredDaysAgo}
           </span>
         )}
         {doc.status === 'expiring-soon' && (
           <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-            {days} days remaining
+            {days} {t.daysRemaining}
           </span>
         )}
         {doc.status === 'valid' && days > 180 && (
           <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-            {Math.floor(days / 30)} months remaining
+            {Math.floor(days / 30)} {t.monthsRemaining}
           </span>
         )}
         {doc.status === 'valid' && days <= 180 && (
           <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-            {days} days remaining
+            {days} {t.daysRemaining}
           </span>
         )}
       </div>
@@ -237,11 +523,13 @@ function EditVehicleModal({
   onClose,
   vehicle,
   onSave,
+  t,
 }: {
   isOpen: boolean
   onClose: () => void
   vehicle: Vehicle
   onSave?: () => void
+  t: Record<string, string>
 }) {
   const [category, setCategory] = useState<VehicleCategory>(vehicle.category)
   const [status, setStatus] = useState<VehicleStatus>(vehicle.status)
@@ -276,7 +564,7 @@ function EditVehicleModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
           <div>
             <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
-              Edit Vehicle
+              {t.editVehicle}
             </h2>
             <p className="text-xs text-stone-500 dark:text-stone-400">
               {vehicle.rcNumber}
@@ -284,7 +572,7 @@ function EditVehicleModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -295,13 +583,13 @@ function EditVehicleModal({
           {/* RC Number (read-only) */}
           <div>
             <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-              RC Number
+              {t.rcNumber}
             </label>
             <input
               type="text"
               value={vehicle.rcNumber}
               disabled
-              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50 text-sm font-mono text-stone-400 dark:text-stone-500 tracking-wider cursor-not-allowed"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50 text-sm font-mono text-stone-500 dark:text-stone-400 tracking-wider cursor-not-allowed"
             />
           </div>
 
@@ -309,7 +597,7 @@ function EditVehicleModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                Make
+                {t.make}
               </label>
               <input
                 type="text"
@@ -320,7 +608,7 @@ function EditVehicleModal({
             </div>
             <div>
               <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                Model
+                {t.model}
               </label>
               <input
                 type="text"
@@ -334,7 +622,7 @@ function EditVehicleModal({
           {/* Vehicle Type */}
           <div>
             <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-              Vehicle Type
+              {t.vehicleType}
             </label>
             <div className="relative">
               <select
@@ -342,11 +630,11 @@ function EditVehicleModal({
                 onChange={(e) => setVehicleType(e.target.value)}
                 className="w-full appearance-none px-3.5 py-2.5 pr-8 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
               >
-                <option value="Truck">Truck</option>
-                <option value="Trailer">Trailer</option>
-                <option value="Tanker">Tanker</option>
-                <option value="Container">Container</option>
-                <option value="Mini Truck">Mini Truck</option>
+                <option value="Truck">{t.truck}</option>
+                <option value="Trailer">{t.trailer}</option>
+                <option value="Tanker">{t.tanker}</option>
+                <option value="Container">{t.container}</option>
+                <option value="Mini Truck">{t.miniTruck}</option>
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
             </div>
@@ -355,7 +643,7 @@ function EditVehicleModal({
           {/* Category */}
           <div>
             <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-              Vehicle Category
+              {t.vehicleCategory}
             </label>
             <div className="relative">
               <select
@@ -365,7 +653,7 @@ function EditVehicleModal({
               >
                 {(['owned', 'leased', 'rented'] as VehicleCategory[]).map((cat) => (
                   <option key={cat} value={cat}>
-                    {CATEGORY_CONFIG[cat].label}
+                    {t[CATEGORY_LABEL_KEY[cat]]}
                   </option>
                 ))}
               </select>
@@ -376,7 +664,7 @@ function EditVehicleModal({
           {/* Status */}
           <div>
             <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-              Status
+              {t.status}
             </label>
             <div className="flex gap-2">
               {(['active', 'inactive'] as VehicleStatus[]).map((s) => {
@@ -385,15 +673,15 @@ function EditVehicleModal({
                   <button
                     key={s}
                     onClick={() => setStatus(s)}
-                    className={`flex-1 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors capitalize ${
+                    className={`flex-1 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
                       isSelected
                         ? s === 'active'
                           ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-current'
                           : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 border-current'
-                        : 'border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-600'
+                        : 'border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
                     }`}
                   >
-                    {s}
+                    {s === 'active' ? t.active : t.inactive}
                   </button>
                 )
               })}
@@ -407,13 +695,13 @@ function EditVehicleModal({
             onClick={handleClose}
             className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
-            Cancel
+            {t.cancel}
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-sm"
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
           >
-            Save Changes
+            {t.saveChanges}
           </button>
         </div>
       </div>
@@ -431,12 +719,14 @@ function AssignDriverModal({
   drivers,
   currentDriverId,
   onAssign,
+  t,
 }: {
   isOpen: boolean
   onClose: () => void
   drivers: Driver[]
   currentDriverId: string | null
   onAssign?: (driverId: string) => void
+  t: Record<string, string>
 }) {
   const [selectedId, setSelectedId] = useState<string>(currentDriverId || '')
   const [search, setSearch] = useState('')
@@ -474,15 +764,15 @@ function AssignDriverModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
           <div>
             <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
-              {currentDriverId ? 'Change Driver' : 'Assign Driver'}
+              {currentDriverId ? t.changeDriver : t.assignDriver}
             </h2>
             <p className="text-xs text-stone-500 dark:text-stone-400">
-              Select a driver from the list
+              {t.selectDriverFromList}
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -496,7 +786,7 @@ function AssignDriverModal({
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, license, phone..."
+              placeholder={t.searchPlaceholder}
               className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
             />
           </div>
@@ -507,8 +797,9 @@ function AssignDriverModal({
           {filtered.map((d) => {
             const isSelected = selectedId === d.id
             const isCurrent = currentDriverId === d.id
-            const licenseConfig = DOC_STATUS_CONFIG[d.licenseStatus]
-            const LicenseIcon = licenseConfig.icon
+            const licenseStyle = DOC_STATUS_STYLE[d.licenseStatus]
+            const licenseLabel = t[DOC_STATUS_LABEL_KEY[d.licenseStatus]]
+            const LicenseIcon = licenseStyle.icon
 
             return (
               <button
@@ -542,17 +833,17 @@ function AssignDriverModal({
                     </p>
                     {isCurrent && (
                       <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400">
-                        Current
+                        {t.current}
                       </span>
                     )}
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-xs text-stone-400 dark:text-stone-500 font-mono">
+                    <span className="text-xs text-stone-500 dark:text-stone-400 font-mono">
                       {d.licenseNumber}
                     </span>
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${licenseConfig.text}`}>
+                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${licenseStyle.text}`}>
                       <LicenseIcon className="w-2.5 h-2.5" />
-                      {licenseConfig.label}
+                      {licenseLabel}
                     </span>
                   </div>
                 </div>
@@ -565,7 +856,7 @@ function AssignDriverModal({
 
           {filtered.length === 0 && (
             <div className="text-center py-6">
-              <p className="text-sm text-stone-500 dark:text-stone-400">No drivers found</p>
+              <p className="text-sm text-stone-500 dark:text-stone-400">{t.noDriversFound}</p>
             </div>
           )}
         </div>
@@ -576,18 +867,18 @@ function AssignDriverModal({
             onClick={handleClose}
             className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
-            Cancel
+            {t.cancel}
           </button>
           <button
             onClick={handleAssign}
             disabled={!selectedId || selectedId === currentDriverId}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
               selectedId && selectedId !== currentDriverId
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400 cursor-not-allowed'
             }`}
           >
-            {currentDriverId ? 'Change Driver' : 'Assign Driver'}
+            {currentDriverId ? t.changeDriver : t.assignDriver}
           </button>
         </div>
       </div>
@@ -601,12 +892,12 @@ function AssignDriverModal({
 
 type DetailTab = 'details' | 'documents' | 'compliance' | 'challans' | 'driver'
 
-const TABS: { id: DetailTab; label: string; icon: typeof CreditCard }[] = [
-  { id: 'details', label: 'Details', icon: CreditCard },
-  { id: 'documents', label: 'Documents', icon: FileText },
-  { id: 'compliance', label: 'Compliance', icon: ShieldCheck },
-  { id: 'challans', label: 'Challans', icon: FileWarning },
-  { id: 'driver', label: 'Assigned Driver', icon: User },
+const TABS: { id: DetailTab; labelKey: string; icon: typeof CreditCard }[] = [
+  { id: 'details', labelKey: 'tabDetails', icon: CreditCard },
+  { id: 'documents', labelKey: 'tabDocuments', icon: FileText },
+  { id: 'compliance', labelKey: 'tabCompliance', icon: ShieldCheck },
+  { id: 'challans', labelKey: 'tabChallans', icon: FileWarning },
+  { id: 'driver', labelKey: 'tabAssignedDriver', icon: User },
 ]
 
 // ---------------------------------------------------------------------------
@@ -664,22 +955,24 @@ type ChallanFetchState = 'idle' | 'fetching' | 'done'
 // ---------------------------------------------------------------------------
 
 const DOC_TYPE_OPTIONS = [
-  { value: 'insurance', label: 'Motor Insurance' },
-  { value: 'puc', label: 'PUC Certificate' },
-  { value: 'fitness', label: 'Fitness Certificate' },
-  { value: 'rc', label: 'Registration Certificate' },
-  { value: 'permit', label: 'Permit' },
-  { value: 'other', label: 'Other' },
+  { value: 'insurance', labelKey: 'motorInsurance' },
+  { value: 'puc', labelKey: 'pucCertificate' },
+  { value: 'fitness', labelKey: 'fitnessCertificate' },
+  { value: 'rc', labelKey: 'registrationCertificate' },
+  { value: 'permit', labelKey: 'permit' },
+  { value: 'other', labelKey: 'other' },
 ]
 
 function UploadDocumentModal({
   isOpen,
   onClose,
   rcNumber,
+  t,
 }: {
   isOpen: boolean
   onClose: () => void
   rcNumber: string
+  t: Record<string, string>
 }) {
   const [selectedType, setSelectedType] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -729,7 +1022,7 @@ function UploadDocumentModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
           <div>
             <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
-              Upload Document
+              {t.uploadDocument}
             </h2>
             <p className="text-xs text-stone-500 dark:text-stone-400">
               {rcNumber}
@@ -737,7 +1030,7 @@ function UploadDocumentModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -748,7 +1041,7 @@ function UploadDocumentModal({
           {/* Document Type */}
           <div>
             <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-              Document Type
+              {t.documentType}
             </label>
             <div className="relative">
               <select
@@ -756,9 +1049,9 @@ function UploadDocumentModal({
                 onChange={(e) => setSelectedType(e.target.value)}
                 className="w-full appearance-none px-3.5 py-2.5 pr-8 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
               >
-                <option value="" disabled>Select document type</option>
+                <option value="" disabled>{t.selectDocumentType}</option>
                 {DOC_TYPE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  <option key={opt.value} value={opt.value}>{t[opt.labelKey]}</option>
                 ))}
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
@@ -768,7 +1061,7 @@ function UploadDocumentModal({
           {/* File Drop Zone */}
           <div>
             <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-              Upload File
+              {t.uploadFile}
             </label>
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
@@ -806,9 +1099,9 @@ function UploadDocumentModal({
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); setSelectedFile(null) }}
-                    className="text-xs text-stone-500 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    className="text-xs text-stone-500 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 transition-colors min-h-11 inline-flex items-center"
                   >
-                    Remove file
+                    {t.removeFile}
                   </button>
                 </div>
               ) : (
@@ -818,10 +1111,10 @@ function UploadDocumentModal({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-stone-700 dark:text-stone-300">
-                      Drop your file here, or <span className="text-emerald-600 dark:text-emerald-400">browse</span>
+                      {t.dropFileHere} <span className="text-emerald-600 dark:text-emerald-400">{t.browse}</span>
                     </p>
-                    <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                      PDF, JPG, PNG or WebP up to 10MB
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                      {t.fileFormats}
                     </p>
                   </div>
                 </div>
@@ -836,19 +1129,19 @@ function UploadDocumentModal({
             onClick={handleClose}
             className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
-            Cancel
+            {t.cancel}
           </button>
           <button
             onClick={handleUpload}
             disabled={!selectedFile || !selectedType}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
               selectedFile && selectedType
-                ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400 cursor-not-allowed'
             }`}
           >
             <FileText className="w-4 h-4" />
-            Upload
+            {t.upload}
           </button>
         </div>
       </div>
@@ -866,6 +1159,8 @@ export function VehicleDetail({
   onChangeCategory,
   onAssignDriver,
 }: VehicleDetailProps) {
+  const { language } = useLanguage()
+  const t = translations[language]
   const [activeTab, setActiveTab] = useState<DetailTab>('details')
   const [showEditModal, setShowEditModal] = useState(false)
   const [showAssignDriver, setShowAssignDriver] = useState(false)
@@ -874,23 +1169,15 @@ export function VehicleDetail({
   const [challanActionMenu, setChallanActionMenu] = useState<string | null>(null)
   const [showUploadDoc, setShowUploadDoc] = useState(false)
   const complianceColors = getComplianceColor(vehicle.complianceScore)
-  const categoryConfig = CATEGORY_CONFIG[vehicle.category]
+  const categoryStyle = CATEGORY_STYLE[vehicle.category]
+  const categoryLabel = t[CATEGORY_LABEL_KEY[vehicle.category]]
 
   const expiredDocs = vehicle.documents.filter((d) => d.status === 'expired')
   const expiringDocs = vehicle.documents.filter((d) => d.status === 'expiring-soon')
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
-        {/* Back Button */}
-        <button
-          onClick={() => onBack?.()}
-          className="inline-flex items-center gap-2 text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors mb-5"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Vehicles
-        </button>
-
         {/* ================================================================= */}
         {/* Hero Header */}
         {/* ================================================================= */}
@@ -900,9 +1187,9 @@ export function VehicleDetail({
             <div className="px-5 py-3 bg-red-50 dark:bg-red-950/30 border-b border-red-200 dark:border-red-900/40 flex items-center gap-2.5">
               <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" />
               <p className="text-sm text-red-700 dark:text-red-300">
-                <span className="font-semibold">{expiredDocs.length} document{expiredDocs.length > 1 ? 's' : ''} expired</span>
+                <span className="font-semibold">{expiredDocs.length} {expiredDocs.length > 1 ? t.documentsExpired : t.documentExpired}</span>
                 {' — '}
-                {expiredDocs.map((d) => DOC_TYPE_LABELS[d.type]?.label || d.name).join(', ')}
+                {expiredDocs.map((d) => { const keys = DOC_TYPE_LABEL_KEY[d.type]; return keys ? t[keys.label] : d.name }).join(', ')}
               </p>
             </div>
           )}
@@ -910,9 +1197,9 @@ export function VehicleDetail({
             <div className="px-5 py-3 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-900/40 flex items-center gap-2.5">
               <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
               <p className="text-sm text-amber-700 dark:text-amber-300">
-                <span className="font-semibold">{expiringDocs.length} document{expiringDocs.length > 1 ? 's' : ''} expiring soon</span>
+                <span className="font-semibold">{expiringDocs.length} {expiringDocs.length > 1 ? t.documentsExpiringSoon : t.documentExpiringSoon}</span>
                 {' — '}
-                {expiringDocs.map((d) => DOC_TYPE_LABELS[d.type]?.label || d.name).join(', ')}
+                {expiringDocs.map((d) => { const keys = DOC_TYPE_LABEL_KEY[d.type]; return keys ? t[keys.label] : d.name }).join(', ')}
               </p>
             </div>
           )}
@@ -922,6 +1209,12 @@ export function VehicleDetail({
               {/* Left: Vehicle Info */}
               <div className="flex-1">
                 <div className="flex items-start gap-4 mb-5">
+                  <button
+                    onClick={() => onBack?.()}
+                    className="mt-1 p-2 -ml-1 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex-shrink-0"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
                   <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
                     vehicle.status === 'active'
                       ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400'
@@ -930,24 +1223,24 @@ export function VehicleDetail({
                     <Truck className="w-7 h-7" />
                   </div>
                   <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
-                      {vehicle.rcNumber}
-                    </h1>
-                    <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
-                      {vehicle.make} {vehicle.model} · {vehicle.year} · {vehicle.vehicleType}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2.5">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${categoryConfig.bg} ${categoryConfig.text}`}>
-                        {categoryConfig.label}
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
+                        {vehicle.rcNumber}
+                      </h1>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${categoryStyle.bg} ${categoryStyle.text}`}>
+                        {categoryLabel}
                       </span>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${
                         vehicle.status === 'active'
                           ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                           : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
                       }`}>
-                        {vehicle.status === 'active' ? 'Active' : 'Inactive'}
+                        {vehicle.status === 'active' ? t.active : t.inactive}
                       </span>
                     </div>
+                    <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
+                      {vehicle.make} {vehicle.model} · {vehicle.year} · {vehicle.vehicleType}
+                    </p>
                   </div>
                 </div>
 
@@ -955,33 +1248,33 @@ export function VehicleDetail({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setShowEditModal(true)}
-                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
                   >
                     <Pencil className="w-3.5 h-3.5" />
-                    Edit Vehicle
+                    {t.editVehicle}
                   </button>
                   <button
                     onClick={() => setShowAssignDriver(true)}
-                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-600 transition-colors"
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                   >
                     <UserPlus className="w-3.5 h-3.5" />
-                    {driver ? 'Change Driver' : 'Assign Driver'}
+                    {driver ? t.changeDriver : t.assignDriver}
                   </button>
                   <button
                     onClick={() => onDelete?.()}
                     className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-amber-600 dark:text-amber-400 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-colors"
                   >
                     <Ban className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Deactivate</span>
+                    <span className="hidden sm:inline">{t.deactivate}</span>
                   </button>
                 </div>
               </div>
 
               {/* Right: Compliance Score Ring */}
               <div className="flex flex-col items-center gap-2">
-                <ComplianceRing score={vehicle.complianceScore} />
+                <ComplianceRing score={vehicle.complianceScore} t={t} />
                 <span className={`text-xs font-semibold uppercase tracking-wider ${complianceColors.text}`}>
-                  {complianceColors.label}
+                  {t[complianceColors.labelKey]}
                 </span>
               </div>
             </div>
@@ -991,21 +1284,21 @@ export function VehicleDetail({
         {/* ================================================================= */}
         {/* Tab Switcher */}
         {/* ================================================================= */}
-        <div className="flex items-center gap-1 p-1 bg-stone-100 dark:bg-stone-900 rounded-lg w-fit mb-6 overflow-x-auto">
+        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-6 overflow-x-auto">
           {TABS.map((tab) => {
             const Icon = tab.icon
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                     : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                {tab.label}
+                {t[tab.labelKey]}
               </button>
             )
           })}
@@ -1018,39 +1311,39 @@ export function VehicleDetail({
           <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">RC Number</p>
+                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.rcNumber}</p>
                 <p className="text-sm font-semibold font-mono text-stone-900 dark:text-stone-100">{vehicle.rcNumber}</p>
               </div>
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Vehicle Type</p>
+                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.vehicleType}</p>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.vehicleType}</p>
               </div>
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Make</p>
+                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.make}</p>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.make}</p>
               </div>
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Model</p>
+                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.model}</p>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.model}</p>
               </div>
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Year</p>
+                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.year}</p>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.year}</p>
               </div>
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Category</p>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${categoryConfig.bg} ${categoryConfig.text}`}>
-                  {categoryConfig.label}
+                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.category}</p>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${categoryStyle.bg} ${categoryStyle.text}`}>
+                  {categoryLabel}
                 </span>
               </div>
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Status</p>
+                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.status}</p>
                 <span className={`text-sm font-medium ${
                   vehicle.status === 'active'
                     ? 'text-emerald-600 dark:text-emerald-400'
                     : 'text-stone-500 dark:text-stone-400'
                 }`}>
-                  {vehicle.status === 'active' ? 'Active' : 'Inactive'}
+                  {vehicle.status === 'active' ? t.active : t.inactive}
                 </span>
               </div>
             </div>
@@ -1061,22 +1354,22 @@ export function VehicleDetail({
         {/* Tab: Documents */}
         {/* ================================================================= */}
         {activeTab === 'documents' && (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6">
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">
-                Vehicle Documents
+                {t.vehicleDocuments}
               </h3>
               <button
                 onClick={() => setShowUploadDoc(true)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition-colors shadow-sm"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors shadow-sm"
               >
                 <FileText className="w-3.5 h-3.5" />
-                Upload Document
+                {t.uploadDocument}
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {vehicle.documents.map((doc) => (
-                <DocumentCard key={doc.id} doc={doc} />
+                <DocumentCard key={doc.id} doc={doc} t={t} language={language} />
               ))}
             </div>
           </div>
@@ -1088,11 +1381,11 @@ export function VehicleDetail({
         {activeTab === 'compliance' && (
           <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6">
             <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
-              <ComplianceRing score={vehicle.complianceScore} />
+              <ComplianceRing score={vehicle.complianceScore} t={t} />
               <div className="flex-1 text-center sm:text-left">
-                <p className={`text-lg font-bold ${complianceColors.text}`}>{complianceColors.label}</p>
+                <p className={`text-lg font-bold ${complianceColors.text}`}>{t[complianceColors.labelKey]}</p>
                 <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
-                  Overall compliance score based on document validity
+                  {t.overallComplianceScore}
                 </p>
 
                 <div className="mt-5 space-y-3">
@@ -1100,9 +1393,9 @@ export function VehicleDetail({
                     <div className="flex items-center gap-2.5 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 rounded-lg">
                       <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" />
                       <p className="text-sm text-red-700 dark:text-red-300">
-                        <span className="font-semibold">{expiredDocs.length} expired</span>
+                        <span className="font-semibold">{expiredDocs.length} {t.expiredLabel}</span>
                         {' — '}
-                        {expiredDocs.map((d) => DOC_TYPE_LABELS[d.type]?.label || d.name).join(', ')}
+                        {expiredDocs.map((d) => { const keys = DOC_TYPE_LABEL_KEY[d.type]; return keys ? t[keys.label] : d.name }).join(', ')}
                       </p>
                     </div>
                   )}
@@ -1110,9 +1403,9 @@ export function VehicleDetail({
                     <div className="flex items-center gap-2.5 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 rounded-lg">
                       <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
                       <p className="text-sm text-amber-700 dark:text-amber-300">
-                        <span className="font-semibold">{expiringDocs.length} expiring soon</span>
+                        <span className="font-semibold">{expiringDocs.length} {t.expiringSoonLabel}</span>
                         {' — '}
-                        {expiringDocs.map((d) => DOC_TYPE_LABELS[d.type]?.label || d.name).join(', ')}
+                        {expiringDocs.map((d) => { const keys = DOC_TYPE_LABEL_KEY[d.type]; return keys ? t[keys.label] : d.name }).join(', ')}
                       </p>
                     </div>
                   )}
@@ -1120,7 +1413,7 @@ export function VehicleDetail({
                     <div className="flex items-center gap-2.5 p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                       <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                        All documents are valid and up to date
+                        {t.allDocumentsValid}
                       </p>
                     </div>
                   )}
@@ -1141,10 +1434,10 @@ export function VehicleDetail({
                   <Search className="w-7 h-7 text-amber-600 dark:text-amber-400" />
                 </div>
                 <h3 className="text-base font-semibold text-stone-900 dark:text-stone-50 mb-1.5">
-                  Fetch Challans for {vehicle.rcNumber}
+                  {t.fetchChallansFor} {vehicle.rcNumber}
                 </h3>
                 <p className="text-sm text-stone-500 dark:text-stone-400 mb-6 max-w-sm mx-auto">
-                  Check for pending traffic challans from Parivahan and other government databases against this vehicle.
+                  {t.challanIdleDescription}
                 </p>
                 <button
                   onClick={() => {
@@ -1154,10 +1447,10 @@ export function VehicleDetail({
                       setChallanFetchState('done')
                     }, 2500)
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors shadow-sm"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
                 >
                   <RefreshCw className="w-4 h-4" />
-                  Fetch Challans
+                  {t.fetchChallans}
                 </button>
               </div>
             )}
@@ -1168,10 +1461,10 @@ export function VehicleDetail({
                   <Loader2 className="w-7 h-7 text-emerald-600 dark:text-emerald-400 animate-spin" />
                 </div>
                 <h3 className="text-base font-semibold text-stone-900 dark:text-stone-50 mb-1.5">
-                  Fetching Challans...
+                  {t.fetchingChallans}
                 </h3>
                 <p className="text-sm text-stone-500 dark:text-stone-400">
-                  Checking Parivahan and government databases for <span className="font-mono font-medium text-stone-700 dark:text-stone-300">{vehicle.rcNumber}</span>
+                  {t.checkingDatabases} <span className="font-mono font-medium text-stone-700 dark:text-stone-300">{vehicle.rcNumber}</span>
                 </p>
               </div>
             )}
@@ -1182,11 +1475,11 @@ export function VehicleDetail({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">
-                      Pending Challans
+                      {t.pendingChallans}
                     </h3>
                     {fetchedChallans.length > 0 && (
                       <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400">
-                        {fetchedChallans.filter(c => c.status === 'pending').length} pending
+                        {fetchedChallans.filter(c => c.status === 'pending').length} {t.pending.toLowerCase()}
                       </span>
                     )}
                   </div>
@@ -1198,10 +1491,10 @@ export function VehicleDetail({
                         setChallanFetchState('done')
                       }, 2500)
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs font-medium text-stone-600 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-600 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    Re-fetch
+                    {t.reFetch}
                   </button>
                 </div>
 
@@ -1213,9 +1506,9 @@ export function VehicleDetail({
                         <IndianRupee className="w-5 h-5 text-amber-700 dark:text-amber-400" />
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">Total Pending Amount</p>
+                        <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">{t.totalPendingAmount}</p>
                         <p className="text-xl font-bold text-amber-800 dark:text-amber-200 tabular-nums">
-                          {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(
+                          {new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(
                             fetchedChallans.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.amount, 0)
                           )}
                         </p>
@@ -1241,7 +1534,7 @@ export function VehicleDetail({
                               <p className="text-sm font-semibold text-stone-900 dark:text-stone-50">
                                 {challan.violationType}
                               </p>
-                              <p className="text-xs text-stone-400 dark:text-stone-500 font-mono mt-0.5">
+                              <p className="text-xs text-stone-500 dark:text-stone-400 font-mono mt-0.5">
                                 {challan.challanNumber}
                               </p>
                             </div>
@@ -1254,7 +1547,7 @@ export function VehicleDetail({
                                 ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300'
                                 : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                             }`}>
-                              {challan.status === 'pending' ? 'Pending' : challan.status === 'submitted' ? 'Submitted' : 'Resolved'}
+                              {challan.status === 'pending' ? t.pending : challan.status === 'submitted' ? t.submitted : t.resolved}
                             </span>
                           </div>
                         </div>
@@ -1263,12 +1556,12 @@ export function VehicleDetail({
                           <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
                             <IndianRupee className="w-3.5 h-3.5 flex-shrink-0" />
                             <span className="font-semibold text-stone-900 dark:text-stone-100 tabular-nums">
-                              {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(challan.amount)}
+                              {new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(challan.amount)}
                             </span>
                           </div>
                           <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
                             <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                            {formatDate(challan.issueDate)}
+                            {formatDate(challan.issueDate, language)}
                           </div>
                           <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
                             <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
@@ -1285,17 +1578,17 @@ export function VehicleDetail({
                                   prev.map(c => c.id === challan.id ? { ...c, status: 'submitted' as const } : c)
                                 )
                               }}
-                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium transition-colors shadow-sm"
+                              className="flex items-center gap-1.5 px-3.5 py-2 min-h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors shadow-sm"
                             >
                               <Gavel className="w-3.5 h-3.5" />
-                              Submit for Resolution
+                              {t.submitForResolution}
                             </button>
                             <button
                               onClick={() => {}}
-                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-700 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-600 transition-colors"
+                              className="flex items-center gap-1.5 px-3.5 py-2 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                             >
                               <Send className="w-3.5 h-3.5" />
-                              Send Proposal
+                              {t.sendProposal}
                             </button>
                           </div>
                         )}
@@ -1304,7 +1597,7 @@ export function VehicleDetail({
                           <div className="flex items-center gap-2 pt-3 border-t border-stone-100 dark:border-stone-800">
                             <span className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400">
                               <Clock className="w-3.5 h-3.5" />
-                              Submitted for resolution — awaiting update
+                              {t.submittedForResolution}
                             </span>
                           </div>
                         )}
@@ -1316,9 +1609,9 @@ export function VehicleDetail({
                     <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
                       <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <p className="text-sm font-medium text-stone-900 dark:text-stone-50">No pending challans</p>
-                    <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
-                      This vehicle has no pending traffic challans
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-50">{t.noPendingChallans}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                      {t.noPendingChallansDesc}
                     </p>
                   </div>
                 )}
@@ -1353,28 +1646,28 @@ export function VehicleDetail({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                    <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">License Number</p>
+                    <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.licenseNumber}</p>
                     <p className="text-sm font-medium font-mono text-stone-900 dark:text-stone-100">{driver.licenseNumber}</p>
                   </div>
                   <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                    <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">License Expiry</p>
-                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{formatDate(driver.licenseExpiry)}</p>
+                    <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.licenseExpiry}</p>
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{formatDate(driver.licenseExpiry, language)}</p>
                   </div>
                   <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                    <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">License Status</p>
+                    <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.licenseStatus}</p>
                     {(() => {
-                      const config = DOC_STATUS_CONFIG[driver.licenseStatus]
-                      const Icon = config.icon
+                      const style = DOC_STATUS_STYLE[driver.licenseStatus]
+                      const Icon = style.icon
                       return (
-                        <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${config.text}`}>
+                        <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${style.text}`}>
                           <Icon className="w-3.5 h-3.5" />
-                          {config.label}
+                          {t[DOC_STATUS_LABEL_KEY[driver.licenseStatus]]}
                         </span>
                       )
                     })()}
                   </div>
                   <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                    <p className="text-[10px] font-medium text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Vehicles Assigned</p>
+                    <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.vehiclesAssigned}</p>
                     <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{driver.assignedVehicleIds.length}</p>
                   </div>
                 </div>
@@ -1385,17 +1678,17 @@ export function VehicleDetail({
                   <UserPlus className="w-6 h-6 text-stone-400 dark:text-stone-500" />
                 </div>
                 <p className="text-sm font-medium text-stone-600 dark:text-stone-400 mb-1">
-                  No driver assigned
+                  {t.noDriverAssigned}
                 </p>
-                <p className="text-xs text-stone-400 dark:text-stone-500 mb-4">
-                  Assign a driver to this vehicle to track their details here
+                <p className="text-xs text-stone-500 dark:text-stone-400 mb-4">
+                  {t.noDriverAssignedDesc}
                 </p>
                 <button
                   onClick={() => setShowAssignDriver(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors"
                 >
                   <UserPlus className="w-4 h-4" />
-                  Assign Driver
+                  {t.assignDriver}
                 </button>
               </div>
             )}
@@ -1408,6 +1701,7 @@ export function VehicleDetail({
           onClose={() => setShowEditModal(false)}
           vehicle={vehicle}
           onSave={() => onEdit?.()}
+          t={t}
         />
 
         {/* Assign Driver Modal */}
@@ -1417,6 +1711,7 @@ export function VehicleDetail({
           drivers={drivers}
           currentDriverId={vehicle.assignedDriverId}
           onAssign={(driverId) => onAssignDriver?.(driverId)}
+          t={t}
         />
 
         {/* Upload Document Modal */}
@@ -1424,6 +1719,7 @@ export function VehicleDetail({
           isOpen={showUploadDoc}
           onClose={() => setShowUploadDoc(false)}
           rcNumber={vehicle.rcNumber}
+          t={t}
         />
       </div>
     </div>

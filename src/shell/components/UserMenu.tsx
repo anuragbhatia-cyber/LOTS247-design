@@ -46,7 +46,7 @@ export function UserMenu({ user, isCollapsed, onLogout }: UserMenuProps) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          w-full flex items-center gap-3 p-3
+          w-full flex items-center gap-3 p-3 min-h-11
           hover:bg-stone-800 transition-colors
           ${isCollapsed ? 'justify-center' : ''}
         `}
@@ -127,7 +127,7 @@ export function UserMenu({ user, isCollapsed, onLogout }: UserMenuProps) {
               setIsOpen(false)
               onLogout?.()
             }}
-            className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-stone-400 hover:text-red-400 hover:bg-stone-800 transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2.5 min-h-11 text-sm text-stone-400 hover:text-red-400 hover:bg-stone-800 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign out</span>

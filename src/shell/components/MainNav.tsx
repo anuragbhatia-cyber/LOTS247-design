@@ -58,7 +58,7 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
                   }
                 }}
                 className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium
+                  w-full flex items-center gap-3 px-3 py-2.5 min-h-11 rounded-lg text-[13px] font-medium
                   transition-all duration-150
                   ${isCollapsed ? 'justify-center px-2' : ''}
                   ${
@@ -119,7 +119,7 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
                       <button
                         onClick={() => onNavigate?.(child.href)}
                         className={`
-                          w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm
+                          w-full flex items-center gap-2.5 px-3 py-2 min-h-11 rounded-lg text-sm
                           transition-all duration-150
                           ${
                             child.isActive
@@ -142,8 +142,8 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
                         {child.badge !== undefined && (
                           <span
                             className={`
-                              min-w-[1.125rem] h-[1.125rem] px-1 flex items-center justify-center
-                              text-[10px] font-semibold rounded-full
+                              px-1.5 py-0.5 flex items-center justify-center
+                              text-[10px] font-semibold rounded-full whitespace-nowrap
                               ${
                                 child.isActive
                                   ? 'bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200'
