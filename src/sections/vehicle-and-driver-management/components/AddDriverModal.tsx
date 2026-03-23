@@ -91,7 +91,7 @@ export function AddDriverModal({
               <UserPlus className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
+              <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
                 {t.addDriver}
               </h2>
               <p className="text-xs text-stone-500 dark:text-stone-400">

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   ArrowLeft,
   CreditCard,
@@ -25,6 +25,9 @@ import {
   FileBarChart,
   Paperclip,
   Upload,
+  Eye,
+  X,
+  FilePlus,
 } from 'lucide-react'
 import type {
   ChallanDetailProps,
@@ -52,9 +55,11 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Tabs
     tabOverview: 'Overview',
-    tabComments: 'Comments',
-    tabCommentsShort: 'Chat',
-    tabReport: 'Report',
+    tabDocuments: 'Documents',
+    tabDocumentsShort: 'Docs',
+    tabComments: 'Follow-up',
+    tabCommentsShort: 'Follow-up',
+    tabReport: 'Reports',
     noReportYet: 'No report generated yet',
 
     // SLA
@@ -70,7 +75,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Section card titles
     challanDetails: 'Challan Details',
     timeline: 'Timeline',
-    comments: 'Comments',
+    comments: 'Follow-up',
 
     // Detail row labels
     vehicle: 'Vehicle',
@@ -97,7 +102,7 @@ const translations: Record<Language, Record<string, string>> = {
     noActivityYet: 'No activity yet',
 
     // Comments
-    noCommentsYet: 'No comments yet. Start the conversation below.',
+    noCommentsYet: 'No follow-ups yet. Start the conversation below.',
     support: 'Support',
     typeMessage: 'Type a message...',
     enterToSend: 'Press Enter to send, Shift+Enter for new line',
@@ -115,8 +120,10 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Tabs
     tabOverview: 'अवलोकन',
-    tabComments: 'टिप्पणियाँ',
-    tabCommentsShort: 'चैट',
+    tabDocuments: 'दस्तावेज़',
+    tabDocumentsShort: 'दस्तावेज़',
+    tabComments: 'फॉलो-अप',
+    tabCommentsShort: 'फॉलो-अप',
     tabReport: 'रिपोर्ट',
     noReportYet: 'अभी कोई रिपोर्ट नहीं बनी',
 
@@ -133,7 +140,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Section card titles
     challanDetails: 'चालान विवरण',
     timeline: 'समयरेखा',
-    comments: 'टिप्पणियाँ',
+    comments: 'फॉलो-अप',
 
     // Detail row labels
     vehicle: 'वाहन',
@@ -160,7 +167,7 @@ const translations: Record<Language, Record<string, string>> = {
     noActivityYet: 'अभी कोई गतिविधि नहीं',
 
     // Comments
-    noCommentsYet: 'अभी कोई टिप्पणी नहीं। नीचे बातचीत शुरू करें।',
+    noCommentsYet: 'अभी कोई फॉलो-अप नहीं। नीचे बातचीत शुरू करें।',
     support: 'सहायता',
     typeMessage: 'संदेश लिखें...',
     enterToSend: 'भेजने के लिए Enter दबाएँ, नई लाइन के लिए Shift+Enter',
@@ -276,11 +283,13 @@ function SectionCard({
   title,
   icon: Icon,
   count,
+  action,
   children,
 }: {
   title?: string
   icon?: typeof Activity
   count?: number
+  action?: React.ReactNode
   children: React.ReactNode
 }) {
   return (
@@ -298,6 +307,7 @@ function SectionCard({
               </span>
             )}
           </div>
+          {action}
         </div>
       )}
       <div className="p-5">{children}</div>
@@ -465,7 +475,7 @@ function Timeline({ activities, t, lang }: { activities: ChallanActivity[]; t: R
 // Tab types
 // ---------------------------------------------------------------------------
 
-type TabId = 'overview' | 'comments' | 'report'
+type TabId = 'overview' | 'documents' | 'comments' | 'report'
 
 // ---------------------------------------------------------------------------
 // SLA Progress
@@ -669,13 +679,10 @@ function OverviewTab({
 }) {
   return (
     <div className="space-y-3">
-      {/* Amount + Violation */}
-      <div className="flex items-baseline gap-2">
+      {/* Amount */}
+      <div>
         <span className="text-3xl font-bold text-stone-900 dark:text-stone-50 tabular-nums tracking-tight">
           {formatCurrency(challan.amount)}
-        </span>
-        <span className="text-sm text-stone-500 dark:text-stone-400">
-          {challan.violationType}
         </span>
       </div>
 
@@ -842,36 +849,165 @@ const SAMPLE_DOCS = [
   { id: 'd3', name: 'Driver License Copy.jpg', size: '312 KB', color: 'text-blue-500 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30' },
 ]
 
-function DocumentsSection() {
-  return (
-    <SectionCard title="Documents" icon={Paperclip} count={SAMPLE_DOCS.length}>
-      <div className="space-y-1.5">
-        {SAMPLE_DOCS.map((doc) => (
-          <div
-            key={doc.id}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors group"
-          >
-            <div className={`w-9 h-9 rounded-lg ${doc.bg} flex items-center justify-center flex-shrink-0`}>
-              <FileText className={`w-4 h-4 ${doc.color}`} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
-                {doc.name}
-              </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400">{doc.size}</p>
-            </div>
-            <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700 flex-shrink-0">
-              <Download className="w-3.5 h-3.5 text-stone-500 dark:text-stone-400" />
-            </button>
-          </div>
-        ))}
+function UploadDocumentModal({ onClose }: { onClose: () => void }) {
+  const [dragOver, setDragOver] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-        <button className="w-full mt-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-dashed border-stone-300 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800/30 text-sm text-stone-500 dark:text-stone-400 transition-colors">
-          <Upload className="w-3.5 h-3.5" />
-          Upload document
-        </button>
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) setSelectedFile(file)
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) setSelectedFile(file)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+          <div className="flex items-center gap-2">
+            <FilePlus className="w-4 h-4 text-stone-500 dark:text-stone-400" />
+            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">Upload Document</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-5 space-y-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
+          {/* Drop zone */}
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`flex flex-col items-center justify-center gap-3 px-6 py-10 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
+              dragOver
+                ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-950/30'
+                : selectedFile
+                ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20'
+                : 'border-stone-300 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800/30'
+            }`}
+          >
+            {selectedFile ? (
+              <>
+                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/50 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{selectedFile.name}</p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                    {(selectedFile.size / 1024).toFixed(0)} KB
+                  </p>
+                </div>
+                <p className="text-xs text-stone-500 dark:text-stone-400">Click to change file</p>
+              </>
+            ) : (
+              <>
+                <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-stone-700 dark:text-stone-300">
+                    Drop file here or <span className="text-emerald-600 dark:text-emerald-400">browse</span>
+                  </p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                    PDF, JPG, PNG up to 10 MB
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-stone-100 dark:border-stone-800">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onClose}
+            disabled={!selectedFile}
+            className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 text-sm font-semibold transition-colors"
+          >
+            Upload
+          </button>
+        </div>
       </div>
-    </SectionCard>
+    </div>
+  )
+}
+
+function DocumentsSection() {
+  const [showUpload, setShowUpload] = useState(false)
+
+  return (
+    <>
+      <SectionCard
+        title="Documents"
+        icon={Paperclip}
+        count={SAMPLE_DOCS.length}
+        action={
+          <button
+            onClick={() => setShowUpload(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            Upload
+          </button>
+        }
+      >
+        <div className="space-y-1.5">
+          {SAMPLE_DOCS.map((doc) => (
+            <div
+              key={doc.id}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors group"
+            >
+              <div className={`w-9 h-9 rounded-lg ${doc.bg} flex items-center justify-center flex-shrink-0`}>
+                <FileText className={`w-4 h-4 ${doc.color}`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">
+                  {doc.name}
+                </p>
+                <p className="text-xs text-stone-500 dark:text-stone-400">{doc.size}</p>
+              </div>
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                <button className="p-1.5 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700">
+                  <Eye className="w-3.5 h-3.5 text-stone-500 dark:text-stone-400" />
+                </button>
+                <button className="p-1.5 rounded-lg hover:bg-stone-200 dark:hover:bg-stone-700">
+                  <Download className="w-3.5 h-3.5 text-stone-500 dark:text-stone-400" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
+
+      {showUpload && <UploadDocumentModal onClose={() => setShowUpload(false)} />}
+    </>
   )
 }
 
@@ -906,10 +1042,12 @@ export function ChallanDetail({
     { id: 'overview', label: t.tabOverview, shortLabel: t.tabOverview, icon: Info },
     { id: 'comments', label: t.tabComments, shortLabel: t.tabCommentsShort, icon: MessageSquare },
     { id: 'report', label: t.tabReport, shortLabel: t.tabReport, icon: FileBarChart },
+    { id: 'documents', label: t.tabDocuments, shortLabel: t.tabDocumentsShort, icon: Paperclip },
   ]
 
   const tabCounts: Record<TabId, number> = {
     overview: 0,
+    documents: SAMPLE_DOCS.length,
     comments: comments.length,
     report: 0,
   }
@@ -997,11 +1135,16 @@ export function ChallanDetail({
                   onRequestRefund={onRequestRefund}
                 />
               </SectionCard>
-              <DocumentsSection />
             </div>
             <SectionCard title={t.timeline} icon={Activity} count={activities.length}>
               <Timeline activities={activities} t={t} lang={language} />
             </SectionCard>
+          </div>
+        )}
+
+        {activeTab === 'documents' && (
+          <div className="mt-5">
+            <DocumentsSection />
           </div>
         )}
 

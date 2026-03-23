@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import data from '@/../product/sections/incident-management/data.json'
 import { ChallanDetail } from './components/ChallanDetail'
 
@@ -21,12 +22,29 @@ export default function ChallanDetailPreview() {
   const driver = challan.driverId
     ? data.drivers.find((d) => d.id === challan.driverId) || null
     : null
-  const comments = data.comments.filter(
+  const initialComments = data.comments.filter(
     (c) => c.entityType === 'challan' && c.entityId === challan.id
   )
   const activities = data.challanActivities.filter(
     (a) => a.challanId === challan.id
   )
+
+  const [comments, setComments] = useState(initialComments)
+
+  const handleAddComment = (msg: string) => {
+    setComments((prev) => [
+      ...prev,
+      {
+        id: `cmt-${Date.now()}`,
+        entityType: 'challan' as const,
+        entityId: challan.id,
+        authorType: 'user' as const,
+        authorName: 'Rajesh Kumar',
+        message: msg,
+        createdAt: new Date().toISOString(),
+      },
+    ])
+  }
 
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
@@ -41,7 +59,7 @@ export default function ChallanDetailPreview() {
         onEscalateToCase={() => console.log('Escalate to case:', challan.id)}
         onDownloadReceipt={() => console.log('Download receipt:', challan.id)}
         onRequestRefund={() => console.log('Request refund:', challan.id)}
-        onAddComment={(msg) => console.log('Add comment:', msg)}
+        onAddComment={handleAddComment}
         onBack={() => navigateToScreen('IncidentManagement', { tab: 'challans' })}
       />
     </div>

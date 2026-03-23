@@ -237,7 +237,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
               </button>
             )}
             <div>
-              <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
+              <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
                 {headerTitle}
               </h2>
               {headerSubtitle && (

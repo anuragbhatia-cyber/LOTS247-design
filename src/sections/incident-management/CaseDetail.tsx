@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import data from '@/../product/sections/incident-management/data.json'
 import { CaseDetail } from './components/CaseDetail'
 
@@ -33,9 +34,26 @@ export default function CaseDetailPreview() {
   const reports = data.caseReports.filter(
     (r) => r.caseId === caseItem.id
   )
-  const comments = data.comments.filter(
+  const initialComments = data.comments.filter(
     (c) => c.entityType === 'case' && c.entityId === caseItem.id
   )
+
+  const [comments, setComments] = useState(initialComments)
+
+  const handleAddComment = (msg: string) => {
+    setComments((prev) => [
+      ...prev,
+      {
+        id: `cmt-${Date.now()}`,
+        entityType: 'case' as const,
+        entityId: caseItem.id,
+        authorType: 'user' as const,
+        authorName: 'Rajesh Kumar',
+        message: msg,
+        createdAt: new Date().toISOString(),
+      },
+    ])
+  }
 
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
@@ -49,7 +67,7 @@ export default function CaseDetailPreview() {
         reports={reports}
         comments={comments}
         onUploadDocument={(file) => console.log('Upload document:', file.name)}
-        onAddComment={(msg) => console.log('Add comment:', msg)}
+        onAddComment={handleAddComment}
         onBack={() => navigateToScreen('IncidentManagement', { tab: 'cases' })}
       />
     </div>

@@ -30,7 +30,7 @@ export function ContactModal({ apiName, isOpen, onClose, onSubmit }: ContactModa
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/30 dark:bg-black/50"
         onClick={onClose}
       />
 
@@ -38,7 +38,7 @@ export function ContactModal({ apiName, isOpen, onClose, onSubmit }: ContactModa
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-2xl shadow-stone-300/30 dark:shadow-stone-950/50 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
-          <h3 className="text-base font-semibold text-stone-900 dark:text-stone-50">
+          <h3 className="text-base font-bold text-stone-900 dark:text-stone-50">
             Contact for Pricing
           </h3>
           <button

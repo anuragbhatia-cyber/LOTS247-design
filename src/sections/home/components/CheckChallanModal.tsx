@@ -88,7 +88,7 @@ export function CheckChallanModal({ isOpen, onClose, onCheck, onShowResults }: C
           <>
             <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
               <div>
-                <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">{t.title}</h2>
+                <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">{t.title}</h2>
                 <p className="text-xs text-stone-500 dark:text-stone-400">{t.subtitle}</p>
               </div>
               <button onClick={handleClose} className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
@@ -128,7 +128,7 @@ export function CheckChallanModal({ isOpen, onClose, onCheck, onShowResults }: C
         ) : (
           <div className="px-6 py-16 flex flex-col items-center text-center">
             <Loader2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400 animate-spin mb-5" />
-            <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50 mb-1.5">
+            <h2 className="text-base font-bold text-stone-900 dark:text-stone-50 mb-1.5">
               {t.checking}
             </h2>
             <p className="text-sm text-stone-500 dark:text-stone-400">

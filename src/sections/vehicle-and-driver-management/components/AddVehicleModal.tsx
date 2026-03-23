@@ -119,7 +119,7 @@ export function AddVehicleModal({
               <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50">
+              <h2 className="text-lg font-bold text-stone-900 dark:text-stone-50">
                 {t.vehicleAdded}
               </h2>
               <p className="text-sm text-stone-500 dark:text-stone-400 mt-1.5">
@@ -142,7 +142,7 @@ export function AddVehicleModal({
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
               <div>
-                <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
+                <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
                   {t.addVehicle}
                 </h2>
                 <p className="text-xs text-stone-500 dark:text-stone-400">

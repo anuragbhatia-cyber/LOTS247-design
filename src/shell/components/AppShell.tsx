@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle } from 'lucide-react'
+import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2 } from 'lucide-react'
 import { MainNav } from './MainNav'
 import { useLanguage, type Language } from './LanguageContext'
 import { NotificationsView } from '@/sections/home/components/NotificationsView'
@@ -7,6 +7,7 @@ import { AddVehicleModal } from '@/sections/vehicle-and-driver-management/compon
 import { AddDriverModal } from '@/sections/vehicle-and-driver-management/components/AddDriverModal'
 import { CheckChallanModal } from '@/sections/home/components/CheckChallanModal'
 import { AddIncidentModal } from '@/sections/home/components/AddIncidentModal'
+import { BulkUploadModal } from '@/sections/vehicle-and-driver-management/components/BulkUploadModal'
 import { ChallanResultsView } from '@/sections/home/components/ChallanResultsView'
 
 interface Notification {
@@ -171,6 +172,162 @@ const QUICK_ACTIONS = [
   },
 ]
 
+// ---------------------------------------------------------------------------
+// Support Ticket Modal
+// ---------------------------------------------------------------------------
+
+function SupportModal({
+  isOpen,
+  onClose,
+  language,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  language: Language
+}) {
+  const [subscriberId, setSubscriberId] = useState('')
+  const [name, setName] = useState('')
+  const [message, setMessage] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+
+  if (!isOpen) return null
+
+  const handleSubmit = () => {
+    if (subscriberId.trim() && name.trim() && message.trim()) {
+      setSubmitted(true)
+    }
+  }
+
+  const handleClose = () => {
+    setSubscriberId('')
+    setName('')
+    setMessage('')
+    setSubmitted(false)
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60" onClick={handleClose} />
+      <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+          <div className="flex items-center gap-2">
+            <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
+              {language === 'en' ? 'Raise a Support Ticket' : 'सहायता टिकट बनाएं'}
+            </h3>
+          </div>
+          <button
+            onClick={handleClose}
+            className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {submitted ? (
+          /* Success state */
+          <div className="p-8 text-center">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-100 dark:bg-emerald-950/50 flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <h4 className="text-base font-bold text-stone-900 dark:text-stone-100 mb-1.5">
+              {language === 'en' ? 'Ticket Submitted' : 'टिकट जमा किया गया'}
+            </h4>
+            <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
+              {language === 'en'
+                ? 'Our team will reach out to you within a few hours. Thank you for your patience.'
+                : 'हमारी टीम कुछ ही घंटों में आपसे संपर्क करेगी। आपके धैर्य के लिए धन्यवाद।'}
+            </p>
+            <button
+              onClick={handleClose}
+              className="mt-6 px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
+            >
+              {language === 'en' ? 'Done' : 'ठीक है'}
+            </button>
+          </div>
+        ) : (
+          /* Form */
+          <>
+            <div className="p-5 space-y-4">
+              {/* Subscriber ID */}
+              <div>
+                <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
+                  {language === 'en' ? 'Subscriber ID' : 'सब्सक्राइबर ID'}
+                </label>
+                <input
+                  type="text"
+                  value={subscriberId}
+                  onChange={(e) => setSubscriberId(e.target.value)}
+                  placeholder={language === 'en' ? 'e.g. SUB-10234' : 'जैसे SUB-10234'}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                />
+              </div>
+
+              {/* Name */}
+              <div>
+                <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
+                  {language === 'en' ? 'Your Name' : 'आपका नाम'}
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={language === 'en' ? 'Enter your full name' : 'अपना पूरा नाम दर्ज करें'}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                />
+              </div>
+
+              {/* Message */}
+              <div>
+                <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
+                  {language === 'en' ? 'Message' : 'संदेश'}
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={language === 'en' ? 'Describe your issue or question...' : 'अपनी समस्या या प्रश्न का वर्णन करें...'}
+                  rows={4}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 resize-none transition-colors"
+                />
+              </div>
+
+              {/* Info message */}
+              <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
+                <HelpCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-emerald-700 dark:text-emerald-300 leading-relaxed">
+                  {language === 'en'
+                    ? 'Our team will reach out to you within a few hours after you submit this ticket.'
+                    : 'टिकट जमा करने के बाद हमारी टीम कुछ ही घंटों में आपसे संपर्क करेगी।'}
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-stone-100 dark:border-stone-800">
+              <button
+                onClick={handleClose}
+                className="px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+              >
+                {language === 'en' ? 'Cancel' : 'रद्द करें'}
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!subscriberId.trim() || !name.trim() || !message.trim()}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 text-sm font-semibold transition-colors"
+              >
+                <Send className="w-3.5 h-3.5" />
+                {language === 'en' ? 'Submit Ticket' : 'टिकट जमा करें'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function AppShell({
   children,
   navigationItems,
@@ -192,7 +349,10 @@ export function AppShell({
   const [showAddDriver, setShowAddDriver] = useState(false)
   const [showCheckChallan, setShowCheckChallan] = useState(false)
   const [showAddIncident, setShowAddIncident] = useState(false)
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [challanResultsVehicle, setChallanResultsVehicle] = useState<string | null>(null)
+  const [iframeOverlay, setIframeOverlay] = useState(false)
+  const [showSupport, setShowSupport] = useState(false)
   const quickActionsRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
@@ -234,8 +394,17 @@ export function AppShell({
       if (event.data?.type === 'openAddIncident') {
         setShowAddIncident(true)
       }
+      if (event.data?.type === 'openBulkUpload') {
+        setShowBulkUpload(true)
+      }
       if (event.data?.type === 'openChallanResults' && event.data?.vehicleNumber) {
         setChallanResultsVehicle(event.data.vehicleNumber)
+      }
+      if (event.data?.type === 'showOverlay') {
+        setIframeOverlay(true)
+      }
+      if (event.data?.type === 'hideOverlay') {
+        setIframeOverlay(false)
       }
     }
     window.addEventListener('message', handleMessage)
@@ -376,6 +545,7 @@ export function AppShell({
         >
           {/* Help */}
           <button
+            onClick={() => setShowSupport(true)}
             className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium"
           >
             <HelpCircle className="w-4 h-4" />
@@ -562,6 +732,11 @@ export function AppShell({
         </div>
       </main>
 
+      {/* Iframe overlay — shown when an embedded section opens a modal */}
+      {iframeOverlay && (
+        <div className="fixed inset-0 z-[90] bg-black/50 dark:bg-black/70 pointer-events-none" />
+      )}
+
       {/* Add Vehicle Modal */}
       <AddVehicleModal
         isOpen={showAddVehicle}
@@ -585,6 +760,19 @@ export function AppShell({
       <AddIncidentModal
         isOpen={showAddIncident}
         onClose={() => setShowAddIncident(false)}
+      />
+
+      {/* Bulk Upload Modal */}
+      <BulkUploadModal
+        isOpen={showBulkUpload}
+        onClose={() => setShowBulkUpload(false)}
+      />
+
+      {/* Support Ticket Modal */}
+      <SupportModal
+        isOpen={showSupport}
+        onClose={() => setShowSupport(false)}
+        language={language}
       />
     </div>
   )

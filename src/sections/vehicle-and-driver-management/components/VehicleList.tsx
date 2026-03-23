@@ -19,10 +19,7 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
-  Download,
-  FileSpreadsheet,
   CheckCircle2,
-  AlertCircle,
   UserPlus,
   ArrowLeftRight,
   UserMinus,
@@ -35,8 +32,6 @@ import type {
   VehicleStatus,
   DocumentStatus,
 } from '@/../product/sections/vehicle-and-driver-management/types'
-import { AddVehicleModal } from './AddVehicleModal'
-import { AddDriverModal } from './AddDriverModal'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 // ---------------------------------------------------------------------------
@@ -152,6 +147,21 @@ const translations: Record<Language, Record<string, string>> = {
     cancel: 'Cancel',
     uploadAndImport: 'Upload & Import',
 
+    // Change vehicle modal
+    changeVehicleTitle: 'Change Vehicle',
+    searchVehiclePlaceholder: 'Search by RC number, make, model...',
+    selectVehicle: 'Select a vehicle to assign',
+    currentlyAssigned: 'Currently Assigned',
+    confirmAssignment: 'Confirm Assignment',
+    assignDriverTo: 'Assign',
+    toVehicle: 'to',
+    questionMark: '?',
+    yes: 'Yes',
+    no: 'No',
+    driverAssigned: 'Driver Assigned',
+    driverAssignedDesc: 'has been assigned to',
+    done: 'Done',
+
   },
   hi: {
     // Page header
@@ -260,6 +270,21 @@ const translations: Record<Language, Record<string, string>> = {
     requiredColumnsList: 'RC नंबर, वाहन प्रकार, निर्माता, मॉडल, वर्ष, श्रेणी, बीमा समाप्ति, पीयूसी समाप्ति',
     cancel: 'रद्द करें',
     uploadAndImport: 'अपलोड और आयात',
+
+    // Change vehicle modal
+    changeVehicleTitle: 'वाहन बदलें',
+    searchVehiclePlaceholder: 'RC नंबर, निर्माता, मॉडल से खोजें...',
+    selectVehicle: 'नियुक्त करने के लिए वाहन चुनें',
+    currentlyAssigned: 'वर्तमान में नियुक्त',
+    confirmAssignment: 'नियुक्ति की पुष्टि करें',
+    assignDriverTo: 'नियुक्त करें',
+    toVehicle: 'को',
+    questionMark: '?',
+    yes: 'हाँ',
+    no: 'नहीं',
+    driverAssigned: 'ड्राइवर नियुक्त',
+    driverAssignedDesc: 'को नियुक्त किया गया है',
+    done: 'पूर्ण',
 
   },
 }
@@ -402,204 +427,275 @@ function FilterPill({ label, onClear }: { label: string; onClear: () => void }) 
 }
 
 // ---------------------------------------------------------------------------
-// Add Vehicle Modal — imported from shared component
+// Change Vehicle Modal (3-step: search → confirm → success)
 // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// Bulk Upload Modal
-// ---------------------------------------------------------------------------
+type ChangeVehicleStep = 'search' | 'confirm' | 'success'
 
-function BulkUploadModal({
+function notifyParentOverlay(show: boolean) {
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: show ? 'showOverlay' : 'hideOverlay' }, '*')
+  }
+}
+
+function ChangeVehicleModal({
   isOpen,
   onClose,
-  onUpload,
-  onDownloadSample,
+  driver,
+  vehicles,
   t,
 }: {
   isOpen: boolean
   onClose: () => void
-  onUpload?: () => void
-  onDownloadSample?: () => void
+  driver: Driver | null
+  vehicles: Vehicle[]
   t: Record<string, string>
 }) {
-  const [dragOver, setDragOver] = useState(false)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [step, setStep] = useState<ChangeVehicleStep>('search')
+  const [search, setSearch] = useState('')
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null)
 
-  if (!isOpen) return null
-
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault()
-    setDragOver(false)
-    const file = e.dataTransfer.files[0]
-    if (file && isValidFile(file)) {
-      setSelectedFile(file)
+  useEffect(() => {
+    if (isOpen) {
+      notifyParentOverlay(true)
     }
+    return () => { notifyParentOverlay(false) }
+  }, [isOpen])
+
+  if (!isOpen || !driver) return null
+
+  const currentVehicleIds = driver.assignedVehicleIds
+  const filtered = vehicles.filter((v) => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return (
+      v.rcNumber.toLowerCase().includes(q) ||
+      v.make.toLowerCase().includes(q) ||
+      v.model.toLowerCase().includes(q) ||
+      v.vehicleType.toLowerCase().includes(q)
+    )
+  })
+
+  const selectedVehicle = vehicles.find((v) => v.id === selectedVehicleId)
+
+  function handleClose() {
+    notifyParentOverlay(false)
+    setStep('search')
+    setSearch('')
+    setSelectedVehicleId(null)
+    onClose()
   }
 
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file && isValidFile(file)) {
-      setSelectedFile(file)
-    }
-  }
-
-  function isValidFile(file: File): boolean {
-    const validTypes = [
-      'text/csv',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    ]
-    const validExtensions = ['.csv', '.xls', '.xlsx']
-    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase()
-    return validTypes.includes(file.type) || validExtensions.includes(ext)
-  }
-
-  function formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-  }
-
-  function handleUpload() {
-    if (selectedFile) {
-      onUpload?.()
-      setSelectedFile(null)
-      onClose()
-    }
+  function handleConfirm() {
+    setStep('success')
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 dark:bg-black/70"
-        onClick={() => { setSelectedFile(null); onClose() }}
-      />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+      <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={handleClose} />
 
-      {/* Modal */}
-      <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
-          <div>
-            <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
-              {t.bulkUploadVehicles}
-            </h2>
-            <p className="text-xs text-stone-500 dark:text-stone-400">
-              {t.importMultipleVehicles}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onDownloadSample?.()}
-              className="flex items-center gap-1.5 px-3 py-1.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" />
-              {t.downloadSample}
-            </button>
-            <button
-              onClick={() => { setSelectedFile(null); onClose() }}
-              className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
+      <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
 
-        {/* Body */}
-        <div className="px-6 py-5">
-          {/* Drop Zone */}
-          <div
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-              dragOver
-                ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20'
-                : selectedFile
-                ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/30 dark:bg-emerald-950/10'
-                : 'border-stone-300 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800/50'
-            }`}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv,.xls,.xlsx"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-
-            {selectedFile ? (
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-stone-900 dark:text-stone-50">
-                    {selectedFile.name}
-                  </p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                    {formatFileSize(selectedFile.size)}
-                  </p>
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setSelectedFile(null) }}
-                  className="text-xs text-stone-500 dark:text-stone-400 hover:text-red-600 dark:hover:text-red-400 transition-colors min-h-11 inline-flex items-center"
-                >
-                  {t.removeFile}
-                </button>
+        {/* ---- Step 1: Search & Select Vehicle ---- */}
+        {step === 'search' && (
+          <>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+              <div>
+                <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
+                  {t.changeVehicleTitle}
+                </h2>
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  {t.selectVehicle}
+                </p>
               </div>
-            ) : (
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                  <FileSpreadsheet className="w-6 h-6 text-stone-400 dark:text-stone-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-stone-700 dark:text-stone-300">
-                    {t.dropFileHere} <span className="text-emerald-600 dark:text-emerald-400">{t.browse}</span>
-                  </p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
-                    {t.supportedFormats}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+              <button
+                onClick={handleClose}
+                className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-          {/* Format Info */}
-          <div className="mt-4 p-3 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-stone-400 dark:text-stone-500 mt-0.5 flex-shrink-0" />
-              <div className="text-xs text-stone-500 dark:text-stone-400">
-                <p className="font-medium text-stone-600 dark:text-stone-300 mb-1">{t.requiredColumns}</p>
-                <p>{t.requiredColumnsList}</p>
+            {/* Search */}
+            <div className="px-6 pt-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t.searchVehiclePlaceholder}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                />
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
-          <button
-            onClick={() => { setSelectedFile(null); onClose() }}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
-          >
-            {t.cancel}
-          </button>
-          <button
-            onClick={handleUpload}
-            disabled={!selectedFile}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
-              selectedFile
-                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400 cursor-not-allowed'
-            }`}
-          >
-            <Upload className="w-4 h-4" />
-            {t.uploadAndImport}
-          </button>
-        </div>
+            {/* Vehicle List */}
+            <div className="px-6 py-4 space-y-1.5 max-h-72 overflow-y-auto">
+              {filtered.map((v) => {
+                const isSelected = selectedVehicleId === v.id
+                const isCurrent = currentVehicleIds.includes(v.id)
+
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => setSelectedVehicleId(v.id)}
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${
+                      isSelected
+                        ? 'bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800'
+                        : 'border border-transparent hover:bg-stone-50 dark:hover:bg-stone-800/50'
+                    }`}
+                  >
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isSelected
+                        ? 'bg-emerald-100 dark:bg-emerald-900/50'
+                        : v.status === 'active'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40'
+                        : 'bg-stone-100 dark:bg-stone-800'
+                    }`}>
+                      <Truck className={`w-4.5 h-4.5 ${
+                        isSelected
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : v.status === 'active'
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-stone-400 dark:text-stone-500'
+                      }`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className={`text-sm font-semibold font-mono tracking-tight truncate ${
+                          isSelected
+                            ? 'text-emerald-900 dark:text-emerald-100'
+                            : 'text-stone-900 dark:text-stone-100'
+                        }`}>
+                          {v.rcNumber}
+                        </p>
+                        {isCurrent && (
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 flex-shrink-0">
+                            {t.currentlyAssigned}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                        {v.make} {v.model} · {v.vehicleType}
+                      </p>
+                    </div>
+                    {isSelected && (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    )}
+                  </button>
+                )
+              })}
+
+              {filtered.length === 0 && (
+                <div className="text-center py-6">
+                  <p className="text-sm text-stone-500 dark:text-stone-400">{t.noVehiclesFound}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+              <button
+                onClick={handleClose}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={() => {
+                  if (selectedVehicleId) setStep('confirm')
+                }}
+                disabled={!selectedVehicleId || currentVehicleIds.includes(selectedVehicleId)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+                  selectedVehicleId && !currentVehicleIds.includes(selectedVehicleId)
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400 cursor-not-allowed'
+                }`}
+              >
+                {t.changeVehicle}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ---- Step 2: Confirmation ---- */}
+        {step === 'confirm' && selectedVehicle && (
+          <>
+            <div className="px-6 py-8 text-center">
+              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center">
+                <ArrowLeftRight className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 mb-2">
+                {t.confirmAssignment}
+              </h3>
+              <p className="text-sm text-stone-500 dark:text-stone-400">
+                {t.assignDriverTo} <span className="font-semibold text-stone-900 dark:text-stone-100">{driver.name}</span> {t.toVehicle} <span className="font-semibold font-mono text-stone-900 dark:text-stone-100">{selectedVehicle.rcNumber}</span>{t.questionMark}
+              </p>
+
+              {/* Vehicle preview card */}
+              <div className="mt-5 mx-auto max-w-xs p-4 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
+                    <Truck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold font-mono text-stone-900 dark:text-stone-50">
+                      {selectedVehicle.rcNumber}
+                    </p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                      {selectedVehicle.make} {selectedVehicle.model}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-center gap-3 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+              <button
+                onClick={() => setStep('search')}
+                className="flex-1 max-w-[140px] px-4 py-2.5 rounded-lg text-sm font-medium border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              >
+                {t.no}
+              </button>
+              <button
+                onClick={handleConfirm}
+                className="flex-1 max-w-[140px] px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+              >
+                {t.yes}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ---- Step 3: Success ---- */}
+        {step === 'success' && selectedVehicle && (
+          <>
+            <div className="px-6 py-8 text-center">
+              <div className="w-14 h-14 mx-auto mb-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
+                <CheckCircle2 className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 mb-2">
+                {t.driverAssigned}
+              </h3>
+              <p className="text-sm text-stone-500 dark:text-stone-400">
+                <span className="font-semibold text-stone-900 dark:text-stone-100">{driver.name}</span> {t.driverAssignedDesc} <span className="font-semibold font-mono text-stone-900 dark:text-stone-100">{selectedVehicle.rcNumber}</span>
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-center px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+              <button
+                onClick={handleClose}
+                className="px-6 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+              >
+                {t.done}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
@@ -627,9 +723,6 @@ export function VehicleList({
     return tab === 'drivers' ? 'drivers' : 'vehicles'
   })
   const [searchQuery, setSearchQuery] = useState('')
-  const [showBulkUpload, setShowBulkUpload] = useState(false)
-  const [showAddVehicle, setShowAddVehicle] = useState(false)
-  const [showAddDriver, setShowAddDriver] = useState(false)
   const [categoryFilter, setCategoryFilter] = useState<VehicleCategory | 'all'>('all')
   const [expiryFilter, setExpiryFilter] = useState<DocumentStatus | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<VehicleStatus | 'all'>('all')
@@ -640,6 +733,7 @@ export function VehicleList({
   const [vehiclePage, setVehiclePage] = useState(1)
   const [driverPage, setDriverPage] = useState(1)
   const [driverActionId, setDriverActionId] = useState<string | null>(null)
+  const [changeVehicleDriver, setChangeVehicleDriver] = useState<Driver | null>(null)
   const ITEMS_PER_PAGE = 5
   const dropdownRef = useRef<HTMLDivElement>(null)
   const driverDropdownRef = useRef<HTMLDivElement>(null)
@@ -768,21 +862,21 @@ export function VehicleList({
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowBulkUpload(true)}
+              onClick={() => window.parent.postMessage({ type: 'openBulkUpload' }, '*')}
               className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
             >
               <Upload className="w-4 h-4" />
               <span className="hidden sm:inline">{t.bulkUpload}</span>
             </button>
             <button
-              onClick={() => setShowAddDriver(true)}
+              onClick={() => window.parent.postMessage({ type: 'openAddDriver' }, '*')}
               className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
             >
               <UserPlus className="w-4 h-4" />
               <span className="hidden sm:inline">{t.addDriver}</span>
             </button>
             <button
-              onClick={() => setShowAddVehicle(true)}
+              onClick={() => window.parent.postMessage({ type: 'openAddVehicle' }, '*')}
               className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
@@ -792,49 +886,66 @@ export function VehicleList({
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4">
-            <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-              {t.totalVehicles}
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.total}
-            </p>
-            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
-              {stats.active} {t.active}
-            </p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+            <div className="p-4 sm:p-5 lg:p-6">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
+                  {stats.total}
+                </p>
+                <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50">
+                  <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                {t.totalVehicles}
+              </p>
+            </div>
           </div>
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4">
-            <div className="flex items-center gap-1.5">
-              <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+            <div className="p-4 sm:p-5 lg:p-6">
+              <div className="flex items-center justify-between mb-1">
+                <p className={`text-2xl sm:text-3xl font-bold tracking-tight tabular-nums ${getComplianceColor(stats.avgCompliance).text}`}>
+                  {stats.avgCompliance}%
+                </p>
+                <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50">
+                  <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
                 {t.avgCompliance}
               </p>
             </div>
-            <p className={`mt-1 text-2xl font-bold tabular-nums ${getComplianceColor(stats.avgCompliance).text}`}>
-              {stats.avgCompliance}%
-            </p>
           </div>
-          <div className="bg-white dark:bg-stone-900 border border-red-200 dark:border-red-900/40 rounded-xl p-4">
-            <p className="text-xs font-medium text-red-600 dark:text-red-400 uppercase tracking-wider">
-              {t.expiredDocs}
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.expiredCount}
-            </p>
-            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
-              {t.vehiclesNeedAttention}
-            </p>
+          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+            <div className="p-4 sm:p-5 lg:p-6">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
+                  {stats.expiredCount}
+                </p>
+                <div className="p-2 sm:p-2.5 rounded-lg bg-red-50 dark:bg-red-950/50">
+                  <ShieldX className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                {t.expiredDocs}
+              </p>
+            </div>
           </div>
-          <div className="bg-white dark:bg-stone-900 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4">
-            <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-              {t.expiringSoon}
-            </p>
-            <p className="mt-1 text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
-              {stats.expiringCount}
-            </p>
-            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
-              {t.upcomingRenewals}
-            </p>
+          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+            <div className="p-4 sm:p-5 lg:p-6">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
+                  {stats.expiringCount}
+                </p>
+                <div className="p-2 sm:p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50">
+                  <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+              </div>
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                {t.expiringSoon}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -1419,7 +1530,10 @@ export function VehicleList({
                               <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-20">
                                 <div className="py-1">
                                   <button
-                                    onClick={() => setDriverActionId(null)}
+                                    onClick={() => {
+                                      setChangeVehicleDriver(driver)
+                                      setDriverActionId(null)
+                                    }}
                                     className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                                   >
                                     <ArrowLeftRight className="w-4 h-4 text-stone-400" />
@@ -1563,27 +1677,13 @@ export function VehicleList({
           </>
         )}
 
-        {/* Add Vehicle Modal */}
-        <AddVehicleModal
-          isOpen={showAddVehicle}
-          onClose={() => setShowAddVehicle(false)}
-          onAdd={() => onAddVehicle?.()}
-          drivers={drivers}
-        />
-
-        {/* Bulk Upload Modal */}
-        <BulkUploadModal
-          isOpen={showBulkUpload}
-          onClose={() => setShowBulkUpload(false)}
-          onUpload={() => onBulkUpload?.()}
-          onDownloadSample={() => console.log('Download sample template')}
+        {/* Change Vehicle Modal */}
+        <ChangeVehicleModal
+          isOpen={changeVehicleDriver !== null}
+          onClose={() => setChangeVehicleDriver(null)}
+          driver={changeVehicleDriver}
+          vehicles={vehicles}
           t={t}
-        />
-
-        {/* Add Driver Modal */}
-        <AddDriverModal
-          isOpen={showAddDriver}
-          onClose={() => setShowAddDriver(false)}
         />
       </div>
     </div>

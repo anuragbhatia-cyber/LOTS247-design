@@ -26,6 +26,11 @@ import {
   Gavel,
   MoreVertical,
   Loader2,
+  Download,
+  Eye,
+  Briefcase,
+  Building2,
+  MoreHorizontal,
 } from 'lucide-react'
 import type {
   VehicleDetailProps,
@@ -37,6 +42,9 @@ import type {
   VehicleDocument,
 } from '@/../product/sections/vehicle-and-driver-management/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { ChallanList } from '@/sections/incident-management/components/ChallanList'
+import { CaseList } from '@/sections/incident-management/components/CaseList'
+import incidentData from '@/../product/sections/incident-management/data.json'
 
 // ---------------------------------------------------------------------------
 // Translations
@@ -72,7 +80,30 @@ const translations: Record<Language, Record<string, string>> = {
     tabDocuments: 'Documents',
     tabCompliance: 'Compliance',
     tabChallans: 'Challans',
+    tabIncidents: 'Incidents',
     tabAssignedDriver: 'Assigned Driver',
+
+    // Incidents tab
+    recentIncidents: 'Recent Incidents',
+    noIncidents: 'No incidents reported',
+    noIncidentsDesc: 'This vehicle has no reported incidents or cases',
+    incidentOpen: 'Open',
+    incidentInProgress: 'In Progress',
+    incidentResolved: 'Resolved',
+    incidentClosed: 'Closed',
+    incidentSeverityHigh: 'High',
+    incidentSeverityMedium: 'Medium',
+    incidentSeverityLow: 'Low',
+    reportedOn: 'Reported',
+    viewDetails: 'View Details',
+    viewIncident: 'View Incident',
+    headerIncident: 'Incident',
+    headerType: 'Type',
+    headerSeverity: 'Severity',
+    headerDate: 'Date',
+    headerLocation: 'Location',
+    headerStatus: 'Status',
+    headerAction: 'Action',
 
     // Details tab
     rcNumber: 'RC Number',
@@ -110,6 +141,8 @@ const translations: Record<Language, Record<string, string>> = {
     expiredDaysAgo: 'days ago',
     daysRemaining: 'days remaining',
     monthsRemaining: 'months remaining',
+    viewDocument: 'View Document',
+    downloadDocument: 'Download Document',
 
     // Documents tab
     vehicleDocuments: 'Vehicle Documents',
@@ -208,7 +241,30 @@ const translations: Record<Language, Record<string, string>> = {
     tabDocuments: 'दस्तावेज़',
     tabCompliance: 'अनुपालन',
     tabChallans: 'चालान',
+    tabIncidents: 'घटनाएं',
     tabAssignedDriver: 'नियुक्त ड्राइवर',
+
+    // Incidents tab
+    recentIncidents: 'हाल की घटनाएं',
+    noIncidents: 'कोई घटना दर्ज नहीं',
+    noIncidentsDesc: 'इस वाहन की कोई दर्ज घटना या मामला नहीं है',
+    incidentOpen: 'खुला',
+    incidentInProgress: 'प्रगति में',
+    incidentResolved: 'हल किया',
+    incidentClosed: 'बंद',
+    incidentSeverityHigh: 'उच्च',
+    incidentSeverityMedium: 'मध्यम',
+    incidentSeverityLow: 'निम्न',
+    reportedOn: 'दर्ज',
+    viewDetails: 'विवरण देखें',
+    viewIncident: 'घटना देखें',
+    headerIncident: 'घटना',
+    headerType: 'प्रकार',
+    headerSeverity: 'गंभीरता',
+    headerDate: 'तारीख',
+    headerLocation: 'स्थान',
+    headerStatus: 'स्थिति',
+    headerAction: 'कार्रवाई',
 
     // Details tab
     rcNumber: 'आरसी नंबर',
@@ -246,6 +302,8 @@ const translations: Record<Language, Record<string, string>> = {
     expiredDaysAgo: 'दिन पहले समाप्त',
     daysRemaining: 'दिन शेष',
     monthsRemaining: 'महीने शेष',
+    viewDocument: 'दस्तावेज़ देखें',
+    downloadDocument: 'दस्तावेज़ डाउनलोड करें',
 
     // Documents tab
     vehicleDocuments: 'वाहन दस्तावेज़',
@@ -457,10 +515,10 @@ function ComplianceRing({ score, t }: { score: number; t: Record<string, string>
 }
 
 function DocumentCard({ doc, t, language }: { doc: VehicleDocument; t: Record<string, string>; language: Language }) {
+  const [showMenu, setShowMenu] = useState(false)
   const statusStyle = DOC_STATUS_STYLE[doc.status]
   const typeKeys = DOC_TYPE_LABEL_KEY[doc.type] || { label: '', description: '' }
   const typeLabel = typeKeys.label ? t[typeKeys.label] : doc.name
-  const typeDesc = typeKeys.description ? t[typeKeys.description] : ''
   const statusLabel = t[DOC_STATUS_LABEL_KEY[doc.status]]
   const StatusIcon = statusStyle.icon
   const days = daysUntil(doc.expiry)
@@ -478,10 +536,43 @@ function DocumentCard({ doc, t, language }: { doc: VehicleDocument; t: Record<st
             </p>
           </div>
         </div>
-        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${statusStyle.bg} ${statusStyle.text}`}>
-          <StatusIcon className="w-3 h-3" />
-          {statusLabel}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${statusStyle.bg} ${statusStyle.text}`}>
+            <StatusIcon className="w-3 h-3" />
+            {statusLabel}
+          </span>
+          {doc.status === 'valid' && (
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              >
+                <MoreVertical className="w-4 h-4" />
+              </button>
+              {showMenu && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-20 w-44 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg py-1">
+                    <button
+                      onClick={() => { setShowMenu(false) }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors text-left"
+                    >
+                      <Eye className="w-4 h-4 text-stone-400 dark:text-stone-500" />
+                      {t.viewDocument}
+                    </button>
+                    <button
+                      onClick={() => { setShowMenu(false) }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors text-left"
+                    >
+                      <Download className="w-4 h-4 text-stone-400 dark:text-stone-500" />
+                      {t.downloadDocument}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center justify-between">
@@ -496,16 +587,6 @@ function DocumentCard({ doc, t, language }: { doc: VehicleDocument; t: Record<st
         )}
         {doc.status === 'expiring-soon' && (
           <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-            {days} {t.daysRemaining}
-          </span>
-        )}
-        {doc.status === 'valid' && days > 180 && (
-          <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-            {Math.floor(days / 30)} {t.monthsRemaining}
-          </span>
-        )}
-        {doc.status === 'valid' && days <= 180 && (
-          <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
             {days} {t.daysRemaining}
           </span>
         )}
@@ -890,13 +971,14 @@ function AssignDriverModal({
 // Main Component
 // ---------------------------------------------------------------------------
 
-type DetailTab = 'details' | 'documents' | 'compliance' | 'challans' | 'driver'
+type DetailTab = 'details' | 'documents' | 'compliance' | 'challans' | 'incidents' | 'driver'
 
 const TABS: { id: DetailTab; labelKey: string; icon: typeof CreditCard }[] = [
   { id: 'details', labelKey: 'tabDetails', icon: CreditCard },
   { id: 'documents', labelKey: 'tabDocuments', icon: FileText },
   { id: 'compliance', labelKey: 'tabCompliance', icon: ShieldCheck },
   { id: 'challans', labelKey: 'tabChallans', icon: FileWarning },
+  { id: 'incidents', labelKey: 'tabIncidents', icon: AlertTriangle },
   { id: 'driver', labelKey: 'tabAssignedDriver', icon: User },
 ]
 
@@ -947,6 +1029,80 @@ const SAMPLE_CHALLANS: VehicleChallan[] = [
     source: 'Parivahan',
   },
 ]
+
+// ---------------------------------------------------------------------------
+// Incident Types & Sample Data
+// ---------------------------------------------------------------------------
+
+interface VehicleIncident {
+  id: string
+  title: string
+  type: string
+  severity: 'high' | 'medium' | 'low'
+  status: 'open' | 'in-progress' | 'resolved' | 'closed'
+  reportedAt: string
+  location: string
+  description: string
+}
+
+const SAMPLE_INCIDENTS: VehicleIncident[] = [
+  {
+    id: 'inc-001',
+    title: 'Minor Collision at Toll Plaza',
+    type: 'Accident',
+    severity: 'medium',
+    status: 'in-progress',
+    reportedAt: '2026-03-12',
+    location: 'NH-48, Gurugram Toll Plaza',
+    description: 'Minor collision with a stationary vehicle while entering the toll lane. Front bumper damage reported.',
+  },
+  {
+    id: 'inc-002',
+    title: 'Tyre Burst on Expressway',
+    type: 'Breakdown',
+    severity: 'high',
+    status: 'resolved',
+    reportedAt: '2026-02-28',
+    location: 'Yamuna Expressway, KM 102',
+    description: 'Rear left tyre burst at high speed. Vehicle safely pulled over. No injuries.',
+  },
+  {
+    id: 'inc-003',
+    title: 'Cargo Damage During Transit',
+    type: 'Cargo Issue',
+    severity: 'low',
+    status: 'closed',
+    reportedAt: '2026-01-15',
+    location: 'Warehouse, Manesar',
+    description: 'Minor water damage to packaged goods due to tarpaulin tear during rain.',
+  },
+]
+
+const INCIDENT_STATUS_STYLE: Record<VehicleIncident['status'], { bg: string; text: string }> = {
+  open: { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-300' },
+  'in-progress': { bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-700 dark:text-blue-300' },
+  resolved: { bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-300' },
+  closed: { bg: 'bg-stone-100 dark:bg-stone-800', text: 'text-stone-600 dark:text-stone-400' },
+}
+
+const INCIDENT_STATUS_LABEL_KEY: Record<VehicleIncident['status'], string> = {
+  open: 'incidentOpen',
+  'in-progress': 'incidentInProgress',
+  resolved: 'incidentResolved',
+  closed: 'incidentClosed',
+}
+
+const SEVERITY_STYLE: Record<VehicleIncident['severity'], { bg: string; text: string }> = {
+  high: { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-300' },
+  medium: { bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-300' },
+  low: { bg: 'bg-stone-100 dark:bg-stone-800', text: 'text-stone-600 dark:text-stone-400' },
+}
+
+const SEVERITY_LABEL_KEY: Record<VehicleIncident['severity'], string> = {
+  high: 'incidentSeverityHigh',
+  medium: 'incidentSeverityMedium',
+  low: 'incidentSeverityLow',
+}
 
 type ChallanFetchState = 'idle' | 'fetching' | 'done'
 
@@ -1168,6 +1324,11 @@ export function VehicleDetail({
   const [fetchedChallans, setFetchedChallans] = useState<VehicleChallan[]>([])
   const [challanActionMenu, setChallanActionMenu] = useState<string | null>(null)
   const [showUploadDoc, setShowUploadDoc] = useState(false)
+  const [incidentSubTab, setIncidentSubTab] = useState<'challans' | 'cases' | 'rto' | 'other'>('challans')
+
+  // Filter incident data for this vehicle
+  const vehicleChallans = incidentData.challans.filter((c: { vehicleId: string }) => c.vehicleId === vehicle.id)
+  const vehicleCases = incidentData.cases.filter((c: { vehicleId: string }) => c.vehicleId === vehicle.id)
   const complianceColors = getComplianceColor(vehicle.complianceScore)
   const categoryStyle = CATEGORY_STYLE[vehicle.category]
   const categoryLabel = t[CATEGORY_LABEL_KEY[vehicle.category]]
@@ -1615,6 +1776,78 @@ export function VehicleDetail({
                     </p>
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ================================================================= */}
+        {/* Tab: Incidents */}
+        {/* ================================================================= */}
+        {activeTab === 'incidents' && (
+          <div>
+            {/* Sub-Tab Switcher */}
+            <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-4">
+              {([
+                { id: 'challans' as const, label: t.tabChallans, icon: FileWarning, count: vehicleChallans.length },
+                { id: 'cases' as const, label: 'Cases', icon: Briefcase, count: vehicleCases.length },
+                { id: 'rto' as const, label: 'RTO', icon: Building2, count: 0 },
+                { id: 'other' as const, label: 'Other', icon: MoreHorizontal, count: 0 },
+              ]).map((tab) => {
+                const Icon = tab.icon
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setIncidentSubTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+                      incidentSubTab === tab.id
+                        ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
+                        : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {tab.label}
+                    <span className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
+                      incidentSubTab === tab.id
+                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
+                    }`}>
+                      {tab.count}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Sub-Tab Content */}
+            {incidentSubTab === 'challans' && (
+              <ChallanList
+                challans={vehicleChallans}
+                vehicles={incidentData.vehicles}
+                drivers={incidentData.drivers}
+                onView={(id) => console.log('View challan:', id)}
+                onPay={(id) => console.log('Pay challan:', id)}
+                onDispute={(id) => console.log('Dispute challan:', id)}
+                onEscalateToCase={(id) => console.log('Escalate to case:', id)}
+                onDownloadReceipt={(id) => console.log('Download receipt:', id)}
+                onRequestRefund={(id) => console.log('Request refund:', id)}
+              />
+            )}
+            {incidentSubTab === 'cases' && (
+              <CaseList
+                cases={vehicleCases}
+                vehicles={incidentData.vehicles}
+                drivers={incidentData.drivers}
+                lawyers={incidentData.lawyers}
+                onView={(id) => console.log('View case:', id)}
+                onCreate={() => console.log('Create new case')}
+              />
+            )}
+            {(incidentSubTab === 'rto' || incidentSubTab === 'other') && (
+              <div className="py-16 text-center">
+                <p className="text-sm text-stone-500 dark:text-stone-400">
+                  No {incidentSubTab === 'rto' ? 'RTO' : 'other'} incidents for this vehicle
+                </p>
               </div>
             )}
           </div>
