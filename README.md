@@ -1,6 +1,6 @@
 # LOTS247 Design
 
-Product planning and design tool for LOTS247 — a logistics and transport management platform.
+Hi, Product planning and design tool for LOTS247 — a logistics and transport management platform.
 
 ## Tech Stack
 
