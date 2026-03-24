@@ -12,8 +12,8 @@ const statusLabels: Record<Language, Record<ComplianceStatus, string>> = {
 }
 
 const translations: Record<Language, Record<string, string>> = {
-  en: { complianceHealth: 'Compliance Health', viewDetails: 'View Details' },
-  hi: { complianceHealth: 'अनुपालन स्वास्थ्य', viewDetails: 'विवरण देखें' },
+  en: { complianceHealth: 'Compliance Health', viewDetails: 'View Details', fromLastMonth: 'from last month' },
+  hi: { complianceHealth: 'अनुपालन स्वास्थ्य', viewDetails: 'विवरण देखें', fromLastMonth: 'पिछले महीने से' },
 }
 
 const statusStyles: Record<ComplianceStatus, {
@@ -64,9 +64,15 @@ export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
         <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
           {t.complianceHealth}
         </h2>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${overall.bg} ${overall.color}`}>
-          {overallLabel}
-        </span>
+        {data.changeFromLastMonth != null && data.changeFromLastMonth !== 0 ? (
+          <span className={`text-xs font-semibold ${data.changeFromLastMonth > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+            {data.changeFromLastMonth > 0 ? '+' : ''}{data.changeFromLastMonth}% {t.fromLastMonth}
+          </span>
+        ) : (
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${overall.bg} ${overall.color}`}>
+            {overallLabel}
+          </span>
+        )}
       </div>
 
       {/* Score + Categories */}
@@ -136,7 +142,7 @@ export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
 
       <button
         onClick={onViewDetails}
-        className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+        className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
       >
         {t.viewDetails} &rarr;
       </button>

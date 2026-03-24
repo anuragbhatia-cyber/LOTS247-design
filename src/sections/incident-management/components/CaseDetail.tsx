@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   ArrowLeft,
   Clock,
@@ -7,17 +7,10 @@ import {
   FileQuestion,
   Timer,
   AlertCircle,
-  Scale,
-  Car,
-  Shield,
-  Lock,
-  FileWarning,
-  Gavel,
   ArrowUpRight,
   Truck,
   User,
   Calendar,
-  Briefcase,
   MapPin,
   Upload,
   Download,
@@ -29,6 +22,7 @@ import {
   UserCheck,
   Info,
   FileDown,
+  X,
 } from 'lucide-react'
 import type {
   CaseDetailProps,
@@ -58,14 +52,15 @@ const translations: Record<Language, Record<string, string>> = {
     statusExtended: 'Extended',
 
     // Case type labels
-    caseTypeAccident: 'Accident',
-    caseTypeVehicleDetention: 'Vehicle Detention',
     caseTypeTheft: 'Theft',
+    caseTypeDetention: 'Detention',
+    caseTypeBail: 'Bail',
+    caseTypeAccidents: 'Accidents',
+    caseTypeFIRs: 'FIRs',
+    caseTypeSuperdari: 'Superdari',
     caseTypeVehicleImpounding: 'Vehicle Impounding',
-    caseTypeInsuranceDispute: 'Insurance Dispute',
-    caseTypeLegalComplaint: 'Legal Complaint',
-    caseTypeRTOEscalation: 'RTO Escalation',
-    caseTypeEscalatedChallan: 'Escalated Challan',
+    caseTypeEWayBillIssues: 'E-Way Bill',
+    caseTypeOthers: 'Others',
 
     // Tabs
     tabOverview: 'Overview',
@@ -76,12 +71,17 @@ const translations: Record<Language, Record<string, string>> = {
     tabReportsShort: 'Reports',
     tabComments: 'Comments',
     tabCommentsShort: 'Chat',
+    tabFollowUp: 'Follow-up',
+    tabFollowUpShort: 'Follow-up',
 
     // Origin badges
     originLawyerCall: 'Lawyer Call',
     originEscalated: 'Escalated',
 
-    // Created prefix
+    // Labels
+    type: 'Case Type',
+    expectedClosure: 'Expected Closure',
+    slaCompleted: 'Completed',
     created: 'Created',
 
     // Section card titles
@@ -131,14 +131,15 @@ const translations: Record<Language, Record<string, string>> = {
     statusExtended: 'विस्तारित',
 
     // Case type labels
-    caseTypeAccident: 'दुर्घटना',
-    caseTypeVehicleDetention: 'वाहन हिरासत',
     caseTypeTheft: 'चोरी',
-    caseTypeVehicleImpounding: 'वाहन जब्ती',
-    caseTypeInsuranceDispute: 'बीमा विवाद',
-    caseTypeLegalComplaint: 'कानूनी शिकायत',
-    caseTypeRTOEscalation: 'आरटीओ शिकायत',
-    caseTypeEscalatedChallan: 'बढ़ाया गया चालान',
+    caseTypeDetention: 'हिरासत',
+    caseTypeBail: 'ज़मानत',
+    caseTypeAccidents: 'दुर्घटनाएँ',
+    caseTypeFIRs: 'एफ़आईआर',
+    caseTypeSuperdari: 'सुपुर्दगी',
+    caseTypeVehicleImpounding: 'वाहन ज़ब्ती',
+    caseTypeEWayBillIssues: 'ई-वे बिल',
+    caseTypeOthers: 'अन्य',
 
     // Tabs
     tabOverview: 'अवलोकन',
@@ -149,12 +150,17 @@ const translations: Record<Language, Record<string, string>> = {
     tabReportsShort: 'रिपोर्ट',
     tabComments: 'टिप्पणियाँ',
     tabCommentsShort: 'चैट',
+    tabFollowUp: 'फॉलो-अप',
+    tabFollowUpShort: 'फॉलो-अप',
 
     // Origin badges
     originLawyerCall: 'वकील कॉल',
     originEscalated: 'बढ़ाया गया',
 
-    // Created prefix
+    // Labels
+    type: 'मामले का प्रकार',
+    expectedClosure: 'अपेक्षित समापन',
+    slaCompleted: 'पूर्ण',
     created: 'बनाया गया',
 
     // Section card titles
@@ -199,14 +205,15 @@ const translations: Record<Language, Record<string, string>> = {
 // ---------------------------------------------------------------------------
 
 const CASE_TYPE_TRANSLATION_KEY: Record<CaseType, string> = {
-  Accident: 'caseTypeAccident',
-  'Vehicle Detention': 'caseTypeVehicleDetention',
   Theft: 'caseTypeTheft',
+  Detention: 'caseTypeDetention',
+  Bail: 'caseTypeBail',
+  Accidents: 'caseTypeAccidents',
+  FIRs: 'caseTypeFIRs',
+  Superdari: 'caseTypeSuperdari',
   'Vehicle Impounding': 'caseTypeVehicleImpounding',
-  'Insurance Dispute': 'caseTypeInsuranceDispute',
-  'Legal Complaint': 'caseTypeLegalComplaint',
-  'RTO Escalation': 'caseTypeRTOEscalation',
-  'Escalated Challan': 'caseTypeEscalatedChallan',
+  'E-Way Bill': 'caseTypeEWayBillIssues',
+  Others: 'caseTypeOthers',
 }
 
 // ---------------------------------------------------------------------------
@@ -254,15 +261,16 @@ const STATUS_CONFIG: Record<
   },
 }
 
-const CASE_TYPE_ICONS: Record<CaseType, typeof AlertCircle> = {
-  Accident: AlertCircle,
-  'Vehicle Detention': Lock,
-  Theft: Shield,
-  'Vehicle Impounding': Car,
-  'Insurance Dispute': Scale,
-  'Legal Complaint': Gavel,
-  'RTO Escalation': FileWarning,
-  'Escalated Challan': ArrowUpRight,
+const CASE_TYPE_CONFIG: Record<CaseType, { color: string; bg: string }> = {
+  Theft: { color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/40' },
+  Detention: { color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40' },
+  Bail: { color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-950/40' },
+  Accidents: { color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-950/40' },
+  FIRs: { color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/40' },
+  Superdari: { color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/40' },
+  'Vehicle Impounding': { color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/40' },
+  'E-Way Bill': { color: 'text-stone-600 dark:text-stone-400', bg: 'bg-stone-100 dark:bg-stone-800/60' },
+  Others: { color: 'text-stone-500 dark:text-stone-400', bg: 'bg-stone-100 dark:bg-stone-800/60' },
 }
 
 // ---------------------------------------------------------------------------
@@ -446,13 +454,13 @@ function DetailRow({
 // Tab types
 // ---------------------------------------------------------------------------
 
-type TabId = 'overview' | 'documents' | 'reports' | 'comments'
+type TabId = 'overview' | 'followup' | 'reports' | 'documents'
 
 const TABS: { id: TabId; labelKey: string; shortLabelKey: string; icon: typeof Activity }[] = [
   { id: 'overview', labelKey: 'tabOverview', shortLabelKey: 'tabOverviewShort', icon: Info },
-  { id: 'documents', labelKey: 'tabDocuments', shortLabelKey: 'tabDocumentsShort', icon: Paperclip },
+  { id: 'followup', labelKey: 'tabFollowUp', shortLabelKey: 'tabFollowUpShort', icon: MessageSquare },
   { id: 'reports', labelKey: 'tabReports', shortLabelKey: 'tabReportsShort', icon: FileDown },
-  { id: 'comments', labelKey: 'tabComments', shortLabelKey: 'tabCommentsShort', icon: MessageSquare },
+  { id: 'documents', labelKey: 'tabDocuments', shortLabelKey: 'tabDocumentsShort', icon: Paperclip },
 ]
 
 // ---------------------------------------------------------------------------
@@ -509,90 +517,172 @@ function Timeline({ activities }: { activities: CaseActivity[] }) {
 // Documents Tab
 // ---------------------------------------------------------------------------
 
-function DocumentsTab({
-  documents,
-  onUploadDocument,
-}: {
-  documents: CaseDocument[]
-  onUploadDocument?: (file: File) => void
-}) {
-  const { language } = useLanguage()
-  const t = translations[language]
+function UploadDocumentModal({ onClose, onUpload }: { onClose: () => void; onUpload?: (file: File) => void }) {
+  const [dragOver, setDragOver] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleUpload = () => {
-    fileInputRef.current?.click()
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragOver(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) setSelectedFile(file)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file && onUploadDocument) {
-      onUploadDocument(file)
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+    if (file) setSelectedFile(file)
   }
 
   return (
-    <div>
-      <div className="mb-4">
-        <input
-          ref={fileInputRef}
-          type="file"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-        <button
-          onClick={handleUpload}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-lg border-2 border-dashed border-stone-200 dark:border-stone-700 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 text-stone-500 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-        >
-          <Upload className="w-4 h-4" />
-          <span className="text-sm font-medium">{t.uploadDocument}</span>
-        </button>
-      </div>
-
-      {documents.length === 0 ? (
-        <EmptyState icon={Paperclip} message={t.noDocumentsUploaded} />
-      ) : (
-        <div className="space-y-1.5">
-          {documents.map((doc) => (
-            <div
-              key={doc.id}
-              className="flex items-center gap-3 px-3.5 py-3 rounded-lg bg-stone-50 dark:bg-stone-800/40 hover:bg-stone-100 dark:hover:bg-stone-800/60 transition-colors"
-            >
-              <div className="w-9 h-9 rounded-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 flex items-center justify-center flex-shrink-0">
-                <File className="w-4 h-4 text-stone-400 dark:text-stone-500" />
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">
-                  {doc.fileName}
-                </p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span
-                    className={`text-[11px] font-medium px-1.5 py-0.5 rounded ${
-                      doc.uploadedBy === 'user'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400'
-                        : 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'
-                    }`}
-                  >
-                    {doc.uploadedBy === 'user' ? t.you : t.lawyer}
-                  </span>
-                  <span className="text-[11px] text-stone-500 dark:text-stone-400">
-                    {formatDateTime(doc.uploadedAt, language)}
-                  </span>
-                </div>
-              </div>
-
-              <button className="p-3.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-stone-700 transition-colors flex-shrink-0">
-                <Download className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+          <div className="flex items-center gap-2">
+            <Upload className="w-4 h-4 text-stone-500 dark:text-stone-400" />
+            <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">Upload Document</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-      )}
+
+        <div className="p-5 space-y-4">
+          <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
+          <div
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            className={`flex flex-col items-center justify-center gap-3 px-6 py-10 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
+              dragOver
+                ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-950/30'
+                : selectedFile
+                ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20'
+                : 'border-stone-300 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800/30'
+            }`}
+          >
+            {selectedFile ? (
+              <>
+                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/50 flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{selectedFile.name}</p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{(selectedFile.size / 1024).toFixed(0)} KB</p>
+                </div>
+                <p className="text-xs text-stone-500 dark:text-stone-400">Click to change file</p>
+              </>
+            ) : (
+              <>
+                <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-stone-700 dark:text-stone-300">
+                    Drop file here or <span className="text-emerald-600 dark:text-emerald-400">browse</span>
+                  </p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">PDF, JPG, PNG up to 10 MB</p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-stone-100 dark:border-stone-800">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => { if (selectedFile && onUpload) onUpload(selectedFile); onClose() }}
+            disabled={!selectedFile}
+            className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 text-sm font-semibold transition-colors"
+          >
+            Upload
+          </button>
+        </div>
+      </div>
     </div>
+  )
+}
+
+function DocumentsSection({
+  documents,
+  onUploadDocument,
+  t,
+}: {
+  documents: CaseDocument[]
+  onUploadDocument?: (file: File) => void
+  t: Record<string, string>
+}) {
+  const { language } = useLanguage()
+  const [showUpload, setShowUpload] = useState(false)
+
+  return (
+    <>
+      <SectionCard
+        title={t.documents}
+        icon={Paperclip}
+        count={documents.length || undefined}
+        action={
+          <button
+            onClick={() => setShowUpload(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            Upload
+          </button>
+        }
+      >
+        {documents.length === 0 ? (
+          <EmptyState icon={Paperclip} message={t.noDocumentsUploaded} />
+        ) : (
+          <div className="divide-y divide-stone-100 dark:divide-stone-800">
+            {documents.map((doc) => {
+              const ext = doc.fileName.split('.').pop()?.toLowerCase() || ''
+              const isPdf = ext === 'pdf'
+              return (
+                <div
+                  key={doc.id}
+                  className="flex items-center gap-3.5 px-5 py-3.5 group/row hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors"
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isPdf ? 'bg-red-50 dark:bg-red-950/40' : 'bg-blue-50 dark:bg-blue-950/40'}`}>
+                    <FileText className={`w-4.5 h-4.5 ${isPdf ? 'text-red-500 dark:text-red-400' : 'text-blue-500 dark:text-blue-400'}`} />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">
+                      {doc.fileName}
+                    </p>
+                    <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+                      {Math.floor(50 + doc.fileName.length * 7)} KB
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                    <button className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors flex-shrink-0">
+                      <Info className="w-4 h-4" />
+                    </button>
+                    <button className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors flex-shrink-0">
+                      <Download className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </SectionCard>
+
+      {showUpload && <UploadDocumentModal onClose={() => setShowUpload(false)} onUpload={onUploadDocument} />}
+    </>
   )
 }
 
@@ -766,17 +856,16 @@ function OverviewTab({
 }) {
   const { language } = useLanguage()
   const t = translations[language]
-  const CaseTypeIcon = CASE_TYPE_ICONS[caseData.caseType] || Briefcase
   const caseTypeKey = CASE_TYPE_TRANSLATION_KEY[caseData.caseType]
   const caseTypeLabel = caseTypeKey ? t[caseTypeKey] : caseData.caseType
+  const caseTypeConfig = CASE_TYPE_CONFIG[caseData.caseType] || CASE_TYPE_CONFIG.Others
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-6">
       {/* Case Type + Description */}
       <div>
         <div className="flex items-center gap-2 mb-1.5">
-          <CaseTypeIcon className="w-4 h-4 text-stone-500 dark:text-stone-400" />
-          <span className="text-sm font-semibold text-stone-700 dark:text-stone-300">
+          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${caseTypeConfig.bg} ${caseTypeConfig.color}`}>
             {caseTypeLabel}
           </span>
         </div>
@@ -819,44 +908,6 @@ function OverviewTab({
         />
       </div>
 
-      {/* Assigned Lawyer */}
-      <div className="pt-3 border-t border-stone-100 dark:border-stone-800">
-        <p className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-3">
-          {t.assignedLawyer}
-        </p>
-        {lawyer ? (
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
-              <Briefcase className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">
-                {lawyer.name}
-              </p>
-              <div className="flex items-center gap-1.5 mt-0.5 text-xs text-stone-500 dark:text-stone-400">
-                <span>{lawyer.specialization}</span>
-                <span className="text-stone-300 dark:text-stone-600">&middot;</span>
-                <MapPin className="w-3 h-3" />
-                <span>{lawyer.location}</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 py-1">
-            <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
-              <User className="w-4.5 h-4.5 text-stone-300 dark:text-stone-600" />
-            </div>
-            <div>
-              <p className="text-sm text-stone-500 dark:text-stone-400 italic">
-                {t.notYetAssigned}
-              </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                {t.lawyerAssignedAfterScreening}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   )
 }
@@ -887,41 +938,84 @@ export function CaseDetail({
 
   const tabCounts: Record<TabId, number> = {
     overview: 0,
-    documents: documents.length,
+    followup: comments.length,
     reports: reports.length,
-    comments: comments.length,
+    documents: documents.length,
   }
+
+  const caseTypeKey = CASE_TYPE_TRANSLATION_KEY[caseData.caseType]
+  const caseTypeLabel = caseTypeKey ? t[caseTypeKey] : caseData.caseType
+  const caseTypeConfig = CASE_TYPE_CONFIG[caseData.caseType] || CASE_TYPE_CONFIG.Others
 
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
 
-        {/* Back Button with ID + Date */}
-        <button
-          onClick={onBack}
-          className="flex items-center gap-3 mb-6 group"
-        >
-          <div className="w-8 h-8 rounded-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 flex items-center justify-center group-hover:bg-stone-100 dark:group-hover:bg-stone-800 transition-colors">
-            <ArrowLeft className="w-4 h-4 text-stone-500 dark:text-stone-400" />
-          </div>
-          <div className="text-left">
-            <p className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
-              {caseData.displayId}
-            </p>
-            <p className="text-sm text-stone-500 dark:text-stone-400">
-              {t.created} {formatDateTime(caseData.createdAt, language)}
-            </p>
-          </div>
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ml-2 ${statusConfig.bg} ${statusConfig.text}`}
-          >
-            <StatusIcon className="w-3 h-3" />
-            {t[statusConfig.labelKey]}
-          </span>
-        </button>
+        {/* Hero Header Card */}
+        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden mb-6">
+          <div className="p-5 sm:p-6 lg:p-8">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              {/* Left: Case Info */}
+              <div className="flex-1">
+                <div className="flex items-start gap-4">
+                  {/* Back Arrow */}
+                  <button
+                    onClick={onBack}
+                    className="mt-1 p-2 -ml-1 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex-shrink-0"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
 
-        {/* Tab Switcher (pill style) */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-5">
+                  {/* ID + Badges */}
+                  <div>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
+                        {caseData.displayId}
+                      </h1>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+                        <StatusIcon className="w-3 h-3" />
+                        {t[statusConfig.labelKey]}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${caseTypeConfig.bg} ${caseTypeConfig.color}`}>
+                        {caseTypeLabel}
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+                      {t.created} {formatDate(caseData.createdAt, language)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Amount-style with SLA */}
+              <div className="flex-shrink-0 lg:text-right">
+                {(() => {
+                  const diffDays = Math.ceil((new Date(caseData.slaDeadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+                  const label = caseData.status === 'resolved'
+                    ? t.slaCompleted
+                    : diffDays < 0
+                    ? `${Math.abs(diffDays)} days overdue`
+                    : `${diffDays} days remaining`
+                  const color = caseData.status === 'resolved'
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : diffDays < 0
+                    ? 'text-red-600 dark:text-red-400'
+                    : diffDays <= 7
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-emerald-600 dark:text-emerald-400'
+                  return (
+                    <p className={`text-sm font-medium mt-1 ${color}`}>
+                      {label}
+                    </p>
+                  )
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-6 overflow-x-auto">
           {TABS.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
@@ -931,7 +1025,7 @@ export function CaseDetail({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                   isActive
                     ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                     : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
@@ -973,12 +1067,11 @@ export function CaseDetail({
 
         {activeTab === 'documents' && (
           <div className="mt-5">
-            <SectionCard title={t.documents} icon={Paperclip} count={documents.length || undefined}>
-              <DocumentsTab
-                documents={documents}
-                onUploadDocument={onUploadDocument}
-              />
-            </SectionCard>
+            <DocumentsSection
+              documents={documents}
+              onUploadDocument={onUploadDocument}
+              t={t}
+            />
           </div>
         )}
 
@@ -990,9 +1083,9 @@ export function CaseDetail({
           </div>
         )}
 
-        {activeTab === 'comments' && (
+        {activeTab === 'followup' && (
           <div className="mt-5">
-            <SectionCard title={t.comments} icon={MessageSquare} count={comments.length || undefined}>
+            <SectionCard title={t.tabFollowUp} icon={MessageSquare} count={comments.length || undefined}>
               <CommentsTab
                 comments={comments}
                 onAddComment={onAddComment}

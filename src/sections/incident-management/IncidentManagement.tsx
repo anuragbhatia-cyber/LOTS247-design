@@ -241,11 +241,12 @@ export default function IncidentManagementPreview() {
               <div className="p-4 sm:p-5 lg:p-6">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{totalChallans}</p>
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50">
-                    <FileWarning className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-stone-500 dark:text-stone-400">Online: <span className="font-semibold text-stone-700 dark:text-stone-300">5</span></span>
+                    <span className="text-xs text-stone-500 dark:text-stone-400">Court: <span className="font-semibold text-stone-700 dark:text-stone-300">3</span></span>
                   </div>
                 </div>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Total Challans</p>
+                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Total Submitted Challans</p>
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
@@ -275,7 +276,7 @@ export default function IncidentManagementPreview() {
 
         {/* Overview Cards — Cases */}
         {activeTab === 'cases' && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
               <div className="p-4 sm:p-5 lg:p-6">
                 <div className="flex items-center justify-between mb-1">
@@ -285,17 +286,6 @@ export default function IncidentManagementPreview() {
                   </div>
                 </div>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Submitted</p>
-              </div>
-            </div>
-            <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-4 sm:p-5 lg:p-6">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{docRequestedCases}</p>
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50">
-                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
-                  </div>
-                </div>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Doc Requested</p>
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
@@ -326,19 +316,19 @@ export default function IncidentManagementPreview() {
 
       {/* Tab Content */}
       {activeTab === 'challans' && (
+        <div className="px-4 sm:px-6 lg:px-8">
         <ChallanList
           challans={data.challans}
           vehicles={data.vehicles}
           drivers={data.drivers}
           onView={(id) => navigateToScreen('ChallanDetail', { id })}
-          onPay={(id) => console.log('Pay challan:', id)}
-          onDispute={(id) => console.log('Dispute challan:', id)}
-          onEscalateToCase={(id) => console.log('Escalate to case:', id)}
+          onAddFollowUp={(id) => navigateToScreen('ChallanDetail', { id, tab: 'comments' })}
           onDownloadReceipt={(id) => console.log('Download receipt:', id)}
-          onRequestRefund={(id) => console.log('Request refund:', id)}
         />
+        </div>
       )}
       {activeTab === 'cases' && (
+        <div className="px-4 sm:px-6 lg:px-8">
         <CaseList
           cases={data.cases}
           vehicles={data.vehicles}
@@ -347,6 +337,7 @@ export default function IncidentManagementPreview() {
           onView={(id) => navigateToScreen('CaseDetail', { id })}
           onCreate={() => console.log('Create new case')}
         />
+        </div>
       )}
       {(activeTab === 'rto' || activeTab === 'other') && (
         <div className="px-4 sm:px-6 lg:px-8 py-16 text-center">

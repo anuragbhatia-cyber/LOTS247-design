@@ -267,12 +267,12 @@ function getSlaData(
   const daysLeft = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
   if (daysLeft < 0) {
-    return { percent: 100, label: `${t.slaBreached} (${Math.abs(daysLeft)}d ${t.slaOverdue})`, color: 'red', breached: true, daysLeft }
+    return { percent: 100, label: `${Math.abs(daysLeft)} days overdue`, color: 'red', breached: true, daysLeft }
   }
   if (percent >= 80) {
-    return { percent, label: `${daysLeft}d ${t.slaRemaining}`, color: 'amber', breached: false, daysLeft }
+    return { percent, label: `${daysLeft} days remaining`, color: 'amber', breached: false, daysLeft }
   }
-  return { percent, label: `${daysLeft}d ${t.slaRemaining}`, color: 'emerald', breached: false, daysLeft }
+  return { percent, label: `${daysLeft} days remaining`, color: 'emerald', breached: false, daysLeft }
 }
 
 // ---------------------------------------------------------------------------
@@ -678,7 +678,7 @@ function OverviewTab({
   onRequestRefund?: () => void
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-6">
       {/* Amount */}
       <div>
         <span className="text-3xl font-bold text-stone-900 dark:text-stone-50 tabular-nums tracking-tight">
@@ -687,7 +687,7 @@ function OverviewTab({
       </div>
 
       {/* Detail fields */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0 pt-2 border-t border-stone-100 dark:border-stone-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 gap-y-0 pt-2 border-t border-stone-100 dark:border-stone-800">
         <DetailRow
           icon={Truck}
           label={t.vehicle}
@@ -1029,7 +1029,13 @@ export function ChallanDetail({
   onAddComment,
   onBack,
 }: ChallanDetailProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const initialTab = (() => {
+    const params = new URLSearchParams(window.location.search)
+    const t2 = params.get('tab')
+    if (t2 === 'comments' || t2 === 'documents' || t2 === 'report' || t2 === 'overview') return t2 as TabId
+    return 'overview' as TabId
+  })()
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab)
   const { language } = useLanguage()
   const t = translations[language]
 
@@ -1056,32 +1062,60 @@ export function ChallanDetail({
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
 
-        {/* Back Button with ID + Date */}
-        <button
-          onClick={onBack}
-          className="flex items-center gap-3 mb-6 group"
-        >
-          <div className="w-8 h-8 rounded-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 flex items-center justify-center group-hover:bg-stone-100 dark:group-hover:bg-stone-800 transition-colors">
-            <ArrowLeft className="w-4 h-4 text-stone-500 dark:text-stone-400" />
-          </div>
-          <div className="text-left">
-            <p className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
-              {challan.displayId}
-            </p>
-            <p className="text-sm text-stone-500 dark:text-stone-400">
-              {t.created} {formatDateTime(challan.createdAt, language)}
-            </p>
-          </div>
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ml-2 ${statusStyle.bg} ${statusStyle.text}`}
-          >
-            <StatusIcon className="w-3 h-3" />
-            {statusLabel}
-          </span>
-        </button>
+        {/* Hero Header Card */}
+        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden mb-6">
+          <div className="p-5 sm:p-6 lg:p-8">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              {/* Left: Challan Info */}
+              <div className="flex-1">
+                <div className="flex items-start gap-4 mb-5">
+                  {/* Back Arrow */}
+                  <button
+                    onClick={onBack}
+                    className="mt-1 p-2 -ml-1 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex-shrink-0"
+                  >
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
 
-        {/* Tab Switcher (pill style) */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-5">
+                  {/* Challan Icon */}
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${statusStyle.bg}`}>
+                    <StatusIcon className={`w-4 h-4 ${statusStyle.text}`} />
+                  </div>
+
+                  {/* ID + Badges */}
+                  <div>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
+                        {challan.displayId}
+                      </h1>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}>
+                        <StatusIcon className="w-3 h-3" />
+                        {statusLabel}
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+                      {challan.location} · {t.created} {formatDate(challan.createdAt, language)}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Right: Amount */}
+              <div className="flex-shrink-0 lg:text-right">
+                <p className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-50 tabular-nums tracking-tight">
+                  {formatCurrency(challan.amount)}
+                </p>
+                <p className={`text-sm font-medium mt-1 ${sla.color === 'red' ? 'text-red-600 dark:text-red-400' : sla.color === 'amber' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                  {sla.label}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Switcher */}
+        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-6 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
@@ -1091,7 +1125,7 @@ export function ChallanDetail({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                   isActive
                     ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                     : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'

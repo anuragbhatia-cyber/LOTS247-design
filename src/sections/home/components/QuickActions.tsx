@@ -70,16 +70,6 @@ export function QuickActions({
 
   const actions: ActionConfig[] = [
     {
-      id: 'incident',
-      label: t.addIncident,
-      description: t.addIncidentDesc,
-      icon: AlertTriangle,
-      onClick: onAddIncident,
-      priority: 'high',
-      restricted: false,
-      restrictedMessage: '',
-    },
-    {
       id: 'vehicle',
       label: t.addVehicle,
       description: t.addVehicleDesc,
@@ -88,6 +78,16 @@ export function QuickActions({
       priority: 'normal',
       restricted: vehicleLimitReached,
       restrictedMessage: t.vehicleLimitReached,
+    },
+    {
+      id: 'incident',
+      label: t.addIncident,
+      description: t.addIncidentDesc,
+      icon: AlertTriangle,
+      onClick: onAddIncident,
+      priority: 'normal',
+      restricted: false,
+      restrictedMessage: '',
     },
     {
       id: 'lawyer',

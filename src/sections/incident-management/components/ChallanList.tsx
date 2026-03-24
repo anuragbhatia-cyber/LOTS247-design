@@ -4,12 +4,8 @@ import {
   SlidersHorizontal,
   ChevronDown,
   CreditCard,
-  Scale,
-  ArrowUpRight,
   Download,
-  RotateCcw,
   X,
-  AlertTriangle,
   Clock,
   CheckCircle2,
   XCircle,
@@ -18,6 +14,7 @@ import {
   MoreVertical,
   ChevronLeft,
   ChevronRight,
+  Send,
 } from 'lucide-react'
 import type {
   ChallanListProps,
@@ -71,22 +68,27 @@ const translations: Record<Language, Record<string, string>> = {
     // SLA labels
     slaCompleted: 'Completed',
     slaBreachedOverdue: 'SLA breached',
-    slaDaysOverdue: 'd overdue',
-    slaDaysRemaining: 'd remaining',
+    slaDaysOverdue: ' days',
+    slaDaysRemaining: ' days',
 
     // Table headers
     headerIncidentId: 'Incident ID',
     headerVehicle: 'Vehicle',
+    headerType: 'Type',
     headerViolation: 'Offence',
     headerAmount: 'Amount',
     headerStatus: 'Status',
     headerSla: 'SLA',
+    headerExpectedClosure: 'Expected Closure',
     headerActions: 'Actions',
 
+    // Challan type labels
+    challanTypeCourt: 'Court Challan',
+    challanTypeOnline: 'Online Challan',
+
     // Actions
-    actionPayNow: 'Pay Now',
-    actionDispute: 'Dispute',
-    actionEscalate: 'Escalate',
+    actionViewIncident: 'View Incident',
+    actionAddFollowUp: 'Add Follow-up',
     actionReceipt: 'Receipt',
     actionRefund: 'Refund',
 
@@ -141,22 +143,27 @@ const translations: Record<Language, Record<string, string>> = {
     // SLA labels
     slaCompleted: 'पूर्ण',
     slaBreachedOverdue: 'SLA उल्लंघन',
-    slaDaysOverdue: 'दिन अतिदेय',
-    slaDaysRemaining: 'दिन शेष',
+    slaDaysOverdue: ' दिन',
+    slaDaysRemaining: ' दिन',
 
     // Table headers
     headerIncidentId: 'घटना ID',
     headerVehicle: 'वाहन',
+    headerType: 'प्रकार',
     headerViolation: 'उल्लंघन',
     headerAmount: 'राशि',
     headerStatus: 'स्थिति',
     headerSla: 'SLA',
+    headerExpectedClosure: 'अपेक्षित समापन',
     headerActions: 'कार्रवाई',
 
+    // Challan type labels
+    challanTypeCourt: 'कोर्ट चालान',
+    challanTypeOnline: 'ऑनलाइन चालान',
+
     // Actions
-    actionPayNow: 'अभी भुगतान करें',
-    actionDispute: 'विवाद करें',
-    actionEscalate: 'आगे बढ़ाएं',
+    actionViewIncident: 'घटना देखें',
+    actionAddFollowUp: 'फॉलो-अप जोड़ें',
     actionReceipt: 'रसीद',
     actionRefund: 'वापसी',
 
@@ -244,7 +251,7 @@ function getSlaInfo(slaDeadline: string, status: ChallanStatus, t: Record<string
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
-    return { label: `${t.slaBreachedOverdue} (${Math.abs(diffDays)}${t.slaDaysOverdue})`, color: 'text-red-600 dark:text-red-400', breached: true }
+    return { label: `${Math.abs(diffDays)}${t.slaDaysOverdue}`, color: 'text-red-600 dark:text-red-400', breached: true }
   }
   if (diffDays <= 7) {
     return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-amber-600 dark:text-amber-400', breached: false }
@@ -307,11 +314,8 @@ export function ChallanList({
   vehicles,
   drivers,
   onView,
-  onPay,
-  onDispute,
-  onEscalateToCase,
+  onAddFollowUp,
   onDownloadReceipt,
-  onRequestRefund,
 }: ChallanListProps) {
   const { language } = useLanguage()
   const t = translations[language]
@@ -415,7 +419,6 @@ export function ChallanList({
     (statusFilter !== 'all' ? 1 : 0) + (vehicleFilter !== 'all' ? 1 : 0)
 
   function getRowActions(challan: Challan) {
-    const sla = getSlaInfo(challan.slaDeadline, challan.status, t)
     const actions: {
       label: string
       icon: typeof CreditCard
@@ -423,24 +426,20 @@ export function ChallanList({
       variant?: 'primary' | 'danger' | 'default'
     }[] = []
 
-    if (challan.status === 'submitted' || challan.status === 'inProgress') {
-      actions.push({
-        label: t.actionPayNow,
-        icon: CreditCard,
-        onClick: () => onPay?.(challan.id),
-        variant: 'primary',
-      })
-      actions.push({
-        label: t.actionDispute,
-        icon: Scale,
-        onClick: () => onDispute?.(challan.id),
-      })
-      actions.push({
-        label: t.actionEscalate,
-        icon: ArrowUpRight,
-        onClick: () => onEscalateToCase?.(challan.id),
-      })
-    }
+    // Always show View Incident
+    actions.push({
+      label: t.actionViewIncident,
+      icon: FileText,
+      onClick: () => onView?.(challan.id),
+      variant: 'primary',
+    })
+
+    // Always show Add Follow-up
+    actions.push({
+      label: t.actionAddFollowUp,
+      icon: Send,
+      onClick: () => onAddFollowUp?.(challan.id),
+    })
 
     if (challan.status === 'resolved' && challan.paymentReference) {
       actions.push({
@@ -450,21 +449,12 @@ export function ChallanList({
       })
     }
 
-    if (sla.breached && challan.status !== 'resolved') {
-      actions.push({
-        label: t.actionRefund,
-        icon: RotateCcw,
-        onClick: () => onRequestRefund?.(challan.id),
-        variant: 'danger',
-      })
-    }
-
     return actions
   }
 
   return (
-    <div className="bg-stone-100 dark:bg-stone-950">
-      <div className="px-4 sm:px-6 lg:px-8">
+    <div>
+      <div>
         {/* Search + Filters */}
         <div className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
@@ -613,12 +603,13 @@ export function ChallanList({
         <div className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
           <table className="w-full table-fixed">
             <colgroup>
-              <col className="w-[15%]" />
-              <col className="w-[15%]" />
-              <col className="w-[30%]" />
-              <col className="w-[12%]" />
+              <col className="w-[13%]" />
+              <col className="w-[13%]" />
+              <col className="w-[14%]" />
+              <col className="w-[10%]" />
+              <col className="w-[14%]" />
               <col className="w-[16%]" />
-              <col className="w-[12%]" />
+              <col className="w-[10%]" />
             </colgroup>
             <thead>
               <tr className="border-b border-stone-100 dark:border-stone-800">
@@ -629,13 +620,16 @@ export function ChallanList({
                   {t.headerVehicle}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  {t.headerViolation}
+                  {t.headerType}
                 </th>
                 <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                   {t.headerAmount}
                 </th>
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                   {t.headerStatus}
+                </th>
+                <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
+                  {t.headerExpectedClosure}
                 </th>
                 <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                   {t.headerActions}
@@ -672,18 +666,10 @@ export function ChallanList({
                       </p>
                     </td>
 
-                    {/* Violation + Location */}
+                    {/* Type */}
                     <td className="px-5 py-4">
-                      <div className="group/tip relative">
-                        <p className="text-sm text-stone-800 dark:text-stone-200 truncate">
-                          {challan.violationType}
-                        </p>
-                        <div className="pointer-events-none absolute left-0 bottom-full mb-1.5 z-50 max-w-xs px-2.5 py-1.5 rounded-lg bg-stone-900 dark:bg-stone-100 text-xs text-white dark:text-stone-900 shadow-lg opacity-0 translate-y-1 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 transition-all duration-200 ease-out whitespace-normal">
-                          {challan.violationType}
-                        </div>
-                      </div>
-                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 truncate">
-                        {challan.location}
+                      <p className="text-sm text-stone-700 dark:text-stone-300">
+                        {challan.challanType === 'court' ? t.challanTypeCourt : t.challanTypeOnline}
                       </p>
                     </td>
 
@@ -697,6 +683,13 @@ export function ChallanList({
                     {/* Status */}
                     <td className="px-5 py-4">
                       <StatusBadge status={challan.status} t={t} />
+                    </td>
+
+                    {/* Expected Closure */}
+                    <td className="px-5 py-4">
+                      <p className={`text-sm font-medium ${sla.color}`}>
+                        {sla.label}
+                      </p>
                     </td>
 
                     {/* Actions */}
@@ -718,28 +711,18 @@ export function ChallanList({
 
                         {openDropdownId === challan.id && (
                           <div className="absolute right-0 top-full mt-1 z-50 w-44 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden py-1">
-                            {actions.map((action) => {
-                              const Icon = action.icon
-                              return (
+                            {actions.map((action) => (
                                 <button
                                   key={action.label}
                                   onClick={() => {
                                     action.onClick()
                                     setOpenDropdownId(null)
                                   }}
-                                  className={`w-full flex items-center gap-2.5 px-3.5 py-2 min-h-11 text-sm transition-colors ${
-                                    action.variant === 'primary'
-                                      ? 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
-                                      : action.variant === 'danger'
-                                      ? 'text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40'
-                                      : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700/50'
-                                  }`}
+                                  className="w-full text-left px-3.5 py-2 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors"
                                 >
-                                  <Icon className="w-4 h-4 flex-shrink-0" />
                                   {action.label}
                                 </button>
-                              )
-                            })}
+                            ))}
                           </div>
                         )}
                       </div>
@@ -793,19 +776,16 @@ export function ChallanList({
                       {formatDate(challan.issueDate, language)}
                     </p>
                   </div>
-                  <StatusBadge status={challan.status} t={t} />
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-stone-500 dark:text-stone-400">
+                      {challan.challanType === 'court' ? t.challanTypeCourt : t.challanTypeOnline}
+                    </span>
+                    <StatusBadge status={challan.status} t={t} />
+                  </div>
                 </div>
 
                 {/* Middle: Details */}
                 <div className="space-y-1.5 mb-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-stone-500 dark:text-stone-400">
-                      {t.labelViolation}
-                    </span>
-                    <span className="text-sm text-stone-800 dark:text-stone-200 text-right">
-                      {challan.violationType}
-                    </span>
-                  </div>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-stone-500 dark:text-stone-400">
                       {t.labelVehicle}

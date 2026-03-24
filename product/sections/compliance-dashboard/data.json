@@ -1,0 +1,382 @@
+{
+  "_meta": {
+    "models": {
+      "complianceScore": "The fleet's overall compliance health score (0-100), derived from document validity, pending challans, and government flags across all vehicles and drivers.",
+      "categories": "The 8 compliance categories tracked across the fleet — RC, Insurance, PUCC, Permits, DL, Challans, Blacklisted, and NTBT — each with compliant/total counts.",
+      "insights": "Auto-generated, data-driven observations about fleet compliance, such as upcoming expiries, score changes, and flagged vehicles.",
+      "monthlyTrend": "Monthly compliance score data points used to render the trend line chart over the selected date range.",
+      "expiryUrgencyItems": "Vehicles and documents approaching or past expiry, sorted by soonest expiry date with urgency classification.",
+      "categoryDrilldowns": "Per-category vehicle-level breakdown tables showing each vehicle's compliance status for a specific category.",
+      "vehicles": "Fleet vehicles available for the vehicle-scope selector dropdown.",
+      "drivers": "Fleet drivers available for the driver-scope selector dropdown."
+    },
+    "relationships": [
+      "complianceScore.overall is a weighted average across all 8 categories",
+      "Each category card summarizes compliance across all vehicles in the fleet",
+      "expiryUrgencyItems link to specific vehicles and document types",
+      "categoryDrilldowns contain vehicle-level rows for each of the 8 categories",
+      "Permits drill-down includes sub-breakdown by permit type (All India, Nationwide, State)",
+      "Blacklisted and NTBT drill-downs include government flag details (reason, authority, date)",
+      "vehicles and drivers are used for scope filtering — selecting one filters all dashboard data"
+    ]
+  },
+  "complianceScore": {
+    "overall": 78,
+    "previousMonth": 75,
+    "change": 3,
+    "status": "healthy"
+  },
+  "categories": [
+    {
+      "id": "rc",
+      "label": "RC",
+      "fullLabel": "Registration Certificate",
+      "compliant": 17,
+      "total": 18,
+      "percentage": 94,
+      "status": "healthy"
+    },
+    {
+      "id": "insurance",
+      "label": "Insurance",
+      "fullLabel": "Insurance Policy",
+      "compliant": 14,
+      "total": 18,
+      "percentage": 78,
+      "status": "healthy"
+    },
+    {
+      "id": "pucc",
+      "label": "PUCC",
+      "fullLabel": "Pollution Under Control Certificate",
+      "compliant": 12,
+      "total": 18,
+      "percentage": 67,
+      "status": "warning"
+    },
+    {
+      "id": "permits",
+      "label": "Permits",
+      "fullLabel": "Permits",
+      "compliant": 15,
+      "total": 18,
+      "percentage": 83,
+      "status": "healthy",
+      "subBreakdown": {
+        "allIndia": { "compliant": 6, "total": 7 },
+        "nationwide": { "compliant": 5, "total": 5 },
+        "state": { "compliant": 4, "total": 6 }
+      }
+    },
+    {
+      "id": "dl",
+      "label": "DL",
+      "fullLabel": "Driving License",
+      "compliant": 19,
+      "total": 22,
+      "percentage": 86,
+      "status": "healthy"
+    },
+    {
+      "id": "challans",
+      "label": "Challans",
+      "fullLabel": "Pending Challans",
+      "compliant": 6,
+      "total": 18,
+      "percentage": 33,
+      "status": "critical",
+      "outstandingCount": 27,
+      "outstandingAmount": 147500
+    },
+    {
+      "id": "blacklisted",
+      "label": "Blacklisted",
+      "fullLabel": "Blacklisted Vehicles",
+      "compliant": 16,
+      "total": 18,
+      "percentage": 89,
+      "status": "healthy"
+    },
+    {
+      "id": "ntbt",
+      "label": "NTBT",
+      "fullLabel": "Not to Be Transit",
+      "compliant": 17,
+      "total": 18,
+      "percentage": 94,
+      "status": "healthy"
+    }
+  ],
+  "insights": [
+    {
+      "id": "ins-001",
+      "type": "warning",
+      "message": "6 PUCC certificates expiring in the next 15 days"
+    },
+    {
+      "id": "ins-002",
+      "type": "positive",
+      "message": "Fleet compliance improved 3% from last month"
+    },
+    {
+      "id": "ins-003",
+      "type": "critical",
+      "message": "12 vehicles have pending challans totalling ₹1,47,500"
+    },
+    {
+      "id": "ins-004",
+      "type": "warning",
+      "message": "2 vehicles flagged as blacklisted since last check"
+    }
+  ],
+  "monthlyTrend": [
+    { "month": "Oct 2025", "score": 68 },
+    { "month": "Nov 2025", "score": 71 },
+    { "month": "Dec 2025", "score": 69 },
+    { "month": "Jan 2026", "score": 73 },
+    { "month": "Feb 2026", "score": 75 },
+    { "month": "Mar 2026", "score": 78 }
+  ],
+  "monthlyChallanTrend": [
+    { "month": "Oct 2025", "count": 8, "online": 5, "court": 3, "amount": 42000 },
+    { "month": "Nov 2025", "count": 5, "online": 3, "court": 2, "amount": 28500 },
+    { "month": "Dec 2025", "count": 11, "online": 5, "court": 6, "amount": 55000 },
+    { "month": "Jan 2026", "count": 6, "online": 4, "court": 2, "amount": 31000 },
+    { "month": "Feb 2026", "count": 9, "online": 6, "court": 3, "amount": 47500 },
+    { "month": "Mar 2026", "count": 12, "online": 7, "court": 5, "amount": 62500 }
+  ],
+  "historicalStats": {
+    "totalVehiclesTracked": 18,
+    "totalDriversTracked": 22,
+    "documentsRenewed": 42,
+    "challansPaid": 31,
+    "totalChallanAmount": 285000,
+    "blacklistRemovals": 1,
+    "avgComplianceScore": 72,
+    "bestMonth": "Mar 2026",
+    "worstMonth": "Oct 2025"
+  },
+  "expiryUrgencyItems": [
+    {
+      "id": "exp-001",
+      "vehicleNumber": "UP32MM1113",
+      "documentType": "PUCC",
+      "expiryDate": "2026-03-18",
+      "daysRemaining": -5,
+      "urgency": "expired"
+    },
+    {
+      "id": "exp-002",
+      "vehicleNumber": "DL1CAB3456",
+      "documentType": "Insurance",
+      "expiryDate": "2026-03-20",
+      "daysRemaining": -3,
+      "urgency": "expired"
+    },
+    {
+      "id": "exp-003",
+      "vehicleNumber": "UP14GT7890",
+      "documentType": "PUCC",
+      "expiryDate": "2026-03-25",
+      "daysRemaining": 2,
+      "urgency": "critical"
+    },
+    {
+      "id": "exp-004",
+      "vehicleNumber": "HR26DK4521",
+      "documentType": "Insurance",
+      "expiryDate": "2026-03-28",
+      "daysRemaining": 5,
+      "urgency": "critical"
+    },
+    {
+      "id": "exp-005",
+      "vehicleNumber": "MH04EQ6789",
+      "documentType": "PUCC",
+      "expiryDate": "2026-03-30",
+      "daysRemaining": 7,
+      "urgency": "critical"
+    },
+    {
+      "id": "exp-006",
+      "vehicleNumber": "RJ14SB2345",
+      "documentType": "RC",
+      "expiryDate": "2026-04-02",
+      "daysRemaining": 10,
+      "urgency": "warning"
+    },
+    {
+      "id": "exp-007",
+      "vehicleNumber": "UP78BT5678",
+      "documentType": "PUCC",
+      "expiryDate": "2026-04-05",
+      "daysRemaining": 13,
+      "urgency": "warning"
+    },
+    {
+      "id": "exp-008",
+      "vehicleNumber": "GJ01JX9012",
+      "documentType": "Insurance",
+      "expiryDate": "2026-04-07",
+      "daysRemaining": 15,
+      "urgency": "warning"
+    },
+    {
+      "id": "exp-009",
+      "vehicleNumber": "MP09NK3456",
+      "documentType": "Permit",
+      "expiryDate": "2026-04-15",
+      "daysRemaining": 23,
+      "urgency": "notice"
+    },
+    {
+      "id": "exp-010",
+      "vehicleNumber": "KA01MV7890",
+      "documentType": "PUCC",
+      "expiryDate": "2026-04-20",
+      "daysRemaining": 28,
+      "urgency": "notice"
+    }
+  ],
+  "categoryDrilldowns": {
+    "rc": [
+      { "vehicleNumber": "UP32MM1113", "status": "valid", "issueDate": "2021-06-10", "expiryDate": "2036-06-09", "rtoOffice": "RTO Lucknow" },
+      { "vehicleNumber": "DL1CAB3456", "status": "valid", "issueDate": "2019-03-15", "expiryDate": "2034-03-14", "rtoOffice": "RTO Delhi South" },
+      { "vehicleNumber": "UP14GT7890", "status": "valid", "issueDate": "2020-11-22", "expiryDate": "2035-11-21", "rtoOffice": "RTO Ghaziabad" },
+      { "vehicleNumber": "HR26DK4521", "status": "valid", "issueDate": "2022-01-08", "expiryDate": "2037-01-07", "rtoOffice": "RTO Gurugram" },
+      { "vehicleNumber": "MH04EQ6789", "status": "valid", "issueDate": "2018-09-30", "expiryDate": "2033-09-29", "rtoOffice": "RTO Mumbai Central" },
+      { "vehicleNumber": "RJ14SB2345", "status": "expiring", "issueDate": "2011-04-02", "expiryDate": "2026-04-02", "rtoOffice": "RTO Jaipur" },
+      { "vehicleNumber": "UP78BT5678", "status": "valid", "issueDate": "2023-07-18", "expiryDate": "2038-07-17", "rtoOffice": "RTO Kanpur" },
+      { "vehicleNumber": "GJ01JX9012", "status": "valid", "issueDate": "2020-05-25", "expiryDate": "2035-05-24", "rtoOffice": "RTO Ahmedabad" }
+    ],
+    "insurance": [
+      { "vehicleNumber": "UP32MM1113", "status": "valid", "provider": "ICICI Lombard", "policyNumber": "POL-2025-44821", "expiryDate": "2026-09-14" },
+      { "vehicleNumber": "DL1CAB3456", "status": "expired", "provider": "Bajaj Allianz", "policyNumber": "POL-2025-33102", "expiryDate": "2026-03-20" },
+      { "vehicleNumber": "UP14GT7890", "status": "valid", "provider": "HDFC ERGO", "policyNumber": "POL-2025-55743", "expiryDate": "2026-12-01" },
+      { "vehicleNumber": "HR26DK4521", "status": "expiring", "provider": "New India Assurance", "policyNumber": "POL-2025-22567", "expiryDate": "2026-03-28" },
+      { "vehicleNumber": "MH04EQ6789", "status": "valid", "provider": "ICICI Lombard", "policyNumber": "POL-2025-67891", "expiryDate": "2026-11-05" },
+      { "vehicleNumber": "RJ14SB2345", "status": "valid", "provider": "SBI General", "policyNumber": "POL-2025-78234", "expiryDate": "2027-01-18" },
+      { "vehicleNumber": "UP78BT5678", "status": "valid", "provider": "Bajaj Allianz", "policyNumber": "POL-2025-89012", "expiryDate": "2026-08-22" },
+      { "vehicleNumber": "GJ01JX9012", "status": "expiring", "provider": "HDFC ERGO", "policyNumber": "POL-2025-90345", "expiryDate": "2026-04-07" }
+    ],
+    "pucc": [
+      { "vehicleNumber": "UP32MM1113", "status": "expired", "testCenter": "Green Auto Care, Lucknow", "expiryDate": "2026-03-18" },
+      { "vehicleNumber": "DL1CAB3456", "status": "valid", "testCenter": "Delhi PUC Centre, Nehru Place", "expiryDate": "2026-08-10" },
+      { "vehicleNumber": "UP14GT7890", "status": "expiring", "testCenter": "Clean Air Testing, Ghaziabad", "expiryDate": "2026-03-25" },
+      { "vehicleNumber": "HR26DK4521", "status": "valid", "testCenter": "Eco Check, Gurugram", "expiryDate": "2026-07-15" },
+      { "vehicleNumber": "MH04EQ6789", "status": "expiring", "testCenter": "Mumbai PUC Lab, Andheri", "expiryDate": "2026-03-30" },
+      { "vehicleNumber": "RJ14SB2345", "status": "valid", "testCenter": "Jaipur Emission Centre", "expiryDate": "2026-10-01" },
+      { "vehicleNumber": "UP78BT5678", "status": "expiring", "testCenter": "Kanpur Green Test", "expiryDate": "2026-04-05" },
+      { "vehicleNumber": "GJ01JX9012", "status": "valid", "testCenter": "Ahmedabad PUC Hub", "expiryDate": "2026-09-20" }
+    ],
+    "permits": [
+      { "vehicleNumber": "UP32MM1113", "status": "valid", "permitType": "allIndia", "permitNumber": "NP-2024-44821", "expiryDate": "2027-06-10" },
+      { "vehicleNumber": "DL1CAB3456", "status": "valid", "permitType": "nationwide", "permitNumber": "NP-2024-33102", "expiryDate": "2027-03-15" },
+      { "vehicleNumber": "UP14GT7890", "status": "valid", "permitType": "allIndia", "permitNumber": "NP-2024-55743", "expiryDate": "2027-11-22" },
+      { "vehicleNumber": "HR26DK4521", "status": "expired", "permitType": "state", "permitNumber": "SP-2024-22567", "expiryDate": "2026-01-08" },
+      { "vehicleNumber": "MH04EQ6789", "status": "valid", "permitType": "nationwide", "permitNumber": "NP-2024-67891", "expiryDate": "2027-09-30" },
+      { "vehicleNumber": "RJ14SB2345", "status": "valid", "permitType": "state", "permitNumber": "SP-2024-78234", "expiryDate": "2026-12-02" },
+      { "vehicleNumber": "UP78BT5678", "status": "valid", "permitType": "allIndia", "permitNumber": "NP-2024-89012", "expiryDate": "2027-07-18" },
+      { "vehicleNumber": "GJ01JX9012", "status": "expired", "permitType": "state", "permitNumber": "SP-2024-90345", "expiryDate": "2026-02-25" },
+      { "vehicleNumber": "MP09NK3456", "status": "expiring", "permitType": "allIndia", "permitNumber": "NP-2024-12345", "expiryDate": "2026-04-15" },
+      { "vehicleNumber": "KA01MV7890", "status": "valid", "permitType": "nationwide", "permitNumber": "NP-2024-23456", "expiryDate": "2027-05-10" }
+    ],
+    "dl": [
+      { "driverName": "Vikram Singh", "licenseNumber": "DL-0420110012345", "status": "valid", "expiryDate": "2028-05-12", "vehiclesAssigned": ["UP32MM1113", "UP14GT7890"] },
+      { "driverName": "Suresh Yadav", "licenseNumber": "UP-5020090054321", "status": "valid", "expiryDate": "2027-11-08", "vehiclesAssigned": ["DL1CAB3456"] },
+      { "driverName": "Manoj Tiwari", "licenseNumber": "HR-0620150067890", "status": "expiring", "expiryDate": "2026-04-18", "vehiclesAssigned": ["HR26DK4521", "RJ14SB2345"] },
+      { "driverName": "Ramesh Gupta", "licenseNumber": "MH-0120120034567", "status": "valid", "expiryDate": "2029-02-25", "vehiclesAssigned": ["MH04EQ6789"] },
+      { "driverName": "Ajay Sharma", "licenseNumber": "RJ-2020180045678", "status": "valid", "expiryDate": "2028-09-30", "vehiclesAssigned": ["UP78BT5678", "GJ01JX9012"] },
+      { "driverName": "Deepak Verma", "licenseNumber": "GJ-0120160078901", "status": "expired", "expiryDate": "2026-02-10", "vehiclesAssigned": ["MP09NK3456"] },
+      { "driverName": "Sanjay Patel", "licenseNumber": "KA-0120170089012", "status": "valid", "expiryDate": "2029-07-14", "vehiclesAssigned": ["KA01MV7890"] },
+      { "driverName": "Ravi Kumar", "licenseNumber": "UP-3220190090123", "status": "valid", "expiryDate": "2030-01-20", "vehiclesAssigned": ["UP32MM1113"] }
+    ],
+    "challans": [
+      { "vehicleNumber": "UP32MM1113", "outstandingCount": 3, "courtCount": 1, "onlineCount": 2, "totalAmount": 15500, "latestDate": "2026-03-10" },
+      { "vehicleNumber": "DL1CAB3456", "outstandingCount": 5, "courtCount": 2, "onlineCount": 3, "totalAmount": 28000, "latestDate": "2026-03-15" },
+      { "vehicleNumber": "UP14GT7890", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null },
+      { "vehicleNumber": "HR26DK4521", "outstandingCount": 2, "courtCount": 1, "onlineCount": 1, "totalAmount": 11000, "latestDate": "2026-02-28" },
+      { "vehicleNumber": "MH04EQ6789", "outstandingCount": 4, "courtCount": 1, "onlineCount": 3, "totalAmount": 22500, "latestDate": "2026-03-18" },
+      { "vehicleNumber": "RJ14SB2345", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null },
+      { "vehicleNumber": "UP78BT5678", "outstandingCount": 1, "courtCount": 0, "onlineCount": 1, "totalAmount": 5000, "latestDate": "2026-01-22" },
+      { "vehicleNumber": "GJ01JX9012", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null },
+      { "vehicleNumber": "MP09NK3456", "outstandingCount": 6, "courtCount": 2, "onlineCount": 4, "totalAmount": 35500, "latestDate": "2026-03-20" },
+      { "vehicleNumber": "KA01MV7890", "outstandingCount": 3, "courtCount": 1, "onlineCount": 2, "totalAmount": 18000, "latestDate": "2026-03-05" },
+      { "vehicleNumber": "TN01AB1234", "outstandingCount": 2, "courtCount": 1, "onlineCount": 1, "totalAmount": 8500, "latestDate": "2026-02-15" },
+      { "vehicleNumber": "PB10CD5678", "outstandingCount": 1, "courtCount": 0, "onlineCount": 1, "totalAmount": 3500, "latestDate": "2026-03-01" }
+    ],
+    "blacklisted": [
+      { "vehicleNumber": "MP09NK3456", "flagReason": "Multiple unpaid challans exceeding ₹30,000", "flaggingAuthority": "RTO Bhopal", "flagDate": "2026-03-12", "status": "active" },
+      { "vehicleNumber": "DL1CAB3456", "flagReason": "Involvement in hit-and-run case (FIR No. 245/2026)", "flaggingAuthority": "Delhi Traffic Police", "flagDate": "2026-02-20", "status": "active" }
+    ],
+    "ntbt": [
+      { "vehicleNumber": "MH04EQ6789", "holdReason": "Court-ordered hold pending accident liability case", "issuingAuthority": "Mumbai High Court", "holdDate": "2026-01-15", "caseReference": "WP/2026/1045", "status": "active" }
+    ]
+  },
+  "vehicles": [
+    { "id": "veh-001", "vehicleNumber": "UP32MM1113", "vehicleType": "Truck", "make": "Tata Motors", "model": "Prima 4928", "year": 2023, "category": "Owned", "status": "Active" },
+    { "id": "veh-002", "vehicleNumber": "DL1CAB3456", "vehicleType": "Truck", "make": "Ashok Leyland", "model": "AVTR 4120", "year": 2022, "category": "Leased", "status": "Active" },
+    { "id": "veh-003", "vehicleNumber": "UP14GT7890", "vehicleType": "Truck", "make": "Tata Motors", "model": "Signa 4825", "year": 2023, "category": "Owned", "status": "Active" },
+    { "id": "veh-004", "vehicleNumber": "HR26DK4521", "vehicleType": "Truck", "make": "Mahindra", "model": "Blazo X 35", "year": 2021, "category": "Owned", "status": "Maintenance" },
+    { "id": "veh-005", "vehicleNumber": "MH04EQ6789", "vehicleType": "Trailer", "make": "BharatBenz", "model": "3523R", "year": 2023, "category": "Leased", "status": "Active" },
+    { "id": "veh-006", "vehicleNumber": "RJ14SB2345", "vehicleType": "Truck", "make": "Eicher", "model": "Pro 6049", "year": 2022, "category": "Rented", "status": "Active" },
+    { "id": "veh-007", "vehicleNumber": "UP78BT5678", "vehicleType": "Truck", "make": "Tata Motors", "model": "Ultra T.16", "year": 2024, "category": "Owned", "status": "Active" },
+    { "id": "veh-008", "vehicleNumber": "GJ01JX9012", "vehicleType": "Truck", "make": "Ashok Leyland", "model": "BOSS 1920", "year": 2022, "category": "Leased", "status": "Active" },
+    { "id": "veh-009", "vehicleNumber": "MP09NK3456", "vehicleType": "Truck", "make": "Tata Motors", "model": "Signa 3518", "year": 2023, "category": "Owned", "status": "Active" },
+    { "id": "veh-010", "vehicleNumber": "KA01MV7890", "vehicleType": "Truck", "make": "Eicher", "model": "Pro 3019", "year": 2021, "category": "Rented", "status": "Inactive" },
+    { "id": "veh-011", "vehicleNumber": "TN01AB1234", "vehicleType": "Truck", "make": "Ashok Leyland", "model": "Captain 3523", "year": 2022, "category": "Owned", "status": "Active" },
+    { "id": "veh-012", "vehicleNumber": "PB10CD5678", "vehicleType": "Truck", "make": "Mahindra", "model": "Blazo X 28", "year": 2023, "category": "Owned", "status": "Active" },
+    { "id": "veh-013", "vehicleNumber": "CG04EF9012", "vehicleType": "Truck", "make": "Tata Motors", "model": "Prima 5530", "year": 2024, "category": "Leased", "status": "Active" },
+    { "id": "veh-014", "vehicleNumber": "UK07GH3456", "vehicleType": "Trailer", "make": "BharatBenz", "model": "4228R", "year": 2022, "category": "Owned", "status": "Active" },
+    { "id": "veh-015", "vehicleNumber": "AP09JK7890", "vehicleType": "Truck", "make": "Eicher", "model": "Pro 6042", "year": 2023, "category": "Rented", "status": "Active" },
+    { "id": "veh-016", "vehicleNumber": "WB02LM1234", "vehicleType": "Truck", "make": "Tata Motors", "model": "Ultra T.11", "year": 2021, "category": "Owned", "status": "Maintenance" },
+    { "id": "veh-017", "vehicleNumber": "JH05NP5678", "vehicleType": "Truck", "make": "Ashok Leyland", "model": "AVTR 2620", "year": 2023, "category": "Leased", "status": "Active" },
+    { "id": "veh-018", "vehicleNumber": "OR02QR9012", "vehicleType": "Truck", "make": "Mahindra", "model": "Blazo X 42", "year": 2022, "category": "Owned", "status": "Active" }
+  ],
+  "drivers": [
+    { "id": "drv-001", "name": "Vikram Singh", "licenseNumber": "DL-0420110012345", "phone": "919820134567" },
+    { "id": "drv-002", "name": "Suresh Yadav", "licenseNumber": "UP-5020090054321", "phone": "919876543210" },
+    { "id": "drv-003", "name": "Manoj Tiwari", "licenseNumber": "HR-0620150067890", "phone": "918306712720" },
+    { "id": "drv-004", "name": "Ramesh Gupta", "licenseNumber": "MH-0120120034567", "phone": "919123456789" },
+    { "id": "drv-005", "name": "Ajay Sharma", "licenseNumber": "RJ-2020180045678", "phone": "918765432109" },
+    { "id": "drv-006", "name": "Deepak Verma", "licenseNumber": "GJ-0120160078901", "phone": "917654321098" },
+    { "id": "drv-007", "name": "Sanjay Patel", "licenseNumber": "KA-0120170089012", "phone": "916543210987" },
+    { "id": "drv-008", "name": "Ravi Kumar", "licenseNumber": "UP-3220190090123", "phone": "915432109876" },
+    { "id": "drv-009", "name": "Amit Chauhan", "licenseNumber": "MP-0920200001234", "phone": "914321098765" },
+    { "id": "drv-010", "name": "Rajendra Prasad", "licenseNumber": "TN-0120140023456", "phone": "913210987654" },
+    { "id": "drv-011", "name": "Bharat Mishra", "licenseNumber": "PB-1020160034567", "phone": "912109876543" },
+    { "id": "drv-012", "name": "Gopal Reddy", "licenseNumber": "AP-0920180045678", "phone": "911098765432" },
+    { "id": "drv-013", "name": "Harish Joshi", "licenseNumber": "UK-0720190056789", "phone": "910987654321" },
+    { "id": "drv-014", "name": "Karan Mehra", "licenseNumber": "CG-0420200067890", "phone": "919087654321" },
+    { "id": "drv-015", "name": "Lalit Rana", "licenseNumber": "WB-0220170078901", "phone": "918076543210" },
+    { "id": "drv-016", "name": "Naveen Das", "licenseNumber": "JH-0520180089012", "phone": "917065432109" },
+    { "id": "drv-017", "name": "Om Prakash", "licenseNumber": "OR-0220190090123", "phone": "916054321098" },
+    { "id": "drv-018", "name": "Prem Chand", "licenseNumber": "RJ-1420200001234", "phone": "915043210987" },
+    { "id": "drv-019", "name": "Raju Thakur", "licenseNumber": "HR-2620160012345", "phone": "914032109876" },
+    { "id": "drv-020", "name": "Santosh Dubey", "licenseNumber": "GJ-0120170023456", "phone": "913021098765" },
+    { "id": "drv-021", "name": "Tarun Nair", "licenseNumber": "KA-0120180034567", "phone": "912010987654" },
+    { "id": "drv-022", "name": "Umesh Pandey", "licenseNumber": "MH-0420190045678", "phone": "911009876543" }
+  ],
+  "vehicleHistory": {
+    "UP32MM1113": [
+      { "date": "2026-03-10", "type": "challan", "title": "Challan Issued", "description": "Overspeeding on NH-24", "amount": 5000 },
+      { "date": "2026-02-15", "type": "insurance", "title": "Insurance Renewed", "description": "ICICI Lombard — Policy renewed", "amount": null },
+      { "date": "2026-01-20", "type": "challan", "title": "Challan Issued", "description": "No parking violation", "amount": 2500 },
+      { "date": "2025-12-05", "type": "pucc", "title": "PUCC Renewed", "description": "Green Zone Testing Center", "amount": null },
+      { "date": "2025-11-18", "type": "challan", "title": "Challan Issued", "description": "Red light jump at Hazratganj", "amount": 8000 },
+      { "date": "2025-10-02", "type": "service", "title": "Servicing Done", "description": "Annual maintenance at Tata Motors", "amount": 12000 },
+      { "date": "2025-08-14", "type": "permit", "title": "Permit Renewed", "description": "All India permit extended", "amount": null }
+    ],
+    "MH12AB1234": [
+      { "date": "2026-03-01", "type": "challan", "title": "Challan Issued", "description": "Overloading on Mumbai-Pune Expressway", "amount": 10000 },
+      { "date": "2026-01-10", "type": "insurance", "title": "Insurance Renewed", "description": "Bajaj Allianz — Policy renewed", "amount": null },
+      { "date": "2025-12-20", "type": "challan", "title": "Challan Issued", "description": "Driving without seatbelt", "amount": 1000 },
+      { "date": "2025-11-05", "type": "rc", "title": "RC Renewed", "description": "RTO Pune — Registration renewed", "amount": null }
+    ],
+    "DL01CA5678": [
+      { "date": "2026-02-28", "type": "service", "title": "Servicing Done", "description": "Brake pad replacement", "amount": 8500 },
+      { "date": "2026-01-15", "type": "challan", "title": "Challan Issued", "description": "Lane violation on Ring Road", "amount": 3000 },
+      { "date": "2025-12-10", "type": "pucc", "title": "PUCC Renewed", "description": "Delhi Auto Testing", "amount": null }
+    ]
+  }
+}

@@ -27,6 +27,10 @@ const translations: Record<Language, Record<string, string>> = {
     otherDesc: 'Other incident',
     vehicleNumber: 'Vehicle Number',
     vehicleNumberPlaceholder: 'UP32MM1113',
+    challanType: 'Challan Type',
+    selectChallanType: 'Select challan type',
+    courtChallan: 'Court Challan',
+    onlineChallan: 'Online Challan',
     violationType: 'Violation Type',
     selectViolation: 'Select violation',
     overloading: 'Overloading',
@@ -39,14 +43,30 @@ const translations: Record<Language, Record<string, string>> = {
     amountPlaceholder: '1500',
     caseType: 'Case Type',
     selectCaseType: 'Select case type',
-    accident: 'Accident',
-    vehicleDetention: 'Vehicle Detention',
     theft: 'Theft',
-    impounding: 'Impounding',
-    insuranceDispute: 'Insurance Dispute',
-    legalComplaint: 'Legal Complaint',
+    detention: 'Detention',
+    bail: 'Bail',
+    accidents: 'Accidents',
+    firs: 'FIRs',
+    superdari: 'Superdari',
+    vehicleImpounding: 'Vehicle Impounding',
+    ewayBillIssues: 'E-Way Bill',
+    others: 'Others',
     caseDetail: 'Case Detail',
     caseDetailPlaceholder: 'Describe the case in detail...',
+    rtoType: 'Type',
+    selectRtoType: 'Select type',
+    rtoRcRenewal: 'RC Renewal',
+    rtoRcRetrieval: 'RC Retrieval',
+    rtoLicenseRetrieval: 'License Retrieval',
+    rtoLicenseRenewal: 'License Renewal',
+    rtoFitnessRetrieval: 'Fitness Retrieval',
+    rtoFitnessRenewal: 'Fitness Renewal',
+    rtoOwnershipTransfer: 'Ownership Transfer',
+    rtoNumberUpdating: 'Number Updating',
+    rtoPucRenewal: 'PUC Renewal',
+    rtoInsuranceRenewal: 'Insurance Renewal',
+    rtoOthers: 'Others',
     description: 'Description',
     descriptionPlaceholder: 'Describe the incident...',
     searchVehicle: 'Type to search vehicle...',
@@ -68,6 +88,10 @@ const translations: Record<Language, Record<string, string>> = {
     otherDesc: 'अन्य घटना',
     vehicleNumber: 'वाहन नंबर',
     vehicleNumberPlaceholder: 'उदा. UP32MM1113',
+    challanType: 'चालान प्रकार',
+    selectChallanType: 'चालान प्रकार चुनें',
+    courtChallan: 'कोर्ट चालान',
+    onlineChallan: 'ऑनलाइन चालान',
     violationType: 'उल्लंघन का प्रकार',
     selectViolation: 'उल्लंघन चुनें',
     overloading: 'ओवरलोडिंग',
@@ -80,14 +104,30 @@ const translations: Record<Language, Record<string, string>> = {
     amountPlaceholder: '1500',
     caseType: 'केस का प्रकार',
     selectCaseType: 'केस प्रकार चुनें',
-    accident: 'दुर्घटना',
-    vehicleDetention: 'वाहन हिरासत',
     theft: 'चोरी',
-    impounding: 'जब्ती',
-    insuranceDispute: 'बीमा विवाद',
-    legalComplaint: 'कानूनी शिकायत',
+    detention: 'हिरासत',
+    bail: 'जमानत',
+    accidents: 'दुर्घटनाएँ',
+    firs: 'FIR',
+    superdari: 'सुपुर्दगी',
+    vehicleImpounding: 'वाहन जब्ती',
+    ewayBillIssues: 'ई-वे बिल',
+    others: 'अन्य',
     caseDetail: 'केस विवरण',
     caseDetailPlaceholder: 'केस का विस्तृत विवरण दें...',
+    rtoType: 'प्रकार',
+    selectRtoType: 'प्रकार चुनें',
+    rtoRcRenewal: 'RC नवीनीकरण',
+    rtoRcRetrieval: 'RC पुनर्प्राप्ति',
+    rtoLicenseRetrieval: 'लाइसेंस पुनर्प्राप्ति',
+    rtoLicenseRenewal: 'लाइसेंस नवीनीकरण',
+    rtoFitnessRetrieval: 'फिटनेस पुनर्प्राप्ति',
+    rtoFitnessRenewal: 'फिटनेस नवीनीकरण',
+    rtoOwnershipTransfer: 'स्वामित्व हस्तांतरण',
+    rtoNumberUpdating: 'नंबर अपडेटिंग',
+    rtoPucRenewal: 'PUC नवीनीकरण',
+    rtoInsuranceRenewal: 'बीमा नवीनीकरण',
+    rtoOthers: 'अन्य',
     description: 'विवरण',
     descriptionPlaceholder: 'घटना का विवरण दें...',
     searchVehicle: 'वाहन खोजने के लिए टाइप करें...',
@@ -132,9 +172,11 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
   const [vehicleNumber, setVehicleNumber] = useState('')
   const [vehicleSearch, setVehicleSearch] = useState('')
   const [vehicleDropdownOpen, setVehicleDropdownOpen] = useState(false)
+  const [challanType, setChallanType] = useState('')
   const [violationType, setViolationType] = useState('')
   const [amount, setAmount] = useState('')
   const [caseType, setCaseType] = useState('')
+  const [rtoType, setRtoType] = useState('')
   const [description, setDescription] = useState('')
   const vehicleSearchRef = useRef<HTMLDivElement>(null)
   const { language } = useLanguage()
@@ -169,9 +211,11 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     setVehicleNumber('')
     setVehicleSearch('')
     setVehicleDropdownOpen(false)
+    setChallanType('')
     setViolationType('')
     setAmount('')
     setCaseType('')
+    setRtoType('')
     setDescription('')
     onClose()
   }
@@ -182,9 +226,11 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     setVehicleNumber('')
     setVehicleSearch('')
     setVehicleDropdownOpen(false)
+    setChallanType('')
     setViolationType('')
     setAmount('')
     setCaseType('')
+    setRtoType('')
     setDescription('')
   }
 
@@ -203,10 +249,11 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     if (!vehicleValid) return false
     switch (category) {
       case 'challan':
-        return violationType !== '' && amount !== ''
+        return challanType !== '' && violationType !== '' && amount !== ''
       case 'case':
         return caseType !== '' && description.trim().length > 0
       case 'rto':
+        return rtoType !== '' && description.trim().length > 0
       case 'other':
         return description.trim().length > 0
       default:
@@ -340,6 +387,23 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                 <>
                   <div>
                     <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                      {t.challanType}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={challanType}
+                        onChange={(e) => setChallanType(e.target.value)}
+                        className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
+                      >
+                        <option value="">{t.selectChallanType}</option>
+                        <option value="court">{t.courtChallan}</option>
+                        <option value="online">{t.onlineChallan}</option>
+                      </select>
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
                       {t.violationType}
                     </label>
                     <div className="relative">
@@ -389,12 +453,15 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                         className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
                       >
                         <option value="">{t.selectCaseType}</option>
-                        <option value="accident">{t.accident}</option>
-                        <option value="vehicle_detention">{t.vehicleDetention}</option>
                         <option value="theft">{t.theft}</option>
-                        <option value="impounding">{t.impounding}</option>
-                        <option value="insurance_dispute">{t.insuranceDispute}</option>
-                        <option value="legal_complaint">{t.legalComplaint}</option>
+                        <option value="detention">{t.detention}</option>
+                        <option value="bail">{t.bail}</option>
+                        <option value="accidents">{t.accidents}</option>
+                        <option value="firs">{t.firs}</option>
+                        <option value="superdari">{t.superdari}</option>
+                        <option value="vehicle_impounding">{t.vehicleImpounding}</option>
+                        <option value="eway_bill_issues">{t.ewayBillIssues}</option>
+                        <option value="others">{t.others}</option>
                       </select>
                       <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
                     </div>
@@ -414,8 +481,52 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                 </>
               )}
 
-              {/* RTO / Other — just description */}
-              {(category === 'rto' || category === 'other') && (
+              {/* RTO-specific fields */}
+              {category === 'rto' && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                      {t.rtoType}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={rtoType}
+                        onChange={(e) => setRtoType(e.target.value)}
+                        className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
+                      >
+                        <option value="">{t.selectRtoType}</option>
+                        <option value="rc_renewal">{t.rtoRcRenewal}</option>
+                        <option value="rc_retrieval">{t.rtoRcRetrieval}</option>
+                        <option value="license_retrieval">{t.rtoLicenseRetrieval}</option>
+                        <option value="license_renewal">{t.rtoLicenseRenewal}</option>
+                        <option value="fitness_retrieval">{t.rtoFitnessRetrieval}</option>
+                        <option value="fitness_renewal">{t.rtoFitnessRenewal}</option>
+                        <option value="ownership_transfer">{t.rtoOwnershipTransfer}</option>
+                        <option value="number_updating">{t.rtoNumberUpdating}</option>
+                        <option value="puc_renewal">{t.rtoPucRenewal}</option>
+                        <option value="insurance_renewal">{t.rtoInsuranceRenewal}</option>
+                        <option value="others">{t.rtoOthers}</option>
+                      </select>
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                      {t.description}
+                    </label>
+                    <textarea
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder={t.descriptionPlaceholder}
+                      rows={3}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors resize-none"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Other — just description */}
+              {category === 'other' && (
                 <div>
                   <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
                     {t.description}

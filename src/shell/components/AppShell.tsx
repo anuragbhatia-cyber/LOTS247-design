@@ -672,13 +672,13 @@ export function AppShell({
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.name} className="w-9 h-9 rounded-full object-cover" />
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-semibold text-white">
+                  <div className="w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
                       {user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}
                     </span>
                   </div>
                 )}
-                <span className="text-sm font-medium text-stone-700 dark:text-stone-200">{user.name}</span>
+                <span className="text-sm font-bold text-stone-900 dark:text-stone-50">{user.name}</span>
                 <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform duration-150 ${profileOpen ? 'rotate-180' : ''}`} />
               </button>
 

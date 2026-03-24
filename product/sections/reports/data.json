@@ -1,0 +1,165 @@
+{
+  "_meta": {
+    "models": {
+      "reports": "A system-generated report for the fleet owner/admin. Report types include Monthly Incident Summary (MIS), Incident Closure Report (ICR), Incident Summary Report (ISR), and Monthly Challan Summary (MIS-CHALLAN). Reports are auto-generated and available for viewing, downloading, and sharing."
+    },
+    "relationships": [
+      "MIS and MIS-CHALLAN reports cover a monthly period across the subscriber's fleet",
+      "ICR reports are generated when a specific incident is closed",
+      "ISR reports are generated 24 hours after a specific incident is created",
+      "ICR and ISR reports reference a specific incident and vehicle"
+    ]
+  },
+  "reports": [
+    {
+      "id": "rpt-001",
+      "type": "MIS",
+      "title": "Monthly Incident Summary — February 2026",
+      "period": "Feb 2026",
+      "format": "PDF",
+      "generatedAt": "2026-03-01T06:00:00Z",
+      "fileUrl": "/reports/mis-feb-2026.pdf",
+      "incidentId": null,
+      "vehicleRegistration": null,
+      "totalIncidents": 7,
+      "resolvedIncidents": 5,
+      "pendingIncidents": 2
+    },
+    {
+      "id": "rpt-002",
+      "type": "MIS",
+      "title": "Monthly Incident Summary — January 2026",
+      "period": "Jan 2026",
+      "format": "PDF",
+      "generatedAt": "2026-02-01T06:00:00Z",
+      "fileUrl": "/reports/mis-jan-2026.pdf",
+      "incidentId": null,
+      "vehicleRegistration": null,
+      "totalIncidents": 4,
+      "resolvedIncidents": 4,
+      "pendingIncidents": 0
+    },
+    {
+      "id": "rpt-003",
+      "type": "MIS",
+      "title": "Monthly Incident Summary — December 2025",
+      "period": "Dec 2025",
+      "format": "PDF",
+      "generatedAt": "2026-01-01T06:00:00Z",
+      "fileUrl": "/reports/mis-dec-2025.pdf",
+      "incidentId": null,
+      "vehicleRegistration": null,
+      "totalIncidents": 11,
+      "resolvedIncidents": 9,
+      "pendingIncidents": 2
+    },
+    {
+      "id": "rpt-004",
+      "type": "MIS-CHALLAN",
+      "title": "Monthly Challan Summary — February 2026",
+      "period": "Feb 2026",
+      "format": "PDF",
+      "generatedAt": "2026-03-01T06:00:00Z",
+      "fileUrl": "/reports/mis-challan-feb-2026.pdf",
+      "incidentId": null,
+      "vehicleRegistration": null,
+      "totalChallans": 14,
+      "resolvedChallans": 10,
+      "pendingChallans": 4,
+      "totalFines": 42500
+    },
+    {
+      "id": "rpt-005",
+      "type": "MIS-CHALLAN",
+      "title": "Monthly Challan Summary — January 2026",
+      "period": "Jan 2026",
+      "format": "PDF",
+      "generatedAt": "2026-02-01T06:00:00Z",
+      "fileUrl": "/reports/mis-challan-jan-2026.pdf",
+      "incidentId": null,
+      "vehicleRegistration": null,
+      "totalChallans": 9,
+      "resolvedChallans": 9,
+      "pendingChallans": 0,
+      "totalFines": 27000
+    },
+    {
+      "id": "rpt-006",
+      "type": "ICR",
+      "title": "Incident Closure Report — INC-2026-0042",
+      "period": "18 Mar 2026",
+      "format": "PDF",
+      "generatedAt": "2026-03-18T14:30:00Z",
+      "fileUrl": "/reports/icr-inc-2026-0042.pdf",
+      "incidentId": "INC-2026-0042",
+      "vehicleRegistration": "UP32MM1113",
+      "incidentType": "Accident",
+      "resolution": "Settled via insurance claim, vehicle released"
+    },
+    {
+      "id": "rpt-007",
+      "type": "ICR",
+      "title": "Incident Closure Report — INC-2026-0038",
+      "period": "09 Mar 2026",
+      "format": "PDF",
+      "generatedAt": "2026-03-09T11:15:00Z",
+      "fileUrl": "/reports/icr-inc-2026-0038.pdf",
+      "incidentId": "INC-2026-0038",
+      "vehicleRegistration": "UP32NN2224",
+      "incidentType": "Vehicle Seizure",
+      "resolution": "Released from RTO yard after document verification"
+    },
+    {
+      "id": "rpt-008",
+      "type": "ICR",
+      "title": "Incident Closure Report — INC-2026-0031",
+      "period": "22 Feb 2026",
+      "format": "PDF",
+      "generatedAt": "2026-02-22T16:45:00Z",
+      "fileUrl": "/reports/icr-inc-2026-0031.pdf",
+      "incidentId": "INC-2026-0031",
+      "vehicleRegistration": "UP32PP3335",
+      "incidentType": "Roadside Stop",
+      "resolution": "Resolved on-call, no further action required"
+    },
+    {
+      "id": "rpt-009",
+      "type": "ISR",
+      "title": "Incident Summary Report — INC-2026-0045",
+      "period": "21 Mar 2026",
+      "format": "PDF",
+      "generatedAt": "2026-03-22T08:00:00Z",
+      "fileUrl": "/reports/isr-inc-2026-0045.pdf",
+      "incidentId": "INC-2026-0045",
+      "vehicleRegistration": "UP32QQ4446",
+      "incidentType": "Accident",
+      "status": "In Progress"
+    },
+    {
+      "id": "rpt-010",
+      "type": "ISR",
+      "title": "Incident Summary Report — INC-2026-0042",
+      "period": "14 Mar 2026",
+      "format": "PDF",
+      "generatedAt": "2026-03-15T08:00:00Z",
+      "fileUrl": "/reports/isr-inc-2026-0042.pdf",
+      "incidentId": "INC-2026-0042",
+      "vehicleRegistration": "UP32MM1113",
+      "incidentType": "Accident",
+      "status": "Closed"
+    },
+    {
+      "id": "rpt-011",
+      "type": "ISR",
+      "title": "Incident Summary Report — INC-2026-0038",
+      "period": "06 Mar 2026",
+      "format": "PDF",
+      "generatedAt": "2026-03-07T08:00:00Z",
+      "fileUrl": "/reports/isr-inc-2026-0038.pdf",
+      "incidentId": "INC-2026-0038",
+      "vehicleRegistration": "UP32NN2224",
+      "incidentType": "Vehicle Seizure",
+      "status": "Closed"
+    }
+  ]
+}

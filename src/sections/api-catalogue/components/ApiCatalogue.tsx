@@ -93,9 +93,42 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
-      <div className="p-5 sm:p-6 lg:p-8">
-        {/* Header — full width */}
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex">
+      {/* Sidebar — full height, flush left */}
+      <aside className="hidden md:flex md:flex-col w-56 lg:w-64 flex-shrink-0 bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 min-h-screen">
+        <nav className="flex-1 space-y-1 px-3 py-6">
+          {SIDEBAR_ITEMS.map((item) => {
+            const Icon = item.icon
+            const isActive = activeTab === item.id && !selectedApi
+            const count = item.id === 'all' ? apis.length : apis.filter((a) => MY_API_IDS.includes(a.id)).length
+            return (
+              <button
+                key={item.id}
+                onClick={() => { setActiveTab(item.id); setSelectedApiId(null) }}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-400 dark:text-stone-500'}`} />
+                <span className="flex-1 text-left">{item.label}</span>
+                <span className={`text-xs tabular-nums min-w-[22px] h-[22px] flex items-center justify-center rounded-full font-semibold ${
+                  isActive
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </nav>
+      </aside>
+
+      {/* Main content area */}
+      <div className="flex-1 min-w-0 p-5 sm:p-6 lg:p-8">
+        {/* Header — above cards */}
         {!selectedApi && (
           <div className="mb-6">
             <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
@@ -141,42 +174,6 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
           </div>
         )}
 
-        {/* Sidebar + Content */}
-        <div className="flex gap-5 sm:gap-6">
-          {/* Sidebar */}
-          <aside className="hidden md:block w-56 lg:w-64 flex-shrink-0">
-            <nav className="sticky top-6 space-y-1 bg-white dark:bg-stone-900 rounded-xl p-2.5 shadow-sm dark:shadow-stone-950/20">
-              {SIDEBAR_ITEMS.map((item) => {
-                const Icon = item.icon
-                const isActive = activeTab === item.id && !selectedApi
-                const count = item.id === 'all' ? apis.length : apis.filter((a) => MY_API_IDS.includes(a.id)).length
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => { setActiveTab(item.id); setSelectedApiId(null) }}
-                    className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
-                        : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-400 dark:text-stone-500'}`} />
-                    <span className="flex-1 text-left">{item.label}</span>
-                    <span className={`text-xs tabular-nums min-w-[22px] h-[22px] flex items-center justify-center rounded-full font-semibold ${
-                      isActive
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
-                    }`}>
-                      {count}
-                    </span>
-                  </button>
-                )
-              })}
-            </nav>
-          </aside>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0">
             {selectedApi ? (
               <ApiDetailContent
                 api={selectedApi}
@@ -188,7 +185,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
             ) : (
               <>
                 {/* API Cards */}
-                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {displayedApis.map((api) => {
                     const Icon = ICON_MAP[api.icon] || ShieldCheck
                     const isMyApi = MY_API_IDS.includes(api.id)
@@ -267,8 +264,6 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                 )}
               </>
             )}
-          </div>
-        </div>
       </div>
 
       {/* Contact Modal */}

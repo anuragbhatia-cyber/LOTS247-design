@@ -35,7 +35,7 @@ The Home screen is the primary control center of LOTS247, serving as the daily e
   - Insurance Status
   - PUC Status
   - DL Validity
-  - Outstanding Challans
+  - Pending Challans
 
 ### Alerts
 - Proactive alerts for vehicles with expiring PUC, insurance, or pending challans

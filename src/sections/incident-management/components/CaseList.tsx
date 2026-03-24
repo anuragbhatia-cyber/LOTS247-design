@@ -21,6 +21,7 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
+  MoreVertical,
 } from 'lucide-react'
 import type {
   CaseListProps,
@@ -67,19 +68,20 @@ const translations: Record<Language, Record<string, string>> = {
     // Status labels
     statusSubmitted: 'Submitted',
     statusInProgress: 'In Progress',
-    statusResolved: 'Resolved',
-    statusDocumentRequested: 'Document Requested',
-    statusExtended: 'Extended',
+    statusResolved: 'Closed',
+    statusDocumentRequested: 'In Progress',
+    statusExtended: 'In Progress',
 
     // Case type labels
-    typeAccident: 'Accident',
-    typeVehicleDetention: 'Vehicle Detention',
     typeTheft: 'Theft',
+    typeDetention: 'Detention',
+    typeBail: 'Bail',
+    typeAccidents: 'Accidents',
+    typeFIRs: 'FIRs',
+    typeSuperdari: 'Superdari',
     typeVehicleImpounding: 'Vehicle Impounding',
-    typeInsuranceDispute: 'Insurance Dispute',
-    typeLegalComplaint: 'Legal Complaint',
-    typeRTOEscalation: 'RTO Escalation',
-    typeEscalatedChallan: 'Escalated Challan',
+    typeEWayBillIssues: 'E-Way Bill',
+    typeOthers: 'Others',
 
     // Origin badges
     originLawyerCall: 'Lawyer Call',
@@ -88,7 +90,14 @@ const translations: Record<Language, Record<string, string>> = {
     // Table headers
     incidentId: 'Incident ID',
     detail: 'Detail',
-    updated: 'Last Updated',
+    expectedClosure: 'Expected Closure',
+    actions: 'Actions',
+
+    // SLA labels
+    slaCompleted: 'Completed',
+    slaDaysRemaining: ' days',
+    slaDaysOverdue: ' days',
+    slaBreachedOverdue: 'SLA breached',
 
     // Empty state
     noCasesFound: 'No cases found',
@@ -138,19 +147,20 @@ const translations: Record<Language, Record<string, string>> = {
     // Status labels
     statusSubmitted: 'प्रस्तुत',
     statusInProgress: 'प्रगति में',
-    statusResolved: 'हल किया',
-    statusDocumentRequested: 'दस्तावेज़ अनुरोधित',
-    statusExtended: 'विस्तारित',
+    statusResolved: 'बंद',
+    statusDocumentRequested: 'प्रगति में',
+    statusExtended: 'प्रगति में',
 
     // Case type labels
-    typeAccident: 'दुर्घटना',
-    typeVehicleDetention: 'वाहन हिरासत',
     typeTheft: 'चोरी',
+    typeDetention: 'हिरासत',
+    typeBail: 'ज़मानत',
+    typeAccidents: 'दुर्घटनाएँ',
+    typeFIRs: 'एफ़आईआर',
+    typeSuperdari: 'सुपुर्दगी',
     typeVehicleImpounding: 'वाहन ज़ब्ती',
-    typeInsuranceDispute: 'बीमा विवाद',
-    typeLegalComplaint: 'कानूनी शिकायत',
-    typeRTOEscalation: 'आरटीओ एस्केलेशन',
-    typeEscalatedChallan: 'एस्केलेटेड चालान',
+    typeEWayBillIssues: 'ई-वे बिल',
+    typeOthers: 'अन्य',
 
     // Origin badges
     originLawyerCall: 'वकील कॉल',
@@ -159,7 +169,14 @@ const translations: Record<Language, Record<string, string>> = {
     // Table headers
     incidentId: 'घटना आईडी',
     detail: 'विवरण',
-    updated: 'अपडेट',
+    expectedClosure: 'अपेक्षित समापन',
+    actions: 'कार्रवाई',
+
+    // SLA labels
+    slaCompleted: 'पूर्ण',
+    slaDaysRemaining: ' दिन',
+    slaDaysOverdue: ' दिन',
+    slaBreachedOverdue: 'SLA उल्लंघन',
 
     // Empty state
     noCasesFound: 'कोई मामला नहीं मिला',
@@ -199,14 +216,15 @@ const STATUS_TRANSLATION_KEY: Record<CaseStatus, string> = {
 // ---------------------------------------------------------------------------
 
 const CASE_TYPE_TRANSLATION_KEY: Record<CaseType, string> = {
-  Accident: 'typeAccident',
-  'Vehicle Detention': 'typeVehicleDetention',
   Theft: 'typeTheft',
+  Detention: 'typeDetention',
+  Bail: 'typeBail',
+  Accidents: 'typeAccidents',
+  FIRs: 'typeFIRs',
+  Superdari: 'typeSuperdari',
   'Vehicle Impounding': 'typeVehicleImpounding',
-  'Insurance Dispute': 'typeInsuranceDispute',
-  'Legal Complaint': 'typeLegalComplaint',
-  'RTO Escalation': 'typeRTOEscalation',
-  'Escalated Challan': 'typeEscalatedChallan',
+  'E-Way Bill': 'typeEWayBillIssues',
+  Others: 'typeOthers',
 }
 
 // ---------------------------------------------------------------------------
@@ -233,14 +251,14 @@ const STATUS_CONFIG: Record<
     icon: CheckCircle2,
   },
   documentRequested: {
-    bg: 'bg-purple-50 dark:bg-purple-950/40',
-    text: 'text-purple-700 dark:text-purple-300',
-    icon: FileQuestion,
+    bg: 'bg-amber-50 dark:bg-amber-950/40',
+    text: 'text-amber-700 dark:text-amber-300',
+    icon: Clock,
   },
   extended: {
-    bg: 'bg-orange-50 dark:bg-orange-950/40',
-    text: 'text-orange-700 dark:text-orange-300',
-    icon: Timer,
+    bg: 'bg-amber-50 dark:bg-amber-950/40',
+    text: 'text-amber-700 dark:text-amber-300',
+    icon: Clock,
   },
 }
 
@@ -250,47 +268,43 @@ const STATUS_CONFIG: Record<
 
 const CASE_TYPE_CONFIG: Record<
   CaseType,
-  { icon: typeof AlertCircle; color: string; bg: string }
+  { color: string; bg: string }
 > = {
-  Accident: {
-    icon: AlertCircle,
+  Theft: {
     color: 'text-red-600 dark:text-red-400',
     bg: 'bg-red-50 dark:bg-red-950/40',
   },
-  'Vehicle Detention': {
-    icon: Lock,
+  Detention: {
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
   },
-  Theft: {
-    icon: Shield,
-    color: 'text-stone-600 dark:text-stone-400',
-    bg: 'bg-stone-100 dark:bg-stone-800/60',
-  },
-  'Vehicle Impounding': {
-    icon: Car,
-    color: 'text-orange-600 dark:text-orange-400',
-    bg: 'bg-orange-50 dark:bg-orange-950/40',
-  },
-  'Insurance Dispute': {
-    icon: Scale,
-    color: 'text-blue-600 dark:text-blue-400',
-    bg: 'bg-blue-50 dark:bg-blue-950/40',
-  },
-  'Legal Complaint': {
-    icon: Gavel,
+  Bail: {
     color: 'text-purple-600 dark:text-purple-400',
     bg: 'bg-purple-50 dark:bg-purple-950/40',
   },
-  'RTO Escalation': {
-    icon: FileWarning,
+  Accidents: {
+    color: 'text-orange-600 dark:text-orange-400',
+    bg: 'bg-orange-50 dark:bg-orange-950/40',
+  },
+  FIRs: {
+    color: 'text-blue-600 dark:text-blue-400',
+    bg: 'bg-blue-50 dark:bg-blue-950/40',
+  },
+  Superdari: {
+    color: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+  },
+  'Vehicle Impounding': {
     color: 'text-amber-600 dark:text-amber-400',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
   },
-  'Escalated Challan': {
-    icon: ArrowUpRight,
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+  'E-Way Bill': {
+    color: 'text-stone-600 dark:text-stone-400',
+    bg: 'bg-stone-100 dark:bg-stone-800/60',
+  },
+  Others: {
+    color: 'text-stone-500 dark:text-stone-400',
+    bg: 'bg-stone-100 dark:bg-stone-800/60',
   },
 }
 
@@ -333,6 +347,23 @@ function resolveLawyer(lawyerId: string | null, lawyers: Lawyer[]): Lawyer | und
   return lawyers.find((l) => l.id === lawyerId)
 }
 
+function getCaseSlaInfo(slaDeadline: string, status: CaseStatus, t: Record<string, string>) {
+  if (status === 'resolved') return { label: t.slaCompleted, color: 'text-emerald-600 dark:text-emerald-400' }
+
+  const now = new Date()
+  const deadline = new Date(slaDeadline)
+  const diffMs = deadline.getTime() - now.getTime()
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffDays < 0) {
+    return { label: `${Math.abs(diffDays)}${t.slaDaysOverdue}`, color: 'text-red-600 dark:text-red-400' }
+  }
+  if (diffDays <= 7) {
+    return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-amber-600 dark:text-amber-400' }
+  }
+  return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-stone-500 dark:text-stone-400' }
+}
+
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
@@ -357,9 +388,8 @@ function CaseTypeBadge({ caseType, t }: { caseType: CaseType; t: Record<string, 
   const label = t[CASE_TYPE_TRANSLATION_KEY[caseType]]
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${config.bg} ${config.color}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${config.bg} ${config.color}`}
     >
-      <Icon className="w-3 h-3" />
       {label}
     </span>
   )
@@ -450,7 +480,11 @@ export function CaseList({
     }
 
     if (statusFilter !== 'all') {
-      result = result.filter((c) => c.status === statusFilter)
+      if (statusFilter === 'inProgress') {
+        result = result.filter((c) => c.status === 'inProgress' || c.status === 'documentRequested' || c.status === 'extended')
+      } else {
+        result = result.filter((c) => c.status === statusFilter)
+      }
     }
 
     if (typeFilter !== 'all') {
@@ -492,8 +526,8 @@ export function CaseList({
   )
 
   return (
-    <div className="bg-stone-100 dark:bg-stone-950">
-      <div className="px-4 sm:px-6 lg:px-8">
+    <div>
+      <div>
         {/* Search + Filters */}
         <div className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
@@ -545,8 +579,6 @@ export function CaseList({
                     <option value="all">{t.allStatuses}</option>
                     <option value="submitted">{t.statusSubmitted}</option>
                     <option value="inProgress">{t.statusInProgress}</option>
-                    <option value="documentRequested">{t.statusDocumentRequested}</option>
-                    <option value="extended">{t.statusExtended}</option>
                     <option value="resolved">{t.statusResolved}</option>
                   </select>
                   <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
@@ -649,7 +681,16 @@ export function CaseList({
         {/* Desktop Table */}
         {/* ================================================================= */}
         <div className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
-          <table className="w-full">
+          <table className="w-full table-fixed">
+            <colgroup>
+              <col className="w-[11%]" />
+              <col className="w-[13%]" />
+              <col className="w-[11%]" />
+              <col className="w-[27%]" />
+              <col className="w-[13%]" />
+              <col className="w-[16%]" />
+              <col className="w-[9%]" />
+            </colgroup>
             <thead>
               <tr className="border-b border-stone-100 dark:border-stone-800">
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
@@ -667,8 +708,11 @@ export function CaseList({
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                   {t.status}
                 </th>
+                <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
+                  {t.expectedClosure}
+                </th>
                 <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                  {t.updated}
+                  {t.actions}
                 </th>
               </tr>
             </thead>
@@ -677,6 +721,7 @@ export function CaseList({
                 const vehicle = resolveVehicle(caseItem.vehicleId, vehicles)
                 const driver = resolveDriver(caseItem.driverId, drivers)
                 const lawyer = resolveLawyer(caseItem.assignedLawyerId, lawyers)
+                const sla = getCaseSlaInfo(caseItem.slaDeadline, caseItem.status, t)
 
                 return (
                   <tr
@@ -723,11 +768,21 @@ export function CaseList({
                       <StatusBadge status={caseItem.status} t={t} />
                     </td>
 
-                    {/* Updated */}
-                    <td className="px-5 py-4 text-right">
-                      <p className="text-sm text-stone-500 dark:text-stone-400">
-                        {timeAgo(caseItem.updatedAt, t)}
+                    {/* Expected Closure */}
+                    <td className="px-5 py-4">
+                      <p className={`text-sm font-medium ${sla.color}`}>
+                        {sla.label}
                       </p>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-5 py-4 text-right">
+                      <button
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
                     </td>
                   </tr>
                 )

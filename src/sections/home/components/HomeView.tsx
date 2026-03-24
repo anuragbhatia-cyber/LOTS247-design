@@ -31,7 +31,7 @@ const homeTranslations: Record<Language, Record<string, string>> = {
     noDrivers: 'No drivers assigned',
     currentlyAssigned: 'Currently assigned',
     noChallans: 'No pending challans',
-    outstanding: 'outstanding',
+    outstanding: 'pending',
     noIncidents: 'No active incidents',
     new: 'new',
     inProgress: 'in progress',
@@ -101,16 +101,16 @@ const homeTranslations: Record<Language, Record<string, string>> = {
 
 const QUICK_ACTIONS = [
   {
-    id: 'incident',
-    label: 'Add Incident',
-    description: 'Report an accident or legal issue',
-    image: '/icon-add-incident.png',
-  },
-  {
     id: 'vehicle',
     label: 'Add Vehicle',
     description: 'Register a new vehicle to your fleet',
     image: '/icon-add-vehicle.png',
+  },
+  {
+    id: 'incident',
+    label: 'Add Incident',
+    description: 'Report an accident or legal issue',
+    image: '/icon-add-incident.png',
   },
   {
     id: 'challan',

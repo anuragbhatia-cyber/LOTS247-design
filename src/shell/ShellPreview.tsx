@@ -47,6 +47,7 @@ const hrefToScreen: Record<string, { sectionId: string; screenName?: string }> =
   '/incidents': { sectionId: 'incident-management', screenName: 'IncidentManagement' },
   '/fleet': { sectionId: 'vehicle-and-driver-management', screenName: 'VehicleList' },
   '/api-catalogue': { sectionId: 'api-catalogue' },
+  '/reports': { sectionId: 'reports', screenName: 'ReportsList' },
   '/wallet': { sectionId: 'wallet' },
 }
 

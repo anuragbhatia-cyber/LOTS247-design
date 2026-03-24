@@ -107,15 +107,13 @@ export function AddVehicleModal({
         {showSuccess ? (
           /* Success State */
           <>
-            <div className="px-6 py-4 flex justify-end border-b border-stone-100 dark:border-stone-800">
+            <div className="relative px-6 py-10 flex flex-col items-center text-center">
               <button
                 onClick={handleClose}
-                className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="absolute top-3 right-3 p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
-            </div>
-            <div className="px-6 py-10 flex flex-col items-center text-center">
               <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
               </div>

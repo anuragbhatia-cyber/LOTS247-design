@@ -4,14 +4,14 @@
       "subscriber": "The currently logged-in fleet owner or vehicle operator using LOTS247.",
       "subscription": "The subscriber's active plan, which controls feature access, vehicle limits, and support levels.",
       "stats": "Aggregated real-time counts and amounts derived from the subscriber's vehicles, drivers, challans, and incidents — displayed as overview cards on the Home screen.",
-      "complianceScore": "Overall and per-category compliance health across the fleet, derived from document validity and outstanding challans.",
+      "complianceScore": "Overall and per-category compliance health across the fleet, derived from document validity and pending challans.",
       "alerts": "Urgency-sorted alerts for vehicles with expiring PUC, insurance, or pending challans."
     },
     "relationships": [
       "The Subscriber has one active Subscription that determines plan limits",
       "Stats are derived from the Subscriber's Vehicles, Drivers, Challans, and Incidents",
       "activeVehicles.used reflects vehicles counted against the plan's vehicle limit",
-      "pendingChallans.totalAmount is the sum of all outstanding challan fines",
+      "pendingChallans.totalAmount is the sum of all pending challan fines",
       "activeIncidents.count reflects only incidents with non-terminal statuses (New, Assigned, In Progress, Awaiting Action)",
       "complianceScore.overall is a weighted average of all category scores",
       "alerts are sorted by urgency — critical first, then warning, then notice"
@@ -63,14 +63,15 @@
     }
   },
   "complianceScore": {
-    "overall": 74,
-    "status": "warning",
+    "overall": 78,
+    "status": "healthy",
+    "changeFromLastMonth": 3,
     "categories": [
       { "id": "rc", "label": "RC Validity", "status": "healthy", "score": 94 },
-      { "id": "insurance", "label": "Insurance Status", "status": "warning", "score": 67 },
-      { "id": "puc", "label": "PUC Status", "status": "critical", "score": 52 },
-      { "id": "dl", "label": "DL Validity", "status": "healthy", "score": 88 },
-      { "id": "challans", "label": "Outstanding Challans", "status": "warning", "score": 61 }
+      { "id": "insurance", "label": "Insurance Status", "status": "healthy", "score": 78 },
+      { "id": "puc", "label": "PUC Status", "status": "warning", "score": 67 },
+      { "id": "permit", "label": "Permit Status", "status": "healthy", "score": 83 },
+      { "id": "dl", "label": "DL Validity", "status": "healthy", "score": 86 }
     ]
   },
   "alerts": [

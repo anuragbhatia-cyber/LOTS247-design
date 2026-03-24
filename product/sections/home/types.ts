@@ -72,6 +72,7 @@ export interface ComplianceCategory {
 export interface ComplianceScore {
   overall: number
   status: ComplianceStatus
+  changeFromLastMonth?: number
   categories: ComplianceCategory[]
 }
 

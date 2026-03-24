@@ -7,11 +7,11 @@ const translations: Record<Language, Record<string, string>> = {
     challansOn: 'Challans on',
     pending: 'Pending',
     paid: 'Paid',
-    totalOutstanding: 'Total Outstanding',
+    totalOutstanding: 'Total Pending',
     payNow: 'Pay Now',
     paidOn: 'Paid on',
     noPending: 'No pending challans',
-    noPendingDesc: 'This vehicle has no outstanding traffic challans.',
+    noPendingDesc: 'This vehicle has no pending traffic challans.',
     noPaid: 'No paid challans',
     noPaidDesc: 'No challan payments found for this vehicle.',
     source: 'Source',
@@ -33,6 +33,8 @@ const translations: Record<Language, Record<string, string>> = {
   },
 }
 
+type ChallanCategory = 'court' | 'online'
+
 interface Challan {
   id: string
   challanNumber: string
@@ -42,6 +44,7 @@ interface Challan {
   location: string
   status: 'pending' | 'paid'
   source: string
+  category: ChallanCategory
   paidDate?: string
 }
 
@@ -55,6 +58,7 @@ const SAMPLE_CHALLANS: Challan[] = [
     location: 'NH-48, Gurugram Toll Plaza',
     status: 'pending',
     source: 'Parivahan',
+    category: 'court',
   },
   {
     id: 'ch2',
@@ -65,6 +69,7 @@ const SAMPLE_CHALLANS: Challan[] = [
     location: 'Mahipalpur Junction, Delhi',
     status: 'pending',
     source: 'Parivahan',
+    category: 'online',
   },
   {
     id: 'ch3',
@@ -75,6 +80,7 @@ const SAMPLE_CHALLANS: Challan[] = [
     location: 'Yamuna Expressway, KM 45',
     status: 'pending',
     source: 'Parivahan',
+    category: 'court',
   },
   {
     id: 'ch4',
@@ -85,6 +91,7 @@ const SAMPLE_CHALLANS: Challan[] = [
     location: 'Connaught Place, Delhi',
     status: 'paid',
     source: 'Parivahan',
+    category: 'online',
     paidDate: '2025-11-20',
   },
   {
@@ -96,6 +103,7 @@ const SAMPLE_CHALLANS: Challan[] = [
     location: 'Noida Expressway, Sector 62',
     status: 'paid',
     source: 'Parivahan',
+    category: 'online',
     paidDate: '2025-10-02',
   },
 ]
@@ -221,7 +229,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                               <p className="text-sm font-semibold text-stone-900 dark:text-stone-50">{challan.violationType}</p>
                               <p className="text-xs text-stone-500 dark:text-stone-400 font-mono mt-0.5">{challan.challanNumber}</p>
                             </div>
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-bold bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 tabular-nums">
+                            <span className="inline-flex items-center text-lg font-bold text-amber-700 dark:text-amber-300 tabular-nums">
                               {formatCurrency(challan.amount, language)}
                             </span>
                           </div>
@@ -236,7 +244,15 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                             </span>
                           </div>
                           <div className="flex items-center justify-between pt-3 border-t border-stone-100 dark:border-stone-800">
-                            <span className="text-xs text-stone-400 dark:text-stone-500">{t.source}: {challan.source}</span>
+                            {challan.category === 'court' ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400">
+                                {language === 'hi' ? 'कोर्ट चालान' : 'Court Challans'}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
+                                {language === 'hi' ? 'ऑनलाइन चालान' : 'Online Challans'}
+                              </span>
+                            )}
                             <button className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors shadow-sm">
                               {t.payNow}
                             </button>
@@ -245,23 +261,6 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                       ))}
                     </div>
 
-                    {/* Total Outstanding Card */}
-                    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 flex items-center justify-between">
-                      <div>
-                        <p className="text-xs text-amber-700 dark:text-amber-400 font-medium uppercase tracking-wider">{t.totalOutstanding}</p>
-                        <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums mt-1">
-                          {formatCurrency(totalOutstanding, language)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <button className="px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm font-medium transition-colors">
-                          {language === 'hi' ? 'प्रस्ताव भेजें' : 'Send Proposal'}
-                        </button>
-                        <button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm">
-                          {t.payNow}
-                        </button>
-                      </div>
-                    </div>
                   </>
                 ) : (
                   <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl py-16 text-center">
@@ -328,6 +327,28 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
         </div>
 
       </div>
+
+      {/* Sticky Bottom Bar — Total Outstanding */}
+      {pendingChallans.length > 0 && (
+        <div className="sticky bottom-0 z-40 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-amber-700 dark:text-amber-400 font-medium tracking-wider">{language === 'hi' ? 'कुल चालान राशि' : 'Total Challan Amount'}</p>
+              <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums mt-0.5">
+                {formatCurrency(totalOutstanding, language)}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button className="px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm font-medium transition-colors">
+                {language === 'hi' ? 'प्रस्ताव भेजें' : 'Send Proposal'}
+              </button>
+              <button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm">
+                {t.payNow}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

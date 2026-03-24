@@ -22,7 +22,6 @@ import {
   RefreshCw,
   MapPin,
   IndianRupee,
-  Send,
   Gavel,
   MoreVertical,
   Loader2,
@@ -31,6 +30,8 @@ import {
   Briefcase,
   Building2,
   MoreHorizontal,
+  Paperclip,
+  Upload,
 } from 'lucide-react'
 import type {
   VehicleDetailProps,
@@ -1325,6 +1326,7 @@ export function VehicleDetail({
   const [challanActionMenu, setChallanActionMenu] = useState<string | null>(null)
   const [showUploadDoc, setShowUploadDoc] = useState(false)
   const [incidentSubTab, setIncidentSubTab] = useState<'challans' | 'cases' | 'rto' | 'other'>('challans')
+  const [expandedCompliance, setExpandedCompliance] = useState<Set<string>>(new Set())
 
   // Filter incident data for this vehicle
   const vehicleChallans = incidentData.challans.filter((c: { vehicleId: string }) => c.vehicleId === vehicle.id)
@@ -1515,23 +1517,58 @@ export function VehicleDetail({
         {/* Tab: Documents */}
         {/* ================================================================= */}
         {activeTab === 'documents' && (
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">
-                {t.vehicleDocuments}
-              </h3>
+          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-100 dark:border-stone-800">
+              <div className="flex items-center gap-2">
+                <Paperclip className="w-4 h-4 text-stone-400 dark:text-stone-500" />
+                <h3 className="text-sm font-semibold text-stone-700 dark:text-stone-300">
+                  {t.vehicleDocuments}
+                </h3>
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
+                  {vehicle.documents.length}
+                </span>
+              </div>
               <button
                 onClick={() => setShowUploadDoc(true)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors shadow-sm"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
               >
-                <FileText className="w-3.5 h-3.5" />
+                <Upload className="w-3.5 h-3.5" />
                 {t.uploadDocument}
               </button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {vehicle.documents.map((doc) => (
-                <DocumentCard key={doc.id} doc={doc} t={t} language={language} />
-              ))}
+            <div className="divide-y divide-stone-100 dark:divide-stone-800">
+              {vehicle.documents.map((doc) => {
+                const ext = doc.name.split('.').pop()?.toLowerCase() || ''
+                const isPdf = ext === 'pdf'
+                const typeKeys = DOC_TYPE_LABEL_KEY[doc.type] || { label: '', description: '' }
+                const typeLabel = typeKeys.label ? t[typeKeys.label] : doc.name
+                return (
+                  <div
+                    key={doc.id}
+                    className="flex items-center gap-3.5 px-5 py-3.5 group/row hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors"
+                  >
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${isPdf ? 'bg-red-50 dark:bg-red-950/40' : 'bg-blue-50 dark:bg-blue-950/40'}`}>
+                      <FileText className={`w-4.5 h-4.5 ${isPdf ? 'text-red-500 dark:text-red-400' : 'text-blue-500 dark:text-blue-400'}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">
+                        {typeLabel}
+                      </p>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+                        {Math.floor(50 + typeLabel.length * 7)} KB
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                      <button className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors flex-shrink-0">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors flex-shrink-0">
+                        <Download className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
@@ -1540,44 +1577,214 @@ export function VehicleDetail({
         {/* Tab: Compliance */}
         {/* ================================================================= */}
         {activeTab === 'compliance' && (
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6">
-            <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
-              <ComplianceRing score={vehicle.complianceScore} t={t} />
-              <div className="flex-1 text-center sm:text-left">
-                <p className={`text-lg font-bold ${complianceColors.text}`}>{t[complianceColors.labelKey]}</p>
-                <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
-                  {t.overallComplianceScore}
-                </p>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            {/* Compliance Status — left */}
+            <div className="lg:col-span-3 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+              <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
+                Compliance Status
+              </h3>
+              <div className="space-y-1">
+                {/* Document rows */}
+                {vehicle.documents.map((doc) => {
+                  const typeKeys = DOC_TYPE_LABEL_KEY[doc.type] || { label: '', description: '' }
+                  const typeLabel = typeKeys.label ? t[typeKeys.label] : doc.name
+                  const statusLabel = doc.status === 'valid' ? t.valid : doc.status === 'expiring-soon' ? 'Expiring' : 'Expired'
+                  const statusBadge = doc.status === 'valid'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
+                    : doc.status === 'expiring-soon'
+                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
+                    : 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400'
+                  const isExpanded = expandedCompliance.has(doc.id)
+                  const toggleExpand = () => {
+                    setExpandedCompliance(prev => {
+                      const next = new Set(prev)
+                      if (next.has(doc.id)) next.delete(doc.id)
+                      else next.add(doc.id)
+                      return next
+                    })
+                  }
+                  const detail = (() => {
+                    switch (doc.type) {
+                      case 'insurance': return [
+                        { label: 'Document', value: doc.name },
+                        { label: 'Expiry Date', value: new Date(doc.expiry).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) },
+                        { label: 'Status', value: statusLabel },
+                      ]
+                      case 'puc': return [
+                        { label: 'Document', value: doc.name },
+                        { label: 'Expiry Date', value: new Date(doc.expiry).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) },
+                        { label: 'Status', value: statusLabel },
+                      ]
+                      case 'fitness': return [
+                        { label: 'Document', value: doc.name },
+                        { label: 'Expiry Date', value: new Date(doc.expiry).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) },
+                        { label: 'Status', value: statusLabel },
+                      ]
+                      case 'rc': return [
+                        { label: 'Document', value: doc.name },
+                        { label: 'Expiry Date', value: new Date(doc.expiry).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) },
+                        { label: 'Status', value: statusLabel },
+                      ]
+                      default: return [
+                        { label: 'Document', value: doc.name },
+                        { label: 'Expiry Date', value: new Date(doc.expiry).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) },
+                      ]
+                    }
+                  })()
+                  return (
+                    <div
+                      key={doc.id}
+                      className={`rounded-xl transition-colors ${isExpanded ? 'bg-stone-100 dark:bg-stone-800/60' : 'bg-stone-50 dark:bg-stone-800/30 hover:bg-stone-100/80 dark:hover:bg-stone-800/50'}`}
+                    >
+                      <button
+                        onClick={toggleExpand}
+                        className="w-full flex items-center justify-between px-4 py-3.5 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3">
+                          <ChevronDown className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : '-rotate-90'}`} />
+                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200">{typeLabel}</p>
+                        </div>
+                        <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${statusBadge}`}>{statusLabel}</span>
+                      </button>
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-0.5 ml-7">
+                          <div className="border-l-2 border-stone-200 dark:border-stone-700 pl-4 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
+                            {detail.map(d => (
+                              <div key={d.label}>
+                                <p className="text-[11px] uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-0.5">{d.label}</p>
+                                <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{d.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+                {/* Pending Challans row */}
+                {(() => {
+                  const challansId = '__challans__'
+                  const isExpanded = expandedCompliance.has(challansId)
+                  const toggleExpand = () => {
+                    setExpandedCompliance(prev => {
+                      const next = new Set(prev)
+                      if (next.has(challansId)) next.delete(challansId)
+                      else next.add(challansId)
+                      return next
+                    })
+                  }
+                  return (
+                    <div className={`rounded-xl transition-colors ${isExpanded ? 'bg-stone-100 dark:bg-stone-800/60' : 'bg-stone-50 dark:bg-stone-800/30 hover:bg-stone-100/80 dark:hover:bg-stone-800/50'}`}>
+                      <button
+                        onClick={toggleExpand}
+                        className="w-full flex items-center justify-between px-4 py-3.5 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3">
+                          <ChevronDown className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : '-rotate-90'}`} />
+                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200">Pending Challans</p>
+                        </div>
+                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">Expired</span>
+                      </button>
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-0.5 ml-7">
+                          <div className="border-l-2 border-stone-200 dark:border-stone-700 pl-4 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-0.5">Pending</p>
+                              <p className="text-sm font-medium text-stone-700 dark:text-stone-300">3 Challans</p>
+                            </div>
+                            <div>
+                              <p className="text-[11px] uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-0.5">Total Amount</p>
+                              <p className="text-sm font-medium text-stone-700 dark:text-stone-300">₹15,500</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+                {/* Permits row */}
+                {(() => {
+                  const permitsId = '__permits__'
+                  const isExpanded = expandedCompliance.has(permitsId)
+                  const toggleExpand = () => {
+                    setExpandedCompliance(prev => {
+                      const next = new Set(prev)
+                      if (next.has(permitsId)) next.delete(permitsId)
+                      else next.add(permitsId)
+                      return next
+                    })
+                  }
+                  return (
+                    <div className={`rounded-xl transition-colors ${isExpanded ? 'bg-stone-100 dark:bg-stone-800/60' : 'bg-stone-50 dark:bg-stone-800/30 hover:bg-stone-100/80 dark:hover:bg-stone-800/50'}`}>
+                      <button
+                        onClick={toggleExpand}
+                        className="w-full flex items-center justify-between px-4 py-3.5 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3">
+                          <ChevronDown className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : '-rotate-90'}`} />
+                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200">Permits</p>
+                        </div>
+                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">{t.valid}</span>
+                      </button>
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-0.5 ml-7">
+                          <div className="border-l-2 border-stone-200 dark:border-stone-700 pl-4 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-0.5">Permit Type</p>
+                              <p className="text-sm font-medium text-stone-700 dark:text-stone-300">All India</p>
+                            </div>
+                            <div>
+                              <p className="text-[11px] uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-0.5">Expiry Date</p>
+                              <p className="text-sm font-medium text-stone-700 dark:text-stone-300">15 Mar 2027</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+              </div>
+            </div>
 
-                <div className="mt-5 space-y-3">
-                  {expiredDocs.length > 0 && (
-                    <div className="flex items-center gap-2.5 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/40 rounded-lg">
-                      <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0" />
-                      <p className="text-sm text-red-700 dark:text-red-300">
-                        <span className="font-semibold">{expiredDocs.length} {t.expiredLabel}</span>
-                        {' — '}
-                        {expiredDocs.map((d) => { const keys = DOC_TYPE_LABEL_KEY[d.type]; return keys ? t[keys.label] : d.name }).join(', ')}
-                      </p>
-                    </div>
-                  )}
-                  {expiringDocs.length > 0 && (
-                    <div className="flex items-center gap-2.5 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 rounded-lg">
-                      <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
-                        <span className="font-semibold">{expiringDocs.length} {t.expiringSoonLabel}</span>
-                        {' — '}
-                        {expiringDocs.map((d) => { const keys = DOC_TYPE_LABEL_KEY[d.type]; return keys ? t[keys.label] : d.name }).join(', ')}
-                      </p>
-                    </div>
-                  )}
-                  {expiredDocs.length === 0 && expiringDocs.length === 0 && (
-                    <div className="flex items-center gap-2.5 p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-lg">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                      <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                        {t.allDocumentsValid}
-                      </p>
-                    </div>
-                  )}
+            {/* Vehicle History — right */}
+            <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
+              <div className="px-5 py-4">
+                <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider">
+                  Vehicle History
+                </h3>
+              </div>
+              <div className="px-5 pb-5">
+                <div className="relative">
+                  {/* Vertical line */}
+                  <div className="absolute left-[5px] top-2 bottom-2 w-px bg-stone-200 dark:bg-stone-700" />
+
+                  <div className="space-y-4">
+                    {[
+                      { event: 'Challan Issued', date: '10 Mar 2026', amount: 5000 },
+                      { event: 'Insurance Renewed', date: '15 Feb 2026', amount: null },
+                      { event: 'Challan Issued', date: '20 Jan 2026', amount: 2500 },
+                      { event: 'PUCC Renewed', date: '5 Dec 2025', amount: null },
+                      { event: 'Challan Issued', date: '18 Nov 2025', amount: 8000 },
+                      { event: 'Servicing Done', date: '2 Oct 2025', amount: 12000 },
+                    ].map((item, i) => (
+                      <div key={i} className="relative flex gap-3 pl-0">
+                        {/* Dot */}
+                        <div className="w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 bg-emerald-500 dark:bg-emerald-400" />
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{item.event}</p>
+                            {item.amount !== null && (
+                              <span className="text-xs font-semibold text-stone-600 dark:text-stone-300 tabular-nums flex-shrink-0">
+                                ₹{item.amount.toLocaleString('en-IN')}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-stone-400 dark:text-stone-500 mt-0.5">{item.date}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1743,13 +1950,6 @@ export function VehicleDetail({
                             >
                               <Gavel className="w-3.5 h-3.5" />
                               {t.submitForResolution}
-                            </button>
-                            <button
-                              onClick={() => {}}
-                              className="flex items-center gap-1.5 px-3.5 py-2 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-                            >
-                              <Send className="w-3.5 h-3.5" />
-                              {t.sendProposal}
                             </button>
                           </div>
                         )}

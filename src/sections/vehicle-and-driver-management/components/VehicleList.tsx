@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Search,
   SlidersHorizontal,
@@ -403,10 +404,8 @@ function CategoryBadge({ category, t }: { category: VehicleCategory; t: Record<s
 }
 
 function ExpiryBadge({ status, label }: { status: DocumentStatus; label: string }) {
-  const config = EXPIRY_CONFIG[status]
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${config.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+    <span className="text-xs font-medium text-stone-600 dark:text-stone-400">
       {label}
     </span>
   )
@@ -490,11 +489,10 @@ function ChangeVehicleModal({
     setStep('success')
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
-      <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={handleClose} />
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 bg-black/50 dark:bg-black/70" onClick={handleClose}>
 
-      <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
+      <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto" onClick={(e) => e.stopPropagation()}>
 
         {/* ---- Step 1: Search & Select Vehicle ---- */}
         {step === 'search' && (
@@ -697,7 +695,8 @@ function ChangeVehicleModal({
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -887,7 +886,7 @@ export function VehicleList({
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+          <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
             <div className="p-4 sm:p-5 lg:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
@@ -902,7 +901,7 @@ export function VehicleList({
               </p>
             </div>
           </div>
-          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+          <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
             <div className="p-4 sm:p-5 lg:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className={`text-2xl sm:text-3xl font-bold tracking-tight tabular-nums ${getComplianceColor(stats.avgCompliance).text}`}>
@@ -917,7 +916,7 @@ export function VehicleList({
               </p>
             </div>
           </div>
-          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+          <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
             <div className="p-4 sm:p-5 lg:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
@@ -932,7 +931,7 @@ export function VehicleList({
               </p>
             </div>
           </div>
-          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+          <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
             <div className="p-4 sm:p-5 lg:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">

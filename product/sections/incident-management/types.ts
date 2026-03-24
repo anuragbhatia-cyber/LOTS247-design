@@ -31,11 +31,14 @@ export type ChallanStatus =
   | 'onHold'
   | 'notSettled'
 
+export type ChallanType = 'court' | 'online'
+
 export interface Challan {
   id: string
   displayId: string
   vehicleId: string
   driverId: string | null
+  challanType: ChallanType
   violationType: string
   amount: number
   issueDate: string
@@ -70,14 +73,15 @@ export type CaseStatus =
   | 'extended'
 
 export type CaseType =
-  | 'Accident'
-  | 'Vehicle Detention'
   | 'Theft'
+  | 'Detention'
+  | 'Bail'
+  | 'Accidents'
+  | 'FIRs'
+  | 'Superdari'
   | 'Vehicle Impounding'
-  | 'Insurance Dispute'
-  | 'Legal Complaint'
-  | 'RTO Escalation'
-  | 'Escalated Challan'
+  | 'E-Way Bill'
+  | 'Others'
 
 export type CaseOrigin = 'manual' | 'lawyerCall' | 'escalation'
 
@@ -92,6 +96,7 @@ export interface Case {
   status: CaseStatus
   origin: CaseOrigin
   escalatedFromChallanId: string | null
+  slaDeadline: string
   createdAt: string
   updatedAt: string
 }
@@ -151,6 +156,8 @@ export interface ChallanListProps {
   drivers: Driver[]
   /** Called when user wants to view a challan's details */
   onView?: (id: string) => void
+  /** Called when user wants to add a follow-up on a challan */
+  onAddFollowUp?: (id: string) => void
   /** Called when user wants to pay a challan */
   onPay?: (id: string) => void
   /** Called when user wants to dispute a challan */

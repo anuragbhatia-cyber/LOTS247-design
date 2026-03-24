@@ -122,7 +122,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
       {items.length > 3 && (
         <button
           onClick={onViewAll}
-          className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+          className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
         >
           {t.seeAllAlerts} &rarr;
         </button>
