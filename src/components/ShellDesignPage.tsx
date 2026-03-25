@@ -186,38 +186,9 @@ export function ShellDesignFullscreen() {
     return React.lazy(shellPreviewLoader)
   }, [shellPreviewLoader])
 
-  // Sync theme with parent window
+  // Force light mode only
   useEffect(() => {
-    const applyTheme = () => {
-      const theme = localStorage.getItem('theme') || 'system'
-      const root = document.documentElement
-
-      if (theme === 'system') {
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        root.classList.toggle('dark', systemDark)
-      } else {
-        root.classList.toggle('dark', theme === 'dark')
-      }
-    }
-
-    // Apply on mount
-    applyTheme()
-
-    // Listen for storage changes (from parent window)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'theme') {
-        applyTheme()
-      }
-    }
-    window.addEventListener('storage', handleStorageChange)
-
-    // Also poll for changes since storage event doesn't fire in same window
-    const interval = setInterval(applyTheme, 100)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      clearInterval(interval)
-    }
+    document.documentElement.classList.remove('dark')
   }, [])
 
   if (!ShellPreviewComponent) {
