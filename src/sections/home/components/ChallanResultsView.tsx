@@ -329,7 +329,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
       </div>
 
       {/* Sticky Bottom Bar — Total Outstanding */}
-      {pendingChallans.length > 0 && (
+      {activeTab === 'pending' && pendingChallans.length > 0 && (
         <div className="sticky bottom-0 z-40 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
           <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <div>

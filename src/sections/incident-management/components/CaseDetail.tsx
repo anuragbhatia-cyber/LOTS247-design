@@ -23,6 +23,8 @@ import {
   Info,
   FileDown,
   X,
+  Phone,
+  Shield,
 } from 'lucide-react'
 import type {
   CaseDetailProps,
@@ -99,6 +101,16 @@ const translations: Record<Language, Record<string, string>> = {
     assignedLawyer: 'Assigned Lawyer',
     notYetAssigned: 'Not yet assigned',
     lawyerAssignedAfterScreening: 'A lawyer will be assigned after screening',
+    incidentState: 'Incident State',
+    incidentCity: 'Incident City',
+    authorityInvolved: 'Authority Involved',
+    roadName: 'Road Name',
+    pin: 'Pin',
+    incidentArea: 'Incident Area',
+    incidentReporterName: 'Reporter Name',
+    incidentReporterPhone: 'Reporter Phone',
+    incidentLocation: 'Incident Location',
+    reporterInfo: 'Reporter Information',
 
     // Documents tab
     uploadDocument: 'Upload a document',
@@ -178,6 +190,16 @@ const translations: Record<Language, Record<string, string>> = {
     assignedLawyer: 'नियुक्त वकील',
     notYetAssigned: 'अभी तक नियुक्त नहीं',
     lawyerAssignedAfterScreening: 'स्क्रीनिंग के बाद वकील नियुक्त किया जाएगा',
+    incidentState: 'घटना राज्य',
+    incidentCity: 'घटना शहर',
+    authorityInvolved: 'शामिल प्राधिकरण',
+    roadName: 'सड़क का नाम',
+    pin: 'पिन',
+    incidentArea: 'घटना क्षेत्र',
+    incidentReporterName: 'रिपोर्टर का नाम',
+    incidentReporterPhone: 'रिपोर्टर फ़ोन',
+    incidentLocation: 'घटना स्थान',
+    reporterInfo: 'रिपोर्टर जानकारी',
 
     // Documents tab
     uploadDocument: 'दस्तावेज़ अपलोड करें',
@@ -907,6 +929,54 @@ function OverviewTab({
           value={formatDate(caseData.updatedAt, language)}
         />
       </div>
+
+      {/* Incident Location */}
+      {(caseData.incidentState || caseData.incidentCity || caseData.roadName || caseData.incidentArea || caseData.pin) && (
+        <div className="pt-2 border-t border-stone-100 dark:border-stone-800">
+          <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-2">{t.incidentLocation}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+            {caseData.incidentState && (
+              <DetailRow icon={MapPin} label={t.incidentState} value={caseData.incidentState} />
+            )}
+            {caseData.incidentCity && (
+              <DetailRow icon={MapPin} label={t.incidentCity} value={caseData.incidentCity} />
+            )}
+            {caseData.roadName && (
+              <DetailRow icon={MapPin} label={t.roadName} value={caseData.roadName} />
+            )}
+            {caseData.incidentArea && (
+              <DetailRow icon={MapPin} label={t.incidentArea} value={caseData.incidentArea} />
+            )}
+            {caseData.pin && (
+              <DetailRow icon={MapPin} label={t.pin} value={caseData.pin} />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Authority Involved */}
+      {caseData.authorityInvolved && (
+        <div className="pt-2 border-t border-stone-100 dark:border-stone-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+            <DetailRow icon={Shield} label={t.authorityInvolved} value={caseData.authorityInvolved} />
+          </div>
+        </div>
+      )}
+
+      {/* Reporter Information */}
+      {(caseData.incidentReporterName || caseData.incidentReporterPhone) && (
+        <div className="pt-2 border-t border-stone-100 dark:border-stone-800">
+          <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-2">{t.reporterInfo}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+            {caseData.incidentReporterName && (
+              <DetailRow icon={User} label={t.incidentReporterName} value={caseData.incidentReporterName} />
+            )}
+            {caseData.incidentReporterPhone && (
+              <DetailRow icon={Phone} label={t.incidentReporterPhone} value={caseData.incidentReporterPhone} />
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   )

@@ -27,20 +27,8 @@ const translations: Record<Language, Record<string, string>> = {
     otherDesc: 'Other incident',
     vehicleNumber: 'Vehicle Number',
     vehicleNumberPlaceholder: 'UP32MM1113',
-    challanType: 'Challan Type',
-    selectChallanType: 'Select challan type',
-    courtChallan: 'Court Challan',
-    onlineChallan: 'Online Challan',
-    violationType: 'Violation Type',
-    selectViolation: 'Select violation',
-    overloading: 'Overloading',
-    speeding: 'Speeding',
-    parking: 'Parking',
-    pollution: 'Pollution',
-    seatbelt: 'Seatbelt',
-    otherViolation: 'Other',
-    amount: 'Amount (₹)',
-    amountPlaceholder: '1500',
+    challanNumber: 'Challan Number',
+    challanNumberPlaceholder: 'e.g. CHL-2026-12345',
     caseType: 'Case Type',
     selectCaseType: 'Select case type',
     theft: 'Theft',
@@ -54,6 +42,22 @@ const translations: Record<Language, Record<string, string>> = {
     others: 'Others',
     caseDetail: 'Case Detail',
     caseDetailPlaceholder: 'Describe the case in detail...',
+    incidentState: 'Incident State:',
+    selectState: 'Select',
+    incidentCity: 'Incident City:',
+    selectCity: 'Select',
+    roadName: 'Road Name',
+    roadNamePlaceholder: '',
+    pin: 'Pin',
+    pinPlaceholder: '',
+    incidentReporterPhone: 'Incident Reporter Phone',
+    incidentReporterPhonePlaceholder: '',
+    authorityInvolved: 'Authority Involved:',
+    selectAuthority: 'Select',
+    incidentArea: 'Incident Area',
+    incidentAreaPlaceholder: '',
+    incidentReporterName: 'Incident Reporter Name',
+    incidentReporterNamePlaceholder: '',
     rtoType: 'Type',
     selectRtoType: 'Select type',
     rtoRcRenewal: 'RC Renewal',
@@ -88,20 +92,8 @@ const translations: Record<Language, Record<string, string>> = {
     otherDesc: 'अन्य घटना',
     vehicleNumber: 'वाहन नंबर',
     vehicleNumberPlaceholder: 'उदा. UP32MM1113',
-    challanType: 'चालान प्रकार',
-    selectChallanType: 'चालान प्रकार चुनें',
-    courtChallan: 'कोर्ट चालान',
-    onlineChallan: 'ऑनलाइन चालान',
-    violationType: 'उल्लंघन का प्रकार',
-    selectViolation: 'उल्लंघन चुनें',
-    overloading: 'ओवरलोडिंग',
-    speeding: 'तेज़ गति',
-    parking: 'पार्किंग',
-    pollution: 'प्रदूषण',
-    seatbelt: 'सीटबेल्ट',
-    otherViolation: 'अन्य',
-    amount: 'राशि (₹)',
-    amountPlaceholder: '1500',
+    challanNumber: 'चालान नंबर',
+    challanNumberPlaceholder: 'उदा. CHL-2026-12345',
     caseType: 'केस का प्रकार',
     selectCaseType: 'केस प्रकार चुनें',
     theft: 'चोरी',
@@ -115,6 +107,22 @@ const translations: Record<Language, Record<string, string>> = {
     others: 'अन्य',
     caseDetail: 'केस विवरण',
     caseDetailPlaceholder: 'केस का विस्तृत विवरण दें...',
+    incidentState: 'घटना राज्य:',
+    selectState: 'चुनें',
+    incidentCity: 'घटना शहर:',
+    selectCity: 'चुनें',
+    roadName: 'सड़क का नाम',
+    roadNamePlaceholder: '',
+    pin: 'पिन',
+    pinPlaceholder: '',
+    incidentReporterPhone: 'रिपोर्टर फ़ोन',
+    incidentReporterPhonePlaceholder: '',
+    authorityInvolved: 'शामिल प्राधिकरण:',
+    selectAuthority: 'चुनें',
+    incidentArea: 'घटना क्षेत्र',
+    incidentAreaPlaceholder: '',
+    incidentReporterName: 'रिपोर्टर का नाम',
+    incidentReporterNamePlaceholder: '',
     rtoType: 'प्रकार',
     selectRtoType: 'प्रकार चुनें',
     rtoRcRenewal: 'RC नवीनीकरण',
@@ -172,10 +180,16 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
   const [vehicleNumber, setVehicleNumber] = useState('')
   const [vehicleSearch, setVehicleSearch] = useState('')
   const [vehicleDropdownOpen, setVehicleDropdownOpen] = useState(false)
-  const [challanType, setChallanType] = useState('')
-  const [violationType, setViolationType] = useState('')
-  const [amount, setAmount] = useState('')
+  const [challanNumber, setChallanNumber] = useState('')
   const [caseType, setCaseType] = useState('')
+  const [incidentState, setIncidentState] = useState('')
+  const [incidentCity, setIncidentCity] = useState('')
+  const [roadName, setRoadName] = useState('')
+  const [pin, setPin] = useState('')
+  const [incidentReporterPhone, setIncidentReporterPhone] = useState('')
+  const [authorityInvolved, setAuthorityInvolved] = useState('')
+  const [incidentArea, setIncidentArea] = useState('')
+  const [incidentReporterName, setIncidentReporterName] = useState('')
   const [rtoType, setRtoType] = useState('')
   const [description, setDescription] = useState('')
   const vehicleSearchRef = useRef<HTMLDivElement>(null)
@@ -211,10 +225,16 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     setVehicleNumber('')
     setVehicleSearch('')
     setVehicleDropdownOpen(false)
-    setChallanType('')
-    setViolationType('')
-    setAmount('')
+    setChallanNumber('')
     setCaseType('')
+    setIncidentState('')
+    setIncidentCity('')
+    setRoadName('')
+    setPin('')
+    setIncidentReporterPhone('')
+    setAuthorityInvolved('')
+    setIncidentArea('')
+    setIncidentReporterName('')
     setRtoType('')
     setDescription('')
     onClose()
@@ -226,10 +246,16 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     setVehicleNumber('')
     setVehicleSearch('')
     setVehicleDropdownOpen(false)
-    setChallanType('')
-    setViolationType('')
-    setAmount('')
+    setChallanNumber('')
     setCaseType('')
+    setIncidentState('')
+    setIncidentCity('')
+    setRoadName('')
+    setPin('')
+    setIncidentReporterPhone('')
+    setAuthorityInvolved('')
+    setIncidentArea('')
+    setIncidentReporterName('')
     setRtoType('')
     setDescription('')
   }
@@ -249,7 +275,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     if (!vehicleValid) return false
     switch (category) {
       case 'challan':
-        return challanType !== '' && violationType !== '' && amount !== ''
+        return challanNumber.trim().length > 0
       case 'case':
         return caseType !== '' && description.trim().length > 0
       case 'rto':
@@ -271,7 +297,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={resetAndClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
+      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
           <div className="flex items-center gap-3">
@@ -303,7 +329,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5">
+        <div className="px-6 py-5 overflow-y-auto flex-1">
           {step === 'category' ? (
             /* Category Selection Grid */
             <div className="grid grid-cols-2 gap-3">
@@ -384,59 +410,18 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
 
               {/* Challan-specific fields */}
               {category === 'challan' && (
-                <>
-                  <div>
-                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                      {t.challanType}
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={challanType}
-                        onChange={(e) => setChallanType(e.target.value)}
-                        className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
-                      >
-                        <option value="">{t.selectChallanType}</option>
-                        <option value="court">{t.courtChallan}</option>
-                        <option value="online">{t.onlineChallan}</option>
-                      </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                      {t.violationType}
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={violationType}
-                        onChange={(e) => setViolationType(e.target.value)}
-                        className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
-                      >
-                        <option value="">{t.selectViolation}</option>
-                        <option value="overloading">{t.overloading}</option>
-                        <option value="speeding">{t.speeding}</option>
-                        <option value="parking">{t.parking}</option>
-                        <option value="pollution">{t.pollution}</option>
-                        <option value="seatbelt">{t.seatbelt}</option>
-                        <option value="other">{t.otherViolation}</option>
-                      </select>
-                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                      {t.amount}
-                    </label>
-                    <input
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      placeholder={t.amountPlaceholder}
-                      min={0}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
-                    />
-                  </div>
-                </>
+                <div>
+                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                    {t.challanNumber}
+                  </label>
+                  <input
+                    type="text"
+                    value={challanNumber}
+                    onChange={(e) => setChallanNumber(e.target.value.toUpperCase())}
+                    placeholder={t.challanNumberPlaceholder}
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                  />
+                </div>
               )}
 
               {/* Case-specific fields */}
@@ -466,6 +451,179 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                       <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
                     </div>
                   </div>
+
+                  {/* Incident State & City */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                        {t.incidentState}
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={incidentState}
+                          onChange={(e) => { setIncidentState(e.target.value); setIncidentCity('') }}
+                          className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
+                        >
+                          <option value="">{t.selectState}</option>
+                          <option value="uttar_pradesh">Uttar Pradesh</option>
+                          <option value="maharashtra">Maharashtra</option>
+                          <option value="delhi">Delhi</option>
+                          <option value="rajasthan">Rajasthan</option>
+                          <option value="madhya_pradesh">Madhya Pradesh</option>
+                          <option value="gujarat">Gujarat</option>
+                          <option value="karnataka">Karnataka</option>
+                          <option value="tamil_nadu">Tamil Nadu</option>
+                          <option value="haryana">Haryana</option>
+                          <option value="punjab">Punjab</option>
+                          <option value="bihar">Bihar</option>
+                          <option value="west_bengal">West Bengal</option>
+                          <option value="telangana">Telangana</option>
+                          <option value="andhra_pradesh">Andhra Pradesh</option>
+                          <option value="chhattisgarh">Chhattisgarh</option>
+                          <option value="jharkhand">Jharkhand</option>
+                          <option value="odisha">Odisha</option>
+                          <option value="kerala">Kerala</option>
+                          <option value="assam">Assam</option>
+                          <option value="uttarakhand">Uttarakhand</option>
+                        </select>
+                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                        {t.incidentCity}
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={incidentCity}
+                          onChange={(e) => setIncidentCity(e.target.value)}
+                          className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
+                        >
+                          <option value="">{t.selectCity}</option>
+                          {incidentState === 'uttar_pradesh' && (<><option value="lucknow">Lucknow</option><option value="kanpur">Kanpur</option><option value="varanasi">Varanasi</option><option value="agra">Agra</option><option value="noida">Noida</option><option value="prayagraj">Prayagraj</option></>)}
+                          {incidentState === 'maharashtra' && (<><option value="mumbai">Mumbai</option><option value="pune">Pune</option><option value="nagpur">Nagpur</option><option value="nashik">Nashik</option><option value="thane">Thane</option></>)}
+                          {incidentState === 'delhi' && (<><option value="new_delhi">New Delhi</option><option value="north_delhi">North Delhi</option><option value="south_delhi">South Delhi</option><option value="east_delhi">East Delhi</option><option value="west_delhi">West Delhi</option></>)}
+                          {incidentState === 'rajasthan' && (<><option value="jaipur">Jaipur</option><option value="jodhpur">Jodhpur</option><option value="udaipur">Udaipur</option><option value="kota">Kota</option></>)}
+                          {incidentState === 'madhya_pradesh' && (<><option value="bhopal">Bhopal</option><option value="indore">Indore</option><option value="gwalior">Gwalior</option><option value="jabalpur">Jabalpur</option></>)}
+                          {incidentState === 'gujarat' && (<><option value="ahmedabad">Ahmedabad</option><option value="surat">Surat</option><option value="vadodara">Vadodara</option><option value="rajkot">Rajkot</option></>)}
+                          {incidentState === 'karnataka' && (<><option value="bengaluru">Bengaluru</option><option value="mysuru">Mysuru</option><option value="hubli">Hubli</option><option value="mangaluru">Mangaluru</option></>)}
+                          {incidentState === 'tamil_nadu' && (<><option value="chennai">Chennai</option><option value="coimbatore">Coimbatore</option><option value="madurai">Madurai</option><option value="salem">Salem</option></>)}
+                          {incidentState === 'haryana' && (<><option value="gurugram">Gurugram</option><option value="faridabad">Faridabad</option><option value="karnal">Karnal</option><option value="panipat">Panipat</option></>)}
+                          {incidentState === 'punjab' && (<><option value="chandigarh">Chandigarh</option><option value="ludhiana">Ludhiana</option><option value="amritsar">Amritsar</option><option value="jalandhar">Jalandhar</option></>)}
+                          {incidentState === 'bihar' && (<><option value="patna">Patna</option><option value="gaya">Gaya</option><option value="muzaffarpur">Muzaffarpur</option></>)}
+                          {incidentState === 'west_bengal' && (<><option value="kolkata">Kolkata</option><option value="howrah">Howrah</option><option value="durgapur">Durgapur</option></>)}
+                          {incidentState === 'telangana' && (<><option value="hyderabad">Hyderabad</option><option value="warangal">Warangal</option><option value="karimnagar">Karimnagar</option></>)}
+                          {incidentState === 'andhra_pradesh' && (<><option value="visakhapatnam">Visakhapatnam</option><option value="vijayawada">Vijayawada</option><option value="tirupati">Tirupati</option></>)}
+                          {incidentState === 'chhattisgarh' && (<><option value="raipur">Raipur</option><option value="bilaspur">Bilaspur</option><option value="durg">Durg</option></>)}
+                          {incidentState === 'jharkhand' && (<><option value="ranchi">Ranchi</option><option value="jamshedpur">Jamshedpur</option><option value="dhanbad">Dhanbad</option></>)}
+                          {incidentState === 'odisha' && (<><option value="bhubaneswar">Bhubaneswar</option><option value="cuttack">Cuttack</option><option value="rourkela">Rourkela</option></>)}
+                          {incidentState === 'kerala' && (<><option value="kochi">Kochi</option><option value="thiruvananthapuram">Thiruvananthapuram</option><option value="kozhikode">Kozhikode</option></>)}
+                          {incidentState === 'assam' && (<><option value="guwahati">Guwahati</option><option value="silchar">Silchar</option><option value="dibrugarh">Dibrugarh</option></>)}
+                          {incidentState === 'uttarakhand' && (<><option value="dehradun">Dehradun</option><option value="haridwar">Haridwar</option><option value="rishikesh">Rishikesh</option></>)}
+                        </select>
+                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Authority Involved */}
+                  <div>
+                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                      {t.authorityInvolved}
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={authorityInvolved}
+                        onChange={(e) => setAuthorityInvolved(e.target.value)}
+                        className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
+                      >
+                        <option value="">{t.selectAuthority}</option>
+                        <option value="police">Police</option>
+                        <option value="rto">RTO</option>
+                        <option value="court">Court</option>
+                        <option value="traffic_police">Traffic Police</option>
+                        <option value="transport_dept">Transport Department</option>
+                        <option value="excise_dept">Excise Department</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Road Name & Pin */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                        {t.roadName}
+                      </label>
+                      <input
+                        type="text"
+                        value={roadName}
+                        onChange={(e) => setRoadName(e.target.value)}
+                        placeholder={t.roadNamePlaceholder}
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                        {t.pin}
+                      </label>
+                      <input
+                        type="text"
+                        value={pin}
+                        onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        placeholder={t.pinPlaceholder}
+                        inputMode="numeric"
+                        maxLength={6}
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Incident Area */}
+                  <div>
+                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                      {t.incidentArea}
+                    </label>
+                    <input
+                      type="text"
+                      value={incidentArea}
+                      onChange={(e) => setIncidentArea(e.target.value)}
+                      placeholder={t.incidentAreaPlaceholder}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                    />
+                  </div>
+
+                  {/* Incident Reporter Name */}
+                  <div>
+                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                      {t.incidentReporterName}
+                    </label>
+                    <input
+                      type="text"
+                      value={incidentReporterName}
+                      onChange={(e) => setIncidentReporterName(e.target.value)}
+                      placeholder={t.incidentReporterNamePlaceholder}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                    />
+                  </div>
+
+                  {/* Incident Reporter Phone */}
+                  <div>
+                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                      {t.incidentReporterPhone}
+                    </label>
+                    <input
+                      type="tel"
+                      value={incidentReporterPhone}
+                      onChange={(e) => setIncidentReporterPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      placeholder={t.incidentReporterPhonePlaceholder}
+                      inputMode="tel"
+                      maxLength={10}
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                    />
+                  </div>
+
                   <div>
                     <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
                       {t.caseDetail}

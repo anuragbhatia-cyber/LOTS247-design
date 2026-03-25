@@ -9,6 +9,11 @@ import {
   BarChart3,
   BookOpen,
   Wallet,
+  FileText,
+  LayoutDashboard,
+  IdCard,
+  CreditCard,
+  ClipboardList,
 } from 'lucide-react'
 import { AppShell } from './components/AppShell'
 import { LanguageProvider, useLanguage, type Language } from './components/LanguageContext'
@@ -23,6 +28,7 @@ const navTranslations: Record<Language, Record<string, string>> = {
     reports: 'Reports',
     apiCatalogue: 'API Catalogue',
     wallet: 'Wallet',
+    proposals: 'Proposals',
     settings: 'Settings',
     help: 'Help',
   },
@@ -34,6 +40,7 @@ const navTranslations: Record<Language, Record<string, string>> = {
     reports: 'रिपोर्ट',
     apiCatalogue: 'API कैटलॉग',
     wallet: 'वॉलेट',
+    proposals: 'प्रस्ताव',
     settings: 'सेटिंग्स',
     help: 'सहायता',
   },
@@ -41,14 +48,19 @@ const navTranslations: Record<Language, Record<string, string>> = {
 
 // Map from nav href to section screen design
 // Format: sectionId:ScreenDesignName (matches the preview-helpers pattern)
-const hrefToScreen: Record<string, { sectionId: string; screenName?: string }> = {
+const hrefToScreen: Record<string, { sectionId: string; screenName?: string; params?: Record<string, string> }> = {
   '/': { sectionId: 'home' },
   '/compliance': { sectionId: 'compliance-dashboard' },
+  '/compliance/dl': { sectionId: 'compliance-dashboard', params: { view: 'dl' } },
+  '/compliance/rc': { sectionId: 'compliance-dashboard', params: { view: 'rc' } },
+  '/compliance/challans': { sectionId: 'compliance-dashboard', params: { view: 'challan' } },
+  '/compliance/vehicle': { sectionId: 'compliance-dashboard', params: { view: 'vehicle' } },
   '/incidents': { sectionId: 'incident-management', screenName: 'IncidentManagement' },
   '/fleet': { sectionId: 'vehicle-and-driver-management', screenName: 'VehicleList' },
   '/api-catalogue': { sectionId: 'api-catalogue' },
   '/reports': { sectionId: 'reports', screenName: 'ReportsList' },
   '/wallet': { sectionId: 'wallet' },
+  '/proposals': { sectionId: 'proposals', screenName: 'ProposalManagement' },
 }
 
 // Build lookup from all preview items
@@ -103,17 +115,21 @@ function ShellContent() {
 
   const navigationItems = [
     { label: t.home, href: '/', icon: <Home className="w-5 h-5" />, isActive: activePath === '/' },
-    { label: t.compliance, href: '/compliance', icon: <ShieldCheck className="w-5 h-5" />, isActive: activePath === '/compliance' },
-    { label: t.incidents, href: '/incidents', icon: <AlertTriangle className="w-5 h-5" />, isActive: activePath === '/incidents' },
     { label: t.vehiclesDrivers, href: '/fleet', icon: <Truck className="w-5 h-5" />, isActive: activePath === '/fleet' },
+    { label: t.incidents, href: '/incidents', icon: <AlertTriangle className="w-5 h-5" />, isActive: activePath === '/incidents' },
+    { label: t.compliance, href: '/compliance', icon: <ShieldCheck className="w-5 h-5" />, isActive: activePath === '/compliance' || activePath.startsWith('/compliance/'), children: [
+      { label: 'Fleet Overview', href: '/compliance', isActive: activePath === '/compliance' },
+      { label: 'Driving License', href: '/compliance/dl', isActive: activePath === '/compliance/dl' },
+      { label: 'Vehicle RC', href: '/compliance/rc', isActive: activePath === '/compliance/rc' },
+      { label: 'Fleet Challans', href: '/compliance/challans', isActive: activePath === '/compliance/challans' },
+    ]},
     { label: t.reports, href: '/reports', icon: <BarChart3 className="w-5 h-5" />, isActive: activePath === '/reports' },
+    { label: t.proposals, href: '/proposals', icon: <FileText className="w-5 h-5" />, isActive: activePath === '/proposals' },
     { label: t.apiCatalogue, href: '/api-catalogue', icon: <BookOpen className="w-5 h-5" />, isActive: activePath === '/api-catalogue' },
     { label: t.wallet, href: '/wallet', icon: <Wallet className="w-5 h-5" />, isActive: activePath === '/wallet' },
   ]
 
-  const secondaryItems = [
-    { label: t.settings, href: '/settings', icon: <Settings className="w-5 h-5" />, isActive: activePath === '/settings' },
-  ]
+  const secondaryItems: typeof navigationItems = []
 
   const user = {
     name: 'Rajesh Kumar',
@@ -129,7 +145,8 @@ function ShellContent() {
       user={user}
       onNavigate={(href) => {
         setActivePath(href)
-        setExtraParams({})
+        const mapping = hrefToScreen[href]
+        setExtraParams(mapping?.params || {})
       }}
       onLogout={() => {
         if (window.parent !== window) {
@@ -143,7 +160,8 @@ function ShellContent() {
         <iframe
           key={`${screenUrl}-${language}-${JSON.stringify(extraParams)}`}
           src={`${screenUrl}?embed=true&lang=${language}${Object.entries(extraParams).map(([k, v]) => `&${k}=${v}`).join('')}`}
-          className="w-full h-full border-0 min-h-screen"
+          className="w-full border-0"
+          style={{ height: 'calc(100vh - 4rem)' }}
           title="Section preview"
         />
       ) : (

@@ -52,7 +52,7 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     alert: 'alert',
     alertsPlural: 'alerts',
     vehicle: 'Vehicle',
-    payNow: 'Pay Now',
+    payNow: 'Create Incident',
     seeAllAlerts: 'See all alerts',
   },
   hi: {
@@ -60,7 +60,7 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     alert: 'अलर्ट',
     alertsPlural: 'अलर्ट',
     vehicle: 'वाहन',
-    payNow: 'भुगतान करें',
+    payNow: 'घटना बनाएं',
     seeAllAlerts: 'सभी अलर्ट देखें',
   },
 }

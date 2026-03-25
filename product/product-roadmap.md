@@ -28,3 +28,6 @@ Browse available APIs, explore endpoints, and submit requests to the team for ne
 
 ### 9. Wallet
 Credit and debit payment ledger used for challan settlements, subscription payments, and transaction history.
+
+### 10. Proposals
+Create, manage, and track service proposals for fleet owners — including pricing breakdowns, coverage details, and approval workflows.

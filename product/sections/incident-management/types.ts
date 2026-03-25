@@ -99,6 +99,14 @@ export interface Case {
   slaDeadline: string
   createdAt: string
   updatedAt: string
+  incidentState?: string
+  incidentCity?: string
+  authorityInvolved?: string
+  roadName?: string
+  pin?: string
+  incidentArea?: string
+  incidentReporterName?: string
+  incidentReporterPhone?: string
 }
 
 export type CaseActivityType =

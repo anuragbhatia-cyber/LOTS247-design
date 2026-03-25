@@ -18,7 +18,7 @@ const homeTranslations: Record<Language, Record<string, string>> = {
     addIncidentDesc: 'Report an accident or legal issue',
     addVehicle: 'Add Vehicle',
     addVehicleDesc: 'Register a new vehicle to your fleet',
-    checkChallan: 'Check Challan',
+    checkChallan: 'Check Vehicle Challans',
     checkChallanDesc: 'Look up pending traffic challans',
     checkRto: 'Check RTO',
     checkRtoDesc: 'Verify vehicle registration status',
@@ -62,7 +62,7 @@ const homeTranslations: Record<Language, Record<string, string>> = {
     addIncidentDesc: 'दुर्घटना या कानूनी मुद्दे की रिपोर्ट करें',
     addVehicle: 'वाहन जोड़ें',
     addVehicleDesc: 'अपने बेड़े में नया वाहन पंजीकृत करें',
-    checkChallan: 'चालान जाँचें',
+    checkChallan: 'वाहन चालान जाँचें',
     checkChallanDesc: 'लंबित ट्रैफ़िक चालान खोजें',
     checkRto: 'RTO जाँचें',
     checkRtoDesc: 'वाहन पंजीकरण स्थिति सत्यापित करें',
@@ -114,7 +114,7 @@ const QUICK_ACTIONS = [
   },
   {
     id: 'challan',
-    label: 'Check Challan',
+    label: 'Check Vehicle Challans',
     description: 'Look up pending traffic challans',
     image: '/icon-check-challan.png',
   },
@@ -277,84 +277,6 @@ export function HomeView({
 
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
 
-          {/* Date Range Filter */}
-          <div ref={dateRangeRef} className="relative">
-            <button
-              onClick={() => setDateRangeOpen(!dateRangeOpen)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 transition-colors"
-            >
-              <Calendar className="w-3.5 h-3.5 text-stone-400" />
-              <span className="hidden sm:inline">
-                {selectedRange === 'custom' && customFrom && customTo
-                  ? `${new Date(customFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} – ${new Date(customTo).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`
-                  : dateRangePresets.find(p => p.id === selectedRange)?.label ?? t.custom
-                }
-              </span>
-              <ChevronDown className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-150 ${dateRangeOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {dateRangeOpen && (
-              <div className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-30">
-                <div className="p-1.5">
-                  {dateRangePresets.map((preset) => (
-                    <button
-                      key={preset.id}
-                      onClick={() => {
-                        setSelectedRange(preset.id)
-                        setDateRangeOpen(false)
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                        selectedRange === preset.id
-                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
-                          : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
-                      }`}
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-
-                  <div className="mx-2 my-1 border-t border-stone-100 dark:border-stone-800" />
-
-                  <button
-                    onClick={() => setSelectedRange('custom')}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      selectedRange === 'custom'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
-                        : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
-                    }`}
-                  >
-                    {t.custom}
-                  </button>
-
-                  {selectedRange === 'custom' && (
-                    <div className="px-3 pb-2 pt-1 flex flex-col gap-2">
-                      <input
-                        type="date"
-                        value={customFrom}
-                        onChange={(e) => setCustomFrom(e.target.value)}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 outline-none focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
-                      />
-                      <input
-                        type="date"
-                        value={customTo}
-                        onChange={(e) => setCustomTo(e.target.value)}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 outline-none focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
-                      />
-                      <button
-                        onClick={() => {
-                          if (customFrom && customTo) setDateRangeOpen(false)
-                        }}
-                        disabled={!customFrom || !customTo}
-                        className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold transition-colors"
-                      >
-                        {t.custom === 'कस्टम' ? 'लागू करें' : 'Apply'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
 
           </div>{/* end right side actions */}
         </div>

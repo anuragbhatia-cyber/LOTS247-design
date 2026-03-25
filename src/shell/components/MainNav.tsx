@@ -113,7 +113,7 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
 
               {/* Children */}
               {hasChildren && isExpanded && !isCollapsed && (
-                <ul className="mt-1.5 ml-4 pl-4 border-l border-stone-800/50 space-y-0.5">
+                <ul className="mt-1.5 ml-4 pl-4 border-l border-stone-600 space-y-0.5">
                   {item.children!.map((child) => (
                     <li key={child.href}>
                       <button

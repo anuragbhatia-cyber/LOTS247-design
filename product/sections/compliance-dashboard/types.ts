@@ -228,4 +228,6 @@ export interface ComplianceDashboardProps {
   onDateRangeChange?: (preset: DateRangePreset, customRange?: { from: string; to: string }) => void
   /** Called when user changes the scope filter */
   onScopeChange?: (scope: ScopeFilter, selectedId?: string) => void
+  /** Initial drilldown view to open (dl, rc, challan, vehicle) */
+  initialView?: 'dl' | 'rc' | 'challan' | 'vehicle' | null
 }

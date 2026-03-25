@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import {
   X,
-  ChevronDown,
-  User,
   CheckCircle2,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
@@ -13,13 +11,6 @@ const translations: Record<Language, Record<string, string>> = {
     enterVehicleDetails: 'Enter vehicle details to register',
     vehicleNumber: 'Vehicle Number',
     vehicleNumberPlaceholder: 'UP32MM1113',
-    vehicleCategory: 'Vehicle Category',
-    selectCategory: 'Select category',
-    owned: 'Owned',
-    leased: 'Leased',
-    rented: 'Rented',
-    assignDriver: 'Assign Driver',
-    noDriverAssigned: 'No driver assigned',
     cancel: 'Cancel',
     vehicleAdded: 'Vehicle Added',
     vehicleAddedDesc: 'has been successfully added to your fleet.',
@@ -30,13 +21,6 @@ const translations: Record<Language, Record<string, string>> = {
     enterVehicleDetails: 'पंजीकरण के लिए वाहन विवरण दर्ज करें',
     vehicleNumber: 'वाहन नंबर',
     vehicleNumberPlaceholder: 'उदा. UP32MM1113',
-    vehicleCategory: 'वाहन श्रेणी',
-    selectCategory: 'श्रेणी चुनें',
-    owned: 'स्वामित्व',
-    leased: 'लीज़ पर',
-    rented: 'किराए पर',
-    assignDriver: 'ड्राइवर नियुक्त करें',
-    noDriverAssigned: 'कोई ड्राइवर नियुक्त नहीं',
     cancel: 'रद्द करें',
     vehicleAdded: 'वाहन जोड़ा गया',
     vehicleAddedDesc: 'आपके बेड़े में सफलतापूर्वक जोड़ दिया गया है।',
@@ -44,30 +28,18 @@ const translations: Record<Language, Record<string, string>> = {
   },
 }
 
-type VehicleCategory = 'owned' | 'leased' | 'rented'
-
-interface Driver {
-  id: string
-  name: string
-  licenseNumber: string
-}
-
 export interface AddVehicleModalProps {
   isOpen: boolean
   onClose: () => void
   onAdd?: () => void
-  drivers?: Driver[]
 }
 
 export function AddVehicleModal({
   isOpen,
   onClose,
   onAdd,
-  drivers = [],
 }: AddVehicleModalProps) {
   const [vehicleNumber, setVehicleNumber] = useState('')
-  const [category, setCategory] = useState<VehicleCategory | ''>('')
-  const [selectedDriverId, setSelectedDriverId] = useState<string>('')
   const [showSuccess, setShowSuccess] = useState(false)
   const [addedVehicle, setAddedVehicle] = useState('')
   const { language } = useLanguage()
@@ -83,8 +55,6 @@ export function AddVehicleModal({
 
   function handleClose() {
     setVehicleNumber('')
-    setCategory('')
-    setSelectedDriverId('')
     setShowSuccess(false)
     setAddedVehicle('')
     onClose()
@@ -95,7 +65,7 @@ export function AddVehicleModal({
     setVehicleNumber(cleaned)
   }
 
-  const isValid = vehicleNumber.length >= 6 && category !== ''
+  const isValid = vehicleNumber.length >= 6
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
@@ -172,46 +142,6 @@ export function AddVehicleModal({
                 />
               </div>
 
-              {/* Vehicle Category Dropdown */}
-              <div>
-                <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                  {t.vehicleCategory}
-                </label>
-                <div className="relative">
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value as VehicleCategory)}
-                    className="w-full appearance-none px-3.5 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
-                  >
-                    <option value="">{t.selectCategory}</option>
-                    <option value="owned">{t.owned}</option>
-                    <option value="leased">{t.leased}</option>
-                    <option value="rented">{t.rented}</option>
-                  </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
-                </div>
-              </div>
-
-              {/* Assign Driver */}
-              <div>
-                <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                  {t.assignDriver}
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
-                  <select
-                    value={selectedDriverId}
-                    onChange={(e) => setSelectedDriverId(e.target.value)}
-                    className="w-full appearance-none pl-9 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
-                  >
-                    <option value="">{t.noDriverAssigned}</option>
-                    {drivers.map((d) => (
-                      <option key={d.id} value={d.id}>{d.name} — {d.licenseNumber}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
-                </div>
-              </div>
             </div>
 
             {/* Footer */}

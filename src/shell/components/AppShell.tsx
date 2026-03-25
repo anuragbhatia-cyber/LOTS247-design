@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2 } from 'lucide-react'
+import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings } from 'lucide-react'
 import { MainNav } from './MainNav'
 import { useLanguage, type Language } from './LanguageContext'
 import { NotificationsView } from '@/sections/home/components/NotificationsView'
@@ -76,6 +76,7 @@ const translations: Record<Language, Record<string, string>> = {
     new: 'new',
     viewAll: 'View all notifications →',
     myProfile: 'My Profile',
+    settings: 'Settings',
     plan: 'Plan',
     logout: 'Logout',
     collapse: 'Collapse',
@@ -96,6 +97,7 @@ const translations: Record<Language, Record<string, string>> = {
     new: 'नई',
     viewAll: 'सभी सूचनाएँ देखें →',
     myProfile: 'मेरी प्रोफ़ाइल',
+    settings: 'सेटिंग्स',
     plan: 'प्लान',
     logout: 'लॉग आउट',
     collapse: 'संक्षिप्त करें',
@@ -412,7 +414,7 @@ export function AppShell({
   }, [])
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
+    <div className="h-screen overflow-hidden bg-stone-50 dark:bg-stone-950">
       {/* Mobile Header */}
       <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-stone-900 border-b border-stone-800 flex items-center justify-between px-4">
         <div className="flex items-center">
@@ -533,8 +535,8 @@ export function AppShell({
       {/* Main Content */}
       <main
         className={`
-          transition-all duration-300 ease-in-out
-          pt-16 lg:pt-16
+          transition-[padding] duration-300 ease-in-out
+          pt-16 lg:pt-16 h-screen overflow-y-auto
           ${isCollapsed ? 'lg:pl-16' : 'lg:pl-60'}
         `}
       >
@@ -632,8 +634,8 @@ export function AppShell({
               }}
               className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium"
             >
-              <Languages className="w-4 h-4" />
-              <span className="text-xs">{language === 'en' ? 'EN' : 'हि'}</span>
+              <span className="text-xs font-medium">{language === 'en' ? 'English' : 'हिन्दी'}</span>
+              <ChevronDown className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-150 ${langOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {langOpen && (
@@ -701,6 +703,16 @@ export function AppShell({
                       <User className="w-4 h-4 text-stone-400" />
                       {t.myProfile}
                     </button>
+                    <button
+                      onClick={() => {
+                        setProfileOpen(false)
+                        onNavigate?.('/settings')
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <Settings className="w-4 h-4 text-stone-400" />
+                      {t.settings}
+                    </button>
                     <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
                     <button
                       onClick={() => {
@@ -718,7 +730,7 @@ export function AppShell({
             </div>
           )}
         </div>
-        <div className="min-h-screen">
+        <div>
           {showNotifications ? (
             <NotificationsView onBack={() => setShowNotifications(false)} />
           ) : challanResultsVehicle ? (

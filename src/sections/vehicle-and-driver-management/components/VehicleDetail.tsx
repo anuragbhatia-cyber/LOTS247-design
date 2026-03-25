@@ -37,7 +37,6 @@ import type {
   VehicleDetailProps,
   Vehicle,
   Driver,
-  VehicleCategory,
   VehicleStatus,
   DocumentStatus,
   VehicleDocument,
@@ -380,27 +379,6 @@ const translations: Record<Language, Record<string, string>> = {
 // Config
 // ---------------------------------------------------------------------------
 
-const CATEGORY_STYLE: Record<VehicleCategory, { bg: string; text: string }> = {
-  owned: {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
-    text: 'text-emerald-700 dark:text-emerald-300',
-  },
-  leased: {
-    bg: 'bg-blue-50 dark:bg-blue-950/40',
-    text: 'text-blue-700 dark:text-blue-300',
-  },
-  rented: {
-    bg: 'bg-amber-50 dark:bg-amber-950/40',
-    text: 'text-amber-700 dark:text-amber-300',
-  },
-}
-
-const CATEGORY_LABEL_KEY: Record<VehicleCategory, string> = {
-  owned: 'owned',
-  leased: 'leased',
-  rented: 'rented',
-}
-
 const DOC_STATUS_STYLE: Record<DocumentStatus, { bg: string; text: string; border: string; icon: typeof CheckCircle2 }> = {
   valid: {
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
@@ -613,7 +591,6 @@ function EditVehicleModal({
   onSave?: () => void
   t: Record<string, string>
 }) {
-  const [category, setCategory] = useState<VehicleCategory>(vehicle.category)
   const [status, setStatus] = useState<VehicleStatus>(vehicle.status)
   const [vehicleType, setVehicleType] = useState(vehicle.vehicleType)
   const [make, setMake] = useState(vehicle.make)
@@ -627,7 +604,6 @@ function EditVehicleModal({
   }
 
   function handleClose() {
-    setCategory(vehicle.category)
     setStatus(vehicle.status)
     setVehicleType(vehicle.vehicleType)
     setMake(vehicle.make)
@@ -717,27 +693,6 @@ function EditVehicleModal({
                 <option value="Tanker">{t.tanker}</option>
                 <option value="Container">{t.container}</option>
                 <option value="Mini Truck">{t.miniTruck}</option>
-              </select>
-              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
-            </div>
-          </div>
-
-          {/* Category */}
-          <div>
-            <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-              {t.vehicleCategory}
-            </label>
-            <div className="relative">
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value as VehicleCategory)}
-                className="w-full appearance-none px-3.5 py-2.5 pr-8 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
-              >
-                {(['owned', 'leased', 'rented'] as VehicleCategory[]).map((cat) => (
-                  <option key={cat} value={cat}>
-                    {t[CATEGORY_LABEL_KEY[cat]]}
-                  </option>
-                ))}
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
             </div>
@@ -1332,9 +1287,6 @@ export function VehicleDetail({
   const vehicleChallans = incidentData.challans.filter((c: { vehicleId: string }) => c.vehicleId === vehicle.id)
   const vehicleCases = incidentData.cases.filter((c: { vehicleId: string }) => c.vehicleId === vehicle.id)
   const complianceColors = getComplianceColor(vehicle.complianceScore)
-  const categoryStyle = CATEGORY_STYLE[vehicle.category]
-  const categoryLabel = t[CATEGORY_LABEL_KEY[vehicle.category]]
-
   const expiredDocs = vehicle.documents.filter((d) => d.status === 'expired')
   const expiringDocs = vehicle.documents.filter((d) => d.status === 'expiring-soon')
 
@@ -1390,9 +1342,6 @@ export function VehicleDetail({
                       <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
                         {vehicle.rcNumber}
                       </h1>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${categoryStyle.bg} ${categoryStyle.text}`}>
-                        {categoryLabel}
-                      </span>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${
                         vehicle.status === 'active'
                           ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
@@ -1492,12 +1441,6 @@ export function VehicleDetail({
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.year}</p>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.year}</p>
-              </div>
-              <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.category}</p>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ${categoryStyle.bg} ${categoryStyle.text}`}>
-                  {categoryLabel}
-                </span>
               </div>
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.status}</p>

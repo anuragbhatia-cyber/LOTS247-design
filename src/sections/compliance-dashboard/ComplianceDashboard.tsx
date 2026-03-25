@@ -3,8 +3,12 @@ import { ComplianceDashboard } from './components/ComplianceDashboard'
 import type { CategoryId, DateRangePreset, ScopeFilter } from '@/../product/sections/compliance-dashboard/types'
 
 export default function ComplianceDashboardPreview() {
+  const params = new URLSearchParams(window.location.search)
+  const view = params.get('view') as 'dl' | 'rc' | 'challan' | 'vehicle' | null
+
   return (
     <ComplianceDashboard
+      key={view}
       complianceScore={data.complianceScore as any}
       categories={data.categories as any}
       insights={data.insights as any}
@@ -20,6 +24,7 @@ export default function ComplianceDashboardPreview() {
       onBackToOverview={() => console.log('Back to overview')}
       onDateRangeChange={(preset: DateRangePreset) => console.log('Date range:', preset)}
       onScopeChange={(scope: ScopeFilter, id?: string) => console.log('Scope:', scope, id)}
+      initialView={view}
     />
   )
 }

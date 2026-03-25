@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -29,6 +29,10 @@ import {
   Plus,
   User,
   MoreVertical,
+  X,
+  RefreshCw,
+  MapPin,
+  Copy,
 } from 'lucide-react'
 import type {
   ComplianceDashboardProps,
@@ -157,6 +161,38 @@ const SCOPE_OPTIONS: { value: ScopeFilter; label: string; icon: typeof Truck }[]
 ]
 
 // ---------------------------------------------------------------------------
+// Proposal Toast
+// ---------------------------------------------------------------------------
+
+function ProposalToast({ show, onClose }: { show: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (show) {
+      const t = setTimeout(onClose, 3000)
+      return () => clearTimeout(t)
+    }
+  }, [show, onClose])
+
+  if (!show) return null
+
+  return (
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-stone-900 dark:bg-stone-100 shadow-xl shadow-stone-900/20 dark:shadow-stone-100/20">
+        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+          <ShieldCheck className="w-4.5 h-4.5 text-white" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-white dark:text-stone-900">Proposal Submitted</p>
+          <p className="text-xs text-stone-400 dark:text-stone-500">Your proposal request has been submitted successfully</p>
+        </div>
+        <button onClick={onClose} className="ml-2 p-1 rounded-lg text-stone-500 hover:text-stone-300 dark:hover:text-stone-700 transition-colors">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
 
@@ -220,18 +256,25 @@ function CategoryCard({
         hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-md dark:hover:shadow-stone-950/40
       `}
     >
-      <div className="mb-3">
+      <div className="flex items-center justify-between mb-3">
         <p className="text-sm font-medium text-stone-900 dark:text-stone-100 leading-snug">{category.fullLabel}</p>
-      </div>
-
-      <div className="flex items-end justify-between">
-        <div>
-          <span className={`text-2xl font-bold ${colors.color}`}>{category.compliant}<span className="text-base font-semibold text-stone-400 dark:text-stone-500">/{category.total}</span></span>
-        </div>
         <div className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 transition-colors">
           <span className="text-xs font-medium">View</span>
           <ArrowUpRight className="w-3 h-3" />
         </div>
+      </div>
+
+      <div className="mb-3">
+        <span className="text-2xl font-bold text-stone-900 dark:text-stone-100">{category.compliant}<span className="text-base font-semibold text-stone-400 dark:text-stone-500">/{category.total}</span></span>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
+          {category.compliant} Valid
+        </span>
+        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
+          {category.total - category.compliant} Expired
+        </span>
       </div>
 
 
@@ -239,7 +282,7 @@ function CategoryCard({
   )
 }
 
-function TrendChart({ data, extraData }: { data: { month: string; score: number }[]; extraData?: { online: number; court: number }[] }) {
+function TrendChart({ data, extraData, secondaryData }: { data: { month: string; score: number }[]; extraData?: { online: number; court: number; amount?: number }[]; secondaryData?: { month: string; score: number }[] }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   const maxScore = Math.max(...data.map(d => d.score))
@@ -253,17 +296,61 @@ function TrendChart({ data, extraData }: { data: { month: string; score: number 
 
   const width = 600
   const height = 200
-  const marginX = 30
+  const marginLeft = 30
+  const marginRight = secondaryData ? 50 : 30
   const marginY = 10
 
   const points = data.map((d, i) => ({
-    x: marginX + (i / (data.length - 1)) * (width - marginX * 2),
+    x: marginLeft + (i / (data.length - 1)) * (width - marginLeft - marginRight),
     y: marginY + (1 - (d.score - chartMin) / chartRange) * (height - marginY * 2),
     ...d,
   }))
 
-  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+  // Secondary line (amount) — uses its own scale, offset to always appear above the count line
+  const secPoints = useMemo(() => {
+    if (!secondaryData) return null
+    const secMax = Math.max(...secondaryData.map(d => d.score))
+    const secMin = Math.min(...secondaryData.map(d => d.score))
+    const secRange = secMax - secMin || 1
+    const secPadding = secRange * 0.2
+    const secChartMin = Math.max(0, secMin - secPadding)
+    const secChartMax = secMax + secPadding
+    const secChartRange = secChartMax - secChartMin || 1
+
+    // Map amount line to top 60% of chart so it stays visually above the count line
+    const usableHeight = (height - marginY * 2) * 0.6
+    const topOffset = marginY
+
+    return {
+      chartMin: secChartMin,
+      chartMax: secChartMax,
+      chartRange: secChartRange,
+      points: secondaryData.map((d, i) => ({
+        x: marginLeft + (i / (secondaryData.length - 1)) * (width - marginLeft - marginRight),
+        y: topOffset + (1 - (d.score - secChartMin) / secChartRange) * usableHeight,
+        ...d,
+      })),
+    }
+  }, [secondaryData, width, height, marginLeft, marginRight, marginY])
+
+  // Smooth cubic bezier path helper
+  function smoothPath(pts: { x: number; y: number }[]): string {
+    if (pts.length < 2) return ''
+    let d = `M ${pts[0].x} ${pts[0].y}`
+    for (let i = 0; i < pts.length - 1; i++) {
+      const curr = pts[i]
+      const next = pts[i + 1]
+      const cpx = (curr.x + next.x) / 2
+      d += ` C ${cpx} ${curr.y}, ${cpx} ${next.y}, ${next.x} ${next.y}`
+    }
+    return d
+  }
+
+  const linePath = smoothPath(points)
   const areaPath = `${linePath} L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`
+
+  const secLinePath = secPoints ? smoothPath(secPoints.points) : ''
+  const secAreaPath = secPoints ? `${secLinePath} L ${secPoints.points[secPoints.points.length - 1].x} ${height} L ${secPoints.points[0].x} ${height} Z` : ''
 
   return (
     <div className="w-full">
@@ -274,17 +361,29 @@ function TrendChart({ data, extraData }: { data: { month: string; score: number 
           const val = Math.round(chartMin + pct * chartRange)
           return (
             <g key={pct}>
-              <line x1={marginX} y1={y} x2={width - marginX} y2={y} stroke="currentColor" strokeDasharray="4 4" className="text-stone-200 dark:text-stone-800" />
-              <text x={marginX - 6} y={y + 4} textAnchor="end" className="fill-stone-400 dark:fill-stone-500" fontSize="10">{val}</text>
+              <line x1={marginLeft} y1={y} x2={width - marginRight} y2={y} stroke="currentColor" strokeDasharray="4 4" className="text-stone-200 dark:text-stone-800" />
+              <text x={marginLeft - 6} y={y + 4} textAnchor="end" className="fill-stone-400 dark:fill-stone-500" fontSize="10">{val}</text>
+              {/* Right Y-axis labels for secondary data */}
+              {secPoints && (
+                <text x={width - marginRight + 6} y={y + 4} textAnchor="start" className="fill-red-400 dark:fill-red-500" fontSize="9">
+                  {formatCurrency(Math.round(secPoints.chartMin + pct * secPoints.chartRange))}
+                </text>
+              )}
             </g>
           )
         })}
 
-        {/* Area fill */}
-        <path d={areaPath} className="fill-emerald-500/10 dark:fill-emerald-400/5" />
+        {/* Secondary area fill (red, behind primary) */}
+        {secPoints && <path d={secAreaPath} className="fill-red-500/8 dark:fill-red-400/5" />}
 
-        {/* Line */}
-        <path d={linePath} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500 dark:text-emerald-400" />
+        {/* Secondary line (red) */}
+        {secPoints && <path d={secLinePath} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-500 dark:text-red-400" />}
+
+        {/* Primary area fill */}
+        <path d={areaPath} className="fill-teal-500/10 dark:fill-teal-400/5" />
+
+        {/* Primary line */}
+        <path d={linePath} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-teal-500 dark:text-teal-400" />
 
         {/* Hover vertical line */}
         {hoveredIndex !== null && (
@@ -314,11 +413,22 @@ function TrendChart({ data, extraData }: { data: { month: string; score: number 
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseLeave={() => setHoveredIndex(null)}
             />
-            {/* Point */}
+            {/* Secondary point (red) */}
+            {secPoints && (
+              <>
+                <circle
+                  cx={secPoints.points[i].x} cy={secPoints.points[i].y}
+                  r={hoveredIndex === i ? 5 : 3.5}
+                  className={`transition-all duration-150 ${hoveredIndex === i ? 'fill-red-600 dark:fill-red-300' : 'fill-red-500 dark:fill-red-400'}`}
+                />
+                <circle cx={secPoints.points[i].x} cy={secPoints.points[i].y} r={hoveredIndex === i ? 2.5 : 1.5} className="fill-white dark:fill-stone-900 pointer-events-none" />
+              </>
+            )}
+            {/* Primary point (teal) */}
             <circle
               cx={p.x} cy={p.y}
               r={hoveredIndex === i ? 6 : 4}
-              className={`transition-all duration-150 ${hoveredIndex === i ? 'fill-emerald-600 dark:fill-emerald-300' : 'fill-emerald-500 dark:fill-emerald-400'}`}
+              className={`transition-all duration-150 ${hoveredIndex === i ? 'fill-teal-600 dark:fill-teal-300' : 'fill-teal-500 dark:fill-teal-400'}`}
             />
             <circle cx={p.x} cy={p.y} r={hoveredIndex === i ? 3 : 2} className="fill-white dark:fill-stone-900 pointer-events-none" />
             {/* Month labels */}
@@ -336,19 +446,24 @@ function TrendChart({ data, extraData }: { data: { month: string; score: number 
                 {extraData ? (
                   <>
                     <rect
-                      x={p.x - 70}
-                      y={p.y - 68}
-                      width="140"
-                      height="58"
+                      x={p.x - 80}
+                      y={Math.min(p.y, secPoints ? secPoints.points[i].y : p.y) - 80}
+                      width="160"
+                      height={extraData[i].amount !== undefined ? 70 : 58}
                       rx="8"
                       className="fill-stone-900 dark:fill-stone-100"
                     />
-                    <text x={p.x} y={p.y - 48} textAnchor="middle" className="fill-white dark:fill-stone-900" fontSize="12" fontWeight="700">
-                      {p.month} — {p.score} Total
+                    <text x={p.x} y={Math.min(p.y, secPoints ? secPoints.points[i].y : p.y) - 60} textAnchor="middle" className="fill-white dark:fill-stone-900" fontSize="12" fontWeight="700">
+                      {p.month} — {p.score} Challans
                     </text>
-                    <text x={p.x} y={p.y - 32} textAnchor="middle" className="fill-stone-300 dark:fill-stone-500" fontSize="11">
+                    <text x={p.x} y={Math.min(p.y, secPoints ? secPoints.points[i].y : p.y) - 44} textAnchor="middle" className="fill-stone-300 dark:fill-stone-500" fontSize="11">
                       {extraData[i].online} Online · {extraData[i].court} Court
                     </text>
+                    {extraData[i].amount !== undefined && (
+                      <text x={p.x} y={Math.min(p.y, secPoints ? secPoints.points[i].y : p.y) - 28} textAnchor="middle" className="fill-red-400 dark:fill-red-500" fontSize="11" fontWeight="600">
+                        Amount: {formatCurrency(extraData[i].amount!)}
+                      </text>
+                    )}
                   </>
                 ) : (
                   <>
@@ -458,6 +573,72 @@ function CategoryDrilldownView({
 }) {
   const colors = STATUS_COLORS[category.status]
   const Icon = CATEGORY_ICONS[categoryId]
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+
+  // Filter options per category
+  const filterOptions = useMemo(() => {
+    if (['rc', 'insurance', 'pucc', 'permits'].includes(categoryId)) {
+      return [
+        { value: 'all', label: 'All' },
+        { value: 'valid', label: 'Valid' },
+        { value: 'expiring', label: 'Expiring' },
+        { value: 'expired', label: 'Expired' },
+      ]
+    }
+    if (categoryId === 'dl') {
+      return [
+        { value: 'all', label: 'All' },
+        { value: 'valid', label: 'Valid' },
+        { value: 'expired', label: 'Expired' },
+        { value: 'expiring', label: 'Expiring' },
+      ]
+    }
+    if (categoryId === 'challans') {
+      return [
+        { value: 'all', label: 'All' },
+        { value: 'pending', label: 'With Pending' },
+        { value: 'clear', label: 'No Pending' },
+      ]
+    }
+    return [
+      { value: 'all', label: 'All' },
+      { value: 'active', label: 'Active' },
+      { value: 'resolved', label: 'Resolved' },
+    ]
+  }, [categoryId])
+
+  // Filtered rows
+  const filteredRc = useMemo(() => statusFilter === 'all' ? drilldowns.rc : drilldowns.rc.filter(r => r.status === statusFilter), [drilldowns.rc, statusFilter])
+  const filteredInsurance = useMemo(() => statusFilter === 'all' ? drilldowns.insurance : drilldowns.insurance.filter(r => r.status === statusFilter), [drilldowns.insurance, statusFilter])
+  const filteredPucc = useMemo(() => statusFilter === 'all' ? drilldowns.pucc : drilldowns.pucc.filter(r => r.status === statusFilter), [drilldowns.pucc, statusFilter])
+  const filteredPermits = useMemo(() => statusFilter === 'all' ? drilldowns.permits : drilldowns.permits.filter(r => r.status === statusFilter), [drilldowns.permits, statusFilter])
+  const filteredDl = useMemo(() => statusFilter === 'all' ? drilldowns.dl : drilldowns.dl.filter(r => r.status === statusFilter), [drilldowns.dl, statusFilter])
+  const filteredChallans = useMemo(() => {
+    if (statusFilter === 'all') return drilldowns.challans
+    if (statusFilter === 'pending') return drilldowns.challans.filter(r => r.outstandingCount > 0)
+    return drilldowns.challans.filter(r => r.outstandingCount === 0)
+  }, [drilldowns.challans, statusFilter])
+  const filteredBlacklisted = useMemo(() => statusFilter === 'all' ? drilldowns.blacklisted : drilldowns.blacklisted.filter(r => r.status === statusFilter), [drilldowns.blacklisted, statusFilter])
+  const filteredNtbt = useMemo(() => statusFilter === 'all' ? drilldowns.ntbt : drilldowns.ntbt.filter(r => r.status === statusFilter), [drilldowns.ntbt, statusFilter])
+
+  const getRows = () => {
+    switch (categoryId) {
+      case 'rc': return { filtered: filteredRc.length, total: drilldowns.rc.length }
+      case 'insurance': return { filtered: filteredInsurance.length, total: drilldowns.insurance.length }
+      case 'pucc': return { filtered: filteredPucc.length, total: drilldowns.pucc.length }
+      case 'permits': return { filtered: filteredPermits.length, total: drilldowns.permits.length }
+      case 'dl': return { filtered: filteredDl.length, total: drilldowns.dl.length }
+      case 'challans': return { filtered: filteredChallans.length, total: drilldowns.challans.length }
+      case 'blacklisted': return { filtered: filteredBlacklisted.length, total: drilldowns.blacklisted.length }
+      case 'ntbt': return { filtered: filteredNtbt.length, total: drilldowns.ntbt.length }
+      default: return { filtered: 0, total: 0 }
+    }
+  }
+  const rowCounts = getRows()
+
+  const emptyRow = (cols: number) => (
+    <tr><td colSpan={cols} className="py-8 text-center text-sm text-stone-400 dark:text-stone-500">No records match this filter</td></tr>
+  )
 
   return (
     <div>
@@ -498,11 +679,35 @@ function CategoryDrilldownView({
         </div>
       )}
 
+      {/* Filter Buttons */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-1 rounded-lg bg-stone-100 dark:bg-stone-800/60 p-1">
+          {filterOptions.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setStatusFilter(opt.value)}
+              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                statusFilter === opt.value
+                  ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm'
+                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <span className="text-xs text-stone-400 dark:text-stone-500">
+          {statusFilter !== 'all'
+            ? `${rowCounts.filtered} of ${rowCounts.total}`
+            : `${rowCounts.total} total`}
+        </span>
+      </div>
+
       {/* Table */}
       <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
         {categoryId === 'rc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Issue Date', 'Expiry Date', 'RTO Office']}>
-            {drilldowns.rc.map(row => (
+            {filteredRc.length === 0 ? emptyRow(5) : filteredRc.map(row => (
               <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
@@ -516,7 +721,7 @@ function CategoryDrilldownView({
 
         {categoryId === 'insurance' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Provider', 'Policy No.', 'Expiry Date']}>
-            {drilldowns.insurance.map(row => (
+            {filteredInsurance.length === 0 ? emptyRow(5) : filteredInsurance.map(row => (
               <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
@@ -530,7 +735,7 @@ function CategoryDrilldownView({
 
         {categoryId === 'pucc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Test Centre', 'Expiry Date']}>
-            {drilldowns.pucc.map(row => (
+            {filteredPucc.length === 0 ? emptyRow(4) : filteredPucc.map(row => (
               <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
@@ -543,7 +748,7 @@ function CategoryDrilldownView({
 
         {categoryId === 'permits' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Type', 'Permit No.', 'Expiry Date']}>
-            {drilldowns.permits.map(row => (
+            {filteredPermits.length === 0 ? emptyRow(5) : filteredPermits.map(row => (
               <tr key={row.vehicleNumber + row.permitNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
@@ -561,7 +766,7 @@ function CategoryDrilldownView({
 
         {categoryId === 'dl' && (
           <DrilldownTable headers={['Driver', 'License Number', 'License Expiry', 'Assigned Vehicles', 'Status']}>
-            {drilldowns.dl.map(row => {
+            {filteredDl.length === 0 ? emptyRow(5) : filteredDl.map(row => {
               const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
               const isValid = row.status === 'valid'
 
@@ -607,7 +812,7 @@ function CategoryDrilldownView({
 
         {categoryId === 'challans' && (
           <DrilldownTable headers={['Vehicle', 'Pending Challans', 'Amount']}>
-            {drilldowns.challans.map(row => (
+            {filteredChallans.length === 0 ? emptyRow(3) : filteredChallans.map(row => (
               <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3">
@@ -633,7 +838,7 @@ function CategoryDrilldownView({
 
         {categoryId === 'blacklisted' && (
           <DrilldownTable headers={['Vehicle', 'Flag Reason', 'Authority', 'Date', 'Status']}>
-            {drilldowns.blacklisted.map(row => (
+            {filteredBlacklisted.length === 0 ? emptyRow(5) : filteredBlacklisted.map(row => (
               <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400 max-w-[250px]">{row.flagReason}</td>
@@ -651,7 +856,7 @@ function CategoryDrilldownView({
 
         {categoryId === 'ntbt' && (
           <DrilldownTable headers={['Vehicle', 'Hold Reason', 'Authority', 'Date', 'Case Ref', 'Status']}>
-            {drilldowns.ntbt.map(row => (
+            {filteredNtbt.length === 0 ? emptyRow(6) : filteredNtbt.map(row => (
               <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400 max-w-[250px]">{row.holdReason}</td>
@@ -668,6 +873,667 @@ function CategoryDrilldownView({
           </DrilldownTable>
         )}
       </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Fleet Card Drilldown Views
+// ---------------------------------------------------------------------------
+
+const CHALLAN_VIOLATIONS: { violation: string; location: string }[] = [
+  { violation: 'Overspeeding', location: 'NH-48, Gurugram Toll Plaza' },
+  { violation: 'Red Light Violation', location: 'Mahipalpur Junction, Delhi' },
+  { violation: 'Overloading', location: 'Yamuna Expressway, KM 45' },
+  { violation: 'No Parking', location: 'Connaught Place, New Delhi' },
+  { violation: 'Lane Violation', location: 'Ring Road, Delhi' },
+  { violation: 'Wrong Way Driving', location: 'NH-24, Lucknow' },
+  { violation: 'Document Not Carried', location: 'Outer Ring Road, Bangalore' },
+  { violation: 'Using Phone While Driving', location: 'Eastern Express Highway, Mumbai' },
+]
+
+type IndividualChallan = {
+  id: string
+  vehicleNumber: string
+  violation: string
+  challanNumber: string
+  amount: number
+  date: string
+  location: string
+  challanType: 'court' | 'online'
+  status: 'pending' | 'paid'
+}
+
+function FleetChallanView({
+  challanRows,
+  vehicles,
+  onBack,
+}: {
+  challanRows: ChallanDrilldownRow[]
+  vehicles: Vehicle[]
+  onBack: () => void
+}) {
+  const [filter, setFilter] = useState<'pending' | 'paid'>('pending')
+  const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set())
+  const [showProposalToast, setShowProposalToast] = useState(false)
+  const [selectedVehiclesInit, setSelectedVehiclesInit] = useState(false)
+  const [selectedVehicles, setSelectedVehicles] = useState<Set<string>>(new Set())
+
+  const toggleSelectVehicle = (vehNum: string) => {
+    setSelectedVehicles(prev => {
+      const next = new Set(prev)
+      if (next.has(vehNum)) next.delete(vehNum)
+      else next.add(vehNum)
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedVehicles.size === grouped.length) {
+      setSelectedVehicles(new Set())
+    } else {
+      setSelectedVehicles(new Set(grouped.map(([vehNum]) => vehNum)))
+    }
+  }
+
+  const toggleVehicle = (vehNum: string) => {
+    setExpandedVehicles(prev => {
+      const next = new Set(prev)
+      if (next.has(vehNum)) next.delete(vehNum)
+      else next.add(vehNum)
+      return next
+    })
+  }
+
+  const allChallans = useMemo<IndividualChallan[]>(() => {
+    const result: IndividualChallan[] = []
+    let idx = 0
+    const paidAmounts = [2000, 3500, 5000, 1500, 4000, 8000, 2500, 6000]
+    for (const row of challanRows) {
+      if (row.outstandingCount > 0) {
+        const baseAmt = Math.round(row.totalAmount / row.outstandingCount / 500) * 500 || 2000
+        for (let i = 0; i < row.outstandingCount; i++) {
+          const m = CHALLAN_VIOLATIONS[idx % CHALLAN_VIOLATIONS.length]
+          const isLast = i === row.outstandingCount - 1
+          const amount = isLast ? row.totalAmount - baseAmt * (row.outstandingCount - 1) : baseAmt
+          const base = new Date(row.latestDate || '2026-02-15')
+          base.setDate(base.getDate() - i * 12)
+          result.push({
+            id: `pend-${idx}`,
+            vehicleNumber: row.vehicleNumber,
+            violation: m.violation,
+            challanNumber: `CH${row.vehicleNumber.replace(/[^0-9]/g, '').slice(0, 8)}${String(idx + 100)}`,
+            amount: Math.max(500, amount),
+            date: base.toISOString().split('T')[0],
+            location: m.location,
+            challanType: i < row.courtCount ? 'court' : 'online',
+            status: 'pending',
+          })
+          idx++
+        }
+        const paidCount = Math.max(1, Math.floor(row.outstandingCount * 0.4))
+        for (let i = 0; i < paidCount; i++) {
+          const m = CHALLAN_VIOLATIONS[(idx + 3) % CHALLAN_VIOLATIONS.length]
+          result.push({
+            id: `paid-${idx}`,
+            vehicleNumber: row.vehicleNumber,
+            violation: m.violation,
+            challanNumber: `CH${row.vehicleNumber.replace(/[^0-9]/g, '').slice(0, 8)}${String(idx + 200)}`,
+            amount: paidAmounts[idx % paidAmounts.length],
+            date: `2025-${String(7 + (i % 5)).padStart(2, '0')}-${String(5 + ((idx * 3) % 23)).padStart(2, '0')}`,
+            location: m.location,
+            challanType: i % 2 === 0 ? 'court' : 'online',
+            status: 'paid',
+          })
+          idx++
+        }
+      }
+    }
+    return result
+  }, [challanRows])
+
+  const filtered = useMemo(() => allChallans.filter(c => c.status === filter), [allChallans, filter])
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, IndividualChallan[]>()
+    for (const c of filtered) {
+      const arr = map.get(c.vehicleNumber) || []
+      arr.push(c)
+      map.set(c.vehicleNumber, arr)
+    }
+    return Array.from(map.entries())
+  }, [filtered])
+
+  // Select all vehicles by default on first render
+  useEffect(() => {
+    if (!selectedVehiclesInit && filter === 'pending' && grouped.length > 0) {
+      setSelectedVehicles(new Set(grouped.map(([vehNum]) => vehNum)))
+      setSelectedVehiclesInit(true)
+    }
+  }, [grouped, filter, selectedVehiclesInit])
+
+  const pendingCount = allChallans.filter(c => c.status === 'pending').length
+  const paidCount = allChallans.filter(c => c.status === 'paid').length
+
+  const selectedAmount = useMemo(() => {
+    if (selectedVehicles.size === 0) return 0
+    return filtered
+      .filter(c => selectedVehicles.has(c.vehicleNumber))
+      .reduce((s, c) => s + c.amount, 0)
+  }, [filtered, selectedVehicles])
+
+  const showBottomBar = filter === 'pending' && selectedVehicles.size > 0
+
+  return (
+    <div className={`${showBottomBar ? 'pb-20' : ''}`}>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">All Vehicle Challans</h2>
+      </div>
+
+      {/* Mobile filter tabs */}
+      <div className="flex md:hidden gap-2 mb-5">
+        {(['pending', 'paid'] as const).map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              filter === f
+                ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400'
+            }`}
+          >
+            {f === 'pending' ? `Pending (${pendingCount})` : `Paid (${paidCount})`}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex gap-6">
+        {/* Sidebar */}
+        <div className="w-56 shrink-0 hidden md:block">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+            {([
+              { key: 'pending' as const, label: 'Pending', count: pendingCount, icon: FileText, countColor: 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400' },
+              { key: 'paid' as const, label: 'Paid', count: paidCount, icon: ShieldCheck, countColor: 'bg-stone-100 dark:bg-stone-800 text-stone-500' },
+            ]).map(item => {
+              const Icon = item.icon
+              const active = filter === item.key
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setFilter(item.key)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </div>
+                  <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
+                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                  }`}>{item.count}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 space-y-4">
+          {/* Select All — only on pending tab */}
+          {filter === 'pending' && grouped.length > 0 && (
+            <div className="flex items-center gap-3 px-1">
+              <button
+                onClick={toggleSelectAll}
+                className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                  selectedVehicles.size === grouped.length
+                    ? 'bg-emerald-600 border-emerald-600'
+                    : selectedVehicles.size > 0
+                      ? 'bg-emerald-600/50 border-emerald-600'
+                      : 'border-stone-300 dark:border-stone-600 hover:border-stone-400 dark:hover:border-stone-500'
+                }`}
+              >
+                {selectedVehicles.size > 0 && (
+                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    {selectedVehicles.size === grouped.length
+                      ? <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      : <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+                    }
+                  </svg>
+                )}
+              </button>
+              <span className="text-sm font-medium text-stone-600 dark:text-stone-400">
+                {selectedVehicles.size === 0
+                  ? 'Select vehicles to request proposal'
+                  : `${selectedVehicles.size} of ${grouped.length} selected`}
+              </span>
+            </div>
+          )}
+
+          {grouped.map(([vehNum, challans]) => {
+            const vehicle = vehicles.find(v => v.vehicleNumber === vehNum)
+            const isExpanded = expandedVehicles.has(vehNum)
+            const vehicleTotal = challans.reduce((s, c) => s + c.amount, 0)
+            const isSelected = selectedVehicles.has(vehNum)
+            return (
+              <div key={vehNum} className={`rounded-2xl bg-white dark:bg-stone-900 shadow-sm border overflow-hidden transition-colors ${
+                isSelected ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-100 dark:border-stone-800'
+              }`}>
+                <div className="flex items-center p-4 hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors">
+                  {/* Checkbox — only on pending tab */}
+                  {filter === 'pending' && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSelectVehicle(vehNum) }}
+                      className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mr-3 transition-colors ${
+                        isSelected
+                          ? 'bg-emerald-600 border-emerald-600'
+                          : 'border-stone-300 dark:border-stone-600 hover:border-stone-400 dark:hover:border-stone-500'
+                      }`}
+                    >
+                      {isSelected && (
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => toggleVehicle(vehNum)}
+                    className="flex-1 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
+                        <Truck className="w-5 h-5 text-stone-400" />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-mono font-bold text-stone-900 dark:text-stone-100">{vehNum}</p>
+                        <p className="text-sm text-stone-500 dark:text-stone-400">
+                          {vehicle ? `${vehicle.make} ${vehicle.model} · Reg. ${vehicle.year}` : '—'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className={`text-sm font-bold tabular-nums ${filter === 'pending' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                          {formatCurrency(vehicleTotal)}
+                        </p>
+                        <p className="text-xs text-stone-400 dark:text-stone-500">{challans.length} {filter === 'pending' ? 'pending' : 'paid'}</p>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-stone-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                    </div>
+                  </button>
+                </div>
+                {isExpanded && (
+                  <div className="px-4 pb-4 border-t border-stone-100 dark:border-stone-800">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-4">
+                      {challans.map(c => (
+                        <div key={c.id} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/40 p-4">
+                          <div className="flex items-start justify-between mb-1">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-sm font-mono font-medium text-stone-900 dark:text-stone-100">{c.challanNumber}</p>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(c.challanNumber) }}
+                                className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                              >
+                                <Copy className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <span className={`text-lg font-bold tabular-nums ${filter === 'pending' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                              {formatCurrency(c.amount)}
+                            </span>
+                          </div>
+                          <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mt-2">{c.violation}</p>
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500 dark:text-stone-400 mt-2 mb-4">
+                            <span className="flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5" />
+                              {formatDate(c.date)}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <MapPin className="w-3.5 h-3.5" />
+                              {c.location}
+                            </span>
+                          </div>
+                          <div className="border-t border-stone-200 dark:border-stone-700 pt-3 flex items-center justify-between">
+                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+                              c.challanType === 'court'
+                                ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400'
+                                : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
+                            }`}>
+                              {c.challanType === 'court' ? 'Court Challans' : 'Online Challans'}
+                            </span>
+                            {filter === 'pending' && (
+                              <button className="px-4 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
+                                Pay Now
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+          {grouped.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} challans found</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {showBottomBar && (
+        <div className="fixed bottom-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-8 py-4 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div>
+              <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                {selectedVehicles.size} {selectedVehicles.size === 1 ? 'vehicle' : 'vehicles'} selected
+              </p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{formatCurrency(selectedAmount)}</p>
+            </div>
+            <button
+              onClick={() => setShowProposalToast(true)}
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+            >
+              Request Proposal
+            </button>
+          </div>
+        </div>
+      )}
+
+      <ProposalToast show={showProposalToast} onClose={() => setShowProposalToast(false)} />
+    </div>
+  )
+}
+
+function FleetRcView({
+  rcRows,
+  vehicles,
+  onBack,
+}: {
+  rcRows: RcDrilldownRow[]
+  vehicles: Vehicle[]
+  onBack: () => void
+}) {
+  const [filter, setFilter] = useState<'valid' | 'expiring'>('expiring')
+  const [showProposalToast, setShowProposalToast] = useState(false)
+
+  const validItems = rcRows.filter(r => r.status === 'valid')
+  const expiringItems = rcRows.filter(r => r.status === 'expiring' || r.status === 'expired')
+  const filtered = filter === 'valid' ? validItems : expiringItems
+
+  return (
+    <div className={`${filter === 'expiring' && expiringItems.length > 0 ? 'pb-20' : ''}`}>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Registration Certificates</h2>
+      </div>
+
+      {/* Mobile tabs */}
+      <div className="flex md:hidden gap-2 mb-5">
+        {(['valid', 'expiring'] as const).map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              filter === f
+                ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400'
+            }`}
+          >
+            {f === 'valid' ? `Valid (${validItems.length})` : `Expiring (${expiringItems.length})`}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex gap-6">
+        {/* Sidebar */}
+        <div className="w-56 shrink-0 hidden md:block">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+            {([
+              { key: 'valid' as const, label: 'Valid', count: validItems.length, icon: ShieldCheck, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
+              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, icon: AlertTriangle, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
+            ]).map(item => {
+              const Icon = item.icon
+              const active = filter === item.key
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setFilter(item.key)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </div>
+                  <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
+                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                  }`}>{item.count}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {filtered.map(row => {
+              const vehicle = vehicles.find(v => v.vehicleNumber === row.vehicleNumber)
+              const badge = DOC_STATUS_BADGE[row.status]
+              return (
+                <div key={row.vehicleNumber} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                        <Truck className="w-4 h-4 text-stone-400" />
+                      </div>
+                      <div>
+                        <p className="font-mono font-bold text-sm text-stone-900 dark:text-stone-100">{row.vehicleNumber}</p>
+                        <p className="text-xs text-stone-400 dark:text-stone-500">{vehicle ? `${vehicle.make} ${vehicle.model}` : '—'}</p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Issue Date</p>
+                      <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{formatDate(row.issueDate)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry Date</p>
+                      <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">RTO Office</p>
+                      <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{row.rtoOffice}</p>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {filtered.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} registration certificates found</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {filter === 'expiring' && expiringItems.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-8 py-4 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div>
+              <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Expiring Registration Certificates</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{expiringItems.length} vehicles</p>
+            </div>
+            <button
+              onClick={() => setShowProposalToast(true)}
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+            >
+              Request Proposal
+            </button>
+          </div>
+        </div>
+      )}
+      <ProposalToast show={showProposalToast} onClose={() => setShowProposalToast(false)} />
+    </div>
+  )
+}
+
+function FleetDlView({
+  dlRows,
+  drivers,
+  onBack,
+}: {
+  dlRows: DlDrilldownRow[]
+  drivers: Driver[]
+  onBack: () => void
+}) {
+  const [filter, setFilter] = useState<'valid' | 'expiring'>('expiring')
+  const [showProposalToast, setShowProposalToast] = useState(false)
+
+  const validItems = dlRows.filter(r => r.status === 'valid')
+  const expiringItems = dlRows.filter(r => r.status === 'expiring' || r.status === 'expired')
+  const filtered = filter === 'valid' ? validItems : expiringItems
+
+  return (
+    <div className={`${filter === 'expiring' && expiringItems.length > 0 ? 'pb-20' : ''}`}>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Driving Licenses</h2>
+      </div>
+
+      {/* Mobile tabs */}
+      <div className="flex md:hidden gap-2 mb-5">
+        {(['valid', 'expiring'] as const).map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+              filter === f
+                ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400'
+            }`}
+          >
+            {f === 'valid' ? `Valid (${validItems.length})` : `Expiring (${expiringItems.length})`}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex gap-6">
+        {/* Sidebar */}
+        <div className="w-56 shrink-0 hidden md:block">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+            {([
+              { key: 'valid' as const, label: 'Valid', count: validItems.length, icon: ShieldCheck, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
+              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, icon: AlertTriangle, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
+            ]).map(item => {
+              const Icon = item.icon
+              const active = filter === item.key
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setFilter(item.key)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </div>
+                  <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
+                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                  }`}>{item.count}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {filtered.map(row => {
+              const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
+              const badge = DOC_STATUS_BADGE[row.status]
+              return (
+                <div key={row.licenseNumber} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                        <User className="w-4 h-4 text-stone-400 dark:text-stone-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-stone-900 dark:text-stone-100">{row.driverName}</p>
+                        <p className="text-xs text-stone-400 dark:text-stone-500">{driver?.phone ? `+${driver.phone}` : '—'}</p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">License Number</p>
+                      <p className="text-sm font-mono font-medium text-stone-700 dark:text-stone-300">{row.licenseNumber}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry Date</p>
+                      <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-1">Assigned Vehicles</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {row.vehiclesAssigned.map(v => (
+                          <span key={v} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
+                            <Truck className="w-3 h-3 text-stone-400" />
+                            {v}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {filtered.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} driving licenses found</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {filter === 'expiring' && expiringItems.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-8 py-4 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div>
+              <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Expiring Driving Licenses</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{expiringItems.length} drivers</p>
+            </div>
+            <button
+              onClick={() => setShowProposalToast(true)}
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+            >
+              Request Proposal
+            </button>
+          </div>
+        </div>
+      )}
+      <ProposalToast show={showProposalToast} onClose={() => setShowProposalToast(false)} />
     </div>
   )
 }
@@ -692,17 +1558,23 @@ export function ComplianceDashboard({
   onBackToOverview,
   onDateRangeChange,
   onScopeChange,
+  initialView,
 }: ComplianceDashboardProps) {
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null)
   const [datePreset, setDatePreset] = useState<DateRangePreset>('last6Months')
   const [dateDropdownOpen, setDateDropdownOpen] = useState(false)
-  const [scope, setScope] = useState<ScopeFilter>('fleet')
+  const [scope, setScope] = useState<ScopeFilter>(initialView === 'vehicle' ? 'vehicle' : 'fleet')
   const [scopeSearch, setScopeSearch] = useState('')
   const [scopeDropdownOpen, setScopeDropdownOpen] = useState(false)
-  const [selectedScopeId, setSelectedScopeId] = useState<string | null>(null)
-  const [scopeApplied, setScopeApplied] = useState(false)
+  const [selectedScopeId, setSelectedScopeId] = useState<string | null>(initialView === 'vehicle' ? vehicles[0]?.id || null : null)
+  const [scopeApplied, setScopeApplied] = useState(initialView === 'vehicle')
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [urgencyPage, setUrgencyPage] = useState(0)
+  const [checkVehicleOpen, setCheckVehicleOpen] = useState(false)
+  const [checkVehicleNumber, setCheckVehicleNumber] = useState('')
+  const [activeCardView, setActiveCardView] = useState<'dl' | 'rc' | 'challan' | null>(
+    initialView === 'dl' || initialView === 'rc' || initialView === 'challan' ? initialView : null
+  )
   const URGENCY_PAGE_SIZE = 5
 
   const activeCategory = useMemo(
@@ -767,21 +1639,44 @@ export function ComplianceDashboard({
     }
   }
 
+  const handleCheckVehicle = () => {
+    if (!checkVehicleNumber) return
+    const cleaned = checkVehicleNumber.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+    const found = vehicles.find(v => v.vehicleNumber.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === cleaned)
+    const target = found ?? vehicles[0]
+    if (!target) return
+    setCheckVehicleOpen(false)
+    setCheckVehicleNumber('')
+    setScope('vehicle')
+    setSelectedScopeId(target.id)
+    setScopeApplied(true)
+    onScopeChange?.('vehicle', target.id)
+  }
+
   const changeIsPositive = complianceScore.change >= 0
 
   return (
-    <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
+    <div className="bg-stone-100 dark:bg-stone-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* ---------------------------------------------------------------- */}
-        {/* Top Bar: Filters                                                 */}
+        {/* Top Bar: Filters — hidden during card drilldowns                 */}
         {/* ---------------------------------------------------------------- */}
+        {!activeCardView && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50">Compliance</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50">Fleet Compliance</h1>
             <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Fleet compliance health at a glance</p>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+          {/* Refresh */}
+            <button
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+            >
+              <RefreshCw className="w-4 h-4 text-stone-400" />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+
           {/* Download PDF */}
             <button
               className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
@@ -822,109 +1717,35 @@ export function ComplianceDashboard({
             </div>
           </div>
         </div>
+        )}
 
-        {/* Scope Toggle + Selector */}
-        <div className="flex flex-wrap items-center gap-3 mb-8">
-          <div className="flex items-center gap-1 rounded-lg bg-stone-200/40 dark:bg-stone-900 p-1">
-            {SCOPE_OPTIONS.map(opt => {
-              const ScopeIcon = opt.icon
-              const isActive = scope === opt.value
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => handleScopeChange(opt.value)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 shadow-sm'
-                      : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
-                  }`}
-                >
-                  <ScopeIcon className={`w-4 h-4 ${isActive ? 'text-stone-700 dark:text-stone-300' : ''}`} />
-                  <span>{opt.label}</span>
-                </button>
-              )
-            })}
-          </div>
 
-        </div>
-
+        {/* Back button — vehicle view */}
         {scope === 'vehicle' && (
-          <div className="flex items-center gap-3 mb-8">
-            <div className="relative flex-1 max-w-md">
-              <button
-                onClick={() => { setScopeDropdownOpen(!scopeDropdownOpen); setDateDropdownOpen(false) }}
-                className="flex items-center gap-2.5 w-full px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm"
-              >
-                <Search className="w-4 h-4 text-stone-400" />
-                <span className="text-stone-500 dark:text-stone-400 truncate">
-                  {selectedScopeId
-                    ? scope === 'vehicle'
-                      ? vehicles.find(v => v.id === selectedScopeId)?.vehicleNumber
-                      : drivers.find(d => d.id === selectedScopeId)?.name
-                    : `Select ${scope}...`}
-                </span>
-                <ChevronDown className={`w-4 h-4 text-stone-400 ml-auto transition-transform ${scopeDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {scopeDropdownOpen && (
-                <div className="absolute left-0 top-full mt-1 w-full bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/40 dark:shadow-stone-950/60 overflow-hidden z-20">
-                  <div className="p-2 border-b border-stone-100 dark:border-stone-800">
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-50 dark:bg-stone-800">
-                      <Search className="w-4 h-4 text-stone-400" />
-                      <input
-                        type="text"
-                        value={scopeSearch}
-                        onChange={e => setScopeSearch(e.target.value)}
-                        placeholder={`Search ${scope}s...`}
-                        className="flex-1 bg-transparent text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 outline-none"
-                        autoFocus
-                      />
-                    </div>
-                  </div>
-                  <div className="max-h-60 overflow-y-auto">
-                    {filteredScopeItems.map(item => (
-                      <button
-                        key={item.id}
-                        onClick={() => handleScopeSelect(item.id)}
-                        className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-stone-50 dark:hover:bg-stone-800/50 ${
-                          selectedScopeId === item.id ? 'bg-emerald-50 dark:bg-emerald-950/30' : ''
-                        }`}
-                      >
-                        <span className="font-medium text-stone-900 dark:text-stone-100">
-                          {'vehicleNumber' in item ? item.vehicleNumber : item.name}
-                        </span>
-                        <span className="text-xs text-stone-400 dark:text-stone-500 ml-2">
-                          {'make' in item ? item.make : item.licenseNumber}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={handleScopeApply}
-              disabled={!selectedScopeId}
-              className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 text-white disabled:text-stone-400 dark:disabled:text-stone-500 text-sm font-semibold transition-colors disabled:cursor-not-allowed"
-            >
-              Apply
-            </button>
-          </div>
+        <button
+          onClick={() => {
+            setScope('fleet')
+            setSelectedScopeId(null)
+            setScopeApplied(false)
+          }}
+          className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Fleet
+        </button>
         )}
 
         {/* ---------------------------------------------------------------- */}
         {/* Drill-down View                                                  */}
         {/* ---------------------------------------------------------------- */}
-        {scope === 'vehicle' && !scopeApplied ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <Search className="w-12 h-12 text-stone-300 dark:text-stone-600 mb-4" />
-            <h3 className="text-lg font-semibold text-stone-700 dark:text-stone-300 mb-1">
-              Select a vehicle to view report
-            </h3>
-            <p className="text-sm text-stone-500 dark:text-stone-400">
-              Choose a vehicle from the dropdown above and click Apply
-            </p>
-          </div>
+        {activeCardView ? (
+          activeCardView === 'challan' ? (
+            <FleetChallanView challanRows={categoryDrilldowns.challans} vehicles={vehicles} onBack={() => setActiveCardView(null)} />
+          ) : activeCardView === 'rc' ? (
+            <FleetRcView rcRows={categoryDrilldowns.rc} vehicles={vehicles} onBack={() => setActiveCardView(null)} />
+          ) : (
+            <FleetDlView dlRows={categoryDrilldowns.dl} drivers={drivers} onBack={() => setActiveCardView(null)} />
+          )
         ) : scope === 'driver' ? (
           <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
             <DrilldownTable headers={['Driver', 'License Number', 'License Expiry', 'Assigned Vehicles', 'Status']}>
@@ -1296,7 +2117,6 @@ export function ComplianceDashboard({
                 { label: 'Make', value: v.make },
                 { label: 'Model', value: v.model },
                 { label: 'Year', value: String(v.year) },
-                { label: 'Category', value: v.category, badge: true, badgeColor: 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400' },
                 { label: 'Status', value: v.status, badge: true, badgeColor: v.status === 'Active' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400' : v.status === 'Maintenance' ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400' },
               ]
               return (
@@ -1339,13 +2159,21 @@ export function ComplianceDashboard({
               <div className="lg:col-span-2 p-5 sm:p-6 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider">Monthly Challans Trend</h3>
-                  <span className="text-xs text-stone-400 dark:text-stone-500">
-                    {(monthlyChallanTrend ?? monthlyTrend)[0]?.month} — {(monthlyChallanTrend ?? monthlyTrend)[(monthlyChallanTrend ?? monthlyTrend).length - 1]?.month}
-                  </span>
+                  <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-0.5 rounded-full bg-teal-500 dark:bg-teal-400 inline-block" />
+                      <span className="text-xs text-stone-500 dark:text-stone-400">Challan Count</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-3 h-0.5 rounded-full bg-red-500 dark:bg-red-400 inline-block" />
+                      <span className="text-xs text-stone-500 dark:text-stone-400">Total Amount</span>
+                    </div>
+                  </div>
                 </div>
                 <TrendChart
                   data={monthlyChallanTrend ? monthlyChallanTrend.map(d => ({ month: d.month, score: d.count })) : monthlyTrend}
-                  extraData={monthlyChallanTrend?.map(d => ({ online: d.online, court: d.court }))}
+                  extraData={monthlyChallanTrend?.map(d => ({ online: d.online, court: d.court, amount: d.amount }))}
+                  secondaryData={monthlyChallanTrend?.map(d => ({ month: d.month, score: d.amount }))}
                 />
               </div>
 
@@ -1498,6 +2326,59 @@ export function ComplianceDashboard({
           </>
         )}
       </div>
+
+      {/* Check Vehicle Modal */}
+      {checkVehicleOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }} />
+          <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+              <div>
+                <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">Check Vehicle</h2>
+                <p className="text-xs text-stone-500 dark:text-stone-400">Enter a vehicle number to view its compliance report</p>
+              </div>
+              <button
+                onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }}
+                className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="px-6 py-5">
+              <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                Vehicle Number
+              </label>
+              <input
+                type="text"
+                value={checkVehicleNumber}
+                onChange={e => {
+                  setCheckVehicleNumber(e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 10))
+                  setCheckVehicleError('')
+                }}
+                onKeyDown={e => { if (e.key === 'Enter') handleCheckVehicle() }}
+                placeholder="e.g. UP32MM1113"
+                maxLength={10}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                autoFocus
+              />
+            </div>
+            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+              <button
+                onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCheckVehicle}
+                className="px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white"
+              >
+                Check
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

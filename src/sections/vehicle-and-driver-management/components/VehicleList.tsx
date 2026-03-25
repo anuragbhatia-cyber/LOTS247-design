@@ -29,7 +29,6 @@ import type {
   VehicleAndDriverManagementProps,
   Vehicle,
   Driver,
-  VehicleCategory,
   VehicleStatus,
   DocumentStatus,
 } from '@/../product/sections/vehicle-and-driver-management/types'
@@ -294,24 +293,6 @@ const translations: Record<Language, Record<string, string>> = {
 // Config
 // ---------------------------------------------------------------------------
 
-const CATEGORY_CONFIG: Record<VehicleCategory, { labelKey: 'owned' | 'leased' | 'rented'; bg: string; text: string }> = {
-  owned: {
-    labelKey: 'owned',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
-    text: 'text-emerald-700 dark:text-emerald-300',
-  },
-  leased: {
-    labelKey: 'leased',
-    bg: 'bg-blue-50 dark:bg-blue-950/40',
-    text: 'text-blue-700 dark:text-blue-300',
-  },
-  rented: {
-    labelKey: 'rented',
-    bg: 'bg-amber-50 dark:bg-amber-950/40',
-    text: 'text-amber-700 dark:text-amber-300',
-  },
-}
-
 const EXPIRY_CONFIG: Record<DocumentStatus, { labelKey: 'valid' | 'expiringLabel' | 'expired'; bg: string; text: string; dot: string }> = {
   valid: {
     labelKey: 'valid',
@@ -390,15 +371,6 @@ function ComplianceScoreBadge({ score }: { score: number }) {
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold tabular-nums ${colors.bg} ${colors.text} ring-1 ${colors.ring}`}>
       <ShieldCheck className="w-3 h-3" />
       {score}
-    </span>
-  )
-}
-
-function CategoryBadge({ category, t }: { category: VehicleCategory; t: Record<string, string> }) {
-  const config = CATEGORY_CONFIG[category]
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${config.bg} ${config.text}`}>
-      {t[config.labelKey]}
     </span>
   )
 }
@@ -722,7 +694,6 @@ export function VehicleList({
     return tab === 'drivers' ? 'drivers' : 'vehicles'
   })
   const [searchQuery, setSearchQuery] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState<VehicleCategory | 'all'>('all')
   const [expiryFilter, setExpiryFilter] = useState<DocumentStatus | 'all'>('all')
   const [statusFilter, setStatusFilter] = useState<VehicleStatus | 'all'>('all')
   const [showFilters, setShowFilters] = useState(false)
@@ -782,10 +753,6 @@ export function VehicleList({
       })
     }
 
-    if (categoryFilter !== 'all') {
-      result = result.filter((v) => v.category === categoryFilter)
-    }
-
     if (expiryFilter !== 'all') {
       result = result.filter((v) => getWorstExpiry(v) === expiryFilter)
     }
@@ -811,7 +778,7 @@ export function VehicleList({
     })
 
     return result
-  }, [vehicles, drivers, searchQuery, categoryFilter, expiryFilter, statusFilter, sortBy, sortDir])
+  }, [vehicles, drivers, searchQuery, expiryFilter, statusFilter, sortBy, sortDir])
 
   // Filter & sort drivers
   const filteredDrivers = useMemo(() => {
@@ -825,7 +792,7 @@ export function VehicleList({
   }, [drivers, searchQuery])
 
   // Reset page when filters/search change
-  useEffect(() => { setVehiclePage(1) }, [searchQuery, categoryFilter, expiryFilter, statusFilter, sortBy, sortDir])
+  useEffect(() => { setVehiclePage(1) }, [searchQuery, expiryFilter, statusFilter, sortBy, sortDir])
   useEffect(() => { setDriverPage(1) }, [searchQuery])
 
   // Paginated slices
@@ -842,7 +809,6 @@ export function VehicleList({
   )
 
   const activeFilterCount =
-    (categoryFilter !== 'all' ? 1 : 0) +
     (expiryFilter !== 'all' ? 1 : 0) +
     (statusFilter !== 'all' ? 1 : 0)
 
@@ -1053,25 +1019,6 @@ export function VehicleList({
             <div className="flex flex-wrap items-end gap-4 p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl">
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
-                  {t.category}
-                </label>
-                <div className="relative">
-                  <select
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value as VehicleCategory | 'all')}
-                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
-                  >
-                    <option value="all">{t.allCategories}</option>
-                    <option value="owned">{t.owned}</option>
-                    <option value="leased">{t.leased}</option>
-                    <option value="rented">{t.rented}</option>
-                  </select>
-                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
                   {t.documentStatus}
                 </label>
                 <div className="relative">
@@ -1110,7 +1057,6 @@ export function VehicleList({
               {activeFilterCount > 0 && (
                 <button
                   onClick={() => {
-                    setCategoryFilter('all')
                     setExpiryFilter('all')
                     setStatusFilter('all')
                   }}
@@ -1126,12 +1072,6 @@ export function VehicleList({
           {activeFilterCount > 0 && !showFilters && activeTab === 'vehicles' && (
             <div className="flex items-center gap-2">
               <span className="text-xs text-stone-500 dark:text-stone-400">{t.filteredBy}</span>
-              {categoryFilter !== 'all' && (
-                <FilterPill
-                  label={t[CATEGORY_CONFIG[categoryFilter].labelKey]}
-                  onClear={() => setCategoryFilter('all')}
-                />
-              )}
               {expiryFilter !== 'all' && (
                 <FilterPill
                   label={t[EXPIRY_CONFIG[expiryFilter].labelKey]}
@@ -1161,9 +1101,6 @@ export function VehicleList({
                   <tr className="border-b border-stone-100 dark:border-stone-800">
                     <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                       {t.vehicle}
-                    </th>
-                    <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
-                      {t.categoryHeader}
                     </th>
                     <th className="text-center text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                       {t.compliance}
@@ -1212,10 +1149,6 @@ export function VehicleList({
                           </div>
                         </td>
 
-                        {/* Category */}
-                        <td className="px-5 py-4">
-                          <CategoryBadge category={vehicle.category} t={t} />
-                        </td>
 
                         {/* Compliance Score */}
                         <td className="px-5 py-4 text-center">
@@ -1391,7 +1324,6 @@ export function VehicleList({
 
                     {/* Tags */}
                     <div className="flex items-center gap-2 mb-3">
-                      <CategoryBadge category={vehicle.category} t={t} />
                       <span className="text-xs text-stone-500 dark:text-stone-400">
                         {vehicle.vehicleType}
                       </span>
