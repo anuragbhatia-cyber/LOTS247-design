@@ -9,7 +9,6 @@ export default function ComplianceDashboardPreview() {
   return (
     <ComplianceDashboard
       key={view}
-      complianceScore={data.complianceScore as any}
       categories={data.categories as any}
       insights={data.insights as any}
       monthlyTrend={data.monthlyTrend}

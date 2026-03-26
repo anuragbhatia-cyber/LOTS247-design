@@ -119,9 +119,9 @@ function ShellContent() {
     { label: t.incidents, href: '/incidents', icon: <AlertTriangle className="w-5 h-5" />, isActive: activePath === '/incidents' },
     { label: t.compliance, href: '/compliance', icon: <ShieldCheck className="w-5 h-5" />, isActive: activePath === '/compliance' || activePath.startsWith('/compliance/'), children: [
       { label: 'Fleet Overview', href: '/compliance', isActive: activePath === '/compliance' },
-      { label: 'Driving License', href: '/compliance/dl', isActive: activePath === '/compliance/dl' },
-      { label: 'Vehicle RC', href: '/compliance/rc', isActive: activePath === '/compliance/rc' },
       { label: 'Fleet Challans', href: '/compliance/challans', isActive: activePath === '/compliance/challans' },
+      { label: 'Vehicle RC', href: '/compliance/rc', isActive: activePath === '/compliance/rc' },
+      { label: 'Driving License', href: '/compliance/dl', isActive: activePath === '/compliance/dl' },
     ]},
     { label: t.reports, href: '/reports', icon: <BarChart3 className="w-5 h-5" />, isActive: activePath === '/reports' },
     { label: t.proposals, href: '/proposals', icon: <FileText className="w-5 h-5" />, isActive: activePath === '/proposals' },

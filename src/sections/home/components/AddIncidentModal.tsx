@@ -6,7 +6,7 @@ import {
   FileWarning,
   ShieldAlert,
   Building2,
-  HelpCircle,
+  Scale,
   Search,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
@@ -17,11 +17,11 @@ const translations: Record<Language, Record<string, string>> = {
   en: {
     addIncident: 'Add Incident',
     selectCategory: 'Select the type of incident to report',
-    challan: 'Challan',
+    challan: 'Challan Assistance',
     challanDesc: 'Report a traffic challan',
-    case: 'Case',
+    case: 'Case Assistance',
     caseDesc: 'Report an accident or legal issue',
-    rto: 'RTO',
+    rto: 'RTO Assistance',
     rtoDesc: 'RTO-related query',
     other: 'Other',
     otherDesc: 'Other incident',
@@ -82,11 +82,11 @@ const translations: Record<Language, Record<string, string>> = {
   hi: {
     addIncident: 'घटना जोड़ें',
     selectCategory: 'रिपोर्ट करने के लिए घटना का प्रकार चुनें',
-    challan: 'चालान',
+    challan: 'चालान सहायता',
     challanDesc: 'ट्रैफ़िक चालान की रिपोर्ट करें',
-    case: 'केस',
+    case: 'केस सहायता',
     caseDesc: 'दुर्घटना या कानूनी मुद्दे की रिपोर्ट करें',
-    rto: 'RTO',
+    rto: 'RTO सहायता',
     rtoDesc: 'RTO से संबंधित प्रश्न',
     other: 'अन्य',
     otherDesc: 'अन्य घटना',
@@ -166,7 +166,7 @@ const CATEGORIES: {
   { id: 'challan', labelKey: 'challan', descKey: 'challanDesc', icon: FileWarning, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/50' },
   { id: 'case', labelKey: 'case', descKey: 'caseDesc', icon: ShieldAlert, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/50' },
   { id: 'rto', labelKey: 'rto', descKey: 'rtoDesc', icon: Building2, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/50' },
-  { id: 'other', labelKey: 'other', descKey: 'otherDesc', icon: HelpCircle, color: 'text-stone-500', bg: 'bg-stone-100 dark:bg-stone-800' },
+  { id: 'other', labelKey: 'other', descKey: 'otherDesc', icon: Scale, color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-950/40' },
 ]
 
 export interface AddIncidentModalProps {

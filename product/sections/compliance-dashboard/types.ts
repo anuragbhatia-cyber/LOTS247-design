@@ -198,8 +198,6 @@ export interface HistoricalStats {
 // =============================================================================
 
 export interface ComplianceDashboardProps {
-  /** Overall fleet compliance score with month-over-month change */
-  complianceScore: ComplianceScore
   /** The 8 compliance category cards */
   categories: ComplianceCategory[]
   /** Auto-generated compliance insights */

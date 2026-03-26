@@ -4,7 +4,7 @@
 
 export type ProposalType = 'Challan' | 'DL' | 'RC'
 
-export type ProposalStatus = 'sent' | 'converted' | 'rejected'
+export type ProposalStatus = 'sent' | 'received' | 'converted' | 'rejected'
 
 export interface Proposal {
   id: string

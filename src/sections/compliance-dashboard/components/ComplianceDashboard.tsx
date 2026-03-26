@@ -33,6 +33,7 @@ import {
   RefreshCw,
   MapPin,
   Copy,
+  Info,
 } from 'lucide-react'
 import type {
   ComplianceDashboardProps,
@@ -1258,22 +1259,23 @@ function FleetRcView({
   vehicles: Vehicle[]
   onBack: () => void
 }) {
-  const [filter, setFilter] = useState<'valid' | 'expiring'>('expiring')
+  const [filter, setFilter] = useState<'valid' | 'expiring' | 'invalid'>('expiring')
   const [showProposalToast, setShowProposalToast] = useState(false)
 
   const validItems = rcRows.filter(r => r.status === 'valid')
-  const expiringItems = rcRows.filter(r => r.status === 'expiring' || r.status === 'expired')
-  const filtered = filter === 'valid' ? validItems : expiringItems
+  const expiringItems = rcRows.filter(r => r.status === 'expiring')
+  const invalidItems = rcRows.filter(r => r.status === 'expired')
+  const filtered = filter === 'valid' ? validItems : filter === 'expiring' ? expiringItems : invalidItems
 
   return (
-    <div className={`${filter === 'expiring' && expiringItems.length > 0 ? 'pb-20' : ''}`}>
+    <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
       <div className="mb-6">
         <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Registration Certificates</h2>
       </div>
 
       {/* Mobile tabs */}
       <div className="flex md:hidden gap-2 mb-5">
-        {(['valid', 'expiring'] as const).map(f => (
+        {(['valid', 'invalid', 'expiring'] as const).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -1283,7 +1285,7 @@ function FleetRcView({
                 : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400'
             }`}
           >
-            {f === 'valid' ? `Valid (${validItems.length})` : `Expiring (${expiringItems.length})`}
+            {f === 'valid' ? `Valid (${validItems.length})` : f === 'invalid' ? `Invalid (${invalidItems.length})` : `Expiring (${expiringItems.length})`}
           </button>
         ))}
       </div>
@@ -1293,10 +1295,10 @@ function FleetRcView({
         <div className="w-56 shrink-0 hidden md:block">
           <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
-              { key: 'valid' as const, label: 'Valid', count: validItems.length, icon: ShieldCheck, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
-              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, icon: AlertTriangle, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
+              { key: 'valid' as const, label: 'Valid', count: validItems.length, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
+              { key: 'invalid' as const, label: 'Invalid', count: invalidItems.length, countColor: 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400' },
+              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
             ]).map(item => {
-              const Icon = item.icon
               const active = filter === item.key
               return (
                 <button
@@ -1308,10 +1310,7 @@ function FleetRcView({
                       : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </div>
+                  <span>{item.label}</span>
                   <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
                     active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
                   }`}>{item.count}</span>
@@ -1385,6 +1384,22 @@ function FleetRcView({
           </div>
         </div>
       )}
+      {filter === 'invalid' && invalidItems.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-8 py-4 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div>
+              <p className="text-xs font-medium text-red-600 dark:text-red-400">Invalid Registration Certificates</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{invalidItems.length} vehicles</p>
+            </div>
+            <button
+              onClick={() => setShowProposalToast(true)}
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+            >
+              Request Proposal
+            </button>
+          </div>
+        </div>
+      )}
       <ProposalToast show={showProposalToast} onClose={() => setShowProposalToast(false)} />
     </div>
   )
@@ -1399,22 +1414,23 @@ function FleetDlView({
   drivers: Driver[]
   onBack: () => void
 }) {
-  const [filter, setFilter] = useState<'valid' | 'expiring'>('expiring')
+  const [filter, setFilter] = useState<'valid' | 'invalid' | 'expiring'>('valid')
   const [showProposalToast, setShowProposalToast] = useState(false)
 
   const validItems = dlRows.filter(r => r.status === 'valid')
-  const expiringItems = dlRows.filter(r => r.status === 'expiring' || r.status === 'expired')
-  const filtered = filter === 'valid' ? validItems : expiringItems
+  const expiringItems = dlRows.filter(r => r.status === 'expiring')
+  const invalidItems = dlRows.filter(r => r.status === 'expired')
+  const filtered = filter === 'valid' ? validItems : filter === 'invalid' ? invalidItems : expiringItems
 
   return (
-    <div className={`${filter === 'expiring' && expiringItems.length > 0 ? 'pb-20' : ''}`}>
+    <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
       <div className="mb-6">
         <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Driving Licenses</h2>
       </div>
 
       {/* Mobile tabs */}
       <div className="flex md:hidden gap-2 mb-5">
-        {(['valid', 'expiring'] as const).map(f => (
+        {(['valid', 'invalid', 'expiring'] as const).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -1424,7 +1440,7 @@ function FleetDlView({
                 : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400'
             }`}
           >
-            {f === 'valid' ? `Valid (${validItems.length})` : `Expiring (${expiringItems.length})`}
+            {f === 'valid' ? `Valid (${validItems.length})` : f === 'invalid' ? `Invalid (${invalidItems.length})` : `Expiring (${expiringItems.length})`}
           </button>
         ))}
       </div>
@@ -1434,10 +1450,10 @@ function FleetDlView({
         <div className="w-56 shrink-0 hidden md:block">
           <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
-              { key: 'valid' as const, label: 'Valid', count: validItems.length, icon: ShieldCheck, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
-              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, icon: AlertTriangle, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
+              { key: 'valid' as const, label: 'Valid', count: validItems.length, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
+              { key: 'invalid' as const, label: 'Invalid', count: invalidItems.length, countColor: 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400' },
+              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
             ]).map(item => {
-              const Icon = item.icon
               const active = filter === item.key
               return (
                 <button
@@ -1449,10 +1465,7 @@ function FleetDlView({
                       : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </div>
+                  <span>{item.label}</span>
                   <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
                     active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
                   }`}>{item.count}</span>
@@ -1533,6 +1546,22 @@ function FleetDlView({
           </div>
         </div>
       )}
+      {filter === 'invalid' && invalidItems.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-8 py-4 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div>
+              <p className="text-xs font-medium text-red-600 dark:text-red-400">Invalid Driving Licenses</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{invalidItems.length} drivers</p>
+            </div>
+            <button
+              onClick={() => setShowProposalToast(true)}
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+            >
+              Request Proposal
+            </button>
+          </div>
+        </div>
+      )}
       <ProposalToast show={showProposalToast} onClose={() => setShowProposalToast(false)} />
     </div>
   )
@@ -1543,7 +1572,6 @@ function FleetDlView({
 // ---------------------------------------------------------------------------
 
 export function ComplianceDashboard({
-  complianceScore,
   categories,
   insights,
   monthlyTrend,
@@ -1652,6 +1680,18 @@ export function ComplianceDashboard({
     setScopeApplied(true)
     onScopeChange?.('vehicle', target.id)
   }
+
+  // Compute compliance health score from categories
+  const complianceScore = useMemo(() => {
+    if (categories.length === 0) return { overall: 0, change: 0, status: 'critical' as ComplianceStatus }
+    const overall = Math.round(categories.reduce((sum, cat) => sum + cat.percentage, 0) / categories.length)
+    const status: ComplianceStatus = overall >= 70 ? 'healthy' : overall >= 50 ? 'warning' : 'critical'
+    // change would come from comparing with previous month data — for now derived from monthlyTrend
+    const trendLen = monthlyTrend.length
+    const previousMonth = trendLen >= 2 ? monthlyTrend[trendLen - 2].score : overall
+    const change = overall - previousMonth
+    return { overall, change, status }
+  }, [categories, monthlyTrend])
 
   const changeIsPositive = complianceScore.change >= 0
 
@@ -1809,12 +1849,22 @@ export function ComplianceDashboard({
               {/* -------------------------------------------------------------- */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
                 {/* Compliance Health Card */}
-                <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
+                <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40">
                   {/* Header */}
                   <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex items-center justify-between">
-                    <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
-                      Compliance Health
-                    </h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
+                        Compliance Health
+                      </h2>
+                      <div className="relative group">
+                        <Info className="w-3.5 h-3.5 text-stone-400 cursor-help" />
+                        <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 px-3 py-2.5 rounded-lg bg-stone-900 dark:bg-stone-100 text-xs text-stone-200 dark:text-stone-700 leading-relaxed shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none">
+                          <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-stone-900 dark:border-b-stone-100" />
+                          <p className="font-semibold text-white dark:text-stone-900 mb-1">How is this calculated?</p>
+                          <p>Average of compliance % across all {categories.length} categories: RC, Insurance, PUCC, Permits, DL, Challans, Blacklisted & NTBT.</p>
+                        </div>
+                      </div>
+                    </div>
                     <span className={`text-sm font-bold ${changeIsPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                       {changeIsPositive ? '+' : ''}{complianceScore.change}% from last month
                     </span>
