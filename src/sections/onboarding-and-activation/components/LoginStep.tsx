@@ -1,25 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 
-interface RegistrationFormData {
-  phoneNumber: string
-  businessName: string
-  businessType: string
-  state: string
-  pincode: string
-  agreedToTerms: boolean
-}
-
-interface RegistrationStepProps {
-  /** Called when user submits registration form and requests OTP */
-  onRequestOTP?: (phoneNumber: string, formData: RegistrationFormData) => void
+interface LoginStepProps {
+  /** Called when user submits phone number and requests OTP */
+  onRequestOTP?: (phoneNumber: string) => void
   /** Called when user verifies OTP */
   onVerifyOTP?: (otp: string) => void
   /** Called when user requests OTP resend */
   onResendOTP?: () => void
-  /** Called when user clicks "Login" link */
-  onLoginClick?: () => void
-  /** Phone number error message */
-  phoneError?: string
+  /** Called when user clicks "Sign Up" link */
+  onSignUpClick?: () => void
   /** OTP error message */
   otpError?: string
   /** Whether OTP has been sent */
@@ -30,42 +19,18 @@ interface RegistrationStepProps {
   resendCountdown?: number
 }
 
-const INDIAN_STATES = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
-  'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
-  'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
-  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
-  'Delhi', 'Jammu & Kashmir', 'Ladakh', 'Chandigarh', 'Puducherry',
-]
-
-const BUSINESS_TYPES = [
-  { value: '', label: 'Select business type' },
-  { value: 'individual', label: 'Individual' },
-  { value: 'proprietorship', label: 'Proprietorship' },
-  { value: 'llp', label: 'LLP' },
-  { value: 'private-limited', label: 'Private Limited' },
-]
-
-export function RegistrationStep({
+export function LoginStep({
   onRequestOTP,
   onVerifyOTP,
   onResendOTP,
-  onLoginClick,
+  onSignUpClick,
   otpError,
   otpSent = false,
   isVerifying = false,
   resendCountdown = 0,
-}: RegistrationStepProps) {
-  const [formData, setFormData] = useState<RegistrationFormData>({
-    phoneNumber: '',
-    businessName: '',
-    businessType: '',
-    state: '',
-    pincode: '',
-    agreedToTerms: false,
-  })
-  const [errors, setErrors] = useState<Partial<Record<keyof RegistrationFormData, string>>>({})
+}: LoginStepProps) {
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [phoneError, setPhoneError] = useState('')
   const [otp, setOtp] = useState(['', '', '', ''])
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -75,41 +40,18 @@ export function RegistrationStep({
     return `${digits.slice(0, 5)} ${digits.slice(5)}`
   }
 
-  const handleChange = (field: keyof RegistrationFormData, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }))
-    }
-  }
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, '').slice(0, 10)
-    handleChange('phoneNumber', value)
-  }
-
-  const handlePincodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 6)
-    handleChange('pincode', value)
-  }
-
-  const validate = (): boolean => {
-    const newErrors: Partial<Record<keyof RegistrationFormData, string>> = {}
-
-    if (formData.phoneNumber.length !== 10) newErrors.phoneNumber = 'Enter a valid 10-digit phone number'
-    if (!formData.businessName.trim()) newErrors.businessName = 'Business/Individual name is required'
-    if (!formData.businessType) newErrors.businessType = 'Select a business type'
-    if (!formData.state) newErrors.state = 'Select a state'
-    if (formData.pincode.length !== 6) newErrors.pincode = 'Enter a valid 6-digit pincode'
-    if (!formData.agreedToTerms) newErrors.agreedToTerms = 'You must agree to continue'
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    setPhoneNumber(value)
+    if (phoneError) setPhoneError('')
   }
 
   const handleSubmit = () => {
-    if (validate()) {
-      onRequestOTP?.(formData.phoneNumber, formData)
+    if (phoneNumber.length !== 10) {
+      setPhoneError('Enter a valid 10-digit mobile number')
+      return
     }
+    onRequestOTP?.(phoneNumber)
   }
 
   const handleOtpChange = (index: number, value: string) => {
@@ -153,30 +95,6 @@ export function RegistrationStep({
     }
   }, [otpSent])
 
-  const inputClassName = (field: keyof RegistrationFormData) => `
-    w-full px-4 py-3 rounded-xl border text-base
-    bg-white dark:bg-stone-900
-    text-stone-900 dark:text-white
-    placeholder:text-stone-400 dark:placeholder:text-stone-500
-    focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
-    transition-all duration-200
-    ${errors[field] ? 'border-red-500 dark:border-red-500' : 'border-stone-300 dark:border-stone-700'}
-  `
-
-  const ErrorMessage = ({ field }: { field: keyof RegistrationFormData }) =>
-    errors[field] ? (
-      <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1.5">
-        <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fillRule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-            clipRule="evenodd"
-          />
-        </svg>
-        {errors[field]}
-      </p>
-    ) : null
-
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Panel - Branding */}
@@ -211,15 +129,18 @@ export function RegistrationStep({
                 {/* Header */}
                 <div className="mb-6">
                   <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-white">
-                    Create your account
+                    Welcome back
                   </h1>
+                  <p className="mt-2 text-stone-500 dark:text-stone-400">
+                    Enter your mobile number to login
+                  </p>
                 </div>
 
-                {/* Registration Form */}
-                <div className="space-y-4">
+                {/* Login Form */}
+                <div className="space-y-5">
                   {/* Mobile Number */}
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+                    <label htmlFor="login-phone" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
                       Mobile Number <span className="text-red-500">*</span>
                     </label>
                     <div className="flex">
@@ -227,9 +148,9 @@ export function RegistrationStep({
                         +91
                       </span>
                       <input
-                        id="phone"
+                        id="login-phone"
                         type="tel"
-                        value={formatPhone(formData.phoneNumber)}
+                        value={formatPhone(phoneNumber)}
                         onChange={handlePhoneChange}
                         placeholder="98765 43210"
                         className={`
@@ -239,108 +160,22 @@ export function RegistrationStep({
                           placeholder:text-stone-400 dark:placeholder:text-stone-500
                           focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent
                           transition-all duration-200
-                          ${errors.phoneNumber ? 'border-red-500 dark:border-red-500' : 'border-stone-300 dark:border-stone-700'}
+                          ${phoneError ? 'border-red-500 dark:border-red-500' : 'border-stone-300 dark:border-stone-700'}
                         `}
                       />
                     </div>
-                    <ErrorMessage field="phoneNumber" />
-                  </div>
-
-                  {/* Business/Individual Name */}
-                  <div>
-                    <label htmlFor="businessName" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
-                      Business / Individual Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="businessName"
-                      type="text"
-                      value={formData.businessName}
-                      onChange={(e) => handleChange('businessName', e.target.value)}
-                      placeholder="Enter business or individual name"
-                      className={inputClassName('businessName')}
-                    />
-                    <ErrorMessage field="businessName" />
-                  </div>
-
-                  {/* Business Type */}
-                  <div>
-                    <label htmlFor="businessType" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
-                      Business Type <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      id="businessType"
-                      value={formData.businessType}
-                      onChange={(e) => handleChange('businessType', e.target.value)}
-                      className={inputClassName('businessType')}
-                    >
-                      {BUSINESS_TYPES.map((type) => (
-                        <option key={type.value} value={type.value}>
-                          {type.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ErrorMessage field="businessType" />
-                  </div>
-
-                  {/* State + Pincode Row */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label htmlFor="state" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
-                        State <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        id="state"
-                        value={formData.state}
-                        onChange={(e) => handleChange('state', e.target.value)}
-                        className={inputClassName('state')}
-                      >
-                        <option value="">Select state</option>
-                        {INDIAN_STATES.map((state) => (
-                          <option key={state} value={state}>
-                            {state}
-                          </option>
-                        ))}
-                      </select>
-                      <ErrorMessage field="state" />
-                    </div>
-                    <div>
-                      <label htmlFor="pincode" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
-                        Pincode <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        id="pincode"
-                        type="text"
-                        inputMode="numeric"
-                        value={formData.pincode}
-                        onChange={handlePincodeChange}
-                        placeholder="110001"
-                        className={inputClassName('pincode')}
-                      />
-                      <ErrorMessage field="pincode" />
-                    </div>
-                  </div>
-
-                  {/* Terms Checkbox */}
-                  <div className="pt-1">
-                    <label className="flex items-start gap-3 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={formData.agreedToTerms}
-                        onChange={(e) => handleChange('agreedToTerms', e.target.checked)}
-                        className="mt-0.5 w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500 bg-white dark:bg-stone-900"
-                      />
-                      <span className="text-sm text-stone-600 dark:text-stone-400 leading-snug">
-                        I agree to the{' '}
-                        <button className="underline text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
-                          Terms & Conditions
-                        </button>{' '}
-                        and{' '}
-                        <button className="underline text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
-                          Privacy Policy
-                        </button>
-                      </span>
-                    </label>
-                    <ErrorMessage field="agreedToTerms" />
+                    {phoneError && (
+                      <p className="mt-1.5 text-sm text-red-500 flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        {phoneError}
+                      </p>
+                    )}
                   </div>
 
                   {/* Continue Button */}
@@ -351,14 +186,14 @@ export function RegistrationStep({
                     Continue
                   </button>
 
-                  {/* Login Link */}
+                  {/* Sign Up Link */}
                   <p className="text-center text-sm text-stone-500 dark:text-stone-400">
-                    Already have an account?{' '}
+                    Don't have an account?{' '}
                     <button
-                      onClick={onLoginClick}
+                      onClick={onSignUpClick}
                       className="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline transition-colors"
                     >
-                      Login
+                      Sign Up
                     </button>
                   </p>
                 </div>
@@ -371,7 +206,7 @@ export function RegistrationStep({
                     Enter verification code
                   </h1>
                   <p className="text-stone-500 dark:text-stone-400">
-                    We sent a 4-digit code to +91 {formatPhone(formData.phoneNumber)}
+                    We sent a 4-digit code to +91 {formatPhone(phoneNumber)}
                   </p>
                 </div>
 

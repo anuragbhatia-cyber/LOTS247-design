@@ -26,6 +26,7 @@
       "pucExpiry": "2026-06-20",
       "fitnessExpiry": "2027-01-10",
       "status": "active",
+      "subscriptionStatus": "active",
       "assignedDriverId": "drv-001",
       "documents": [
         { "id": "doc-001", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2026-08-15", "status": "valid" },
@@ -42,11 +43,13 @@
       "model": "BOSS 1920HB",
       "year": 2021,
       "category": "owned",
+      "detailsFetched": false,
       "complianceScore": 45,
       "insuranceExpiry": "2026-02-28",
       "pucExpiry": "2026-01-10",
       "fitnessExpiry": "2026-07-15",
       "status": "active",
+      "subscriptionStatus": "active",
       "assignedDriverId": "drv-002",
       "documents": [
         { "id": "doc-005", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2026-02-28", "status": "expiring-soon" },
@@ -68,6 +71,7 @@
       "pucExpiry": "2026-11-30",
       "fitnessExpiry": "2027-06-18",
       "status": "active",
+      "subscriptionStatus": "active",
       "assignedDriverId": "drv-003",
       "documents": [
         { "id": "doc-009", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2027-01-20", "status": "valid" },
@@ -89,6 +93,7 @@
       "pucExpiry": "2025-11-15",
       "fitnessExpiry": "2026-03-10",
       "status": "active",
+      "subscriptionStatus": "inactive",
       "assignedDriverId": "drv-004",
       "documents": [
         { "id": "doc-013", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2025-12-01", "status": "expired" },
@@ -105,11 +110,13 @@
       "model": "Ace Gold",
       "year": 2024,
       "category": "owned",
+      "detailsFetched": false,
       "complianceScore": 88,
       "insuranceExpiry": "2027-03-05",
       "pucExpiry": "2026-09-12",
       "fitnessExpiry": "2027-08-22",
       "status": "active",
+      "subscriptionStatus": "active",
       "assignedDriverId": null,
       "documents": [
         { "id": "doc-017", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2027-03-05", "status": "valid" },
@@ -126,11 +133,13 @@
       "model": "Blazo X 46",
       "year": 2021,
       "category": "leased",
+      "detailsFetched": false,
       "complianceScore": 72,
       "insuranceExpiry": "2026-04-18",
       "pucExpiry": "2026-03-01",
       "fitnessExpiry": "2026-10-05",
       "status": "active",
+      "subscriptionStatus": "active",
       "assignedDriverId": "drv-005",
       "documents": [
         { "id": "doc-021", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2026-04-18", "status": "expiring-soon" },
@@ -152,6 +161,7 @@
       "pucExpiry": "2025-08-22",
       "fitnessExpiry": "2025-10-15",
       "status": "inactive",
+      "subscriptionStatus": "inactive",
       "assignedDriverId": null,
       "documents": [
         { "id": "doc-025", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2025-09-30", "status": "expired" },
@@ -173,6 +183,7 @@
       "pucExpiry": "2026-10-25",
       "fitnessExpiry": "2027-04-30",
       "status": "active",
+      "subscriptionStatus": "active",
       "assignedDriverId": "drv-006",
       "documents": [
         { "id": "doc-029", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2027-02-10", "status": "valid" },

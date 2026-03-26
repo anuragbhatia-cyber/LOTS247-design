@@ -1,6 +1,7 @@
 export { OnboardingFlow } from './OnboardingFlow'
 export { ProgressIndicator } from './ProgressIndicator'
 export { RegistrationStep } from './RegistrationStep'
+export { LoginStep } from './LoginStep'
 export { PhoneVerificationStep } from './PhoneVerificationStep'
 export { VehicleAdditionStep } from './VehicleAdditionStep'
 export { DriverAdditionStep } from './DriverAdditionStep'

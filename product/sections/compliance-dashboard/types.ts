@@ -36,6 +36,7 @@ export interface ComplianceCategory {
   label: string
   fullLabel: string
   compliant: number
+  expiring?: number
   total: number
   percentage: number
   status: ComplianceStatus

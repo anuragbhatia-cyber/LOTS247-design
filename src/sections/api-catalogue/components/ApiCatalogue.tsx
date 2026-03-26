@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { ShieldCheck, IdCard, Truck, ArrowRight, ArrowLeft, Mail, BookOpen, Key, IndianRupee, Zap, BarChart3, ScrollText, type LucideIcon } from 'lucide-react'
+import { ShieldCheck, IdCard, Truck, ArrowRight, ArrowLeft, Mail, BookOpen, Key, Zap, BarChart3, ScrollText, ChevronRight, Wallet, type LucideIcon } from 'lucide-react'
 import type { ApiCatalogueProps, Api } from '@/../product/sections/api-catalogue/types'
 import { ContactModal } from './ContactModal'
+import { TopUpModal } from './TopUpModal'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   'shield-check': ShieldCheck,
@@ -19,20 +20,41 @@ const SIDEBAR_ITEMS: { id: SidebarTab; label: string; icon: LucideIcon }[] = [
 // Simulated "my APIs" — subset the user has subscribed to
 const MY_API_IDS = ['api-001']
 
-type DetailTab = 'pricing' | 'credits' | 'usage' | 'logs'
+type DetailTab = 'credits' | 'usage' | 'logs'
 
 const DETAIL_TABS: { id: DetailTab; label: string; icon: LucideIcon }[] = [
-  { id: 'pricing', label: 'Pricing', icon: IndianRupee },
   { id: 'credits', label: 'Credits per Hit', icon: Zap },
   { id: 'usage', label: 'Usage', icon: BarChart3 },
   { id: 'logs', label: 'Logs', icon: ScrollText },
 ]
 
-// Sample pricing data
-const PRICING_PLANS = [
-  { name: 'Starter', price: '₹2,499', hits: '5,000 hits', features: ['Basic endpoints', 'Email support', '99.5% uptime SLA'] },
-  { name: 'Growth', price: '₹9,999', hits: '50,000 hits', features: ['All endpoints', 'Priority support', '99.9% uptime SLA', 'Webhooks'], popular: true },
-  { name: 'Enterprise', price: 'Custom', hits: 'Unlimited', features: ['All endpoints', 'Dedicated support', '99.99% uptime SLA', 'Webhooks', 'Custom integrations'] },
+// How it works flow steps per API
+const HOW_IT_WORKS: Record<string, { step: string; desc: string }[]> = {
+  'api-001': [
+    { step: 'Send Request', desc: 'Pass vehicle number via API call' },
+    { step: 'Data Fetch', desc: 'We query state transport databases' },
+    { step: 'Processing', desc: 'Challans matched & validated' },
+    { step: 'Response', desc: 'Get challan records in JSON' },
+  ],
+  'api-002': [
+    { step: 'Send Request', desc: 'Pass DL number via API call' },
+    { step: 'Verification', desc: 'We query the Sarathi database' },
+    { step: 'Validation', desc: 'Licence details cross-checked' },
+    { step: 'Response', desc: 'Get DL details in JSON' },
+  ],
+  'api-003': [
+    { step: 'Send Request', desc: 'Pass vehicle number via API call' },
+    { step: 'Data Fetch', desc: 'We query the Vahan database' },
+    { step: 'Processing', desc: 'RC data extracted & validated' },
+    { step: 'Response', desc: 'Get RC details in JSON' },
+  ],
+}
+
+const DEFAULT_FLOW = [
+  { step: 'Send Request', desc: 'Make an API call with required params' },
+  { step: 'Data Fetch', desc: 'We query official databases' },
+  { step: 'Processing', desc: 'Data validated & formatted' },
+  { step: 'Response', desc: 'Receive structured JSON response' },
 ]
 
 // Sample credits data
@@ -75,6 +97,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
   const [selectedApiId, setSelectedApiId] = useState<string | null>(null)
   const [detailTab, setDetailTab] = useState<DetailTab>('pricing')
   const [contactApiId, setContactApiId] = useState<string | null>(null)
+  const [showTopUp, setShowTopUp] = useState(false)
 
   const selectedApi = apis.find((a) => a.id === selectedApiId) || null
   const contactApi = apis.find((a) => a.id === contactApiId)
@@ -85,7 +108,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
 
   function handleViewDetail(id: string) {
     setSelectedApiId(id)
-    setDetailTab('pricing')
+    setDetailTab('credits')
   }
 
   function handleBack() {
@@ -94,9 +117,9 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
 
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex">
-      {/* Sidebar — full height, flush left */}
-      <aside className="hidden md:flex md:flex-col w-56 lg:w-64 flex-shrink-0 bg-white dark:bg-stone-900 border-r border-stone-200 dark:border-stone-800 min-h-screen">
-        <nav className="flex-1 space-y-1 px-3 py-6">
+      {/* Sidebar */}
+      <div className="w-64 lg:w-72 shrink-0 hidden md:block p-5 sm:p-6 lg:p-8">
+        <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
           {SIDEBAR_ITEMS.map((item) => {
             const Icon = item.icon
             const isActive = activeTab === item.id && !selectedApi
@@ -105,26 +128,24 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
               <button
                 key={item.id}
                 onClick={() => { setActiveTab(item.id); setSelectedApiId(null) }}
-                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   isActive
                     ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
-                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                    : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-400 dark:text-stone-500'}`} />
-                <span className="flex-1 text-left">{item.label}</span>
-                <span className={`text-xs tabular-nums min-w-[22px] h-[22px] flex items-center justify-center rounded-full font-semibold ${
-                  isActive
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
-                }`}>
-                  {count}
-                </span>
+                <div className="flex items-center gap-2.5">
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </div>
+                <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
+                  isActive ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                }`}>{count}</span>
               </button>
             )
           })}
-        </nav>
-      </aside>
+        </div>
+      </div>
 
       {/* Main content area */}
       <div className="flex-1 min-w-0 p-5 sm:p-6 lg:p-8">
@@ -181,86 +202,146 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                 onDetailTabChange={setDetailTab}
                 onBack={handleBack}
                 onContactPricing={() => setContactApiId(selectedApi.id)}
+                onTopUp={() => setShowTopUp(true)}
+                showTabs={activeTab === 'my'}
               />
             ) : (
               <>
-                {/* API Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {displayedApis.map((api) => {
-                    const Icon = ICON_MAP[api.icon] || ShieldCheck
-                    const isMyApi = MY_API_IDS.includes(api.id)
-
-                    return (
-                      <div
-                        key={api.id}
-                        className="group bg-white dark:bg-stone-900 rounded-xl shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col"
-                      >
-                        {/* Icon + Name */}
-                        <div className="flex items-start gap-3.5 mb-3">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center transition-colors group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950/60">
-                            <Icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                          </div>
-                          <div className="min-w-0 pt-0.5">
-                            <div className="flex items-center gap-2">
-                              <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">
-                                {api.name}
-                              </h3>
-                              {isMyApi && (
-                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                                  Active
-                                </span>
-                              )}
+                {/* All APIs tab — split into Available APIs + My APIs sections */}
+                {activeTab === 'all' ? (
+                  <>
+                    {/* Available APIs section */}
+                    {apis.filter((a) => !MY_API_IDS.includes(a.id)).length > 0 && (
+                      <div className="mb-8">
+                        <h3 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-4">Available APIs</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {apis.filter((a) => !MY_API_IDS.includes(a.id)).map((api) => (
+                            <div
+                              key={api.id}
+                              onClick={() => handleViewDetail(api.id)}
+                              className="group bg-white dark:bg-stone-900 rounded-xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2 mb-3">
+                                <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
+                              </div>
+                              <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
+                              <div className="flex items-center gap-2 pt-4 border-t border-stone-100 dark:border-stone-800">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                                >
+                                  Check Details
+                                  <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setContactApiId(api.id) }}
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                                >
+                                  <Mail className="w-3.5 h-3.5" />
+                                  Contact for Pricing
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">
-                          {api.shortDescription}
-                        </p>
-
-                        {/* Actions */}
-                        <div className="flex items-center justify-end gap-2 pt-4 border-t border-stone-100 dark:border-stone-800">
-                          <button
-                            onClick={() => handleViewDetail(api.id)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
-                          >
-                            Check Details
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => setContactApiId(api.id)}
-                            className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-                          >
-                            <Mail className="w-3.5 h-3.5" />
-                            Contact for Pricing
-                          </button>
+                          ))}
                         </div>
                       </div>
-                    )
-                  })}
-                </div>
+                    )}
 
-                {/* Empty State for My APIs */}
-                {displayedApis.length === 0 && activeTab === 'my' && (
-                  <div className="text-center py-16">
-                    <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
-                      <Key className="w-6 h-6 text-stone-400 dark:text-stone-500" />
+                    {/* My APIs section */}
+                    {apis.filter((a) => MY_API_IDS.includes(a.id)).length > 0 && (
+                      <div>
+                        <h3 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-4">My APIs</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {apis.filter((a) => MY_API_IDS.includes(a.id)).map((api) => (
+                            <div
+                              key={api.id}
+                              onClick={() => handleViewDetail(api.id)}
+                              className="group bg-white dark:bg-stone-900 rounded-xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2 mb-3">
+                                <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
+                              </div>
+                              <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
+                              <div className="flex items-center gap-2 pt-4 border-t border-stone-100 dark:border-stone-800">
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setShowTopUp(true) }}
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                                >
+                                  <Wallet className="w-3.5 h-3.5" />
+                                  Top-up Balance
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                                >
+                                  Check Details
+                                  <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* My APIs tab */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {displayedApis.map((api) => (
+                        <div
+                          key={api.id}
+                          onClick={() => handleViewDetail(api.id)}
+                          className="group bg-white dark:bg-stone-900 rounded-xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 mb-3">
+                            <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
+                          </div>
+                          <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
+                          <div className="flex items-center gap-2 pt-4 border-t border-stone-100 dark:border-stone-800">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setShowTopUp(true) }}
+                              className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                            >
+                              <Wallet className="w-3.5 h-3.5" />
+                              Top-up Balance
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
+                              className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                            >
+                              Check Details
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <p className="text-sm font-medium text-stone-600 dark:text-stone-400 mb-1">
-                      No APIs subscribed yet
-                    </p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400 mb-4">
-                      Browse the catalogue and contact us for pricing to get started.
-                    </p>
-                    <button
-                      onClick={() => setActiveTab('all')}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors"
-                    >
-                      <BookOpen className="w-4 h-4" />
-                      Browse All APIs
-                    </button>
-                  </div>
+
+                    {/* Empty State for My APIs */}
+                    {displayedApis.length === 0 && (
+                      <div className="text-center py-16">
+                        <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                          <Key className="w-6 h-6 text-stone-400 dark:text-stone-500" />
+                        </div>
+                        <p className="text-sm font-medium text-stone-600 dark:text-stone-400 mb-1">
+                          No APIs subscribed yet
+                        </p>
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mb-4">
+                          Browse the catalogue and contact us for pricing to get started.
+                        </p>
+                        <button
+                          onClick={() => setActiveTab('all')}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors"
+                        >
+                          <BookOpen className="w-4 h-4" />
+                          Browse All APIs
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -273,6 +354,15 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
         onClose={() => setContactApiId(null)}
         onSubmit={(message) => {
           console.log('Contact enquiry for:', contactApiId, message)
+        }}
+      />
+
+      {/* Top-up Modal */}
+      <TopUpModal
+        isOpen={showTopUp}
+        onClose={() => setShowTopUp(false)}
+        onSubmit={(amount) => {
+          console.log('Top-up amount:', amount)
         }}
       />
     </div>
@@ -289,14 +379,17 @@ function ApiDetailContent({
   onDetailTabChange,
   onBack,
   onContactPricing,
+  onTopUp,
+  showTabs = true,
 }: {
   api: Api
   detailTab: DetailTab
   onDetailTabChange: (tab: DetailTab) => void
   onBack: () => void
   onContactPricing: () => void
+  onTopUp: () => void
+  showTabs?: boolean
 }) {
-  const Icon = ICON_MAP[api.icon] || ShieldCheck
   const isMyApi = MY_API_IDS.includes(api.id)
 
   return (
@@ -311,111 +404,119 @@ function ApiDetailContent({
       </button>
 
       {/* Header — full width, outside the card */}
-      <div className="flex items-start gap-4 mb-5">
-        <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
-          <Icon className="w-5.5 h-5.5 text-emerald-600 dark:text-emerald-400" />
-        </div>
-        <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
-              {api.name}
-            </h1>
-            {isMyApi && (
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
-                Active
-              </span>
-            )}
+      <div className="mb-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+                {api.name}
+              </h1>
+              {isMyApi && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">
+                  Active
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400 leading-relaxed max-w-2xl">
+              {api.fullDescription}
+            </p>
           </div>
-          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400 leading-relaxed max-w-2xl">
-            {api.fullDescription}
-          </p>
-        </div>
-      </div>
-
-      {/* White card with tabs + content */}
-      <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-        {/* Detail Tabs */}
-        <div className="flex items-center gap-1 px-6 border-b border-stone-100 dark:border-stone-800">
-          {DETAIL_TABS.map((tab) => {
-            const TabIcon = tab.icon
-            const isActive = detailTab === tab.id
-            return (
+          {isMyApi && (
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700">
+                <Wallet className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500" />
+                <span className="text-xs text-stone-500 dark:text-stone-400">Balance:</span>
+                <span className="text-sm font-bold text-stone-900 dark:text-stone-50 tabular-nums">1,753</span>
+                <span className="text-xs text-stone-500 dark:text-stone-400">credits</span>
+              </div>
               <button
-                key={tab.id}
-                onClick={() => onDetailTabChange(tab.id)}
-                className={`relative flex items-center gap-2 px-4 py-3.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
-                }`}
+                onClick={onTopUp}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
               >
-                <TabIcon className="w-4 h-4" />
-                {tab.label}
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
-                )}
+                <Wallet className="w-3.5 h-3.5" />
+                Top-up Balance
               </button>
-            )
-          })}
-        </div>
-
-        {/* Tab Content */}
-        <div className="p-6">
-          {detailTab === 'pricing' && <PricingTab onContactPricing={onContactPricing} />}
-          {detailTab === 'credits' && <CreditsTab />}
-          {detailTab === 'usage' && <UsageTab />}
-          {detailTab === 'logs' && <LogsTab />}
+            </div>
+          )}
         </div>
       </div>
-    </>
-  )
-}
 
-/* ── Pricing Tab ─────────────────────────────────────────────────────────── */
+      {/* How it Works Flow */}
+      <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6 mb-5">
+        <h3 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-5">How it Works</h3>
+        <div className="flex items-start">
+          {(HOW_IT_WORKS[api.id] || DEFAULT_FLOW).map((item, i, arr) => (
+            <div key={i} className="flex items-start flex-1 min-w-0">
+              <div className="flex flex-col items-center text-center flex-1 min-w-0">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center mb-2.5 flex-shrink-0">
+                  <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{i + 1}</span>
+                </div>
+                <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 mb-0.5">{item.step}</p>
+                <p className="text-xs text-stone-500 dark:text-stone-400 leading-snug px-1">{item.desc}</p>
+              </div>
+              {i < arr.length - 1 && (
+                <div className="flex-shrink-0 mt-3 px-1">
+                  <ChevronRight className="w-4 h-4 text-stone-300 dark:text-stone-600" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
 
-function PricingTab({ onContactPricing }: { onContactPricing: () => void }) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-      {PRICING_PLANS.map((plan) => (
-        <div
-          key={plan.name}
-          className={`relative rounded-xl p-6 flex flex-col ${
-            plan.popular
-              ? 'bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-500 dark:border-emerald-600'
-              : 'bg-stone-50 dark:bg-stone-800/50 border border-stone-200 dark:border-stone-800'
-          }`}
-        >
-          {plan.popular && (
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-600 text-white">
-              Popular
-            </span>
-          )}
-          <h3 className="text-base font-semibold text-stone-900 dark:text-stone-50 mb-1">{plan.name}</h3>
-          <div className="mb-1">
-            <span className="text-2xl font-bold text-stone-900 dark:text-stone-50">{plan.price}</span>
+      {/* Credits table + Contact button — only for All APIs (no tabs) */}
+      {!showTabs && (
+        <>
+          <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm dark:shadow-stone-950/20 overflow-hidden mb-5">
+            <CreditsTab />
           </div>
-          <p className="text-sm text-stone-700 dark:text-stone-300 mb-5">{plan.hits}</p>
-          <ul className="space-y-2.5 mb-6 flex-1">
-            {plan.features.map((f) => (
-              <li key={f} className="flex items-center gap-2 text-sm text-stone-600 dark:text-stone-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
-                {f}
-              </li>
-            ))}
-          </ul>
           <button
             onClick={onContactPricing}
-            className={`w-full py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              plan.popular
-                ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                : 'border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700'
-            }`}
+            className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-sm"
           >
-            {plan.price === 'Custom' ? 'Contact Sales' : 'Get Started'}
+            <Mail className="w-4 h-4" />
+            Contact for Pricing
           </button>
+        </>
+      )}
+
+      {/* White card with tabs + content — only for My APIs */}
+      {showTabs && (
+        <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+          {/* Detail Tabs */}
+          <div className="flex items-center gap-1 px-6 border-b border-stone-100 dark:border-stone-800">
+            {DETAIL_TABS.map((tab) => {
+              const TabIcon = tab.icon
+              const isActive = detailTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onDetailTabChange(tab.id)}
+                  className={`relative flex items-center gap-2 px-4 py-3.5 text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                  }`}
+                >
+                  <TabIcon className="w-4 h-4" />
+                  {tab.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-6">
+            {detailTab === 'credits' && <CreditsTab />}
+            {detailTab === 'usage' && <UsageTab />}
+            {detailTab === 'logs' && <LogsTab />}
+          </div>
         </div>
-      ))}
-    </div>
+      )}
+    </>
   )
 }
 

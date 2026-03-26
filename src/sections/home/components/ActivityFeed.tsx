@@ -52,7 +52,8 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     alert: 'alert',
     alertsPlural: 'alerts',
     vehicle: 'Vehicle',
-    payNow: 'Create Incident',
+    payNow: 'Pay Now',
+    raiseProposal: 'Raise Proposal',
     seeAllAlerts: 'See all alerts',
   },
   hi: {
@@ -60,7 +61,8 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     alert: 'अलर्ट',
     alertsPlural: 'अलर्ट',
     vehicle: 'वाहन',
-    payNow: 'घटना बनाएं',
+    payNow: 'अभी भुगतान करें',
+    raiseProposal: 'प्रस्ताव उठाएं',
     seeAllAlerts: 'सभी अलर्ट देखें',
   },
 }
@@ -110,7 +112,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
                 }}
                 className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
               >
-                {t.payNow}
+                {item.category === 'challan' ? t.payNow : t.raiseProposal}
                 <ArrowRight className="w-3 h-3" />
               </button>
             </div>

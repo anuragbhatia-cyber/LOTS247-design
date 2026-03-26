@@ -76,7 +76,8 @@ const translations: Record<Language, Record<string, string>> = {
     searchVehicle: 'Type to search vehicle...',
     noResults: 'No vehicles found',
     cancel: 'Cancel',
-    submit: 'Submit',
+    submit: 'Request Proposal',
+    payNow: 'Pay Now',
     back: 'Back',
   },
   hi: {
@@ -141,7 +142,8 @@ const translations: Record<Language, Record<string, string>> = {
     searchVehicle: 'वाहन खोजने के लिए टाइप करें...',
     noResults: 'कोई वाहन नहीं मिला',
     cancel: 'रद्द करें',
-    submit: 'सबमिट करें',
+    submit: 'प्रस्ताव अनुरोध',
+    payNow: 'अभी भुगतान करें',
     back: 'वापस',
   },
 }
@@ -193,19 +195,41 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
   const [rtoType, setRtoType] = useState('')
   const [description, setDescription] = useState('')
   const vehicleSearchRef = useRef<HTMLDivElement>(null)
+  const vehicleDropdownRef = useRef<HTMLDivElement>(null)
   const { language } = useLanguage()
   const t = translations[language]
 
   // Close vehicle dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (vehicleSearchRef.current && !vehicleSearchRef.current.contains(e.target as Node)) {
+      if (
+        vehicleSearchRef.current && !vehicleSearchRef.current.contains(e.target as Node) &&
+        (!vehicleDropdownRef.current || !vehicleDropdownRef.current.contains(e.target as Node))
+      ) {
         setVehicleDropdownOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Track dropdown position for fixed rendering (avoids overflow clipping)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
+
+  useEffect(() => {
+    if (!vehicleDropdownOpen || !vehicleSearchRef.current) return
+    const updatePos = () => {
+      const rect = vehicleSearchRef.current!.getBoundingClientRect()
+      setDropdownStyle({ top: rect.bottom + 4, left: rect.left, width: rect.width })
+    }
+    updatePos()
+    window.addEventListener('scroll', updatePos, true)
+    window.addEventListener('resize', updatePos)
+    return () => {
+      window.removeEventListener('scroll', updatePos, true)
+      window.removeEventListener('resize', updatePos)
+    }
+  }, [vehicleDropdownOpen])
 
   const filteredVehicles = FLEET_VEHICLES.filter((v) => {
     const query = vehicleSearch.replace(/\s/g, '').toUpperCase()
@@ -297,7 +321,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={resetAndClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
+      <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
           <div className="flex items-center gap-3">
@@ -377,9 +401,9 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                   />
                 </div>
 
-                {/* Dropdown */}
+                {/* Dropdown — fixed so it escapes overflow-y-auto parent */}
                 {vehicleDropdownOpen && (
-                  <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg max-h-48 overflow-y-auto z-10">
+                  <div ref={vehicleDropdownRef} style={dropdownStyle} className="fixed bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-lg shadow-lg max-h-48 overflow-y-auto z-[110]">
                     {filteredVehicles.length === 0 ? (
                       <div className="px-4 py-3 text-xs text-stone-400 dark:text-stone-500 text-center">
                         {t.noResults}
@@ -720,7 +744,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                   : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
               }`}
             >
-              {t.submit}
+              {category === 'challan' ? t.payNow : t.submit}
             </button>
           </div>
         )}

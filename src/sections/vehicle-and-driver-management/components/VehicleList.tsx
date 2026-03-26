@@ -24,12 +24,15 @@ import {
   UserPlus,
   ArrowLeftRight,
   UserMinus,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react'
 import type {
   VehicleAndDriverManagementProps,
   Vehicle,
   Driver,
   VehicleStatus,
+  SubscriptionStatus,
   DocumentStatus,
 } from '@/../product/sections/vehicle-and-driver-management/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
@@ -102,9 +105,16 @@ const translations: Record<Language, Record<string, string>> = {
     vehicle: 'Vehicle',
     categoryHeader: 'Category',
     compliance: 'Compliance',
-    insurance: 'Insurance',
-    puc: 'PUC',
+    subscription: 'Subscription',
+    subscriptionActive: 'Active',
+    subscriptionInactive: 'Inactive',
+    insurance: 'Insurance Upto',
+    puc: 'PUC Upto',
     actions: 'Actions',
+
+    // Fetch details
+    fetchDetails: 'Fetch Details',
+    fetching: 'Fetching...',
 
     // Action menu
     viewDetails: 'View Details',
@@ -226,9 +236,16 @@ const translations: Record<Language, Record<string, string>> = {
     vehicle: 'वाहन',
     categoryHeader: 'श्रेणी',
     compliance: 'अनुपालन',
-    insurance: 'बीमा',
-    puc: 'पीयूसी',
+    subscription: 'सदस्यता',
+    subscriptionActive: 'सक्रिय',
+    subscriptionInactive: 'निष्क्रिय',
+    insurance: 'बीमा तक',
+    puc: 'पीयूसी तक',
     actions: 'कार्रवाई',
+
+    // Fetch details
+    fetchDetails: 'विवरण प्राप्त करें',
+    fetching: 'प्राप्त हो रहा...',
 
     // Action menu
     viewDetails: 'विवरण देखें',
@@ -704,6 +721,12 @@ export function VehicleList({
   const [driverPage, setDriverPage] = useState(1)
   const [driverActionId, setDriverActionId] = useState<string | null>(null)
   const [changeVehicleDriver, setChangeVehicleDriver] = useState<Driver | null>(null)
+  const [fetchedIds, setFetchedIds] = useState<Set<string>>(() => {
+    // Vehicles with detailsFetched !== false are already fetched
+    return new Set(vehicles.filter((v) => v.detailsFetched !== false).map((v) => v.id))
+  })
+  const [loadingIds, setLoadingIds] = useState<Set<string>>(new Set())
+  const [selectedVehicleIds, setSelectedVehicleIds] = useState<Set<string>>(new Set())
   const ITEMS_PER_PAGE = 5
   const dropdownRef = useRef<HTMLDivElement>(null)
   const driverDropdownRef = useRef<HTMLDivElement>(null)
@@ -722,6 +745,18 @@ export function VehicleList({
     }
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [openDropdownId, driverActionId])
+
+  function handleFetchDetails(vehicleId: string) {
+    setLoadingIds((prev) => new Set(prev).add(vehicleId))
+    setTimeout(() => {
+      setLoadingIds((prev) => {
+        const next = new Set(prev)
+        next.delete(vehicleId)
+        return next
+      })
+      setFetchedIds((prev) => new Set(prev).add(vehicleId))
+    }, 1500)
+  }
 
   // Stats
   const stats = useMemo(() => {
@@ -826,13 +861,6 @@ export function VehicleList({
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => window.parent.postMessage({ type: 'openBulkUpload' }, '*')}
-              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-            >
-              <Upload className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.bulkUpload}</span>
-            </button>
             <button
               onClick={() => window.parent.postMessage({ type: 'openAddDriver' }, '*')}
               className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
@@ -1099,6 +1127,24 @@ export function VehicleList({
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-stone-100 dark:border-stone-800">
+                    <th className="w-10 px-0 py-3.5 pl-4">
+                      <input
+                        type="checkbox"
+                        checked={paginatedVehicles.length > 0 && paginatedVehicles.every((v) => selectedVehicleIds.has(v.id))}
+                        onChange={(e) => {
+                          setSelectedVehicleIds((prev) => {
+                            const next = new Set(prev)
+                            if (e.target.checked) {
+                              paginatedVehicles.forEach((v) => next.add(v.id))
+                            } else {
+                              paginatedVehicles.forEach((v) => next.delete(v.id))
+                            }
+                            return next
+                          })
+                        }}
+                        className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30 cursor-pointer"
+                      />
+                    </th>
                     <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                       {t.vehicle}
                     </th>
@@ -1110,6 +1156,9 @@ export function VehicleList({
                     </th>
                     <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                       {t.puc}
+                    </th>
+                    <th className="text-center text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
+                      {t.subscription}
                     </th>
                     <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                       {t.actions}
@@ -1128,23 +1177,61 @@ export function VehicleList({
                         onClick={() => onViewVehicle?.(vehicle.id)}
                         className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
                       >
+                        {/* Checkbox */}
+                        <td className="w-10 px-0 py-4 pl-4" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={selectedVehicleIds.has(vehicle.id)}
+                            onChange={() => {
+                              setSelectedVehicleIds((prev) => {
+                                const next = new Set(prev)
+                                if (next.has(vehicle.id)) {
+                                  next.delete(vehicle.id)
+                                } else {
+                                  next.add(vehicle.id)
+                                }
+                                return next
+                              })
+                            }}
+                            className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30 cursor-pointer"
+                          />
+                        </td>
+
                         {/* Vehicle Info */}
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
-                              vehicle.status === 'active'
-                                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400'
-                                : 'bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500'
-                            }`}>
-                              <Truck className="w-4.5 h-4.5" />
+                            <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-stone-100 dark:bg-stone-800">
+                              <Truck className="w-4.5 h-4.5 text-stone-400 dark:text-stone-500" />
                             </div>
                             <div>
                               <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
                                 {vehicle.rcNumber}
                               </p>
-                              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                                {vehicle.make} {vehicle.model} · {vehicle.year}
-                              </p>
+                              {fetchedIds.has(vehicle.id) ? (
+                                <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                                  {vehicle.make} {vehicle.model} · {vehicle.year}
+                                </p>
+                              ) : (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (!loadingIds.has(vehicle.id)) handleFetchDetails(vehicle.id)
+                                  }}
+                                  className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 transition-colors"
+                                >
+                                  {loadingIds.has(vehicle.id) ? (
+                                    <>
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                      {t.fetching}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <RefreshCw className="w-3 h-3" />
+                                      {t.fetchDetails}
+                                    </>
+                                  )}
+                                </button>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -1152,25 +1239,53 @@ export function VehicleList({
 
                         {/* Compliance Score */}
                         <td className="px-5 py-4 text-center">
-                          <ComplianceScoreBadge score={vehicle.complianceScore} />
+                          {fetchedIds.has(vehicle.id) ? (
+                            <ComplianceScoreBadge score={vehicle.complianceScore} />
+                          ) : (
+                            <span className="text-sm font-bold text-stone-500 dark:text-stone-400">— —</span>
+                          )}
                         </td>
 
                         {/* Insurance Expiry */}
                         <td className="px-5 py-4">
-                          {insuranceDoc && (
-                            <div>
-                              <ExpiryBadge status={insuranceDoc.status} label={formatDate(insuranceDoc.expiry, language)} />
-                            </div>
+                          {fetchedIds.has(vehicle.id) ? (
+                            insuranceDoc && (
+                              <div>
+                                <ExpiryBadge status={insuranceDoc.status} label={formatDate(insuranceDoc.expiry, language)} />
+                              </div>
+                            )
+                          ) : (
+                            <span className="text-sm font-bold text-stone-500 dark:text-stone-400">— —</span>
                           )}
                         </td>
 
                         {/* PUC Expiry */}
                         <td className="px-5 py-4">
-                          {pucDoc && (
-                            <div>
-                              <ExpiryBadge status={pucDoc.status} label={formatDate(pucDoc.expiry, language)} />
-                            </div>
+                          {fetchedIds.has(vehicle.id) ? (
+                            pucDoc && (
+                              <div>
+                                <ExpiryBadge status={pucDoc.status} label={formatDate(pucDoc.expiry, language)} />
+                              </div>
+                            )
+                          ) : (
+                            <span className="text-sm font-bold text-stone-500 dark:text-stone-400">— —</span>
                           )}
+                        </td>
+
+                        {/* Subscription Status */}
+                        <td className="px-5 py-4 text-center">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            vehicle.subscriptionStatus === 'active'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              vehicle.subscriptionStatus === 'active'
+                                ? 'bg-emerald-500'
+                                : 'bg-stone-400 dark:bg-stone-500'
+                            }`} />
+                            {vehicle.subscriptionStatus === 'active' ? t.subscriptionActive : t.subscriptionInactive}
+                          </span>
                         </td>
 
                         {/* Actions */}
@@ -1303,29 +1418,80 @@ export function VehicleList({
                     {/* Top: Vehicle + Compliance */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          vehicle.status === 'active'
-                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400'
-                            : 'bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500'
-                        }`}>
-                          <Truck className="w-5 h-5" />
+                        <input
+                          type="checkbox"
+                          checked={selectedVehicleIds.has(vehicle.id)}
+                          onChange={() => {
+                            setSelectedVehicleIds((prev) => {
+                              const next = new Set(prev)
+                              if (next.has(vehicle.id)) {
+                                next.delete(vehicle.id)
+                              } else {
+                                next.add(vehicle.id)
+                              }
+                              return next
+                            })
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30 cursor-pointer flex-shrink-0"
+                        />
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-stone-100 dark:bg-stone-800">
+                          <Truck className="w-5 h-5 text-stone-400 dark:text-stone-500" />
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
                             {vehicle.rcNumber}
                           </p>
-                          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                            {vehicle.make} {vehicle.model}
-                          </p>
+                          {fetchedIds.has(vehicle.id) ? (
+                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                              {vehicle.make} {vehicle.model}
+                            </p>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                if (!loadingIds.has(vehicle.id)) handleFetchDetails(vehicle.id)
+                              }}
+                              className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 transition-colors"
+                            >
+                              {loadingIds.has(vehicle.id) ? (
+                                <>
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                  {t.fetching}
+                                </>
+                              ) : (
+                                <>
+                                  <RefreshCw className="w-3 h-3" />
+                                  {t.fetchDetails}
+                                </>
+                              )}
+                            </button>
+                          )}
                         </div>
                       </div>
-                      <ComplianceScoreBadge score={vehicle.complianceScore} />
+                      {fetchedIds.has(vehicle.id) ? (
+                        <ComplianceScoreBadge score={vehicle.complianceScore} />
+                      ) : (
+                        <span className="text-sm font-bold text-stone-500 dark:text-stone-400">— —</span>
+                      )}
                     </div>
 
                     {/* Tags */}
                     <div className="flex items-center gap-2 mb-3">
                       <span className="text-xs text-stone-500 dark:text-stone-400">
                         {vehicle.vehicleType}
+                      </span>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
+                        vehicle.subscriptionStatus === 'active'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          vehicle.subscriptionStatus === 'active'
+                            ? 'bg-emerald-500'
+                            : 'bg-stone-400 dark:bg-stone-500'
+                        }`} />
+                        {vehicle.subscriptionStatus === 'active' ? t.subscriptionActive : t.subscriptionInactive}
                       </span>
                       {vehicle.status === 'inactive' && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
@@ -1338,11 +1504,19 @@ export function VehicleList({
                     <div className="space-y-1.5 mb-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-stone-500 dark:text-stone-400">{t.insurance}</span>
-                        {insuranceDoc && <ExpiryBadge status={insuranceDoc.status} label={formatDate(insuranceDoc.expiry, language)} />}
+                        {fetchedIds.has(vehicle.id) ? (
+                          insuranceDoc && <ExpiryBadge status={insuranceDoc.status} label={formatDate(insuranceDoc.expiry, language)} />
+                        ) : (
+                          <span className="text-xs font-bold text-stone-500 dark:text-stone-400">— —</span>
+                        )}
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-stone-500 dark:text-stone-400">{t.puc}</span>
-                        {pucDoc && <ExpiryBadge status={pucDoc.status} label={formatDate(pucDoc.expiry, language)} />}
+                        {fetchedIds.has(vehicle.id) ? (
+                          pucDoc && <ExpiryBadge status={pucDoc.status} label={formatDate(pucDoc.expiry, language)} />
+                        ) : (
+                          <span className="text-xs font-bold text-stone-500 dark:text-stone-400">— —</span>
+                        )}
                       </div>
                     </div>
 

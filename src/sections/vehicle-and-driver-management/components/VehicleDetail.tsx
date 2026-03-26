@@ -113,6 +113,8 @@ const translations: Record<Language, Record<string, string>> = {
     year: 'Year',
     category: 'Category',
     status: 'Status',
+    fetchDetails: 'Fetch Details',
+    fetchingDetails: 'Fetching...',
 
     // Category labels
     owned: 'Owned',
@@ -173,6 +175,10 @@ const translations: Record<Language, Record<string, string>> = {
     submitForResolution: 'Submit for Resolution',
     sendProposal: 'Send Proposal',
     submittedForResolution: 'Submitted for resolution — awaiting update',
+    payNow: 'Pay Now',
+    courtChallans: 'Court Challans',
+    onlineChallans: 'Online Challans',
+    paid: 'Paid',
     noPendingChallans: 'No pending challans',
     noPendingChallansDesc: 'This vehicle has no pending traffic challans',
 
@@ -274,6 +280,8 @@ const translations: Record<Language, Record<string, string>> = {
     year: 'वर्ष',
     category: 'श्रेणी',
     status: 'स्थिति',
+    fetchDetails: 'विवरण प्राप्त करें',
+    fetchingDetails: 'प्राप्त हो रहा...',
 
     // Category labels
     owned: 'स्वामित्व',
@@ -334,6 +342,10 @@ const translations: Record<Language, Record<string, string>> = {
     submitForResolution: 'समाधान के लिए जमा करें',
     sendProposal: 'प्रस्ताव भेजें',
     submittedForResolution: 'समाधान के लिए जमा किया गया — अपडेट की प्रतीक्षा है',
+    payNow: 'अभी भुगतान करें',
+    courtChallans: 'कोर्ट चालान',
+    onlineChallans: 'ऑनलाइन चालान',
+    paid: 'भुगतान किया',
     noPendingChallans: 'कोई लंबित चालान नहीं',
     noPendingChallansDesc: 'इस वाहन पर कोई लंबित यातायात चालान नहीं है',
 
@@ -951,38 +963,42 @@ interface VehicleChallan {
   location: string
   status: 'pending' | 'submitted' | 'resolved'
   source: string
+  challanType: 'court' | 'online'
 }
 
 const SAMPLE_CHALLANS: VehicleChallan[] = [
   {
     id: 'ch1',
-    challanNumber: 'DL-2026-00847',
+    challanNumber: 'CH1213390290',
     violationType: 'Overspeeding',
     amount: 2000,
     issueDate: '2026-02-18',
     location: 'NH-48, Gurugram Toll Plaza',
     status: 'pending',
     source: 'Parivahan',
+    challanType: 'court',
   },
   {
     id: 'ch2',
-    challanNumber: 'DL-2026-00623',
+    challanNumber: 'CH1213390455',
     violationType: 'Red Light Violation',
     amount: 5000,
     issueDate: '2026-02-10',
     location: 'Mahipalpur Junction, Delhi',
     status: 'pending',
     source: 'Parivahan',
+    challanType: 'online',
   },
   {
     id: 'ch3',
-    challanNumber: 'UP-2026-01192',
+    challanNumber: 'CH1213390178',
     violationType: 'Overloading',
     amount: 20000,
     issueDate: '2026-01-25',
     location: 'Yamuna Expressway, KM 45',
     status: 'pending',
     source: 'Parivahan',
+    challanType: 'court',
   },
 ]
 
@@ -1282,6 +1298,16 @@ export function VehicleDetail({
   const [showUploadDoc, setShowUploadDoc] = useState(false)
   const [incidentSubTab, setIncidentSubTab] = useState<'challans' | 'cases' | 'rto' | 'other'>('challans')
   const [expandedCompliance, setExpandedCompliance] = useState<Set<string>>(new Set())
+  const [detailsFetched, setDetailsFetched] = useState(vehicle.detailsFetched !== false)
+  const [detailsFetching, setDetailsFetching] = useState(false)
+
+  const handleFetchDetails = () => {
+    setDetailsFetching(true)
+    setTimeout(() => {
+      setDetailsFetching(false)
+      setDetailsFetched(true)
+    }, 1500)
+  }
 
   // Filter incident data for this vehicle
   const vehicleChallans = incidentData.challans.filter((c: { vehicleId: string }) => c.vehicleId === vehicle.id)
@@ -1350,9 +1376,23 @@ export function VehicleDetail({
                         {vehicle.status === 'active' ? t.active : t.inactive}
                       </span>
                     </div>
-                    <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
-                      {vehicle.make} {vehicle.model} · {vehicle.year} · {vehicle.vehicleType}
-                    </p>
+                    {detailsFetched ? (
+                      <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">
+                        {vehicle.make} {vehicle.model} · {vehicle.year} · {vehicle.vehicleType}
+                      </p>
+                    ) : (
+                      <button
+                        onClick={handleFetchDetails}
+                        disabled={detailsFetching}
+                        className="mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-xs font-medium hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-colors disabled:opacity-60"
+                      >
+                        {detailsFetching ? (
+                          <><Loader2 className="w-3 h-3 animate-spin" />{t.fetchingDetails}</>
+                        ) : (
+                          <><RefreshCw className="w-3 h-3" />{t.fetchDetails}</>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -1430,18 +1470,36 @@ export function VehicleDetail({
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.vehicleType}</p>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.vehicleType}</p>
               </div>
-              <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.make}</p>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.make}</p>
-              </div>
-              <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.model}</p>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.model}</p>
-              </div>
-              <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
-                <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.year}</p>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.year}</p>
-              </div>
+              {detailsFetched ? (
+                <>
+                  <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
+                    <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.make}</p>
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.make}</p>
+                  </div>
+                  <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
+                    <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.model}</p>
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.model}</p>
+                  </div>
+                  <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
+                    <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.year}</p>
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.year}</p>
+                  </div>
+                </>
+              ) : (
+                <div className="p-4 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-lg border border-dashed border-emerald-200 dark:border-emerald-800 col-span-1 sm:col-span-2 lg:col-span-3 flex items-center justify-center">
+                  <button
+                    onClick={handleFetchDetails}
+                    disabled={detailsFetching}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-stone-900 text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors disabled:opacity-60"
+                  >
+                    {detailsFetching ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" />{t.fetchingDetails}</>
+                    ) : (
+                      <><RefreshCw className="w-4 h-4" />{t.fetchDetails}</>
+                    )}
+                  </button>
+                </div>
+              )}
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.status}</p>
                 <span className={`text-sm font-medium ${
@@ -1703,26 +1761,24 @@ export function VehicleDetail({
 
                   <div className="space-y-4">
                     {[
-                      { event: 'Challan Issued', date: '10 Mar 2026', amount: 5000 },
-                      { event: 'Insurance Renewed', date: '15 Feb 2026', amount: null },
-                      { event: 'Challan Issued', date: '20 Jan 2026', amount: 2500 },
-                      { event: 'PUCC Renewed', date: '5 Dec 2025', amount: null },
-                      { event: 'Challan Issued', date: '18 Nov 2025', amount: 8000 },
-                      { event: 'Servicing Done', date: '2 Oct 2025', amount: 12000 },
+                      { event: 'Incident Solved', date: '10 Mar 2026', desc: 'Insurance claim settled' },
+                      { event: 'New Incident Created', date: '22 Feb 2026', desc: 'Challan dispute filed' },
+                      { event: 'Incident Solved', date: '15 Feb 2026', desc: 'PUC renewal completed' },
+                      { event: 'New Incident Created', date: '20 Jan 2026', desc: 'Overloading challan reported' },
+                      { event: 'New Incident Created', date: '5 Dec 2025', desc: 'RC mismatch flagged' },
+                      { event: 'Added to LOTS247', date: '2 Oct 2025', desc: 'Vehicle registered on platform' },
                     ].map((item, i) => (
                       <div key={i} className="relative flex gap-3 pl-0">
                         {/* Dot */}
-                        <div className="w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 bg-emerald-500 dark:bg-emerald-400" />
+                        <div className={`w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 ${
+                          item.event === 'Added to LOTS247' ? 'bg-blue-500 dark:bg-blue-400'
+                            : item.event === 'Incident Solved' ? 'bg-emerald-500 dark:bg-emerald-400'
+                            : 'bg-amber-500 dark:bg-amber-400'
+                        }`} />
                         {/* Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{item.event}</p>
-                            {item.amount !== null && (
-                              <span className="text-xs font-semibold text-stone-600 dark:text-stone-300 tabular-nums flex-shrink-0">
-                                ₹{item.amount.toLocaleString('en-IN')}
-                              </span>
-                            )}
-                          </div>
+                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{item.event}</p>
+                          <p className="text-[11px] text-stone-400 dark:text-stone-500 mt-0.5">{item.desc}</p>
                           <p className="text-[11px] text-stone-400 dark:text-stone-500 mt-0.5">{item.date}</p>
                         </div>
                       </div>
@@ -1780,147 +1836,151 @@ export function VehicleDetail({
               </div>
             )}
 
-            {challanFetchState === 'done' && (
-              <div className="space-y-4">
-                {/* Header with result count and re-fetch */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">
-                      {t.pendingChallans}
-                    </h3>
-                    {fetchedChallans.length > 0 && (
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400">
-                        {fetchedChallans.filter(c => c.status === 'pending').length} {t.pending.toLowerCase()}
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => {
-                      setChallanFetchState('fetching')
-                      setTimeout(() => {
-                        setFetchedChallans(SAMPLE_CHALLANS)
-                        setChallanFetchState('done')
-                      }, 2500)
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    {t.reFetch}
-                  </button>
-                </div>
+            {challanFetchState === 'done' && (() => {
+              const pendingChallans = fetchedChallans.filter(c => c.status === 'pending')
+              const paidChallans = fetchedChallans.filter(c => c.status !== 'pending')
+              type ChallanFilter = 'pending' | 'paid'
+              const challanFilter: ChallanFilter = (challanActionMenu as ChallanFilter) || 'pending'
+              const displayChallans = challanFilter === 'pending' ? pendingChallans : paidChallans
+              const formatAmount = (amt: number) => new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amt)
 
-                {/* Total Amount Card */}
-                {fetchedChallans.length > 0 && (
-                  <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 rounded-xl p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center">
-                        <IndianRupee className="w-5 h-5 text-amber-700 dark:text-amber-400" />
+              return (
+                <div className="flex flex-col lg:flex-row gap-5">
+                  {/* Sidebar filters */}
+                  <div className="lg:w-48 flex-shrink-0">
+                    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
+                      {([
+                        { key: 'pending' as const, icon: FileWarning, label: t.pending, count: pendingChallans.length },
+                        { key: 'paid' as const, icon: CheckCircle2, label: t.paid, count: paidChallans.length },
+                      ]).map((item) => (
+                        <button
+                          key={item.key}
+                          onClick={() => setChallanActionMenu(item.key)}
+                          className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium transition-colors ${
+                            challanFilter === item.key
+                              ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 border-l-3 border-amber-500'
+                              : 'text-stone-500 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800/50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <item.icon className="w-4 h-4" />
+                            <span>{item.label}</span>
+                          </div>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                            challanFilter === item.key
+                              ? 'bg-amber-200 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300'
+                              : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
+                          }`}>
+                            {item.count}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Main content */}
+                  <div className="flex-1 space-y-4">
+                    {/* Vehicle info card */}
+                    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
+                        <Truck className="w-5 h-5 text-stone-500 dark:text-stone-400" />
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider">{t.totalPendingAmount}</p>
-                        <p className="text-xl font-bold text-amber-800 dark:text-amber-200 tabular-nums">
-                          {new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(
-                            fetchedChallans.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.amount, 0)
-                          )}
+                        <p className="text-base font-bold text-stone-900 dark:text-stone-50 font-mono tracking-wide">{vehicle.rcNumber}</p>
+                        <p className="text-xs text-stone-500 dark:text-stone-400">
+                          {vehicle.make} {vehicle.model} · Reg. {vehicle.year}
                         </p>
                       </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Challan Cards */}
-                {fetchedChallans.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {fetchedChallans.map((challan) => (
-                      <div
-                        key={challan.id}
-                        className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 sm:p-5"
+                      <button
+                        onClick={() => {
+                          setChallanFetchState('fetching')
+                          setTimeout(() => {
+                            setFetchedChallans(SAMPLE_CHALLANS)
+                            setChallanFetchState('done')
+                          }, 2500)
+                        }}
+                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 min-h-9 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                       >
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-950/40 flex items-center justify-center flex-shrink-0">
-                              <FileWarning className="w-5 h-5 text-red-600 dark:text-red-400" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-stone-900 dark:text-stone-50">
-                                {challan.violationType}
-                              </p>
-                              <p className="text-xs text-stone-500 dark:text-stone-400 font-mono mt-0.5">
-                                {challan.challanNumber}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold ${
-                              challan.status === 'pending'
-                                ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300'
-                                : challan.status === 'submitted'
-                                ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300'
-                                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
-                            }`}>
-                              {challan.status === 'pending' ? t.pending : challan.status === 'submitted' ? t.submitted : t.resolved}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
-                          <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
-                            <IndianRupee className="w-3.5 h-3.5 flex-shrink-0" />
-                            <span className="font-semibold text-stone-900 dark:text-stone-100 tabular-nums">
-                              {new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(challan.amount)}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
-                            <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                            {formatDate(challan.issueDate, language)}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
-                            <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                            <span className="truncate">{challan.location}</span>
-                          </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        {challan.status === 'pending' && (
-                          <div className="flex items-center gap-2 pt-3 border-t border-stone-100 dark:border-stone-800">
-                            <button
-                              onClick={() => {
-                                setFetchedChallans(prev =>
-                                  prev.map(c => c.id === challan.id ? { ...c, status: 'submitted' as const } : c)
-                                )
-                              }}
-                              className="flex items-center gap-1.5 px-3.5 py-2 min-h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors shadow-sm"
-                            >
-                              <Gavel className="w-3.5 h-3.5" />
-                              {t.submitForResolution}
-                            </button>
-                          </div>
-                        )}
-
-                        {challan.status === 'submitted' && (
-                          <div className="flex items-center gap-2 pt-3 border-t border-stone-100 dark:border-stone-800">
-                            <span className="flex items-center gap-1.5 text-xs font-medium text-blue-600 dark:text-blue-400">
-                              <Clock className="w-3.5 h-3.5" />
-                              {t.submittedForResolution}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-10 text-center">
-                    <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
-                      <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        {t.reFetch}
+                      </button>
                     </div>
-                    <p className="text-sm font-medium text-stone-900 dark:text-stone-50">{t.noPendingChallans}</p>
-                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
-                      {t.noPendingChallansDesc}
-                    </p>
+
+                    {/* Challan Cards */}
+                    {displayChallans.length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {displayChallans.map((challan) => (
+                          <div
+                            key={challan.id}
+                            className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 sm:p-5 flex flex-col"
+                          >
+                            {/* Top: Violation + Amount */}
+                            <div className="flex items-start justify-between mb-3">
+                              <div>
+                                <p className="text-sm font-bold text-stone-900 dark:text-stone-50">
+                                  {challan.violationType}
+                                </p>
+                                <p className="text-xs text-stone-400 dark:text-stone-500 font-mono mt-0.5">
+                                  {challan.challanNumber}
+                                </p>
+                              </div>
+                              <p className="text-lg font-bold text-red-600 dark:text-red-400 tabular-nums whitespace-nowrap">
+                                {formatAmount(challan.amount)}
+                              </p>
+                            </div>
+
+                            {/* Date + Location */}
+                            <div className="flex items-center gap-4 text-xs text-stone-500 dark:text-stone-400 mb-4">
+                              <div className="flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                                {formatDate(challan.issueDate, language)}
+                              </div>
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                                <span className="truncate">{challan.location}</span>
+                              </div>
+                            </div>
+
+                            {/* Footer: Type badge + Pay Now */}
+                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-stone-100 dark:border-stone-800">
+                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${
+                                challan.challanType === 'court'
+                                  ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
+                                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'
+                              }`}>
+                                {challan.challanType === 'court' ? t.courtChallans : t.onlineChallans}
+                              </span>
+                              {challan.status === 'pending' && (
+                                <button
+                                  onClick={() => {
+                                    setFetchedChallans(prev =>
+                                      prev.map(c => c.id === challan.id ? { ...c, status: 'submitted' as const } : c)
+                                    )
+                                  }}
+                                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm"
+                                >
+                                  {t.payNow}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-10 text-center">
+                        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
+                          <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <p className="text-sm font-medium text-stone-900 dark:text-stone-50">{t.noPendingChallans}</p>
+                        <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+                          {t.noPendingChallansDesc}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
+                </div>
+              )
+            })()}
           </div>
         )}
 

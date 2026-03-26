@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Search,
   Download,
-  Mail,
   MessageCircle,
   FileText,
   Eye,
@@ -14,6 +14,8 @@ import {
   Car,
   Calendar,
   Filter,
+  SlidersHorizontal,
+  ChevronDown,
 } from 'lucide-react'
 import type { ReportsProps, Report, ReportTab, ReportType } from '@/../product/sections/reports/types'
 
@@ -105,10 +107,10 @@ function ReportPreviewModal({
 }) {
   const config = TYPE_CONFIG[report.type]
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative w-full max-w-2xl bg-white dark:bg-stone-900 rounded-2xl shadow-2xl dark:shadow-stone-950/50 overflow-hidden">
@@ -184,13 +186,6 @@ function ReportPreviewModal({
             Download PDF
           </button>
           <button
-            onClick={() => onShareEmail?.(report.id)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 text-sm font-medium transition-colors"
-          >
-            <Mail className="w-4 h-4" />
-            <span className="hidden sm:inline">Email</span>
-          </button>
-          <button
             onClick={() => onShareWhatsApp?.(report.id)}
             className="flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 text-sm font-medium transition-colors"
           >
@@ -199,7 +194,8 @@ function ReportPreviewModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -221,6 +217,8 @@ export function ReportsList({
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [previewReport, setPreviewReport] = useState<Report | null>(null)
+  const [formatFilter, setFormatFilter] = useState<'all' | 'PDF' | 'Excel'>('all')
+  const [showFilters, setShowFilters] = useState(false)
 
   const activeTab = controlledTab ?? internalTab
 
@@ -263,11 +261,16 @@ export function ReportsList({
       )
     }
 
+    // Format filter
+    if (formatFilter !== 'all') {
+      result = result.filter((r) => r.format === formatFilter)
+    }
+
     // Sort by generated date descending
     result.sort((a, b) => new Date(b.generatedAt).getTime() - new Date(a.generatedAt).getTime())
 
     return result
-  }, [reports, activeTab, searchQuery])
+  }, [reports, activeTab, searchQuery, formatFilter])
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
   const paginatedItems = filtered.slice(
@@ -330,26 +333,77 @@ export function ReportsList({
           ))}
         </div>
 
-        {/* Search */}
-        <div className="mb-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
-            <input
-              type="text"
-              placeholder="Search by period, vehicle, incident ID..."
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => handleSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
+        {/* Search + Filters */}
+        <div className="mb-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
+              <input
+                type="text"
+                placeholder="Search by period, vehicle, incident ID..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => handleSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                showFilters || formatFilter !== 'all'
+                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
+              }`}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="hidden sm:inline">Filters</span>
+              {formatFilter !== 'all' && (
+                <span className="ml-1 w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">
+                  1
+                </span>
+              )}
+            </button>
           </div>
+
+          {/* Expanded Filters */}
+          {showFilters && (
+            <div className="flex flex-wrap items-end gap-4 p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+                  Format
+                </label>
+                <div className="relative">
+                  <select
+                    value={formatFilter}
+                    onChange={(e) => { setFormatFilter(e.target.value as 'all' | 'PDF' | 'Excel'); setCurrentPage(1) }}
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  >
+                    <option value="all">All Formats</option>
+                    <option value="PDF">PDF</option>
+                    <option value="Excel">Excel</option>
+                  </select>
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {formatFilter !== 'all' && (
+                <button
+                  onClick={() => { setFormatFilter('all'); setCurrentPage(1) }}
+                  className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors pb-2"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Desktop Table */}
@@ -446,13 +500,6 @@ export function ReportsList({
                         <Download className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onShareEmail?.(report.id)}
-                        className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-                        title="Share via Email"
-                      >
-                        <Mail className="w-4 h-4" />
-                      </button>
-                      <button
                         onClick={() => onShareWhatsApp?.(report.id)}
                         className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                         title="Share via WhatsApp"
@@ -540,12 +587,6 @@ export function ReportsList({
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download
-                </button>
-                <button
-                  onClick={() => onShareEmail?.(report.id)}
-                  className="p-2.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-400 transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => onShareWhatsApp?.(report.id)}

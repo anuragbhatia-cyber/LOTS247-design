@@ -1,3 +1,4 @@
+import { Info } from 'lucide-react'
 import type { ComplianceScore as ComplianceScoreType, ComplianceStatus } from '@/../product/sections/home/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
@@ -12,8 +13,8 @@ const statusLabels: Record<Language, Record<ComplianceStatus, string>> = {
 }
 
 const translations: Record<Language, Record<string, string>> = {
-  en: { complianceHealth: 'Compliance Health', viewDetails: 'View Details', fromLastMonth: 'from last month' },
-  hi: { complianceHealth: 'अनुपालन स्वास्थ्य', viewDetails: 'विवरण देखें', fromLastMonth: 'पिछले महीने से' },
+  en: { complianceHealth: 'Fleet Compliance Score', viewDetails: 'View Details', fromLastMonth: 'from last month', tooltipTitle: 'How is this calculated?', tooltipBody: 'Average of compliance % across all categories: RC, Insurance, PUC, Permits & DL.' },
+  hi: { complianceHealth: 'फ्लीट अनुपालन स्कोर', viewDetails: 'विवरण देखें', fromLastMonth: 'पिछले महीने से', tooltipTitle: 'यह कैसे गणना किया जाता है?', tooltipBody: 'सभी श्रेणियों में अनुपालन % का औसत: RC, बीमा, PUC, परमिट और DL।' },
 }
 
 const statusStyles: Record<ComplianceStatus, {
@@ -61,9 +62,19 @@ export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
     <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
       {/* Header */}
       <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex items-center justify-between">
-        <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
-          {t.complianceHealth}
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
+            {t.complianceHealth}
+          </h2>
+          <div className="relative group">
+            <Info className="w-3.5 h-3.5 text-stone-400 cursor-help" />
+            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 px-3 py-2.5 rounded-lg bg-stone-900 dark:bg-stone-100 text-xs text-stone-200 dark:text-stone-700 leading-relaxed shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none">
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-stone-900 dark:border-b-stone-100" />
+              <p className="font-semibold text-white dark:text-stone-900 mb-1">{t.tooltipTitle}</p>
+              <p>{t.tooltipBody}</p>
+            </div>
+          </div>
+        </div>
         {data.changeFromLastMonth != null && data.changeFromLastMonth !== 0 ? (
           <span className={`text-xs font-semibold ${data.changeFromLastMonth > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
             {data.changeFromLastMonth > 0 ? '+' : ''}{data.changeFromLastMonth}% {t.fromLastMonth}
@@ -121,7 +132,7 @@ export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
               <div key={cat.id}>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.dot}`} />
+                    <span className="w-2 h-2 rounded-full flex-shrink-0 bg-emerald-500" />
                     <span className="text-sm text-stone-700 dark:text-stone-300">{cat.label}</span>
                   </div>
                   <span className={`text-sm font-semibold tabular-nums ${cfg.color}`}>

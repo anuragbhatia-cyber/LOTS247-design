@@ -6,6 +6,8 @@ export type VehicleCategory = 'owned' | 'leased' | 'rented'
 
 export type VehicleStatus = 'active' | 'inactive'
 
+export type SubscriptionStatus = 'active' | 'inactive'
+
 export type DocumentType = 'insurance' | 'puc' | 'fitness' | 'rc'
 
 export type DocumentStatus = 'valid' | 'expiring-soon' | 'expired'
@@ -33,6 +35,8 @@ export interface Vehicle {
   pucExpiry: string
   fitnessExpiry: string
   status: VehicleStatus
+  subscriptionStatus: SubscriptionStatus
+  detailsFetched?: boolean
   assignedDriverId: string | null
   documents: VehicleDocument[]
 }

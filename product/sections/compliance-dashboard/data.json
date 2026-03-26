@@ -32,6 +32,7 @@
       "label": "RC",
       "fullLabel": "Registration Certificate",
       "compliant": 17,
+      "expiring": 1,
       "total": 18,
       "percentage": 94,
       "status": "healthy"
@@ -41,6 +42,7 @@
       "label": "Insurance",
       "fullLabel": "Insurance Policy",
       "compliant": 14,
+      "expiring": 2,
       "total": 18,
       "percentage": 78,
       "status": "healthy"
@@ -50,6 +52,7 @@
       "label": "PUCC",
       "fullLabel": "Pollution Under Control Certificate",
       "compliant": 12,
+      "expiring": 3,
       "total": 18,
       "percentage": 67,
       "status": "warning"
@@ -59,6 +62,7 @@
       "label": "Permits",
       "fullLabel": "Permits",
       "compliant": 15,
+      "expiring": 1,
       "total": 18,
       "percentage": 83,
       "status": "healthy",
@@ -73,6 +77,7 @@
       "label": "DL",
       "fullLabel": "Driving License",
       "compliant": 19,
+      "expiring": 2,
       "total": 22,
       "percentage": 86,
       "status": "healthy"

@@ -7,6 +7,7 @@ import { ComplianceScore } from './ComplianceScore'
 import { AlertsFeed } from './ActivityFeed'
 import { NotificationsView } from './NotificationsView'
 import { AlertsView } from './ActivityView'
+import { VehicleComplianceCheck } from './VehicleComplianceCheck'
 
 const homeTranslations: Record<Language, Record<string, string>> = {
   en: {
@@ -20,8 +21,8 @@ const homeTranslations: Record<Language, Record<string, string>> = {
     addVehicleDesc: 'Register a new vehicle to your fleet',
     checkChallan: 'Check Vehicle Challans',
     checkChallanDesc: 'Look up pending traffic challans',
-    checkRto: 'Check RTO',
-    checkRtoDesc: 'Verify vehicle registration status',
+    checkRto: 'Check Vehicle-wise Compliance',
+    checkRtoDesc: 'View compliance status by vehicle',
     totalVehicles: 'Total Vehicles',
     totalDrivers: 'Total Drivers',
     pendingChallans: 'Pending Challans',
@@ -120,8 +121,8 @@ const QUICK_ACTIONS = [
   },
   {
     id: 'rto',
-    label: 'Check RTO',
-    description: 'Verify vehicle registration status',
+    label: 'Check Vehicle-wise Compliance',
+    description: 'View compliance status by vehicle',
     image: '/icon-check-rto.png',
   },
 ]
@@ -185,6 +186,7 @@ export function HomeView({
   const { language } = useLanguage()
   const t = homeTranslations[language]
   const [view, setView] = useState<'home' | 'notifications' | 'alerts'>('home')
+  const [complianceCheckOpen, setComplianceCheckOpen] = useState(false)
   const [quickActionsOpen, setQuickActionsOpen] = useState(false)
   const [dateRangeOpen, setDateRangeOpen] = useState(false)
   const [selectedRange, setSelectedRange] = useState('last7Days')
@@ -217,7 +219,7 @@ export function HomeView({
     incident: () => window.parent.postMessage({ type: 'openAddIncident' }, '*'),
     vehicle: onAddVehicle,
     challan: () => window.parent.postMessage({ type: 'openCheckChallan' }, '*'),
-    rto: () => console.log('Check RTO'),
+    rto: () => setComplianceCheckOpen(true),
   }
 
   const qaTranslations: Record<string, { label: string; description: string }> = {
@@ -310,6 +312,13 @@ export function HomeView({
 
       </div>
 
+      <VehicleComplianceCheck
+        open={complianceCheckOpen}
+        onClose={() => setComplianceCheckOpen(false)}
+        onShowResults={(vn) => {
+          window.parent.postMessage({ type: 'openComplianceResults', vehicleNumber: vn }, '*')
+        }}
+      />
     </div>
   )
 }

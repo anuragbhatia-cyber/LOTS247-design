@@ -9,6 +9,7 @@ import { CheckChallanModal } from '@/sections/home/components/CheckChallanModal'
 import { AddIncidentModal } from '@/sections/home/components/AddIncidentModal'
 import { BulkUploadModal } from '@/sections/vehicle-and-driver-management/components/BulkUploadModal'
 import { ChallanResultsView } from '@/sections/home/components/ChallanResultsView'
+import { VehicleComplianceResultsView } from '@/sections/home/components/VehicleComplianceResultsView'
 
 interface Notification {
   id: string
@@ -296,9 +297,9 @@ function SupportModal({
               </div>
 
               {/* Info message */}
-              <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-                <HelpCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-emerald-700 dark:text-emerald-300 leading-relaxed">
+              <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+                <HelpCircle className="w-4 h-4 text-stone-400 dark:text-stone-500 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
                   {language === 'en'
                     ? 'Our team will reach out to you within a few hours after you submit this ticket.'
                     : 'टिकट जमा करने के बाद हमारी टीम कुछ ही घंटों में आपसे संपर्क करेगी।'}
@@ -353,6 +354,7 @@ export function AppShell({
   const [showAddIncident, setShowAddIncident] = useState(false)
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [challanResultsVehicle, setChallanResultsVehicle] = useState<string | null>(null)
+  const [complianceResultsVehicle, setComplianceResultsVehicle] = useState<string | null>(null)
   const [iframeOverlay, setIframeOverlay] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
   const quickActionsRef = useRef<HTMLDivElement>(null)
@@ -396,6 +398,9 @@ export function AppShell({
       if (event.data?.type === 'openAddIncident') {
         setShowAddIncident(true)
       }
+      if (event.data?.type === 'openComplianceResults' && event.data?.vehicleNumber) {
+        setComplianceResultsVehicle(event.data.vehicleNumber)
+      }
       if (event.data?.type === 'openBulkUpload') {
         setShowBulkUpload(true)
       }
@@ -416,7 +421,7 @@ export function AppShell({
   return (
     <div className="h-screen overflow-hidden bg-stone-50 dark:bg-stone-950">
       {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-stone-900 border-b border-stone-800 flex items-center justify-between px-4">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-16 bg-stone-900 border-b border-stone-800 flex items-center justify-between px-4">
         <div className="flex items-center">
           <button
             onClick={() => setIsMobileOpen(true)}
@@ -450,7 +455,7 @@ export function AppShell({
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 z-50 h-full bg-stone-900 border-r border-stone-800
+          fixed top-0 left-0 z-40 h-full bg-stone-900
           transition-all duration-300 ease-in-out
           ${isCollapsed ? 'w-16' : 'w-60'}
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -542,7 +547,7 @@ export function AppShell({
       >
         {/* Top bar — matches sidebar logo header height */}
         <div
-          className="hidden lg:flex fixed top-0 right-0 h-16 border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 z-40 items-center justify-end px-6 gap-4"
+          className="hidden lg:flex fixed top-0 right-0 h-16 bg-white dark:bg-stone-950 z-40 items-center justify-end px-6 gap-4 border-b border-stone-200 dark:border-stone-800"
           style={{ left: isCollapsed ? '4rem' : '15rem' }}
         >
           {/* Help */}
@@ -737,6 +742,11 @@ export function AppShell({
             <ChallanResultsView
               vehicleNumber={challanResultsVehicle}
               onBack={() => setChallanResultsVehicle(null)}
+            />
+          ) : complianceResultsVehicle ? (
+            <VehicleComplianceResultsView
+              vehicleNumber={complianceResultsVehicle}
+              onBack={() => setComplianceResultsVehicle(null)}
             />
           ) : (
             children

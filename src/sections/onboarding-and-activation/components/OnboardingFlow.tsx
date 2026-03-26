@@ -7,6 +7,7 @@ import type {
   SubscriptionPlan,
 } from '@/../product/sections/onboarding-and-activation/types'
 import { RegistrationStep } from './RegistrationStep'
+import { LoginStep } from './LoginStep'
 import { PlanSelectionStep } from './PlanSelectionStep'
 
 interface OnboardingFlowProps {
@@ -37,6 +38,7 @@ export function OnboardingFlow({
   onSelectPlan,
   onComplete,
 }: OnboardingFlowProps) {
+  const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup')
   const [currentStepId, setCurrentStepId] = useState(
     initialProgress?.currentStep || 'step-signup'
   )
@@ -44,13 +46,28 @@ export function OnboardingFlow({
     initialProgress?.completedSteps || []
   )
   const [otpSent, setOtpSent] = useState(false)
+  const [loginOtpSent, setLoginOtpSent] = useState(false)
   const [resendCountdown, setResendCountdown] = useState(0)
+  const [loginResendCountdown, setLoginResendCountdown] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
 
   const startCountdown = () => {
     setResendCountdown(60)
     const timer = setInterval(() => {
       setResendCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  const startLoginCountdown = () => {
+    setLoginResendCountdown(60)
+    const timer = setInterval(() => {
+      setLoginResendCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer)
           return 0
@@ -76,6 +93,26 @@ export function OnboardingFlow({
   const handleResendOTP = () => {
     onResendOTP?.()
     startCountdown()
+  }
+
+  // Login handlers
+  const handleLoginRequestOTP = (phone: string) => {
+    onRequestOTP?.(phone)
+    setLoginOtpSent(true)
+    startLoginCountdown()
+  }
+
+  const handleLoginVerifyOTP = (otp: string) => {
+    onVerifyOTP?.(otp)
+    setShowSuccess(true)
+    setTimeout(() => {
+      onComplete?.()
+    }, 2000)
+  }
+
+  const handleLoginResendOTP = () => {
+    onResendOTP?.()
+    startLoginCountdown()
   }
 
   // Plan handler
@@ -130,13 +167,25 @@ export function OnboardingFlow({
 
   return (
     <>
-      {currentStepId === 'step-signup' && (
+      {currentStepId === 'step-signup' && authMode === 'signup' && (
         <RegistrationStep
           onRequestOTP={handleRequestOTP}
           onVerifyOTP={handleVerifyOTP}
           onResendOTP={handleResendOTP}
+          onLoginClick={() => setAuthMode('login')}
           otpSent={otpSent}
           resendCountdown={resendCountdown}
+        />
+      )}
+
+      {currentStepId === 'step-signup' && authMode === 'login' && (
+        <LoginStep
+          onRequestOTP={handleLoginRequestOTP}
+          onVerifyOTP={handleLoginVerifyOTP}
+          onResendOTP={handleLoginResendOTP}
+          onSignUpClick={() => setAuthMode('signup')}
+          otpSent={loginOtpSent}
+          resendCountdown={loginResendCountdown}
         />
       )}
 

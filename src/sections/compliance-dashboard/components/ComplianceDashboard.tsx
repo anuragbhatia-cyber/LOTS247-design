@@ -252,14 +252,14 @@ function CategoryCard({
     <button
       onClick={onClick}
       className={`
-        group relative w-full text-left p-4 sm:p-5 rounded-2xl border transition-all duration-200
-        bg-stone-50 dark:bg-stone-800/50 border-stone-200 dark:border-stone-800
+        group relative w-full h-full text-left p-4 sm:p-5 rounded-2xl border transition-all duration-200 flex flex-col
+        bg-white dark:bg-stone-900 border-stone-200 dark:border-stone-800
         hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-md dark:hover:shadow-stone-950/40
       `}
     >
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-medium text-stone-900 dark:text-stone-100 leading-snug">{category.fullLabel}</p>
-        <div className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 transition-colors">
+      <div className="flex items-start justify-between gap-2 mb-3 min-h-[40px]">
+        <p className="text-sm font-medium text-stone-500 dark:text-stone-400 leading-snug min-w-0">{category.fullLabel}</p>
+        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 transition-colors flex-shrink-0">
           <span className="text-xs font-medium">View</span>
           <ArrowUpRight className="w-3 h-3" />
         </div>
@@ -269,13 +269,20 @@ function CategoryCard({
         <span className="text-2xl font-bold text-stone-900 dark:text-stone-100">{category.compliant}<span className="text-base font-semibold text-stone-400 dark:text-stone-500">/{category.total}</span></span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap mt-auto">
         <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
           {category.compliant} Valid
         </span>
-        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
-          {category.total - category.compliant} Expired
-        </span>
+        {(category.expiring ?? 0) > 0 && (
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
+            {category.expiring} Expiring
+          </span>
+        )}
+        {(category.total - category.compliant - (category.expiring ?? 0)) > 0 && (
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
+            {category.total - category.compliant - (category.expiring ?? 0)} Expired
+          </span>
+        )}
       </div>
 
 
@@ -709,7 +716,7 @@ function CategoryDrilldownView({
         {categoryId === 'rc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Issue Date', 'Expiry Date', 'RTO Office']}>
             {filteredRc.length === 0 ? emptyRow(5) : filteredRc.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(row.issueDate)}</td>
@@ -723,7 +730,7 @@ function CategoryDrilldownView({
         {categoryId === 'insurance' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Provider', 'Policy No.', 'Expiry Date']}>
             {filteredInsurance.length === 0 ? emptyRow(5) : filteredInsurance.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.provider}</td>
@@ -737,7 +744,7 @@ function CategoryDrilldownView({
         {categoryId === 'pucc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Test Centre', 'Expiry Date']}>
             {filteredPucc.length === 0 ? emptyRow(4) : filteredPucc.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.testCenter}</td>
@@ -750,7 +757,7 @@ function CategoryDrilldownView({
         {categoryId === 'permits' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Type', 'Permit No.', 'Expiry Date']}>
             {filteredPermits.length === 0 ? emptyRow(5) : filteredPermits.map(row => (
-              <tr key={row.vehicleNumber + row.permitNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+              <tr key={row.vehicleNumber + row.permitNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3">
@@ -772,7 +779,7 @@ function CategoryDrilldownView({
               const isValid = row.status === 'valid'
 
               return (
-                <tr key={row.licenseNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                <tr key={row.licenseNumber} className="transition-colors">
                   <td className="py-4 px-3">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
@@ -814,7 +821,7 @@ function CategoryDrilldownView({
         {categoryId === 'challans' && (
           <DrilldownTable headers={['Vehicle', 'Pending Challans', 'Amount']}>
             {filteredChallans.length === 0 ? emptyRow(3) : filteredChallans.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3">
                   <div className="flex items-center gap-3">
@@ -840,7 +847,7 @@ function CategoryDrilldownView({
         {categoryId === 'blacklisted' && (
           <DrilldownTable headers={['Vehicle', 'Flag Reason', 'Authority', 'Date', 'Status']}>
             {filteredBlacklisted.length === 0 ? emptyRow(5) : filteredBlacklisted.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400 max-w-[250px]">{row.flagReason}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.flaggingAuthority}</td>
@@ -858,7 +865,7 @@ function CategoryDrilldownView({
         {categoryId === 'ntbt' && (
           <DrilldownTable headers={['Vehicle', 'Hold Reason', 'Authority', 'Date', 'Case Ref', 'Status']}>
             {filteredNtbt.length === 0 ? emptyRow(6) : filteredNtbt.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400 max-w-[250px]">{row.holdReason}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.issuingAuthority}</td>
@@ -1233,7 +1240,7 @@ function FleetChallanView({
               <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
                 {selectedVehicles.size} {selectedVehicles.size === 1 ? 'vehicle' : 'vehicles'} selected
               </p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{formatCurrency(selectedAmount)}</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{formatCurrency(selectedAmount)} <span className="text-sm font-medium text-stone-500 dark:text-stone-400">+ GST</span></p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
@@ -1275,7 +1282,7 @@ function FleetRcView({
 
       {/* Mobile tabs */}
       <div className="flex md:hidden gap-2 mb-5">
-        {(['valid', 'invalid', 'expiring'] as const).map(f => (
+        {(['expiring', 'valid', 'invalid'] as const).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -1295,9 +1302,9 @@ function FleetRcView({
         <div className="w-56 shrink-0 hidden md:block">
           <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
+              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
               { key: 'valid' as const, label: 'Valid', count: validItems.length, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
               { key: 'invalid' as const, label: 'Invalid', count: invalidItems.length, countColor: 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400' },
-              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
             ]).map(item => {
               const active = filter === item.key
               return (
@@ -1414,7 +1421,7 @@ function FleetDlView({
   drivers: Driver[]
   onBack: () => void
 }) {
-  const [filter, setFilter] = useState<'valid' | 'invalid' | 'expiring'>('valid')
+  const [filter, setFilter] = useState<'valid' | 'invalid' | 'expiring'>('expiring')
   const [showProposalToast, setShowProposalToast] = useState(false)
 
   const validItems = dlRows.filter(r => r.status === 'valid')
@@ -1430,7 +1437,7 @@ function FleetDlView({
 
       {/* Mobile tabs */}
       <div className="flex md:hidden gap-2 mb-5">
-        {(['valid', 'invalid', 'expiring'] as const).map(f => (
+        {(['expiring', 'valid', 'invalid'] as const).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -1450,9 +1457,9 @@ function FleetDlView({
         <div className="w-56 shrink-0 hidden md:block">
           <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
+              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
               { key: 'valid' as const, label: 'Valid', count: validItems.length, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
               { key: 'invalid' as const, label: 'Invalid', count: invalidItems.length, countColor: 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400' },
-              { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
             ]).map(item => {
               const active = filter === item.key
               return (
@@ -1794,7 +1801,7 @@ export function ComplianceDashboard({
                 const isValid = row.status === 'valid'
 
                 return (
-                  <tr key={row.licenseNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                  <tr key={row.licenseNumber} className="transition-colors">
                     <td className="py-4 px-3">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
@@ -1854,7 +1861,7 @@ export function ComplianceDashboard({
                   <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
-                        Compliance Health
+                        Fleet Compliance Score
                       </h2>
                       <div className="relative group">
                         <Info className="w-3.5 h-3.5 text-stone-400 cursor-help" />
@@ -1883,7 +1890,7 @@ export function ComplianceDashboard({
                           <div key={cat.id}>
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
-                                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.dot}`} />
+                                <span className="w-2 h-2 rounded-full flex-shrink-0 bg-emerald-500" />
                                 <span className="text-sm text-stone-700 dark:text-stone-300">{HEALTH_CARD_LABEL[cat.id]}</span>
                               </div>
                               <span className={`text-sm font-semibold tabular-nums ${cfg.color}`}>
@@ -2304,7 +2311,7 @@ export function ComplianceDashboard({
                     {paginatedUrgencyItems.map(item => {
                       const badge = URGENCY_BADGE[item.urgency]
                       return (
-                        <tr key={item.id} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                        <tr key={item.id} className="transition-colors">
                           <td className="py-3 px-4 sm:px-6 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{item.vehicleNumber}</td>
                           <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{item.documentType}</td>
                           <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(item.expiryDate)}</td>
@@ -2325,7 +2332,7 @@ export function ComplianceDashboard({
                               }}
                               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
                             >
-                              Create Incident
+                              Raise Proposal
                               <ArrowUpRight className="w-3.5 h-3.5" />
                             </button>
                           </td>
