@@ -83,6 +83,20 @@ const translations: Record<Language, Record<string, string>> = {
     collapse: 'Collapse',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
+    supportTitle: 'Raise a Support Ticket',
+    supportTicketSubmitted: 'Ticket Submitted',
+    supportTicketSuccess: 'Our team will reach out to you within a few hours. Thank you for your patience.',
+    supportSubscriberId: 'Subscriber ID',
+    supportSubscriberPlaceholder: 'e.g. SUB-10234',
+    supportYourName: 'Your Name',
+    supportNamePlaceholder: 'Enter your full name',
+    supportMessage: 'Message',
+    supportMessagePlaceholder: 'Describe your issue or question...',
+    supportInfoMessage: 'Our team will reach out to you within a few hours after you submit this ticket.',
+    supportCancel: 'Cancel',
+    supportSubmit: 'Submit Ticket',
+    supportDone: 'Done',
+    help: 'Help',
   },
   hi: {
     quickActions: 'त्वरित कार्य',
@@ -104,6 +118,20 @@ const translations: Record<Language, Record<string, string>> = {
     collapse: 'संक्षिप्त करें',
     openMenu: 'मेनू खोलें',
     closeMenu: 'मेनू बंद करें',
+    supportTitle: 'सहायता टिकट बनाएं',
+    supportTicketSubmitted: 'टिकट जमा किया गया',
+    supportTicketSuccess: 'हमारी टीम कुछ ही घंटों में आपसे संपर्क करेगी। आपके धैर्य के लिए धन्यवाद।',
+    supportSubscriberId: 'सब्सक्राइबर ID',
+    supportSubscriberPlaceholder: 'जैसे SUB-10234',
+    supportYourName: 'आपका नाम',
+    supportNamePlaceholder: 'अपना पूरा नाम दर्ज करें',
+    supportMessage: 'संदेश',
+    supportMessagePlaceholder: 'अपनी समस्या या प्रश्न का वर्णन करें...',
+    supportInfoMessage: 'टिकट जमा करने के बाद हमारी टीम कुछ ही घंटों में आपसे संपर्क करेगी।',
+    supportCancel: 'रद्द करें',
+    supportSubmit: 'टिकट जमा करें',
+    supportDone: 'ठीक है',
+    help: 'सहायता',
   },
 }
 
@@ -182,11 +210,11 @@ const QUICK_ACTIONS = [
 function SupportModal({
   isOpen,
   onClose,
-  language,
+  t,
 }: {
   isOpen: boolean
   onClose: () => void
-  language: Language
+  t: Record<string, string>
 }) {
   const [subscriberId, setSubscriberId] = useState('')
   const [name, setName] = useState('')
@@ -210,15 +238,15 @@ function SupportModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/40 dark:bg-black/60" onClick={handleClose} />
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-2">
             <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
-              {language === 'en' ? 'Raise a Support Ticket' : 'सहायता टिकट बनाएं'}
+              {t.supportTitle}
             </h3>
           </div>
           <button
@@ -236,18 +264,16 @@ function SupportModal({
               <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
             <h4 className="text-base font-bold text-stone-900 dark:text-stone-100 mb-1.5">
-              {language === 'en' ? 'Ticket Submitted' : 'टिकट जमा किया गया'}
+              {t.supportTicketSubmitted}
             </h4>
             <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed">
-              {language === 'en'
-                ? 'Our team will reach out to you within a few hours. Thank you for your patience.'
-                : 'हमारी टीम कुछ ही घंटों में आपसे संपर्क करेगी। आपके धैर्य के लिए धन्यवाद।'}
+              {t.supportTicketSuccess}
             </p>
             <button
               onClick={handleClose}
-              className="mt-6 px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
+              className="mt-6 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
             >
-              {language === 'en' ? 'Done' : 'ठीक है'}
+              {t.supportDone}
             </button>
           </div>
         ) : (
@@ -257,13 +283,13 @@ function SupportModal({
               {/* Subscriber ID */}
               <div>
                 <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
-                  {language === 'en' ? 'Subscriber ID' : 'सब्सक्राइबर ID'}
+                  {t.supportSubscriberId}
                 </label>
                 <input
                   type="text"
                   value={subscriberId}
                   onChange={(e) => setSubscriberId(e.target.value)}
-                  placeholder={language === 'en' ? 'e.g. SUB-10234' : 'जैसे SUB-10234'}
+                  placeholder={t.supportSubscriberPlaceholder}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                 />
               </div>
@@ -271,13 +297,13 @@ function SupportModal({
               {/* Name */}
               <div>
                 <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
-                  {language === 'en' ? 'Your Name' : 'आपका नाम'}
+                  {t.supportYourName}
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder={language === 'en' ? 'Enter your full name' : 'अपना पूरा नाम दर्ज करें'}
+                  placeholder={t.supportNamePlaceholder}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                 />
               </div>
@@ -285,43 +311,41 @@ function SupportModal({
               {/* Message */}
               <div>
                 <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
-                  {language === 'en' ? 'Message' : 'संदेश'}
+                  {t.supportMessage}
                 </label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder={language === 'en' ? 'Describe your issue or question...' : 'अपनी समस्या या प्रश्न का वर्णन करें...'}
+                  placeholder={t.supportMessagePlaceholder}
                   rows={4}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 resize-none transition-colors"
                 />
               </div>
 
               {/* Info message */}
-              <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
+              <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-lg bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700">
                 <HelpCircle className="w-4 h-4 text-stone-400 dark:text-stone-500 flex-shrink-0 mt-0.5" />
                 <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-                  {language === 'en'
-                    ? 'Our team will reach out to you within a few hours after you submit this ticket.'
-                    : 'टिकट जमा करने के बाद हमारी टीम कुछ ही घंटों में आपसे संपर्क करेगी।'}
+                  {t.supportInfoMessage}
                 </p>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-stone-200 dark:border-stone-800">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+                className="px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
               >
-                {language === 'en' ? 'Cancel' : 'रद्द करें'}
+                {t.supportCancel}
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!subscriberId.trim() || !name.trim() || !message.trim()}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 text-sm font-semibold transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 text-sm font-semibold transition-colors"
               >
                 <Send className="w-3.5 h-3.5" />
-                {language === 'en' ? 'Submit Ticket' : 'टिकट जमा करें'}
+                {t.supportSubmit}
               </button>
             </div>
           </>
@@ -420,12 +444,12 @@ export function AppShell({
 
   return (
     <div className="h-screen overflow-hidden bg-stone-50 dark:bg-stone-950">
-      {/* Mobile Header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-16 bg-stone-900 border-b border-stone-800 flex items-center justify-between px-4">
+      {/* Mobile Header — hidden when sidebar is open to avoid double logo (#14) */}
+      <header className={`lg:hidden fixed top-0 left-0 right-0 z-40 h-16 bg-stone-900 border-b border-stone-800 flex items-center justify-between px-4 transition-opacity duration-200 ${isMobileOpen ? 'opacity-0 pointer-events-none' : ''}`}>
         <div className="flex items-center">
           <button
             onClick={() => setIsMobileOpen(true)}
-            className="p-3 -ml-3 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors"
+            className="p-3 -ml-3 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             aria-label={t.openMenu}
           >
             <Menu className="w-5 h-5" />
@@ -437,7 +461,7 @@ export function AppShell({
         {/* Mobile Language Switcher */}
         <button
           onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-xs font-medium"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
         >
           <Languages className="w-4 h-4" />
           <span>{language === 'en' ? 'हिन्दी' : 'EN'}</span>
@@ -447,22 +471,22 @@ export function AppShell({
       {/* Mobile Overlay */}
       {isMobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-50 bg-black/50"
+          className="lg:hidden fixed inset-0 z-[45] bg-black/50"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — z-50 on mobile to sit above overlay (#13) */}
       <aside
         className={`
-          fixed top-0 left-0 z-40 h-full bg-stone-900
+          fixed top-0 left-0 h-full bg-stone-900
           transition-all duration-300 ease-in-out
           ${isCollapsed ? 'w-16' : 'w-60'}
-          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${isMobileOpen ? 'translate-x-0 z-50' : '-translate-x-full lg:translate-x-0 z-40'}
         `}
       >
         {/* Logo & Collapse Toggle */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-stone-800">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-stone-800/50">
           <div className={`flex items-center ${isCollapsed ? 'justify-center w-full' : ''}`}>
             {isCollapsed ? (
               <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center flex-shrink-0">
@@ -476,7 +500,7 @@ export function AppShell({
           {/* Mobile Close */}
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="lg:hidden p-3.5 text-stone-500 hover:text-stone-200 hover:bg-stone-800 rounded-lg transition-colors"
+            className="lg:hidden p-3.5 text-stone-500 hover:text-stone-200 hover:bg-stone-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             aria-label={t.closeMenu}
           >
             <X className="w-4 h-4" />
@@ -498,7 +522,7 @@ export function AppShell({
 
             {secondaryItems && secondaryItems.length > 0 && (
               <>
-                <div className={`my-4 border-t border-stone-800/60 ${isCollapsed ? 'mx-2' : 'mx-4'}`} />
+                <div className={`my-4 border-t border-stone-800/50 ${isCollapsed ? 'mx-2' : 'mx-4'}`} />
                 <MainNav
                   items={secondaryItems}
                   isCollapsed={isCollapsed}
@@ -512,18 +536,20 @@ export function AppShell({
           </div>
 
           {/* Collapse Toggle (Desktop) */}
-          <div className="hidden lg:block px-3 py-3 border-t border-stone-800/60">
+          <div className="hidden lg:block px-3 py-3 border-t border-stone-800/50">
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
+              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-expanded={!isCollapsed}
               className={`
                 w-full flex items-center gap-2 px-2 py-2 text-sm text-stone-400
                 hover:text-stone-200 hover:bg-stone-800
-                rounded-lg transition-colors
+                rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40
                 ${isCollapsed ? 'justify-center' : ''}
               `}
             >
               <svg
-                className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -553,10 +579,10 @@ export function AppShell({
           {/* Help */}
           <button
             onClick={() => setShowSupport(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
           >
             <HelpCircle className="w-4 h-4" />
-            <span className="text-xs">{language === 'en' ? 'Help' : 'सहायता'}</span>
+            <span className="text-sm">{t.help}</span>
           </button>
 
           {/* Notification Bell */}
@@ -565,8 +591,11 @@ export function AppShell({
               onClick={() => {
                 setNotifOpen(!notifOpen)
                 setProfileOpen(false)
+                setLangOpen(false)
               }}
-              className="relative p-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+              aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+              aria-expanded={notifOpen}
+              className="relative p-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -673,8 +702,11 @@ export function AppShell({
                 onClick={() => {
                   setProfileOpen(!profileOpen)
                   setNotifOpen(false)
+                  setLangOpen(false)
                 }}
-                className="flex items-center gap-3 pl-1 pr-2 py-1.5 min-h-11 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                aria-label="User menu"
+                aria-expanded={profileOpen}
+                className="flex items-center gap-3 pl-1 pr-2 py-1.5 min-h-11 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               >
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.name} className="w-9 h-9 rounded-full object-cover" />
@@ -702,7 +734,10 @@ export function AppShell({
                   </div>
                   <div className="py-1">
                     <button
-                      onClick={() => setProfileOpen(false)}
+                      onClick={() => {
+                        setProfileOpen(false)
+                        onNavigate?.('/profile')
+                      }}
                       className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                     >
                       <User className="w-4 h-4 text-stone-400" />
@@ -794,7 +829,7 @@ export function AppShell({
       <SupportModal
         isOpen={showSupport}
         onClose={() => setShowSupport(false)}
-        language={language}
+        t={t}
       />
     </div>
   )

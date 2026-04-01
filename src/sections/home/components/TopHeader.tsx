@@ -146,7 +146,7 @@ export function TopHeader({
               setNotifOpen(!notifOpen)
               setProfileOpen(false)
             }}
-            className="relative p-3.5 sm:p-3 rounded-lg text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="relative p-3.5 sm:p-3 rounded-xl text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
             {unreadCount > 0 && (
@@ -157,7 +157,7 @@ export function TopHeader({
           {/* Notification Dropdown */}
           {notifOpen && (
             <div className="absolute right-0 top-full mt-2 w-96 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden">
-              <div className="px-5 py-3.5 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+              <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">
                   {t.notifications}
                 </h3>
@@ -168,7 +168,7 @@ export function TopHeader({
                 )}
               </div>
 
-              <div className="max-h-96 overflow-y-auto divide-y divide-stone-100 dark:divide-stone-800">
+              <div className="max-h-96 overflow-y-auto divide-y divide-stone-200 dark:divide-stone-800">
                 {DUMMY_NOTIFICATIONS.map((notif) => {
                   const { icon: Icon, style } = NOTIF_CONFIG[notif.type]
                   return (
@@ -204,7 +204,7 @@ export function TopHeader({
                 })}
               </div>
 
-              <div className="px-5 py-3.5 border-t border-stone-100 dark:border-stone-800">
+              <div className="px-5 py-3.5 border-t border-stone-200 dark:border-stone-800">
                 <button
                   onClick={() => {
                     setNotifOpen(false)
@@ -226,7 +226,7 @@ export function TopHeader({
               setProfileOpen(!profileOpen)
               setNotifOpen(false)
             }}
-            className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 sm:py-1.5 min-h-11 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 px-1.5 sm:px-2 py-1 sm:py-1.5 min-h-11 rounded-xl hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
               <span className="text-xs font-bold text-white">{subscriber.avatarInitials}</span>
@@ -243,11 +243,11 @@ export function TopHeader({
           {profileOpen && (
             <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden">
               {/* Subscriber info */}
-              <div className="px-4 py-3 border-b border-stone-100 dark:border-stone-800">
+              <div className="px-4 py-3 border-b border-stone-200 dark:border-stone-800">
                 <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 truncate">
                   {subscriber.name}
                 </p>
-                <span className="inline-flex items-center mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
+                <span className="inline-flex items-center mt-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
                   {subscription.planName} {t.plan}
                 </span>
               </div>
@@ -265,7 +265,7 @@ export function TopHeader({
                   {t.myProfile}
                 </button>
 
-                <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
+                <div className="my-1 mx-3 border-t border-stone-200 dark:border-stone-800" />
 
                 <button
                   onClick={() => {

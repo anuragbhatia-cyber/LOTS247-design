@@ -77,7 +77,7 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={onBack}
-          className="p-3 -ml-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+          className="p-3 -ml-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -89,7 +89,7 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden divide-y divide-stone-100 dark:divide-stone-800">
+      <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden divide-y divide-stone-200 dark:divide-stone-800">
         {ALL_NOTIFICATIONS.map((notif) => {
           const { icon: Icon, style } = NOTIF_CONFIG[notif.type]
           return (

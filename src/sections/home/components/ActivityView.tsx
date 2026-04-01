@@ -71,7 +71,7 @@ export function AlertsView({ items, onBack, onAlertClick }: AlertsViewProps) {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={onBack}
-            className="p-3 -ml-3 rounded-lg text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 -ml-3 rounded-xl text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -86,7 +86,7 @@ export function AlertsView({ items, onBack, onAlertClick }: AlertsViewProps) {
         </div>
 
         {/* Alerts list */}
-        <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden divide-y divide-stone-100 dark:divide-stone-800">
+        <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden divide-y divide-stone-200 dark:divide-stone-800">
           {items.map((item) => {
             const Icon = categoryIcons[item.category]
             const style = urgencyStyles[item.urgency]
@@ -111,7 +111,7 @@ export function AlertsView({ items, onBack, onAlertClick }: AlertsViewProps) {
                     e.stopPropagation()
                     onAlertClick?.(item)
                   }}
-                  className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
+                  className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
                 >
                   {t.payNow}
                   <ArrowRight className="w-3 h-3" />

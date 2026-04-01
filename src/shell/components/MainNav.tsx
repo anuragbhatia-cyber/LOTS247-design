@@ -21,6 +21,9 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
     return initial
   })
 
+  // Track which collapsed item shows flyout
+  const [flyoutHref, setFlyoutHref] = useState<string | null>(null)
+
   const toggleExpand = (href: string) => {
     setExpanded((prev) => {
       const next = new Set(prev)
@@ -43,15 +46,31 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
           const isParentActive = item.isActive || hasActiveChild
 
           return (
-            <li key={item.href}>
+            <li
+              key={item.href}
+              className="relative"
+              onMouseEnter={() => {
+                if (isCollapsed && hasChildren) setFlyoutHref(item.href)
+              }}
+              onMouseLeave={() => {
+                if (isCollapsed && hasChildren) setFlyoutHref(null)
+              }}
+            >
               {/* Parent / regular item */}
               <button
                 onClick={() => {
                   if (hasChildren) {
-                    toggleExpand(item.href)
-                    // Also navigate to the first child if not already in this section
-                    if (!isExpanded && !hasActiveChild && item.children![0]) {
-                      onNavigate?.(item.children![0].href)
+                    if (isCollapsed) {
+                      // In collapsed mode, navigate to first child
+                      if (item.children![0]) {
+                        onNavigate?.(item.children![0].href)
+                      }
+                    } else {
+                      toggleExpand(item.href)
+                      // Also navigate to the first child if not already in this section
+                      if (!isExpanded && !hasActiveChild && item.children![0]) {
+                        onNavigate?.(item.children![0].href)
+                      }
                     }
                   } else {
                     onNavigate?.(item.href)
@@ -60,6 +79,7 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
                 className={`
                   w-full flex items-center gap-3 px-3 py-2.5 min-h-11 rounded-lg text-[13px] font-medium
                   transition-all duration-150
+                  focus:outline-none focus:ring-2 focus:ring-emerald-500/40
                   ${isCollapsed ? 'justify-center px-2' : ''}
                   ${
                     isParentActive
@@ -111,9 +131,9 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
                 )}
               </button>
 
-              {/* Children */}
+              {/* Children — expanded mode */}
               {hasChildren && isExpanded && !isCollapsed && (
-                <ul className="mt-1.5 ml-4 pl-4 border-l border-stone-600 space-y-0.5">
+                <ul className="mt-1.5 ml-4 pl-4 border-l border-stone-700/50 space-y-0.5">
                   {item.children!.map((child) => (
                     <li key={child.href}>
                       <button
@@ -121,6 +141,7 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
                         className={`
                           w-full flex items-center gap-2.5 px-3 py-2 min-h-11 rounded-lg text-sm
                           transition-all duration-150
+                          focus:outline-none focus:ring-2 focus:ring-emerald-500/40
                           ${
                             child.isActive
                               ? 'bg-emerald-950/60 text-emerald-400 font-medium'
@@ -160,7 +181,33 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
                 </ul>
               )}
 
-              {/* Collapsed: show tooltip flyout on hover? For now, just show parent */}
+              {/* Collapsed flyout submenu (#11) */}
+              {isCollapsed && hasChildren && flyoutHref === item.href && (
+                <div className="absolute left-full top-0 ml-2 w-48 bg-stone-900 border border-stone-700/50 rounded-lg shadow-xl shadow-black/30 overflow-hidden z-50 py-1">
+                  <div className="px-3 py-2 border-b border-stone-800/50">
+                    <p className="text-xs font-semibold text-stone-300 uppercase tracking-wider">{item.label}</p>
+                  </div>
+                  {item.children!.map((child) => (
+                    <button
+                      key={child.href}
+                      onClick={() => {
+                        onNavigate?.(child.href)
+                        setFlyoutHref(null)
+                      }}
+                      className={`
+                        w-full flex items-center gap-2 px-3 py-2.5 text-sm transition-colors
+                        ${
+                          child.isActive
+                            ? 'bg-emerald-950/60 text-emerald-400 font-medium'
+                            : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800'
+                        }
+                      `}
+                    >
+                      <span>{child.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
           )
         })}

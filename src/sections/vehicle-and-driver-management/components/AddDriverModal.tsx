@@ -78,14 +78,14 @@ export function AddDriverModal({
   const isValid = name.trim().length >= 2 && phone.trim().length >= 10 && licenseNumber.trim().length >= 6
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={handleClose} />
 
       {/* Modal */}
       <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center">
               <UserPlus className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
@@ -101,7 +101,7 @@ export function AddDriverModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -167,17 +167,17 @@ export function AddDriverModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
           <button
             onClick={handleClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
             {t.cancel}
           </button>
           <button
             onClick={handleAdd}
             disabled={!isValid}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
               isValid
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'

@@ -153,7 +153,7 @@ export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
 
       <button
         onClick={onViewDetails}
-        className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+        className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-200 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
       >
         {t.viewDetails} &rarr;
       </button>

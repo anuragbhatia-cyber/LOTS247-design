@@ -53,7 +53,7 @@ export function ApiDetail({ api, onBack, onContactSubmit }: ApiDetailProps) {
             <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
               <Icon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h1 className="text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
               {api.name}
             </h1>
           </div>
@@ -85,7 +85,7 @@ export function ApiDetail({ api, onBack, onContactSubmit }: ApiDetailProps) {
           </div>
 
           {/* CTA */}
-          <div className="pt-5 border-t border-stone-100 dark:border-stone-800">
+          <div className="pt-5 border-t border-stone-200 dark:border-stone-800">
             <p className="text-sm text-stone-600 dark:text-stone-400 mb-3">
               Interested in using <span className="font-medium text-stone-800 dark:text-stone-200">{api.name}</span>?
             </p>
@@ -142,16 +142,16 @@ export function ApiDetail({ api, onBack, onContactSubmit }: ApiDetailProps) {
             ) : (
               <div className="max-w-3xl">
                 <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
-                  <div className="px-5 py-3.5 border-b border-stone-100 dark:border-stone-800">
+                  <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800">
                     <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
                       {api.endpoints.length} Endpoints
                     </p>
                   </div>
-                  <div className="divide-y divide-stone-100 dark:divide-stone-800">
+                  <div className="divide-y divide-stone-200 dark:divide-stone-800">
                     {api.endpoints.map((endpoint, idx) => {
                       const methodStyle = METHOD_STYLES[endpoint.method] || METHOD_STYLES.GET
                       return (
-                        <div key={idx} className="px-5 py-4 flex items-start gap-3">
+                        <div key={idx} className="px-5 py-4 flex items-start gap-3 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                           <span className={`flex-shrink-0 mt-0.5 text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${methodStyle}`}>
                             {endpoint.method}
                           </span>

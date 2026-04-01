@@ -73,7 +73,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
   return (
     <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
         <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
           {t.alerts}
         </h2>
@@ -85,7 +85,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
       </div>
 
       {/* Alerts — first 4 */}
-      <div className="divide-y divide-stone-100 dark:divide-stone-800">
+      <div className="divide-y divide-stone-200 dark:divide-stone-800">
         {items.slice(0, 3).map((item) => {
           const Icon = categoryIcons[item.category]
           const style = urgencyStyles[item.urgency]
@@ -110,7 +110,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
                   e.stopPropagation()
                   onAlertClick?.(item)
                 }}
-                className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
+                className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
               >
                 {item.category === 'challan' ? t.payNow : t.raiseProposal}
                 <ArrowRight className="w-3 h-3" />
@@ -124,7 +124,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
       {items.length > 3 && (
         <button
           onClick={onViewAll}
-          className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+          className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-200 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
         >
           {t.seeAllAlerts} &rarr;
         </button>

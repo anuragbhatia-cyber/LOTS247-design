@@ -14,6 +14,7 @@ import {
   IdCard,
   CreditCard,
   ClipboardList,
+  Library,
 } from 'lucide-react'
 import { AppShell } from './components/AppShell'
 import { LanguageProvider, useLanguage, type Language } from './components/LanguageContext'
@@ -29,6 +30,7 @@ const navTranslations: Record<Language, Record<string, string>> = {
     apiCatalogue: 'API Catalogue',
     wallet: 'Wallet',
     proposals: 'Proposals',
+    knowledgeBase: 'Knowledge Base',
     settings: 'Settings',
     help: 'Help',
   },
@@ -41,6 +43,7 @@ const navTranslations: Record<Language, Record<string, string>> = {
     apiCatalogue: 'API कैटलॉग',
     wallet: 'वॉलेट',
     proposals: 'प्रस्ताव',
+    knowledgeBase: 'ज्ञान आधार',
     settings: 'सेटिंग्स',
     help: 'सहायता',
   },
@@ -61,6 +64,9 @@ const hrefToScreen: Record<string, { sectionId: string; screenName?: string; par
   '/reports': { sectionId: 'reports', screenName: 'ReportsList' },
   '/wallet': { sectionId: 'wallet' },
   '/proposals': { sectionId: 'proposals', screenName: 'ProposalManagement' },
+  '/knowledge-base': { sectionId: 'knowledge-base' },
+  '/profile': { sectionId: 'my-profile' },
+  '/settings': { sectionId: 'settings' },
 }
 
 // Build lookup from all preview items
@@ -127,6 +133,7 @@ function ShellContent() {
     { label: t.proposals, href: '/proposals', icon: <FileText className="w-5 h-5" />, isActive: activePath === '/proposals' },
     { label: t.apiCatalogue, href: '/api-catalogue', icon: <BookOpen className="w-5 h-5" />, isActive: activePath === '/api-catalogue' },
     { label: t.wallet, href: '/wallet', icon: <Wallet className="w-5 h-5" />, isActive: activePath === '/wallet' },
+    { label: t.knowledgeBase, href: '/knowledge-base', icon: <Library className="w-5 h-5" />, isActive: activePath === '/knowledge-base' },
   ]
 
   const secondaryItems: typeof navigationItems = []

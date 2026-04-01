@@ -237,7 +237,7 @@ function AddMoneyModal({
       <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl dark:shadow-stone-950/50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-200 dark:border-stone-800">
           <div>
             <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 tracking-tight">Add Money</h3>
             <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Top up your LOTS247 wallet</p>
@@ -250,7 +250,7 @@ function AddMoneyModal({
           </button>
         </div>
 
-        <div className="p-4 space-y-4">
+        <div className="p-4 sm:p-6 space-y-4">
           {/* Amount input */}
           <div>
             <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
@@ -285,7 +285,7 @@ function AddMoneyModal({
                 <button
                   key={amount}
                   onClick={() => handleQuickSelect(amount)}
-                  className={`py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                  className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                     selectedAmount === amount
                       ? 'bg-emerald-600 text-white'
                       : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
@@ -340,7 +340,7 @@ function TransactionDetail({
       <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl dark:shadow-stone-950/50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-200 dark:border-stone-800">
           <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 tracking-tight">Transaction Details</h3>
           <button
             onClick={onClose}
@@ -363,7 +363,7 @@ function TransactionDetail({
           </div>
 
           {/* Details */}
-          <div className="rounded-xl border border-stone-200 dark:border-stone-800 divide-y divide-stone-100 dark:divide-stone-800">
+          <div className="rounded-xl border border-stone-200 dark:border-stone-800 divide-y divide-stone-200 dark:divide-stone-800">
             <DetailRow label="Date & Time" value={formatDateTime(transaction.date)} />
             <DetailRow label="Category">
               <CategoryBadge category={transaction.category} />
@@ -384,7 +384,7 @@ function TransactionDetail({
           {transaction.relatedEntityId && transaction.relatedEntityType && (
             <button
               onClick={() => onNavigateToEntity?.(transaction.relatedEntityType!, transaction.relatedEntityId!)}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors group"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors group"
             >
               <div className="flex items-center gap-2.5">
                 <ExternalLink className="w-4 h-4 text-stone-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" />
@@ -598,7 +598,7 @@ export function WalletView({
         {/* ----------------------------------------------------------------- */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
           {/* Balance */}
-          <div className={`col-span-2 rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-4 sm:p-5`}>
+          <div className={`col-span-2 rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6`}>
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Current Balance</p>
@@ -618,7 +618,7 @@ export function WalletView({
                 <Wallet className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
               <RefreshCw className="w-3.5 h-3.5 text-stone-400" />
               <span className="text-xs text-stone-500 dark:text-stone-400">
                 Last recharge {formatCurrency(walletSummary.lastRecharge.amount)} on {formatDate(walletSummary.lastRecharge.date)}
@@ -627,7 +627,7 @@ export function WalletView({
           </div>
 
           {/* Total In */}
-          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-4 sm:p-5">
+          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Total In</p>
@@ -639,13 +639,13 @@ export function WalletView({
                 <TrendingDown className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-100 dark:border-stone-800">
+            <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
               {transactions.filter((t) => t.type === 'credit' && t.status === 'success').length} credit transactions
             </p>
           </div>
 
           {/* Total Out */}
-          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-4 sm:p-5">
+          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Total Out</p>
@@ -657,7 +657,7 @@ export function WalletView({
                 <TrendingUp className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
             </div>
-            <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-100 dark:border-stone-800">
+            <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
               {transactions.filter((t) => t.type === 'debit' && t.status === 'success').length} debit transactions
             </p>
           </div>
@@ -694,7 +694,7 @@ export function WalletView({
           {/* Filters button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium transition-colors shrink-0 ${
+            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors shrink-0 ${
               showFilters || activeFilterCount > 0
                 ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
                 : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
@@ -721,7 +721,7 @@ export function WalletView({
                 <select
                   value={filters.dateRange ?? 'all'}
                   onChange={(e) => updateFilter({ dateRange: e.target.value === 'all' ? undefined : e.target.value as TransactionFilters['dateRange'] })}
-                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                 >
                   <option value="all">All Time</option>
                   {DATE_RANGE_OPTIONS.map((opt) => (
@@ -740,7 +740,7 @@ export function WalletView({
                 <select
                   value={filters.type ?? 'all'}
                   onChange={(e) => updateFilter({ type: e.target.value as TransactionType | 'all' })}
-                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                 >
                   {TYPE_OPTIONS.map((opt) => (
                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -758,7 +758,7 @@ export function WalletView({
                 <select
                   value={filters.category ?? 'all'}
                   onChange={(e) => updateFilter({ category: e.target.value as TransactionCategory | 'all' })}
-                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                 >
                   {CATEGORY_OPTIONS.map((opt) => (
                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -784,7 +784,7 @@ export function WalletView({
         {/* ----------------------------------------------------------------- */}
         <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 mb-6">
           {/* Card header */}
-          <div className="px-5 py-3.5 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+          <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-50">Transaction History</h2>
             <span className="text-xs text-stone-400 dark:text-stone-500">{filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''}</span>
           </div>
@@ -821,7 +821,7 @@ export function WalletView({
                     <col className="w-[15%]" />
                   </colgroup>
                   <thead>
-                    <tr className="border-b border-stone-100 dark:border-stone-800">
+                    <tr className="bg-stone-50 dark:bg-stone-800/60 border-b border-stone-200 dark:border-stone-800">
                       <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3">
                         Transaction
                       </th>
@@ -839,7 +839,7 @@ export function WalletView({
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-stone-100 dark:divide-stone-800/60">
+                  <tbody className="divide-y divide-stone-200 dark:divide-stone-800/60">
                     {paginatedTransactions.map((txn) => {
                       const catConfig = CATEGORY_CONFIG[txn.category]
                       const CatIcon = catConfig.icon
@@ -849,7 +849,7 @@ export function WalletView({
                         <tr
                           key={txn.id}
                           onClick={() => { setSelectedTxnId(txn.id); onViewTransaction?.(txn.id) }}
-                          className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+                          className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                         >
                           {/* Transaction */}
                           <td className="px-5 py-3.5">
@@ -905,7 +905,7 @@ export function WalletView({
               </div>
 
               {/* Mobile Card View */}
-              <div className="md:hidden divide-y divide-stone-100 dark:divide-stone-800/60">
+              <div className="md:hidden divide-y divide-stone-200 dark:divide-stone-800/60">
                 {groupedTransactions.map((group) => (
                   <div key={group.date}>
                     <div className="px-5 py-2.5 bg-stone-50 dark:bg-stone-800/30">
@@ -913,7 +913,7 @@ export function WalletView({
                         {group.label}
                       </span>
                     </div>
-                    <div className="divide-y divide-stone-100 dark:divide-stone-800/60">
+                    <div className="divide-y divide-stone-200 dark:divide-stone-800/60">
                       {group.transactions.map((txn) => {
                         const isCredit = txn.type === 'credit'
 
@@ -921,7 +921,7 @@ export function WalletView({
                           <button
                             key={txn.id}
                             onClick={() => { setSelectedTxnId(txn.id); onViewTransaction?.(txn.id) }}
-                            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors text-left"
+                            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors text-left"
                           >
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 truncate">
@@ -960,7 +960,7 @@ export function WalletView({
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-5 py-3.5 border-t border-stone-100 dark:border-stone-800">
+                <div className="flex items-center justify-between px-5 py-3.5 border-t border-stone-200 dark:border-stone-800">
                   <p className="text-xs text-stone-500 dark:text-stone-400">
                     {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredTransactions.length)} of {filteredTransactions.length}
                   </p>
@@ -968,7 +968,7 @@ export function WalletView({
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                      className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -976,7 +976,7 @@ export function WalletView({
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${
+                        className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
                           page === currentPage
                             ? 'bg-emerald-600 text-white shadow-sm'
                             : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -988,7 +988,7 @@ export function WalletView({
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                      className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>

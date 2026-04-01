@@ -72,7 +72,7 @@ export default function IncidentManagementPreview() {
             <div ref={dateRangeRef} className="relative">
               <button
                 onClick={() => setDateRangeOpen(!dateRangeOpen)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 transition-colors"
               >
                 <Calendar className="w-3.5 h-3.5 text-stone-400" />
                 <span className="hidden sm:inline">
@@ -94,7 +94,7 @@ export default function IncidentManagementPreview() {
                           setSelectedRange(preset.id)
                           setDateRangeOpen(false)
                         }}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                        className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
                           selectedRange === preset.id
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
                             : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
@@ -104,11 +104,11 @@ export default function IncidentManagementPreview() {
                       </button>
                     ))}
 
-                    <div className="mx-2 my-1 border-t border-stone-100 dark:border-stone-800" />
+                    <div className="mx-2 my-1 border-t border-stone-200 dark:border-stone-800" />
 
                     <button
                       onClick={() => setSelectedRange('custom')}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                      className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
                         selectedRange === 'custom'
                           ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
                           : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
@@ -123,20 +123,20 @@ export default function IncidentManagementPreview() {
                           type="date"
                           value={customFrom}
                           onChange={(e) => setCustomFrom(e.target.value)}
-                          className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 outline-none focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                         />
                         <input
                           type="date"
                           value={customTo}
                           onChange={(e) => setCustomTo(e.target.value)}
-                          className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 outline-none focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                         />
                         <button
                           onClick={() => {
                             if (customFrom && customTo) setDateRangeOpen(false)
                           }}
                           disabled={!customFrom || !customTo}
-                          className="w-full py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold transition-colors"
+                          className="w-full py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold transition-colors"
                         >
                           Apply
                         </button>
@@ -238,7 +238,7 @@ export default function IncidentManagementPreview() {
         {activeTab === 'challans' && (
           <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-4 sm:p-5 lg:p-6">
+              <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{totalChallans}</p>
                   <div className="flex items-center gap-3">
@@ -250,7 +250,7 @@ export default function IncidentManagementPreview() {
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-4 sm:p-5 lg:p-6">
+              <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{settledChallans}</p>
                   <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50">
@@ -261,7 +261,7 @@ export default function IncidentManagementPreview() {
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-4 sm:p-5 lg:p-6">
+              <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{inProgressChallans}</p>
                   <div className="p-2 sm:p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50">
@@ -278,7 +278,7 @@ export default function IncidentManagementPreview() {
         {activeTab === 'cases' && (
           <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-4 sm:p-5 lg:p-6">
+              <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{submittedCases}</p>
                   <div className="p-2 sm:p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/50">
@@ -289,7 +289,7 @@ export default function IncidentManagementPreview() {
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-4 sm:p-5 lg:p-6">
+              <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{inProgressCases}</p>
                   <div className="p-2 sm:p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50">
@@ -300,7 +300,7 @@ export default function IncidentManagementPreview() {
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-4 sm:p-5 lg:p-6">
+              <div className="p-5 sm:p-6">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{closedCases}</p>
                   <div className="p-2 sm:p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800">
@@ -341,8 +341,14 @@ export default function IncidentManagementPreview() {
       )}
       {(activeTab === 'rto' || activeTab === 'other') && (
         <div className="px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <p className="text-sm text-stone-500 dark:text-stone-400">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+            {activeTab === 'rto' ? <Building2 className="w-5 h-5 text-stone-400 dark:text-stone-500" /> : <MoreHorizontal className="w-5 h-5 text-stone-400 dark:text-stone-500" />}
+          </div>
+          <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">
             No {activeTab === 'rto' ? 'RTO' : 'other'} incidents yet
+          </p>
+          <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
+            Incidents will appear here once added
           </p>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ShieldCheck, IdCard, Truck, ArrowRight, ArrowLeft, Mail, BookOpen, Key, Zap, BarChart3, ScrollText, ChevronRight, Wallet, type LucideIcon } from 'lucide-react'
+import { ShieldCheck, IdCard, Truck, ArrowRight, ArrowLeft, Mail, BookOpen, Key, Zap, BarChart3, ScrollText, ChevronRight, Wallet, ArrowUpRight, ArrowDownLeft, Receipt, type LucideIcon } from 'lucide-react'
 import type { ApiCatalogueProps, Api } from '@/../product/sections/api-catalogue/types'
 import { ContactModal } from './ContactModal'
 import { TopUpModal } from './TopUpModal'
@@ -92,6 +92,17 @@ const LOGS_DATA = [
   { id: 8, timestamp: '2026-03-19 12:15:48', endpoint: '/v1/challans/UP06KL1234/details', method: 'GET', status: 200, latency: '178ms' },
 ]
 
+// Sample transactions data
+const TRANSACTIONS_DATA = [
+  { id: 1, date: '2026-03-28', type: 'topup' as const, description: 'Credit Top-up', amount: 500, balance: 1753, method: 'UPI' },
+  { id: 2, date: '2026-03-25', type: 'usage' as const, description: 'API Usage — Challan API', amount: -147, balance: 1253, method: null },
+  { id: 3, date: '2026-03-20', type: 'topup' as const, description: 'Credit Top-up', amount: 1000, balance: 1400, method: 'Net Banking' },
+  { id: 4, date: '2026-03-15', type: 'usage' as const, description: 'API Usage — Challan API', amount: -320, balance: 400, method: null },
+  { id: 5, date: '2026-03-10', type: 'topup' as const, description: 'Credit Top-up', amount: 500, balance: 720, method: 'UPI' },
+  { id: 6, date: '2026-03-05', type: 'usage' as const, description: 'API Usage — Challan API', amount: -280, balance: 220, method: null },
+  { id: 7, date: '2026-03-01', type: 'topup' as const, description: 'Welcome Bonus Credits', amount: 500, balance: 500, method: 'Promo' },
+]
+
 export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { onContactPricing?: (id: string) => void }) {
   const [activeTab, setActiveTab] = useState<SidebarTab>('all')
   const [selectedApiId, setSelectedApiId] = useState<string | null>(null)
@@ -119,7 +130,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex">
       {/* Sidebar */}
       <div className="w-64 lg:w-72 shrink-0 hidden md:block p-5 sm:p-6 lg:p-8">
-        <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+        <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
           {SIDEBAR_ITEMS.map((item) => {
             const Icon = item.icon
             const isActive = activeTab === item.id && !selectedApi
@@ -225,17 +236,17 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                                 <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
                               </div>
                               <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
-                              <div className="flex items-center gap-2 pt-4 border-t border-stone-100 dark:border-stone-800">
+                              <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
-                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
                                 >
                                   Check Details
                                   <ArrowRight className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setContactApiId(api.id) }}
-                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                                 >
                                   <Mail className="w-3.5 h-3.5" />
                                   Contact for Pricing
@@ -263,17 +274,17 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                                 <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
                               </div>
                               <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
-                              <div className="flex items-center gap-2 pt-4 border-t border-stone-100 dark:border-stone-800">
+                              <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setShowTopUp(true) }}
-                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
                                 >
                                   <Wallet className="w-3.5 h-3.5" />
                                   Top-up Balance
                                 </button>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
-                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                                 >
                                   Check Details
                                   <ArrowRight className="w-3.5 h-3.5" />
@@ -300,17 +311,17 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                             <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
                           </div>
                           <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
-                          <div className="flex items-center gap-2 pt-4 border-t border-stone-100 dark:border-stone-800">
+                          <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
                             <button
                               onClick={(e) => { e.stopPropagation(); setShowTopUp(true) }}
-                              className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                              className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
                             >
                               <Wallet className="w-3.5 h-3.5" />
                               Top-up Balance
                             </button>
                             <button
                               onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
-                              className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                              className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                             >
                               Check Details
                               <ArrowRight className="w-3.5 h-3.5" />
@@ -334,7 +345,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                         </p>
                         <button
                           onClick={() => setActiveTab('all')}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors"
                         >
                           <BookOpen className="w-4 h-4" />
                           Browse All APIs
@@ -431,7 +442,7 @@ function ApiDetailContent({
               </div>
               <button
                 onClick={onTopUp}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
               >
                 <Wallet className="w-3.5 h-3.5" />
                 Top-up Balance
@@ -482,39 +493,44 @@ function ApiDetailContent({
 
       {/* White card with tabs + content — only for My APIs */}
       {showTabs && (
-        <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-          {/* Detail Tabs */}
-          <div className="flex items-center gap-1 px-6 border-b border-stone-100 dark:border-stone-800">
-            {DETAIL_TABS.map((tab) => {
-              const TabIcon = tab.icon
-              const isActive = detailTab === tab.id
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => onDetailTabChange(tab.id)}
-                  className={`relative flex items-center gap-2 px-4 py-3.5 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
-                  }`}
-                >
-                  <TabIcon className="w-4 h-4" />
-                  {tab.label}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
-                  )}
-                </button>
-              )
-            })}
+        <>
+          <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm dark:shadow-stone-950/20 overflow-hidden">
+            {/* Detail Tabs */}
+            <div className="flex items-center gap-1 px-6 border-b border-stone-200 dark:border-stone-800">
+              {DETAIL_TABS.map((tab) => {
+                const TabIcon = tab.icon
+                const isActive = detailTab === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => onDetailTabChange(tab.id)}
+                    className={`relative flex items-center gap-2 px-4 py-3.5 text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                    }`}
+                  >
+                    <TabIcon className="w-4 h-4" />
+                    {tab.label}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Tab Content */}
+            <div className="p-6">
+              {detailTab === 'credits' && <CreditsTab />}
+              {detailTab === 'usage' && <UsageTab />}
+              {detailTab === 'logs' && <LogsTab />}
+            </div>
           </div>
 
-          {/* Tab Content */}
-          <div className="p-6">
-            {detailTab === 'credits' && <CreditsTab />}
-            {detailTab === 'usage' && <UsageTab />}
-            {detailTab === 'logs' && <LogsTab />}
-          </div>
-        </div>
+          {/* Transactions Section */}
+          <TransactionsSection />
+        </>
       )}
     </>
   )
@@ -525,20 +541,20 @@ function ApiDetailContent({
 function CreditsTab() {
   return (
     <div className="bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-stone-100 dark:border-stone-800">
+      <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800">
         <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
           Credit Consumption per Endpoint
         </p>
       </div>
       <table className="w-full">
         <thead>
-          <tr className="border-b border-stone-100 dark:border-stone-800">
+          <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
             <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Endpoint</th>
             <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Method</th>
             <th className="text-right px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Credits</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+        <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
           {CREDITS_DATA.map((row, idx) => (
             <tr key={idx} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
               <td className="px-5 py-3.5 text-sm text-stone-700 dark:text-stone-300">{row.endpoint}</td>
@@ -618,7 +634,7 @@ function UsageTab() {
 function LogsTab() {
   return (
     <div className="bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+      <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
         <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">
           Recent API Calls
         </p>
@@ -627,14 +643,14 @@ function LogsTab() {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px]">
           <thead>
-            <tr className="border-b border-stone-100 dark:border-stone-800">
+            <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
               <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Timestamp</th>
               <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Method</th>
               <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Endpoint</th>
               <th className="text-right px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Latency</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-stone-100 dark:divide-stone-800">
+          <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
             {LOGS_DATA.map((log) => (
                 <tr key={log.id} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                   <td className="px-5 py-3 text-xs text-stone-500 dark:text-stone-400 tabular-nums font-mono whitespace-nowrap">
@@ -657,6 +673,85 @@ function LogsTab() {
                   </td>
                 </tr>
               ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+/* ── Transactions Section ────────────────────────────────────────────────── */
+
+function TransactionsSection() {
+  return (
+    <div className="bg-white dark:bg-stone-900 rounded-xl shadow-sm dark:shadow-stone-950/20 overflow-hidden mt-5">
+      <div className="px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <Receipt className="w-4 h-4 text-stone-400 dark:text-stone-500" />
+          <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">Transactions</h3>
+        </div>
+        <span className="text-xs text-stone-400 dark:text-stone-500">{TRANSACTIONS_DATA.length} entries</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[580px]">
+          <thead>
+            <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
+              <th className="text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Date</th>
+              <th className="text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Description</th>
+              <th className="text-left px-6 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Method</th>
+              <th className="text-right px-6 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Credits</th>
+              <th className="text-right px-6 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Balance</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
+            {TRANSACTIONS_DATA.map((txn) => {
+              const isTopUp = txn.type === 'topup'
+              return (
+                <tr key={txn.id} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                  <td className="px-6 py-3.5 text-xs text-stone-500 dark:text-stone-400 tabular-nums font-mono whitespace-nowrap">
+                    {txn.date}
+                  </td>
+                  <td className="px-6 py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        isTopUp
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40'
+                          : 'bg-stone-100 dark:bg-stone-800'
+                      }`}>
+                        {isTopUp
+                          ? <ArrowDownLeft className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          : <ArrowUpRight className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500" />
+                        }
+                      </div>
+                      <span className="text-sm text-stone-700 dark:text-stone-300">{txn.description}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-3.5">
+                    {txn.method ? (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
+                        {txn.method}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-stone-400 dark:text-stone-500">—</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-3.5 text-right">
+                    <span className={`text-sm font-semibold tabular-nums ${
+                      isTopUp
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-stone-500 dark:text-stone-400'
+                    }`}>
+                      {isTopUp ? '+' : ''}{txn.amount.toLocaleString()}
+                    </span>
+                  </td>
+                  <td className="px-6 py-3.5 text-right">
+                    <span className="text-sm font-medium text-stone-900 dark:text-stone-50 tabular-nums">
+                      {txn.balance.toLocaleString()}
+                    </span>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

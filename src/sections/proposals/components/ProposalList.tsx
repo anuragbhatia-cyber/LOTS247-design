@@ -167,8 +167,8 @@ function EmptyState({ title, description }: { title: string; description: string
       <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
         <FileText className="w-5 h-5 text-stone-400 dark:text-stone-500" />
       </div>
-      <p className="text-sm font-medium text-stone-600 dark:text-stone-300">{title}</p>
-      <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">{description}</p>
+      <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">{title}</p>
+      <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">{description}</p>
     </div>
   )
 }
@@ -199,18 +199,18 @@ function ProposalRow({
   const isActive = proposal.status === 'sent' || proposal.status === 'received'
 
   return (
-    <div className="group/row flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 px-4 sm:px-5 py-4 border-b border-stone-100 dark:border-stone-800 last:border-b-0 hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors">
+    <div className="group/row flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 px-4 sm:px-5 py-4 border-b border-stone-200 dark:border-stone-800 last:border-b-0 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
       {/* Mobile: Top row with ID + Status */}
       <div className="flex items-center justify-between sm:hidden">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
             {proposal.displayId}
           </span>
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${typeConfig.bg} ${typeConfig.text}`}>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${typeConfig.bg} ${typeConfig.text}`}>
             {t[typeConfig.labelKey]}
           </span>
         </div>
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
           <StatusIcon className="w-3 h-3" />
           {t[statusConfig.labelKey]}
         </span>
@@ -234,7 +234,7 @@ function ProposalRow({
       <div className="flex items-center gap-2 sm:hidden">
         <button
           onClick={onView}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-xs font-medium text-stone-600 dark:text-stone-300 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-xs font-medium text-stone-600 dark:text-stone-300 transition-colors"
         >
           <Eye className="w-3 h-3" />
           {t.viewDetail}
@@ -243,14 +243,14 @@ function ProposalRow({
           <>
             <button
               onClick={onFollowUp}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-xs font-medium text-white transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-medium text-white transition-colors"
             >
               <MessageSquare className="w-3 h-3" />
               {t.followUp}
             </button>
             <button
               onClick={onCancel}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-800 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-200 dark:border-red-800 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
             >
               {t.cancel}
             </button>
@@ -280,7 +280,7 @@ function ProposalRow({
 
         {/* Type */}
         <div className="w-[12%] min-w-[70px]">
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ${typeConfig.bg} ${typeConfig.text}`}>
+          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${typeConfig.bg} ${typeConfig.text}`}>
             {t[typeConfig.labelKey]}
           </span>
         </div>
@@ -297,7 +297,7 @@ function ProposalRow({
 
         {/* Status */}
         <div className="flex-1 min-w-[80px]">
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
             <StatusIcon className="w-3 h-3" />
             {t[statusConfig.labelKey]}
           </span>
@@ -307,7 +307,7 @@ function ProposalRow({
         <div className="relative flex-shrink-0">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
+            className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -329,7 +329,7 @@ function ProposalRow({
                     >
                       {t.followUp}
                     </button>
-                    <div className="border-t border-stone-100 dark:border-stone-800" />
+                    <div className="border-t border-stone-200 dark:border-stone-800" />
                     <button
                       onClick={() => { setMenuOpen(false); onCancel?.() }}
                       className="w-full text-left px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
@@ -396,7 +396,7 @@ export function ProposalList({
         {/* Overview Cards */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
           <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
                   {sentProposals.length}
@@ -409,7 +409,7 @@ export function ProposalList({
             </div>
           </div>
           <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
                   {receivedProposals.length}
@@ -422,7 +422,7 @@ export function ProposalList({
             </div>
           </div>
           <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
                   {pastProposals.length}
@@ -483,7 +483,7 @@ export function ProposalList({
       <div className="px-4 sm:px-6 lg:px-8 pb-8">
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
           {/* Desktop Header */}
-          <div className="hidden sm:flex items-center gap-0 px-5 py-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50/60 dark:bg-stone-900">
+          <div className="hidden sm:flex items-center gap-0 px-5 py-3 border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
             <div className="w-[14%] min-w-[90px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">{t.createdDate}</div>
             <div className="w-[14%] min-w-[90px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">{t.proposalId}</div>
             <div className="w-[12%] min-w-[70px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">{t.type}</div>

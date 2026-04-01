@@ -31,3 +31,12 @@ Credit and debit payment ledger used for challan settlements, subscription payme
 
 ### 10. Proposals
 Create, manage, and track service proposals for fleet owners — including pricing breakdowns, coverage details, and approval workflows.
+
+### 11. Knowledge Base
+Centralized repository of legal guides, compliance documentation, FAQs, and how-to articles for vehicle owners and fleet managers.
+
+### 12. My Profile
+Personal account hub — view and edit personal details, organization/business information, and KYC verification status.
+
+### 13. Settings
+Notification preferences, app behavior configuration, subscription plan management, and billing history.

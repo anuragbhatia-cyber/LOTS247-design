@@ -80,18 +80,18 @@ export function CheckChallanModal({ isOpen, onClose, onCheck, onShowResults }: C
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={step === 'form' ? handleClose : undefined} />
 
       <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {step === 'form' ? (
           <>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
               <div>
                 <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">{t.title}</h2>
                 <p className="text-xs text-stone-500 dark:text-stone-400">{t.subtitle}</p>
               </div>
-              <button onClick={handleClose} className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+              <button onClick={handleClose} className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -111,11 +111,11 @@ export function CheckChallanModal({ isOpen, onClose, onCheck, onShowResults }: C
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>
             </div>
-            <div className="flex items-center justify-end px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-end px-6 py-4 border-t border-stone-200 dark:border-stone-800">
               <button
                 onClick={handleSubmit}
                 disabled={!isValid}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
                   isValid
                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'

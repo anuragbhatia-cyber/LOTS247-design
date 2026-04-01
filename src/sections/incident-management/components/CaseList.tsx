@@ -544,7 +544,7 @@ export function CaseList({
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
                 showFilters || activeFilterCount > 0
                   ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
                   : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
@@ -574,7 +574,7 @@ export function CaseList({
                     onChange={(e) =>
                       setStatusFilter(e.target.value as CaseStatus | 'all')
                     }
-                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                   >
                     <option value="all">{t.allStatuses}</option>
                     <option value="submitted">{t.statusSubmitted}</option>
@@ -596,7 +596,7 @@ export function CaseList({
                     onChange={(e) =>
                       setTypeFilter(e.target.value as CaseType | 'all')
                     }
-                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                   >
                     <option value="all">{t.allTypes}</option>
                     {caseTypes.map((type) => (
@@ -618,7 +618,7 @@ export function CaseList({
                   <select
                     value={vehicleFilter}
                     onChange={(e) => setVehicleFilter(e.target.value)}
-                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                   >
                     <option value="all">{t.allVehicles}</option>
                     {vehicles.map((v) => (
@@ -692,7 +692,7 @@ export function CaseList({
               <col className="w-[9%]" />
             </colgroup>
             <thead>
-              <tr className="border-b border-stone-100 dark:border-stone-800">
+              <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                   {t.incidentId}
                 </th>
@@ -716,7 +716,7 @@ export function CaseList({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100 dark:divide-stone-800/60">
+            <tbody className="divide-y divide-stone-200 dark:divide-stone-800/60">
               {paginatedItems.map((caseItem) => {
                 const vehicle = resolveVehicle(caseItem.vehicleId, vehicles)
                 const driver = resolveDriver(caseItem.driverId, drivers)
@@ -727,7 +727,7 @@ export function CaseList({
                   <tr
                     key={caseItem.id}
                     onClick={() => onView?.(caseItem.id)}
-                    className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+                    className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                   >
                     {/* Incident ID + Date */}
                     <td className="px-5 py-4 max-w-[240px]">
@@ -796,15 +796,15 @@ export function CaseList({
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                 <Briefcase className="w-5 h-5 text-stone-400 dark:text-stone-500" />
               </div>
-              <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
+              <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">
                 {t.noCasesFound}
               </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
                 {t.tryAdjusting}
               </p>
               <button
                 onClick={onCreate}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 min-h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 {t.createFirstCase}
@@ -855,7 +855,7 @@ export function CaseList({
                 </p>
 
                 {/* Footer: Vehicle + Lawyer */}
-                <div className="flex items-center justify-between pt-3 border-t border-stone-100 dark:border-stone-800">
+                <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
                   <div>
                     <p className="text-xs text-stone-500 dark:text-stone-400">{t.vehicle}</p>
                     <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
@@ -891,15 +891,15 @@ export function CaseList({
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                 <Briefcase className="w-5 h-5 text-stone-400 dark:text-stone-500" />
               </div>
-              <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
+              <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">
                 {t.noCasesFound}
               </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
                 {t.tryAdjusting}
               </p>
               <button
                 onClick={onCreate}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 min-h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 {t.createFirstCase}
