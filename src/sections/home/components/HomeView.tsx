@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { Plus, AlertTriangle, PlusCircle, Calendar, ChevronDown, ChevronRight, AlertCircle, ShieldAlert, FileWarning, Search, Building2 } from 'lucide-react'
 import type { HomeProps } from '@/../product/sections/home/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
@@ -7,7 +7,6 @@ import { ComplianceScore } from './ComplianceScore'
 import { AlertsFeed } from './ActivityFeed'
 import { NotificationsView } from './NotificationsView'
 import { AlertsView } from './ActivityView'
-import { VehicleComplianceCheck } from './VehicleComplianceCheck'
 
 const homeTranslations: Record<Language, Record<string, string>> = {
   en: {
@@ -186,7 +185,6 @@ export function HomeView({
   const { language } = useLanguage()
   const t = homeTranslations[language]
   const [view, setView] = useState<'home' | 'notifications' | 'alerts'>('home')
-  const [complianceCheckOpen, setComplianceCheckOpen] = useState(false)
   const [quickActionsOpen, setQuickActionsOpen] = useState(false)
   const [dateRangeOpen, setDateRangeOpen] = useState(false)
   const [selectedRange, setSelectedRange] = useState('last7Days')
@@ -194,6 +192,17 @@ export function HomeView({
   const [customTo, setCustomTo] = useState('')
   const quickActionsRef = useRef<HTMLDivElement>(null)
   const dateRangeRef = useRef<HTMLDivElement>(null)
+
+  // Inject shimmer keyframe into the document
+  useEffect(() => {
+    const id = 'badge-shimmer-style'
+    if (!document.getElementById(id)) {
+      const style = document.createElement('style')
+      style.id = id
+      style.textContent = '@keyframes badge-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}'
+      document.head.appendChild(style)
+    }
+  }, [])
 
   const dateRangePresets = [
     { id: 'today', label: t.today },
@@ -219,7 +228,7 @@ export function HomeView({
     incident: () => window.parent.postMessage({ type: 'openAddIncident' }, '*'),
     vehicle: onAddVehicle,
     challan: () => window.parent.postMessage({ type: 'openCheckChallan' }, '*'),
-    rto: () => setComplianceCheckOpen(true),
+    rto: () => window.parent.postMessage({ type: 'openComplianceCheck' }, '*'),
   }
 
   const qaTranslations: Record<string, { label: string; description: string }> = {
@@ -278,8 +287,27 @@ export function HomeView({
           </h1>
 
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-
-
+            {alerts.length > 0 && (
+              <button
+                onClick={() => setView('alerts')}
+                className="inline-flex items-center gap-0 rounded-full text-xs font-semibold overflow-hidden border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 transition-colors"
+              >
+                <span className="relative px-2.5 py-1 bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 overflow-hidden">
+                  <span
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
+                      backgroundSize: '200% 100%',
+                      animation: 'badge-shimmer 2.5s ease-in-out infinite',
+                    }}
+                  />
+                  {alerts.length} Pending Alerts
+                </span>
+                <span className="px-2.5 py-1 bg-white dark:bg-stone-900 text-red-600 dark:text-red-400 border-l border-red-200 dark:border-red-800">
+                  View &rarr;
+                </span>
+              </button>
+            )}
           </div>{/* end right side actions */}
         </div>
 
@@ -312,13 +340,6 @@ export function HomeView({
 
       </div>
 
-      <VehicleComplianceCheck
-        open={complianceCheckOpen}
-        onClose={() => setComplianceCheckOpen(false)}
-        onShowResults={(vn) => {
-          window.parent.postMessage({ type: 'openComplianceResults', vehicleNumber: vn }, '*')
-        }}
-      />
     </div>
   )
 }

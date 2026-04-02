@@ -212,7 +212,7 @@
       "resendAvailableAt": "2024-02-16T10:31:00Z"
     },
     "vehicleDetails": {
-      "rcNumber": "DL3CAF1234",
+      "rcNumber": "DL03AF1234",
       "vehicleName": "Maruti Suzuki Swift VXi",
       "vehicleType": "Car",
       "registrationDate": "2020-03-15",
@@ -236,8 +236,8 @@
     "driverDetails": {
       "driverName": "Amit Sharma",
       "driverId": "DRV-001",
-      "licenseNumber": "DL-0420110012345",
-      "assignedVehicleId": "DL3CAF1234",
+      "licenseNumber": "DL04110012345",
+      "assignedVehicleId": "DL03AF1234",
       "licenseExpiryDate": "2028-06-15"
     }
   },
@@ -254,7 +254,7 @@
     },
     "vehicle": {
       "duplicateRC": "This vehicle is already registered in your account.",
-      "invalidRC": "Please enter a valid RC number (e.g., DL3CAF1234)",
+      "invalidRC": "Please enter a valid RC number (e.g., DL03AF1234)",
       "apiFailed": "Unable to fetch vehicle details. Please enter manually.",
       "requiredFields": "Please fill in all required vehicle details."
     },

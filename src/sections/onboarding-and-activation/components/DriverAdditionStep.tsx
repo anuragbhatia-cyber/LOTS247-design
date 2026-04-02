@@ -161,7 +161,7 @@ export function DriverAdditionStep({
                 type="text"
                 value={formData.driverId}
                 onChange={handleChange}
-                placeholder="e.g., DRV-001"
+                placeholder="Enter driver ID"
                 className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-white placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
               />
             </div>

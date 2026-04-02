@@ -1617,6 +1617,8 @@ export function ComplianceDashboard({
   const [scopeApplied, setScopeApplied] = useState(initialView === 'vehicle')
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [urgencyPage, setUrgencyPage] = useState(0)
+  const [urgencySortKey, setUrgencySortKey] = useState<'vehicleNumber' | 'documentType' | 'expiryDate' | null>(null)
+  const [urgencySortDir, setUrgencySortDir] = useState<'asc' | 'desc'>('asc')
   const [checkVehicleOpen, setCheckVehicleOpen] = useState(false)
   const [checkVehicleNumber, setCheckVehicleNumber] = useState('')
   const [activeCardView, setActiveCardView] = useState<'dl' | 'rc' | 'challan' | null>(
@@ -1640,11 +1642,33 @@ export function ComplianceDashboard({
     return []
   }, [scope, scopeSearch, vehicles, drivers])
 
-  const urgencyTotalPages = Math.ceil(expiryUrgencyItems.length / URGENCY_PAGE_SIZE)
+  const sortedUrgencyItems = useMemo(() => {
+    if (!urgencySortKey) return expiryUrgencyItems
+    const sorted = [...expiryUrgencyItems].sort((a, b) => {
+      let cmp = 0
+      if (urgencySortKey === 'vehicleNumber') cmp = a.vehicleNumber.localeCompare(b.vehicleNumber)
+      else if (urgencySortKey === 'documentType') cmp = a.documentType.localeCompare(b.documentType)
+      else if (urgencySortKey === 'expiryDate') cmp = new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()
+      return urgencySortDir === 'asc' ? cmp : -cmp
+    })
+    return sorted
+  }, [expiryUrgencyItems, urgencySortKey, urgencySortDir])
+
+  const urgencyTotalPages = Math.ceil(sortedUrgencyItems.length / URGENCY_PAGE_SIZE)
   const paginatedUrgencyItems = useMemo(
-    () => expiryUrgencyItems.slice(urgencyPage * URGENCY_PAGE_SIZE, (urgencyPage + 1) * URGENCY_PAGE_SIZE),
-    [expiryUrgencyItems, urgencyPage]
+    () => sortedUrgencyItems.slice(urgencyPage * URGENCY_PAGE_SIZE, (urgencyPage + 1) * URGENCY_PAGE_SIZE),
+    [sortedUrgencyItems, urgencyPage]
   )
+
+  function handleUrgencySort(key: 'vehicleNumber' | 'documentType' | 'expiryDate') {
+    if (urgencySortKey === key) {
+      setUrgencySortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setUrgencySortKey(key)
+      setUrgencySortDir('asc')
+    }
+    setUrgencyPage(0)
+  }
 
   const handleCategoryClick = (id: CategoryId) => {
     setSelectedCategory(id)
@@ -1902,7 +1926,6 @@ export function ComplianceDashboard({
                           <div key={cat.id}>
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full flex-shrink-0 bg-emerald-500" />
                                 <span className="text-sm text-stone-700 dark:text-stone-300">{HEALTH_CARD_LABEL[cat.id]}</span>
                               </div>
                               <span className={`text-sm font-semibold tabular-nums ${cfg.color}`}>
@@ -2311,9 +2334,27 @@ export function ComplianceDashboard({
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
-                      <th className="text-left py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[18%]">Vehicle</th>
-                      <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[14%]">Document</th>
-                      <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[16%]">Expiry Date</th>
+                      <th
+                        onClick={() => handleUrgencySort('vehicleNumber')}
+                        className="text-left py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[18%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+                      >
+                        Vehicle
+                        <span className="ml-1 text-[10px]">{urgencySortKey === 'vehicleNumber' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
+                      </th>
+                      <th
+                        onClick={() => handleUrgencySort('documentType')}
+                        className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[14%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+                      >
+                        Document
+                        <span className="ml-1 text-[10px]">{urgencySortKey === 'documentType' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
+                      </th>
+                      <th
+                        onClick={() => handleUrgencySort('expiryDate')}
+                        className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[16%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+                      >
+                        Expiry Date
+                        <span className="ml-1 text-[10px]">{urgencySortKey === 'expiryDate' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
+                      </th>
                       <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[10%]">Days</th>
                       <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[12%]">Urgency</th>
                       <th className="text-right py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">Action</th>
@@ -2425,9 +2466,9 @@ export function ComplianceDashboard({
                   setCheckVehicleError('')
                 }}
                 onKeyDown={e => { if (e.key === 'Enter') handleCheckVehicle() }}
-                placeholder="e.g. UP32MM1113"
+                placeholder="Enter vehicle number"
                 maxLength={10}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                 autoFocus
               />
             </div>

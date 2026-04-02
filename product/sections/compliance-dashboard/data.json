@@ -172,7 +172,7 @@
     },
     {
       "id": "exp-002",
-      "vehicleNumber": "DL1CAB3456",
+      "vehicleNumber": "DL01AB3456",
       "documentType": "Insurance",
       "expiryDate": "2026-03-20",
       "daysRemaining": -3,
@@ -246,7 +246,7 @@
   "categoryDrilldowns": {
     "rc": [
       { "vehicleNumber": "UP32MM1113", "status": "valid", "issueDate": "2021-06-10", "expiryDate": "2036-06-09", "rtoOffice": "RTO Lucknow" },
-      { "vehicleNumber": "DL1CAB3456", "status": "valid", "issueDate": "2019-03-15", "expiryDate": "2034-03-14", "rtoOffice": "RTO Delhi South" },
+      { "vehicleNumber": "DL01AB3456", "status": "valid", "issueDate": "2019-03-15", "expiryDate": "2034-03-14", "rtoOffice": "RTO Delhi South" },
       { "vehicleNumber": "UP14GT7890", "status": "valid", "issueDate": "2020-11-22", "expiryDate": "2035-11-21", "rtoOffice": "RTO Ghaziabad" },
       { "vehicleNumber": "HR26DK4521", "status": "valid", "issueDate": "2022-01-08", "expiryDate": "2037-01-07", "rtoOffice": "RTO Gurugram" },
       { "vehicleNumber": "MH04EQ6789", "status": "valid", "issueDate": "2018-09-30", "expiryDate": "2033-09-29", "rtoOffice": "RTO Mumbai Central" },
@@ -257,7 +257,7 @@
     ],
     "insurance": [
       { "vehicleNumber": "UP32MM1113", "status": "valid", "provider": "ICICI Lombard", "policyNumber": "POL-2025-44821", "expiryDate": "2026-09-14" },
-      { "vehicleNumber": "DL1CAB3456", "status": "expired", "provider": "Bajaj Allianz", "policyNumber": "POL-2025-33102", "expiryDate": "2026-03-20" },
+      { "vehicleNumber": "DL01AB3456", "status": "expired", "provider": "Bajaj Allianz", "policyNumber": "POL-2025-33102", "expiryDate": "2026-03-20" },
       { "vehicleNumber": "UP14GT7890", "status": "valid", "provider": "HDFC ERGO", "policyNumber": "POL-2025-55743", "expiryDate": "2026-12-01" },
       { "vehicleNumber": "HR26DK4521", "status": "expiring", "provider": "New India Assurance", "policyNumber": "POL-2025-22567", "expiryDate": "2026-03-28" },
       { "vehicleNumber": "MH04EQ6789", "status": "valid", "provider": "ICICI Lombard", "policyNumber": "POL-2025-67891", "expiryDate": "2026-11-05" },
@@ -267,7 +267,7 @@
     ],
     "pucc": [
       { "vehicleNumber": "UP32MM1113", "status": "expired", "testCenter": "Green Auto Care, Lucknow", "expiryDate": "2026-03-18" },
-      { "vehicleNumber": "DL1CAB3456", "status": "valid", "testCenter": "Delhi PUC Centre, Nehru Place", "expiryDate": "2026-08-10" },
+      { "vehicleNumber": "DL01AB3456", "status": "valid", "testCenter": "Delhi PUC Centre, Nehru Place", "expiryDate": "2026-08-10" },
       { "vehicleNumber": "UP14GT7890", "status": "expiring", "testCenter": "Clean Air Testing, Ghaziabad", "expiryDate": "2026-03-25" },
       { "vehicleNumber": "HR26DK4521", "status": "valid", "testCenter": "Eco Check, Gurugram", "expiryDate": "2026-07-15" },
       { "vehicleNumber": "MH04EQ6789", "status": "expiring", "testCenter": "Mumbai PUC Lab, Andheri", "expiryDate": "2026-03-30" },
@@ -277,7 +277,7 @@
     ],
     "permits": [
       { "vehicleNumber": "UP32MM1113", "status": "valid", "permitType": "allIndia", "permitNumber": "NP-2024-44821", "expiryDate": "2027-06-10" },
-      { "vehicleNumber": "DL1CAB3456", "status": "valid", "permitType": "nationwide", "permitNumber": "NP-2024-33102", "expiryDate": "2027-03-15" },
+      { "vehicleNumber": "DL01AB3456", "status": "valid", "permitType": "nationwide", "permitNumber": "NP-2024-33102", "expiryDate": "2027-03-15" },
       { "vehicleNumber": "UP14GT7890", "status": "valid", "permitType": "allIndia", "permitNumber": "NP-2024-55743", "expiryDate": "2027-11-22" },
       { "vehicleNumber": "HR26DK4521", "status": "expired", "permitType": "state", "permitNumber": "SP-2024-22567", "expiryDate": "2026-01-08" },
       { "vehicleNumber": "MH04EQ6789", "status": "valid", "permitType": "nationwide", "permitNumber": "NP-2024-67891", "expiryDate": "2027-09-30" },
@@ -288,18 +288,18 @@
       { "vehicleNumber": "KA01MV7890", "status": "valid", "permitType": "nationwide", "permitNumber": "NP-2024-23456", "expiryDate": "2027-05-10" }
     ],
     "dl": [
-      { "driverName": "Vikram Singh", "licenseNumber": "DL-0420110012345", "status": "valid", "expiryDate": "2028-05-12", "vehiclesAssigned": ["UP32MM1113", "UP14GT7890"] },
-      { "driverName": "Suresh Yadav", "licenseNumber": "UP-5020090054321", "status": "valid", "expiryDate": "2027-11-08", "vehiclesAssigned": ["DL1CAB3456"] },
-      { "driverName": "Manoj Tiwari", "licenseNumber": "HR-0620150067890", "status": "expiring", "expiryDate": "2026-04-18", "vehiclesAssigned": ["HR26DK4521", "RJ14SB2345"] },
-      { "driverName": "Ramesh Gupta", "licenseNumber": "MH-0120120034567", "status": "valid", "expiryDate": "2029-02-25", "vehiclesAssigned": ["MH04EQ6789"] },
-      { "driverName": "Ajay Sharma", "licenseNumber": "RJ-2020180045678", "status": "valid", "expiryDate": "2028-09-30", "vehiclesAssigned": ["UP78BT5678", "GJ01JX9012"] },
-      { "driverName": "Deepak Verma", "licenseNumber": "GJ-0120160078901", "status": "expired", "expiryDate": "2026-02-10", "vehiclesAssigned": ["MP09NK3456"] },
-      { "driverName": "Sanjay Patel", "licenseNumber": "KA-0120170089012", "status": "valid", "expiryDate": "2029-07-14", "vehiclesAssigned": ["KA01MV7890"] },
-      { "driverName": "Ravi Kumar", "licenseNumber": "UP-3220190090123", "status": "valid", "expiryDate": "2030-01-20", "vehiclesAssigned": ["UP32MM1113"] }
+      { "driverName": "Vikram Singh", "licenseNumber": "DL04110012345", "status": "valid", "expiryDate": "2028-05-12", "vehiclesAssigned": ["UP32MM1113", "UP14GT7890"] },
+      { "driverName": "Suresh Yadav", "licenseNumber": "UP50090054321", "status": "valid", "expiryDate": "2027-11-08", "vehiclesAssigned": ["DL01AB3456"] },
+      { "driverName": "Manoj Tiwari", "licenseNumber": "HR06150067890", "status": "expiring", "expiryDate": "2026-04-18", "vehiclesAssigned": ["HR26DK4521", "RJ14SB2345"] },
+      { "driverName": "Ramesh Gupta", "licenseNumber": "MH01120034567", "status": "valid", "expiryDate": "2029-02-25", "vehiclesAssigned": ["MH04EQ6789"] },
+      { "driverName": "Ajay Sharma", "licenseNumber": "RJ20180045678", "status": "valid", "expiryDate": "2028-09-30", "vehiclesAssigned": ["UP78BT5678", "GJ01JX9012"] },
+      { "driverName": "Deepak Verma", "licenseNumber": "GJ01160078901", "status": "expired", "expiryDate": "2026-02-10", "vehiclesAssigned": ["MP09NK3456"] },
+      { "driverName": "Sanjay Patel", "licenseNumber": "KA01170089012", "status": "valid", "expiryDate": "2029-07-14", "vehiclesAssigned": ["KA01MV7890"] },
+      { "driverName": "Ravi Kumar", "licenseNumber": "UP32190090123", "status": "valid", "expiryDate": "2030-01-20", "vehiclesAssigned": ["UP32MM1113"] }
     ],
     "challans": [
       { "vehicleNumber": "UP32MM1113", "outstandingCount": 3, "courtCount": 1, "onlineCount": 2, "totalAmount": 15500, "latestDate": "2026-03-10" },
-      { "vehicleNumber": "DL1CAB3456", "outstandingCount": 5, "courtCount": 2, "onlineCount": 3, "totalAmount": 28000, "latestDate": "2026-03-15" },
+      { "vehicleNumber": "DL01AB3456", "outstandingCount": 5, "courtCount": 2, "onlineCount": 3, "totalAmount": 28000, "latestDate": "2026-03-15" },
       { "vehicleNumber": "UP14GT7890", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null },
       { "vehicleNumber": "HR26DK4521", "outstandingCount": 2, "courtCount": 1, "onlineCount": 1, "totalAmount": 11000, "latestDate": "2026-02-28" },
       { "vehicleNumber": "MH04EQ6789", "outstandingCount": 4, "courtCount": 1, "onlineCount": 3, "totalAmount": 22500, "latestDate": "2026-03-18" },
@@ -313,7 +313,7 @@
     ],
     "blacklisted": [
       { "vehicleNumber": "MP09NK3456", "flagReason": "Multiple unpaid challans exceeding ₹30,000", "flaggingAuthority": "RTO Bhopal", "flagDate": "2026-03-12", "status": "active" },
-      { "vehicleNumber": "DL1CAB3456", "flagReason": "Involvement in hit-and-run case (FIR No. 245/2026)", "flaggingAuthority": "Delhi Traffic Police", "flagDate": "2026-02-20", "status": "active" }
+      { "vehicleNumber": "DL01AB3456", "flagReason": "Involvement in hit-and-run case (FIR No. 245/2026)", "flaggingAuthority": "Delhi Traffic Police", "flagDate": "2026-02-20", "status": "active" }
     ],
     "ntbt": [
       { "vehicleNumber": "MH04EQ6789", "holdReason": "Court-ordered hold pending accident liability case", "issuingAuthority": "Mumbai High Court", "holdDate": "2026-01-15", "caseReference": "WP/2026/1045", "status": "active" }
@@ -321,7 +321,7 @@
   },
   "vehicles": [
     { "id": "veh-001", "vehicleNumber": "UP32MM1113", "vehicleType": "Truck", "make": "Tata Motors", "model": "Prima 4928", "year": 2023, "category": "Owned", "status": "Active" },
-    { "id": "veh-002", "vehicleNumber": "DL1CAB3456", "vehicleType": "Truck", "make": "Ashok Leyland", "model": "AVTR 4120", "year": 2022, "category": "Leased", "status": "Active" },
+    { "id": "veh-002", "vehicleNumber": "DL01AB3456", "vehicleType": "Truck", "make": "Ashok Leyland", "model": "AVTR 4120", "year": 2022, "category": "Leased", "status": "Active" },
     { "id": "veh-003", "vehicleNumber": "UP14GT7890", "vehicleType": "Truck", "make": "Tata Motors", "model": "Signa 4825", "year": 2023, "category": "Owned", "status": "Active" },
     { "id": "veh-004", "vehicleNumber": "HR26DK4521", "vehicleType": "Truck", "make": "Mahindra", "model": "Blazo X 35", "year": 2021, "category": "Owned", "status": "Maintenance" },
     { "id": "veh-005", "vehicleNumber": "MH04EQ6789", "vehicleType": "Trailer", "make": "BharatBenz", "model": "3523R", "year": 2023, "category": "Leased", "status": "Active" },
@@ -340,28 +340,28 @@
     { "id": "veh-018", "vehicleNumber": "OR02QR9012", "vehicleType": "Truck", "make": "Mahindra", "model": "Blazo X 42", "year": 2022, "category": "Owned", "status": "Active" }
   ],
   "drivers": [
-    { "id": "drv-001", "name": "Vikram Singh", "licenseNumber": "DL-0420110012345", "phone": "919820134567" },
-    { "id": "drv-002", "name": "Suresh Yadav", "licenseNumber": "UP-5020090054321", "phone": "919876543210" },
-    { "id": "drv-003", "name": "Manoj Tiwari", "licenseNumber": "HR-0620150067890", "phone": "918306712720" },
-    { "id": "drv-004", "name": "Ramesh Gupta", "licenseNumber": "MH-0120120034567", "phone": "919123456789" },
-    { "id": "drv-005", "name": "Ajay Sharma", "licenseNumber": "RJ-2020180045678", "phone": "918765432109" },
-    { "id": "drv-006", "name": "Deepak Verma", "licenseNumber": "GJ-0120160078901", "phone": "917654321098" },
-    { "id": "drv-007", "name": "Sanjay Patel", "licenseNumber": "KA-0120170089012", "phone": "916543210987" },
-    { "id": "drv-008", "name": "Ravi Kumar", "licenseNumber": "UP-3220190090123", "phone": "915432109876" },
-    { "id": "drv-009", "name": "Amit Chauhan", "licenseNumber": "MP-0920200001234", "phone": "914321098765" },
-    { "id": "drv-010", "name": "Rajendra Prasad", "licenseNumber": "TN-0120140023456", "phone": "913210987654" },
-    { "id": "drv-011", "name": "Bharat Mishra", "licenseNumber": "PB-1020160034567", "phone": "912109876543" },
-    { "id": "drv-012", "name": "Gopal Reddy", "licenseNumber": "AP-0920180045678", "phone": "911098765432" },
-    { "id": "drv-013", "name": "Harish Joshi", "licenseNumber": "UK-0720190056789", "phone": "910987654321" },
-    { "id": "drv-014", "name": "Karan Mehra", "licenseNumber": "CG-0420200067890", "phone": "919087654321" },
-    { "id": "drv-015", "name": "Lalit Rana", "licenseNumber": "WB-0220170078901", "phone": "918076543210" },
-    { "id": "drv-016", "name": "Naveen Das", "licenseNumber": "JH-0520180089012", "phone": "917065432109" },
-    { "id": "drv-017", "name": "Om Prakash", "licenseNumber": "OR-0220190090123", "phone": "916054321098" },
-    { "id": "drv-018", "name": "Prem Chand", "licenseNumber": "RJ-1420200001234", "phone": "915043210987" },
-    { "id": "drv-019", "name": "Raju Thakur", "licenseNumber": "HR-2620160012345", "phone": "914032109876" },
-    { "id": "drv-020", "name": "Santosh Dubey", "licenseNumber": "GJ-0120170023456", "phone": "913021098765" },
-    { "id": "drv-021", "name": "Tarun Nair", "licenseNumber": "KA-0120180034567", "phone": "912010987654" },
-    { "id": "drv-022", "name": "Umesh Pandey", "licenseNumber": "MH-0420190045678", "phone": "911009876543" }
+    { "id": "drv-001", "name": "Vikram Singh", "licenseNumber": "DL04110012345", "phone": "919820134567" },
+    { "id": "drv-002", "name": "Suresh Yadav", "licenseNumber": "UP50090054321", "phone": "919876543210" },
+    { "id": "drv-003", "name": "Manoj Tiwari", "licenseNumber": "HR06150067890", "phone": "918306712720" },
+    { "id": "drv-004", "name": "Ramesh Gupta", "licenseNumber": "MH01120034567", "phone": "919123456789" },
+    { "id": "drv-005", "name": "Ajay Sharma", "licenseNumber": "RJ20180045678", "phone": "918765432109" },
+    { "id": "drv-006", "name": "Deepak Verma", "licenseNumber": "GJ01160078901", "phone": "917654321098" },
+    { "id": "drv-007", "name": "Sanjay Patel", "licenseNumber": "KA01170089012", "phone": "916543210987" },
+    { "id": "drv-008", "name": "Ravi Kumar", "licenseNumber": "UP32190090123", "phone": "915432109876" },
+    { "id": "drv-009", "name": "Amit Chauhan", "licenseNumber": "MP09200001234", "phone": "914321098765" },
+    { "id": "drv-010", "name": "Rajendra Prasad", "licenseNumber": "TN01140023456", "phone": "913210987654" },
+    { "id": "drv-011", "name": "Bharat Mishra", "licenseNumber": "PB10160034567", "phone": "912109876543" },
+    { "id": "drv-012", "name": "Gopal Reddy", "licenseNumber": "AP09180045678", "phone": "911098765432" },
+    { "id": "drv-013", "name": "Harish Joshi", "licenseNumber": "UK07190056789", "phone": "910987654321" },
+    { "id": "drv-014", "name": "Karan Mehra", "licenseNumber": "CG04200067890", "phone": "919087654321" },
+    { "id": "drv-015", "name": "Lalit Rana", "licenseNumber": "WB02170078901", "phone": "918076543210" },
+    { "id": "drv-016", "name": "Naveen Das", "licenseNumber": "JH05180089012", "phone": "917065432109" },
+    { "id": "drv-017", "name": "Om Prakash", "licenseNumber": "OR02190090123", "phone": "916054321098" },
+    { "id": "drv-018", "name": "Prem Chand", "licenseNumber": "RJ14200001234", "phone": "915043210987" },
+    { "id": "drv-019", "name": "Raju Thakur", "licenseNumber": "HR26160012345", "phone": "914032109876" },
+    { "id": "drv-020", "name": "Santosh Dubey", "licenseNumber": "GJ01170023456", "phone": "913021098765" },
+    { "id": "drv-021", "name": "Tarun Nair", "licenseNumber": "KA01180034567", "phone": "912010987654" },
+    { "id": "drv-022", "name": "Umesh Pandey", "licenseNumber": "MH04190045678", "phone": "911009876543" }
   ],
   "vehicleHistory": {
     "UP32MM1113": [

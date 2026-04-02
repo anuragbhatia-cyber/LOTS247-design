@@ -29,9 +29,9 @@
     { "id": "veh-005", "registrationNumber": "UP32RR5557", "type": "Truck", "model": "Eicher Pro 6049" }
   ],
   "drivers": [
-    { "id": "drv-001", "name": "Ramesh Yadav", "licenseNumber": "MH-0120190012345", "phone": "919876543210" },
-    { "id": "drv-002", "name": "Sunil Sharma", "licenseNumber": "DL-0320180098765", "phone": "919812345678" },
-    { "id": "drv-003", "name": "Manoj Patel", "licenseNumber": "GJ-0520200054321", "phone": "919898765432" }
+    { "id": "drv-001", "name": "Ramesh Yadav", "licenseNumber": "MH01190012345", "phone": "919876543210" },
+    { "id": "drv-002", "name": "Sunil Sharma", "licenseNumber": "DL03180098765", "phone": "919812345678" },
+    { "id": "drv-003", "name": "Manoj Patel", "licenseNumber": "GJ05200054321", "phone": "919898765432" }
   ],
   "lawyers": [
     { "id": "LAW-1001", "name": "Adv. Priya Mehta", "specialization": "Traffic & Motor Vehicle", "location": "Mumbai", "phone": "919900112233" },

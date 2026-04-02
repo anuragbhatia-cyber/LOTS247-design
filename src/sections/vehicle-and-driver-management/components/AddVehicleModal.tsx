@@ -17,7 +17,7 @@ const translations: Record<Language, Record<string, string>> = {
     singleVehicle: 'Single Vehicle',
     bulkUpload: 'Bulk Upload',
     vehicleNumber: 'Vehicle Number',
-    vehicleNumberPlaceholder: 'UP32MM1113',
+    vehicleNumberPlaceholder: 'Enter vehicle number',
     cancel: 'Cancel',
     vehicleAdded: 'Vehicle Added',
     vehicleAddedDesc: 'has been successfully added to your fleet.',
@@ -38,7 +38,7 @@ const translations: Record<Language, Record<string, string>> = {
     singleVehicle: 'एकल वाहन',
     bulkUpload: 'बल्क अपलोड',
     vehicleNumber: 'वाहन नंबर',
-    vehicleNumberPlaceholder: 'उदा. UP32MM1113',
+    vehicleNumberPlaceholder: 'वाहन नंबर दर्ज करें',
     cancel: 'रद्द करें',
     vehicleAdded: 'वाहन जोड़ा गया',
     vehicleAddedDesc: 'आपके बेड़े में सफलतापूर्वक जोड़ दिया गया है।',
@@ -241,7 +241,7 @@ export function AddVehicleModal({
                       onChange={(e) => handleVehicleNumberChange(e.target.value)}
                       placeholder={t.vehicleNumberPlaceholder}
                       maxLength={10}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                     />
                   </div>
                 </div>

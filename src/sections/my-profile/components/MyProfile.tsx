@@ -522,7 +522,7 @@ export function MyProfile({
                       type="text"
                       value={editDob}
                       onChange={(e) => setEditDob(e.target.value)}
-                      placeholder="15 Aug 1985"
+                      placeholder="Enter date of birth"
                       className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                     />
                   ) : (
@@ -639,7 +639,7 @@ export function MyProfile({
                         type="text"
                         value={editGst}
                         onChange={(e) => setEditGst(e.target.value.toUpperCase())}
-                        placeholder="22AAAAA0000A1Z5"
+                        placeholder="Enter GST number"
                         maxLength={15}
                         className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                       />

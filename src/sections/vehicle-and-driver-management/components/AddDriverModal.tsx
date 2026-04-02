@@ -10,11 +10,11 @@ const translations: Record<Language, Record<string, string>> = {
     addDriver: 'Add Driver',
     subtitle: 'Enter driver details and assign to a vehicle',
     fullName: 'Full Name',
-    fullNamePlaceholder: 'e.g. Rajesh Kumar',
+    fullNamePlaceholder: 'Enter full name',
     phoneNumber: 'Phone Number',
-    phonePlaceholder: '918976543210',
+    phonePlaceholder: 'Enter phone number',
     licenseNumber: 'License Number',
-    licensePlaceholder: 'DL-1420110012345',
+    licensePlaceholder: 'Enter license number',
     licenseExpiry: 'License Expiry',
     cancel: 'Cancel',
   },
@@ -22,11 +22,11 @@ const translations: Record<Language, Record<string, string>> = {
     addDriver: 'ड्राइवर जोड़ें',
     subtitle: 'ड्राइवर की जानकारी दर्ज करें और वाहन नियुक्त करें',
     fullName: 'पूरा नाम',
-    fullNamePlaceholder: 'उदा. राजेश कुमार',
+    fullNamePlaceholder: 'पूरा नाम दर्ज करें',
     phoneNumber: 'फ़ोन नंबर',
-    phonePlaceholder: '918976543210',
+    phonePlaceholder: 'फ़ोन नंबर दर्ज करें',
     licenseNumber: 'लाइसेंस नंबर',
-    licensePlaceholder: 'DL-1420110012345',
+    licensePlaceholder: 'लाइसेंस नंबर दर्ज करें',
     licenseExpiry: 'लाइसेंस समाप्ति',
     cancel: 'रद्द करें',
   },
@@ -148,7 +148,7 @@ export function AddDriverModal({
                 value={licenseNumber}
                 onChange={(e) => handleLicenseChange(e.target.value)}
                 placeholder={t.licensePlaceholder}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
               />
             </div>
             <div>

@@ -7,7 +7,7 @@ const translations: Record<Language, Record<string, string>> = {
     title: 'Check Challan',
     subtitle: 'Enter a vehicle registration number to look up pending challans',
     label: 'Vehicle Number',
-    placeholder: 'UP32MM1113',
+    placeholder: 'Enter vehicle number',
     checkButton: 'Check Challan Status',
     checking: 'Checking Challans...',
     checkingDesc: 'Looking up Parivahan and government databases for',
@@ -16,7 +16,7 @@ const translations: Record<Language, Record<string, string>> = {
     title: 'चालान जाँचें',
     subtitle: 'लंबित चालान देखने के लिए वाहन पंजीकरण नंबर दर्ज करें',
     label: 'वाहन नंबर',
-    placeholder: 'UP32MM1113',
+    placeholder: 'वाहन नंबर दर्ज करें',
     checkButton: 'चालान स्थिति जाँचें',
     checking: 'चालान जाँच रहे हैं...',
     checkingDesc: 'परिवहन और सरकारी डेटाबेस में खोज रहे हैं',
@@ -106,7 +106,7 @@ export function CheckChallanModal({ isOpen, onClose, onCheck, onShowResults }: C
                   placeholder={t.placeholder}
                   maxLength={10}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit() }}
-                  className="w-full px-3.5 pr-9 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                  className="w-full px-3.5 pr-9 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                 />
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>

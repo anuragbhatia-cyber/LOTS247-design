@@ -659,7 +659,7 @@ function EditVehicleModal({
               type="text"
               value={vehicle.rcNumber}
               disabled
-              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50 text-sm font-mono text-stone-500 dark:text-stone-400 tracking-wider cursor-not-allowed"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50 text-sm text-stone-500 dark:text-stone-400 cursor-not-allowed"
             />
           </div>
 
@@ -889,10 +889,6 @@ function AssignDriverModal({
                   <div className="flex items-center gap-3 mt-0.5">
                     <span className="text-xs text-stone-500 dark:text-stone-400 font-mono">
                       {d.licenseNumber}
-                    </span>
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${licenseStyle.text}`}>
-                      <LicenseIcon className="w-2.5 h-2.5" />
-                      {licenseLabel}
                     </span>
                   </div>
                 </div>
@@ -1579,8 +1575,34 @@ export function VehicleDetail({
         {/* ================================================================= */}
         {activeTab === 'compliance' && (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            {/* Compliance Status — left */}
-            <div className="lg:col-span-3 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+            {/* Left column — Vehicle Summary + Compliance Status */}
+            <div className="lg:col-span-3 space-y-4">
+              {/* Vehicle Summary Card */}
+              <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+                <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
+                  Vehicle Summary
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                    <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Incidents</p>
+                    <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">5</p>
+                    <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹48,500</p>
+                  </div>
+                  <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                    <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Cases</p>
+                    <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">3</p>
+                    <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹32,000</p>
+                  </div>
+                  <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                    <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Renewals</p>
+                    <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">7</p>
+                    <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹18,200</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Compliance Status */}
+              <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
               <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
                 Compliance Status
               </h3>
@@ -1682,9 +1704,9 @@ export function VehicleDetail({
                       >
                         <div className="flex items-center gap-3">
                           <ChevronDown className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : '-rotate-90'}`} />
-                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200">Pending Challans</p>
+                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200">Challans</p>
                         </div>
-                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">Expired</span>
+                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">{t.pending}</span>
                       </button>
                       {isExpanded && (
                         <div className="px-4 pb-4 pt-0.5 ml-7">
@@ -1746,6 +1768,7 @@ export function VehicleDetail({
                 })()}
               </div>
             </div>
+            </div>
 
             {/* Vehicle History — right */}
             <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
@@ -1770,11 +1793,7 @@ export function VehicleDetail({
                     ].map((item, i) => (
                       <div key={i} className="relative flex gap-3 pl-0">
                         {/* Dot */}
-                        <div className={`w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 ${
-                          item.event === 'Added to LOTS247' ? 'bg-blue-500 dark:bg-blue-400'
-                            : item.event === 'Incident Solved' ? 'bg-emerald-500 dark:bg-emerald-400'
-                            : 'bg-amber-500 dark:bg-amber-400'
-                        }`} />
+                        <div className="w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 bg-emerald-500 dark:bg-emerald-400" />
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{item.event}</p>

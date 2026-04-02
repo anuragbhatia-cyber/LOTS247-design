@@ -46,11 +46,11 @@
       "amount": 1500,
       "currency": "INR",
       "description": "Challan payment — UP32MM1113",
-      "referenceId": "CLN-UP11279200417102541",
+      "referenceId": "CLN-UP200417102541",
       "status": "success",
       "date": "2026-03-21T10:15:00",
       "runningBalance": 7750,
-      "relatedEntityId": "UP11279200417102541",
+      "relatedEntityId": "UP200417102541",
       "relatedEntityType": "challan"
     },
     {
@@ -116,11 +116,11 @@
       "amount": 2000,
       "currency": "INR",
       "description": "Challan payment — UP32NN2224",
-      "referenceId": "CLN-UP11279200518203652",
+      "referenceId": "CLN-UP200518203652",
       "status": "success",
       "date": "2026-03-14T08:30:00",
       "runningBalance": 4999,
-      "relatedEntityId": "UP11279200518203652",
+      "relatedEntityId": "UP200518203652",
       "relatedEntityType": "challan"
     },
     {
@@ -158,11 +158,11 @@
       "amount": 500,
       "currency": "INR",
       "description": "Challan payment — UP32PP3335",
-      "referenceId": "CLN-UP11279200619304763",
+      "referenceId": "CLN-UP200619304763",
       "status": "success",
       "date": "2026-03-08T12:40:00",
       "runningBalance": 6499,
-      "relatedEntityId": "UP11279200619304763",
+      "relatedEntityId": "UP200619304763",
       "relatedEntityType": "challan"
     },
     {

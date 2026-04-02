@@ -198,7 +198,7 @@
       "id": "drv-001",
       "name": "Rajesh Kumar",
       "phone": "918976543210",
-      "licenseNumber": "MH-1220190045678",
+      "licenseNumber": "MH12190045678",
       "licenseExpiry": "2028-05-14",
       "licenseStatus": "valid",
       "assignedVehicleIds": ["veh-001"]
@@ -207,7 +207,7 @@
       "id": "drv-002",
       "name": "Suresh Patel",
       "phone": "918765432109",
-      "licenseNumber": "GJ-0520200034567",
+      "licenseNumber": "GJ05200034567",
       "licenseExpiry": "2027-09-22",
       "licenseStatus": "valid",
       "assignedVehicleIds": ["veh-002"]
@@ -216,7 +216,7 @@
       "id": "drv-003",
       "name": "Mohammad Irfan",
       "phone": "917654321098",
-      "licenseNumber": "RJ-1420210023456",
+      "licenseNumber": "RJ14210023456",
       "licenseExpiry": "2029-01-08",
       "licenseStatus": "valid",
       "assignedVehicleIds": ["veh-003"]
@@ -225,7 +225,7 @@
       "id": "drv-004",
       "name": "Vikram Singh",
       "phone": "916543210987",
-      "licenseNumber": "MP-0920180056789",
+      "licenseNumber": "MP09180056789",
       "licenseExpiry": "2026-03-30",
       "licenseStatus": "expiring-soon",
       "assignedVehicleIds": ["veh-004"]
@@ -234,7 +234,7 @@
       "id": "drv-005",
       "name": "Arjun Reddy",
       "phone": "915432109876",
-      "licenseNumber": "TN-0720200012345",
+      "licenseNumber": "TN07200012345",
       "licenseExpiry": "2028-11-17",
       "licenseStatus": "valid",
       "assignedVehicleIds": ["veh-006"]
@@ -243,7 +243,7 @@
       "id": "drv-006",
       "name": "Deepak Yadav",
       "phone": "914321098765",
-      "licenseNumber": "UP-3220220067890",
+      "licenseNumber": "UP32220067890",
       "licenseExpiry": "2030-07-25",
       "licenseStatus": "valid",
       "assignedVehicleIds": ["veh-008", "veh-005"]

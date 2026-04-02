@@ -583,7 +583,10 @@ export function WalletView({
                 <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
               </div>
               <button
-                onClick={() => setShowAddMoney(true)}
+                onClick={() => {
+                  setShowAddMoney(true)
+                  window.parent.postMessage({ type: 'showOverlay' }, '*')
+                }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
               >
                 <Plus className="w-4 h-4" />
@@ -792,7 +795,10 @@ export function WalletView({
           {/* Transaction list */}
           {filteredTransactions.length === 0 ? (
             transactions.length === 0 ? (
-              <EmptyState onAddMoney={() => setShowAddMoney(true)} />
+              <EmptyState onAddMoney={() => {
+                setShowAddMoney(true)
+                window.parent.postMessage({ type: 'showOverlay' }, '*')
+              }} />
             ) : (
               <div className="py-16 text-center">
                 <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
@@ -968,7 +974,7 @@ export function WalletView({
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                      className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -979,7 +985,7 @@ export function WalletView({
                         className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
                           page === currentPage
                             ? 'bg-emerald-600 text-white shadow-sm'
-                            : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+                            : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
                         }`}
                       >
                         {page}
@@ -988,7 +994,7 @@ export function WalletView({
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                      className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -1005,7 +1011,10 @@ export function WalletView({
         <AddMoneyModal
           quickAmounts={quickAmounts}
           onAddMoney={onAddMoney}
-          onClose={() => setShowAddMoney(false)}
+          onClose={() => {
+            setShowAddMoney(false)
+            window.parent.postMessage({ type: 'hideOverlay' }, '*')
+          }}
         />
       )}
 

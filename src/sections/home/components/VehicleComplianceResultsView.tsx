@@ -62,9 +62,9 @@ const SAMPLE_COMPLIANCE: ComplianceDoc[] = [
   },
   {
     id: 'challans',
-    label: 'Pending Challans',
-    status: 'expired',
-    statusLabel: 'Expired',
+    label: 'Challans',
+    status: 'expiring-soon',
+    statusLabel: 'Pending',
     details: [
       { label: 'Pending', value: '3 Challans' },
       { label: 'Total Amount', value: '₹15,500' },
@@ -191,11 +191,37 @@ export function VehicleComplianceResultsView({ vehicleNumber, onBack }: VehicleC
 
         {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          {/* Compliance Status — left */}
-          <div className="lg:col-span-3 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
-            <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
-              Compliance Status
-            </h3>
+          {/* Left column — Vehicle Summary + Compliance Status */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* Vehicle Summary */}
+            <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+              <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
+                Vehicle Summary
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                  <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Incidents</p>
+                  <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">5</p>
+                  <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹48,500</p>
+                </div>
+                <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                  <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Cases</p>
+                  <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">3</p>
+                  <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹32,000</p>
+                </div>
+                <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                  <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Renewals</p>
+                  <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">7</p>
+                  <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹18,200</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Compliance Status */}
+            <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+              <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
+                Compliance Status
+              </h3>
             <div className="space-y-1">
               {SAMPLE_COMPLIANCE.map((doc) => {
                 const isExpanded = expanded.has(doc.id)
@@ -230,6 +256,7 @@ export function VehicleComplianceResultsView({ vehicleNumber, onBack }: VehicleC
                 )
               })}
             </div>
+          </div>
           </div>
 
           {/* Vehicle History — right */}

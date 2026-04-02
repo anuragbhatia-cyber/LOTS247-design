@@ -16,7 +16,7 @@ import {
   Home,
   BarChart3,
   Wallet,
-  CircleDollarSign,
+  Smartphone,
   Plus,
   Star,
   UserPlus,
@@ -115,6 +115,26 @@ const translations: Record<Language, Record<string, string>> = {
     card: 'Card',
     netbanking: 'Net Banking',
     wallet: 'Wallet',
+    addPaymentTitle: 'Add Payment Method',
+    paymentType: 'Payment Type',
+    upiId: 'UPI ID',
+    upiIdPlaceholder: 'yourname@upi',
+    cardNumber: 'Card Number',
+    cardNumberPlaceholder: '**** **** **** ****',
+    cardHolderName: 'Cardholder Name',
+    cardHolderPlaceholder: 'Name on card',
+    expiryDate: 'Expiry',
+    expiryPlaceholder: 'MM/YY',
+    cvv: 'CVV',
+    cvvPlaceholder: '***',
+    bankName: 'Bank Name',
+    bankNamePlaceholder: 'Select your bank',
+    walletProvider: 'Wallet Provider',
+    walletProviderPlaceholder: 'Select wallet',
+    walletPhone: 'Registered Phone',
+    walletPhonePlaceholder: '+91 98765 43210',
+    makeDefault: 'Set as default payment method',
+    addMethod: 'Add Method',
     // Team Management
     inviteMember: 'Invite Member',
     inviteTitle: 'Invite Team Member',
@@ -128,6 +148,8 @@ const translations: Record<Language, Record<string, string>> = {
     sendInvite: 'Send Invite',
     cancel: 'Cancel',
     teamMembersTitle: 'Team Members',
+    membersTab: 'Members',
+    rolesTab: 'Roles',
     owner: 'Owner',
     admin: 'Admin',
     manager: 'Manager',
@@ -139,6 +161,15 @@ const translations: Record<Language, Record<string, string>> = {
     changeRole: 'Change Role',
     teamUsage: 'of',
     teamSeats: 'seats used',
+    rolePermissions: 'Permissions',
+    ownerDesc: 'Full access to all settings, billing, team management, and data. Cannot be removed.',
+    adminDesc: 'Can manage vehicles, drivers, incidents, compliance, and team members. Cannot access billing.',
+    managerDesc: 'Can view and manage assigned vehicles, raise proposals, and handle incidents.',
+    viewerDesc: 'Read-only access to dashboards, compliance status, and reports.',
+    ownerActivities: 'Manage billing & subscription,Add or remove team members,Change member roles,Access all settings,View & export all reports,Manage vehicles & drivers,Handle incidents & compliance',
+    adminActivities: 'Add or remove team members,Manage vehicles & drivers,Handle incidents & challans,View compliance dashboard,Generate & export reports,Manage proposals',
+    managerActivities: 'View assigned vehicles,Raise & track proposals,Report & manage incidents,View compliance status,Download reports',
+    viewerActivities: 'View dashboards,View compliance status,View reports,View vehicle details',
     // Reports
     scheduledReports: 'Scheduled Reports',
     lastGenerated: 'Last generated',
@@ -229,6 +260,26 @@ const translations: Record<Language, Record<string, string>> = {
     card: 'कार्ड',
     netbanking: 'नेट बैंकिंग',
     wallet: 'वॉलेट',
+    addPaymentTitle: 'भुगतान विधि जोड़ें',
+    paymentType: 'भुगतान प्रकार',
+    upiId: 'UPI आईडी',
+    upiIdPlaceholder: 'yourname@upi',
+    cardNumber: 'कार्ड नंबर',
+    cardNumberPlaceholder: '**** **** **** ****',
+    cardHolderName: 'कार्डधारक का नाम',
+    cardHolderPlaceholder: 'कार्ड पर नाम',
+    expiryDate: 'समाप्ति',
+    expiryPlaceholder: 'MM/YY',
+    cvv: 'CVV',
+    cvvPlaceholder: '***',
+    bankName: 'बैंक का नाम',
+    bankNamePlaceholder: 'अपना बैंक चुनें',
+    walletProvider: 'वॉलेट प्रदाता',
+    walletProviderPlaceholder: 'वॉलेट चुनें',
+    walletPhone: 'पंजीकृत फ़ोन',
+    walletPhonePlaceholder: '+91 98765 43210',
+    makeDefault: 'डिफ़ॉल्ट भुगतान विधि बनाएं',
+    addMethod: 'विधि जोड़ें',
     inviteMember: 'सदस्य आमंत्रित करें',
     inviteTitle: 'टीम सदस्य आमंत्रित करें',
     nameLabel: 'पूरा नाम',
@@ -241,6 +292,8 @@ const translations: Record<Language, Record<string, string>> = {
     sendInvite: 'आमंत्रण भेजें',
     cancel: 'रद्द करें',
     teamMembersTitle: 'टीम सदस्य',
+    membersTab: 'सदस्य',
+    rolesTab: 'भूमिकाएं',
     owner: 'मालिक',
     admin: 'व्यवस्थापक',
     manager: 'प्रबंधक',
@@ -252,6 +305,15 @@ const translations: Record<Language, Record<string, string>> = {
     changeRole: 'भूमिका बदलें',
     teamUsage: 'में से',
     teamSeats: 'सीटें उपयोग में',
+    rolePermissions: 'अनुमतियां',
+    ownerDesc: 'सभी सेटिंग्स, बिलिंग, टीम प्रबंधन और डेटा तक पूर्ण पहुंच। हटाया नहीं जा सकता।',
+    adminDesc: 'वाहन, ड्राइवर, घटनाएं, अनुपालन और टीम सदस्यों का प्रबंधन कर सकते हैं। बिलिंग तक पहुंच नहीं।',
+    managerDesc: 'सौंपे गए वाहनों को देख और प्रबंधित कर सकते हैं, प्रस्ताव उठा सकते हैं और घटनाओं को संभाल सकते हैं।',
+    viewerDesc: 'डैशबोर्ड, अनुपालन स्थिति और रिपोर्ट तक केवल पढ़ने की पहुंच।',
+    ownerActivities: 'बिलिंग और सदस्यता प्रबंधित करें,टीम सदस्य जोड़ें या हटाएं,सदस्य भूमिकाएं बदलें,सभी सेटिंग्स एक्सेस करें,सभी रिपोर्ट देखें और निर्यात करें,वाहन और ड्राइवर प्रबंधित करें,घटनाएं और अनुपालन संभालें',
+    adminActivities: 'टीम सदस्य जोड़ें या हटाएं,वाहन और ड्राइवर प्रबंधित करें,घटनाएं और चालान संभालें,अनुपालन डैशबोर्ड देखें,रिपोर्ट बनाएं और निर्यात करें,प्रस्ताव प्रबंधित करें',
+    managerActivities: 'सौंपे गए वाहन देखें,प्रस्ताव उठाएं और ट्रैक करें,घटनाएं रिपोर्ट और प्रबंधित करें,अनुपालन स्थिति देखें,रिपोर्ट डाउनलोड करें',
+    viewerActivities: 'डैशबोर्ड देखें,अनुपालन स्थिति देखें,रिपोर्ट देखें,वाहन विवरण देखें',
     scheduledReports: 'निर्धारित रिपोर्ट्स',
     lastGenerated: 'अंतिम बार बनाई',
     recipients: 'प्राप्तकर्ता',
@@ -323,7 +385,7 @@ const FEATURE_LABELS: Record<string, string> = {
 }
 
 const PAYMENT_METHOD_ICONS: Record<PaymentMethodType, typeof CreditCard> = {
-  upi: CircleDollarSign,
+  upi: Smartphone,
   card: CreditCard,
   netbanking: Wallet,
   wallet: Wallet,
@@ -549,6 +611,9 @@ export function Settings({
   const [activeTab, setActiveTab] = useState<Tab>('general')
   const [showPlanModal, setShowPlanModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [showAddPaymentModal, setShowAddPaymentModal] = useState(false)
+  const [newPaymentType, setNewPaymentType] = useState<PaymentMethodType>('upi')
+  const [teamSubTab, setTeamSubTab] = useState<'members' | 'roles'>('members')
   const [localQuietHours, setLocalQuietHours] = useState(quietHours)
   const [localLanding, setLocalLanding] = useState(appPreferences.defaultLandingPage)
   const [localBadges, setLocalBadges] = useState(appPreferences.showSidebarBadges)
@@ -893,7 +958,10 @@ export function Settings({
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">{t.paymentMethods}</h3>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors">
+                  <button
+                    onClick={() => { setNewPaymentType('upi'); setShowAddPaymentModal(true) }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                  >
                     <Plus className="w-3.5 h-3.5" />
                     {t.addPaymentMethod}
                   </button>
@@ -904,23 +972,11 @@ export function Settings({
                     return (
                       <div
                         key={method.id}
-                        className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
-                          method.isDefault
-                            ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/10'
-                            : 'border-stone-200 dark:border-stone-700'
-                        }`}
+                        className="flex items-center justify-between p-4 rounded-xl border border-stone-200 dark:border-stone-700 transition-all"
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            method.isDefault
-                              ? 'bg-emerald-100 dark:bg-emerald-900/50'
-                              : 'bg-stone-100 dark:bg-stone-800'
-                          }`}>
-                            <MethodIcon className={`w-5 h-5 ${
-                              method.isDefault
-                                ? 'text-emerald-600 dark:text-emerald-400'
-                                : 'text-stone-500 dark:text-stone-400'
-                            }`} />
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-stone-100 dark:bg-stone-800">
+                            <MethodIcon className="w-5 h-5 text-stone-500 dark:text-stone-400" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
@@ -1027,75 +1083,134 @@ export function Settings({
           {/* ----- Team Management Tab ----- */}
           {activeTab === 'team' && (
             <div className="p-5 sm:p-6">
-              {/* Header with seat usage */}
-              <div className="flex items-center justify-between mb-5">
-                <div>
-                  <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">{t.teamMembersTitle}</h3>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                    {teamMembers.length} {t.teamUsage} {subscription.userLimit} {t.teamSeats}
-                  </p>
-                </div>
+              {/* Sub-tabs: Members / Roles */}
+              <div className="flex items-center gap-1 mb-5 border-b border-stone-200 dark:border-stone-800">
                 <button
-                  onClick={() => setShowInviteModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                  onClick={() => setTeamSubTab('members')}
+                  className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                    teamSubTab === 'members'
+                      ? 'border-emerald-600 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400'
+                      : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                  }`}
                 >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  {t.inviteMember}
+                  {t.membersTab}
+                </button>
+                <button
+                  onClick={() => setTeamSubTab('roles')}
+                  className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                    teamSubTab === 'roles'
+                      ? 'border-emerald-600 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400'
+                      : 'border-transparent text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                  }`}
+                >
+                  {t.rolesTab}
                 </button>
               </div>
 
-              {/* Team Members List */}
-              <div className="space-y-0 divide-y divide-stone-100 dark:divide-stone-800">
-                {teamMembers.map((member) => {
-                  const roleConfig = ROLE_CONFIG[member.role]
-                  const statusConfig = MEMBER_STATUS_CONFIG[member.status]
-                  return (
-                    <div key={member.id} className="py-4 first:pt-0 last:pb-0">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
-                            <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{member.initials}</span>
-                          </div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{member.name}</p>
-                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${roleConfig.color} ${roleConfig.bg}`}>
-                                {t[member.role]}
-                              </span>
-                              {member.status !== 'active' && (
-                                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${statusConfig.color} ${statusConfig.bg}`}>
-                                  {t[member.status]}
-                                </span>
+              {/* Members Sub-Tab */}
+              {teamSubTab === 'members' && (
+                <>
+                  {/* Header with seat usage */}
+                  <div className="flex items-center justify-between mb-5">
+                    <div>
+                      <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">{t.teamMembersTitle}</h3>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                        {teamMembers.length} {t.teamUsage} {subscription.userLimit} {t.teamSeats}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowInviteModal(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      {t.inviteMember}
+                    </button>
+                  </div>
+
+                  {/* Team Members List */}
+                  <div className="space-y-0 divide-y divide-stone-100 dark:divide-stone-800">
+                    {teamMembers.map((member) => {
+                      const roleConfig = ROLE_CONFIG[member.role]
+                      const statusConfig = MEMBER_STATUS_CONFIG[member.status]
+                      return (
+                        <div key={member.id} className="py-4 first:pt-0 last:pb-0">
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                                <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{member.initials}</span>
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-medium text-stone-900 dark:text-stone-100 truncate">{member.name}</p>
+                                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${roleConfig.color} ${roleConfig.bg}`}>
+                                    {t[member.role]}
+                                  </span>
+                                  {member.status !== 'active' && (
+                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider ${statusConfig.color} ${statusConfig.bg}`}>
+                                      {t[member.status]}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-3 mt-0.5">
+                                  <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 truncate">
+                                    <Mail className="w-3 h-3 shrink-0" />
+                                    {member.email}
+                                  </span>
+                                  <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 hidden sm:flex">
+                                    <Phone className="w-3 h-3 shrink-0" />
+                                    {member.phone}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="text-xs text-stone-400 dark:text-stone-500 hidden lg:inline">{t.joined} {member.joinedDate}</span>
+                              {member.role !== 'owner' && (
+                                <button
+                                  onClick={() => onRemoveMember?.(member.id)}
+                                  className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                                >
+                                  <MoreVertical className="w-4 h-4" />
+                                </button>
                               )}
                             </div>
-                            <div className="flex items-center gap-3 mt-0.5">
-                              <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 truncate">
-                                <Mail className="w-3 h-3 shrink-0" />
-                                {member.email}
-                              </span>
-                              <span className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-1 hidden sm:flex">
-                                <Phone className="w-3 h-3 shrink-0" />
-                                {member.phone}
-                              </span>
-                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-xs text-stone-400 dark:text-stone-500 hidden lg:inline">{t.joined} {member.joinedDate}</span>
-                          {member.role !== 'owner' && (
-                            <button
-                              onClick={() => onRemoveMember?.(member.id)}
-                              className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                            >
-                              <MoreVertical className="w-4 h-4" />
-                            </button>
-                          )}
+                      )
+                    })}
+                  </div>
+                </>
+              )}
+
+              {/* Roles Sub-Tab */}
+              {teamSubTab === 'roles' && (
+                <div className="space-y-5">
+                  {(['owner', 'admin', 'manager', 'viewer'] as TeamMemberRole[]).map((role) => {
+                    const config = ROLE_CONFIG[role]
+                    const activitiesKey = `${role}Activities` as string
+                    const activities = (t[activitiesKey] || '').split(',')
+                    return (
+                      <div key={role} className="rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
+                        <div className="px-5 py-4 bg-stone-50 dark:bg-stone-800/40 border-b border-stone-200 dark:border-stone-700">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider ${config.color} ${config.bg}`}>
+                            {t[role]}
+                          </span>
+                        </div>
+                        <div className="px-5 py-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {activities.map((activity: string, i: number) => (
+                              <label key={i} className="flex items-center gap-2.5 cursor-default">
+                                <input type="checkbox" checked readOnly className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30" />
+                                <span className="text-sm text-stone-600 dark:text-stone-400">{activity.trim()}</span>
+                              </label>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           )}
 
@@ -1265,6 +1380,159 @@ export function Settings({
           onClose={() => setShowPlanModal(false)}
           t={t}
         />
+      )}
+
+      {/* Add Payment Method Modal */}
+      {showAddPaymentModal && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAddPaymentModal(false)} />
+          <div className="relative bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="border-b border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+              <h3 className="text-lg font-semibold text-stone-900 dark:text-stone-100">{t.addPaymentTitle}</h3>
+              <button onClick={() => setShowAddPaymentModal(false)} className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              {/* Payment Type Selector */}
+              <div>
+                <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">{t.paymentType}</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {(['upi', 'card', 'netbanking', 'wallet'] as PaymentMethodType[]).map((type) => {
+                    const Icon = PAYMENT_METHOD_ICONS[type]
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => setNewPaymentType(type)}
+                        className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-xs font-medium transition-all ${
+                          newPaymentType === type
+                            ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+                            : 'border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-600'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                        {t[type]}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* UPI Fields */}
+              {newPaymentType === 'upi' && (
+                <div>
+                  <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">{t.upiId}</label>
+                  <input
+                    type="text"
+                    placeholder={t.upiIdPlaceholder}
+                    className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                  />
+                </div>
+              )}
+
+              {/* Card Fields */}
+              {newPaymentType === 'card' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">{t.cardNumber}</label>
+                    <input
+                      type="text"
+                      placeholder={t.cardNumberPlaceholder}
+                      className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">{t.cardHolderName}</label>
+                    <input
+                      type="text"
+                      placeholder={t.cardHolderPlaceholder}
+                      className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">{t.expiryDate}</label>
+                      <input
+                        type="text"
+                        placeholder={t.expiryPlaceholder}
+                        className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">{t.cvv}</label>
+                      <input
+                        type="password"
+                        placeholder={t.cvvPlaceholder}
+                        className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Net Banking Fields */}
+              {newPaymentType === 'netbanking' && (
+                <div>
+                  <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">{t.bankName}</label>
+                  <select className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600">
+                    <option value="">{t.bankNamePlaceholder}</option>
+                    <option value="sbi">State Bank of India</option>
+                    <option value="hdfc">HDFC Bank</option>
+                    <option value="icici">ICICI Bank</option>
+                    <option value="axis">Axis Bank</option>
+                    <option value="kotak">Kotak Mahindra Bank</option>
+                    <option value="pnb">Punjab National Bank</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Wallet Fields */}
+              {newPaymentType === 'wallet' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">{t.walletProvider}</label>
+                    <select className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600">
+                      <option value="">{t.walletProviderPlaceholder}</option>
+                      <option value="paytm">Paytm</option>
+                      <option value="phonepe">PhonePe</option>
+                      <option value="amazon">Amazon Pay</option>
+                      <option value="mobikwik">MobiKwik</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">{t.walletPhone}</label>
+                    <input
+                      type="tel"
+                      placeholder={t.walletPhonePlaceholder}
+                      className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Set as Default Checkbox */}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30" />
+                <span className="text-sm text-stone-600 dark:text-stone-400">{t.makeDefault}</span>
+              </label>
+            </div>
+            <div className="border-t border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setShowAddPaymentModal(false)}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              >
+                {t.cancel}
+              </button>
+              <button
+                onClick={() => setShowAddPaymentModal(false)}
+                className="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+              >
+                {t.addMethod}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Invite Member Modal */}

@@ -10,6 +10,7 @@ import { AddIncidentModal } from '@/sections/home/components/AddIncidentModal'
 import { BulkUploadModal } from '@/sections/vehicle-and-driver-management/components/BulkUploadModal'
 import { ChallanResultsView } from '@/sections/home/components/ChallanResultsView'
 import { VehicleComplianceResultsView } from '@/sections/home/components/VehicleComplianceResultsView'
+import { VehicleComplianceCheck } from '@/sections/home/components/VehicleComplianceCheck'
 
 interface Notification {
   id: string
@@ -376,6 +377,7 @@ export function AppShell({
   const [showAddDriver, setShowAddDriver] = useState(false)
   const [showCheckChallan, setShowCheckChallan] = useState(false)
   const [showAddIncident, setShowAddIncident] = useState(false)
+  const [showComplianceCheck, setShowComplianceCheck] = useState(false)
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [challanResultsVehicle, setChallanResultsVehicle] = useState<string | null>(null)
   const [complianceResultsVehicle, setComplianceResultsVehicle] = useState<string | null>(null)
@@ -421,6 +423,9 @@ export function AppShell({
       }
       if (event.data?.type === 'openAddIncident') {
         setShowAddIncident(true)
+      }
+      if (event.data?.type === 'openComplianceCheck') {
+        setShowComplianceCheck(true)
       }
       if (event.data?.type === 'openComplianceResults' && event.data?.vehicleNumber) {
         setComplianceResultsVehicle(event.data.vehicleNumber)
@@ -626,9 +631,6 @@ export function AppShell({
                           ${!notif.read ? 'bg-stone-50/80 dark:bg-stone-800/20' : ''}
                         `}
                       >
-                        <div className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${style}`}>
-                          <Icon className="w-4 h-4" />
-                        </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-3 mb-0.5">
                             <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 leading-snug">{notif.title}</p>
@@ -770,7 +772,7 @@ export function AppShell({
             </div>
           )}
         </div>
-        <div>
+        <div className={iframeOverlay ? 'relative z-[95]' : ''}>
           {showNotifications ? (
             <NotificationsView onBack={() => setShowNotifications(false)} />
           ) : challanResultsVehicle ? (
@@ -817,6 +819,16 @@ export function AppShell({
       <AddIncidentModal
         isOpen={showAddIncident}
         onClose={() => setShowAddIncident(false)}
+      />
+
+      {/* Vehicle Compliance Check Modal */}
+      <VehicleComplianceCheck
+        open={showComplianceCheck}
+        onClose={() => setShowComplianceCheck(false)}
+        onShowResults={(vn) => {
+          setShowComplianceCheck(false)
+          setComplianceResultsVehicle(vn)
+        }}
       />
 
       {/* Bulk Upload Modal */}

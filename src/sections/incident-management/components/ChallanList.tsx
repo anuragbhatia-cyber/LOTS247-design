@@ -875,7 +875,7 @@ export function ChallanList({
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -883,7 +883,7 @@ export function ChallanList({
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${
+                  className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
                     page === currentPage
                       ? 'bg-emerald-600 text-white shadow-sm'
                       : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
@@ -895,7 +895,7 @@ export function ChallanList({
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

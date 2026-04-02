@@ -534,21 +534,6 @@ function ChangeVehicleModal({
                         : 'border border-transparent hover:bg-stone-50 dark:hover:bg-stone-800/50'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isSelected
-                        ? 'bg-emerald-100 dark:bg-emerald-900/50'
-                        : v.status === 'active'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40'
-                        : 'bg-stone-100 dark:bg-stone-800'
-                    }`}>
-                      <Truck className={`w-4.5 h-4.5 ${
-                        isSelected
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : v.status === 'active'
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : 'text-stone-400 dark:text-stone-500'
-                      }`} />
-                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className={`text-sm font-semibold font-mono tracking-tight truncate ${
@@ -1274,16 +1259,11 @@ export function VehicleList({
 
                         {/* Subscription Status */}
                         <td className="px-5 py-4 text-center">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
                             vehicle.subscriptionStatus === 'active'
                               ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                               : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
                           }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${
-                              vehicle.subscriptionStatus === 'active'
-                                ? 'bg-emerald-500'
-                                : 'bg-stone-400 dark:bg-stone-500'
-                            }`} />
                             {vehicle.subscriptionStatus === 'active' ? t.subscriptionActive : t.subscriptionInactive}
                           </span>
                         </td>
@@ -1481,16 +1461,11 @@ export function VehicleList({
                       <span className="text-xs text-stone-500 dark:text-stone-400">
                         {vehicle.vehicleType}
                       </span>
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
                         vehicle.subscriptionStatus === 'active'
                           ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                           : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
                       }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${
-                          vehicle.subscriptionStatus === 'active'
-                            ? 'bg-emerald-500'
-                            : 'bg-stone-400 dark:bg-stone-500'
-                        }`} />
                         {vehicle.subscriptionStatus === 'active' ? t.subscriptionActive : t.subscriptionInactive}
                       </span>
                       {vehicle.status === 'inactive' && (

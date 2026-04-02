@@ -132,7 +132,6 @@ export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
               <div key={cat.id}>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full flex-shrink-0 bg-emerald-500" />
                     <span className="text-sm text-stone-700 dark:text-stone-300">{cat.label}</span>
                   </div>
                   <span className={`text-sm font-semibold tabular-nums ${cfg.color}`}>

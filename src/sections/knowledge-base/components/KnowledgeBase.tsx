@@ -138,47 +138,47 @@ const CATEGORY_CONFIG: Record<
 > = {
   template: {
     labelKey: 'templates',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
-    text: 'text-emerald-700 dark:text-emerald-300',
-    border: 'border-emerald-200 dark:border-emerald-800',
+    bg: 'bg-stone-100 dark:bg-stone-800',
+    text: 'text-stone-600 dark:text-stone-300',
+    border: 'border-stone-200 dark:border-stone-700',
     icon: FileText,
     activeBg: 'bg-emerald-600 dark:bg-emerald-500',
     activeText: 'text-white dark:text-white',
   },
   faq: {
     labelKey: 'faqs',
-    bg: 'bg-blue-50 dark:bg-blue-950/40',
-    text: 'text-blue-700 dark:text-blue-300',
-    border: 'border-blue-200 dark:border-blue-800',
+    bg: 'bg-stone-100 dark:bg-stone-800',
+    text: 'text-stone-600 dark:text-stone-300',
+    border: 'border-stone-200 dark:border-stone-700',
     icon: HelpCircle,
-    activeBg: 'bg-blue-600 dark:bg-blue-500',
+    activeBg: 'bg-emerald-600 dark:bg-emerald-500',
     activeText: 'text-white dark:text-white',
   },
   guide: {
     labelKey: 'guides',
-    bg: 'bg-amber-50 dark:bg-amber-950/40',
-    text: 'text-amber-700 dark:text-amber-300',
-    border: 'border-amber-200 dark:border-amber-800',
+    bg: 'bg-stone-100 dark:bg-stone-800',
+    text: 'text-stone-600 dark:text-stone-300',
+    border: 'border-stone-200 dark:border-stone-700',
     icon: BookOpen,
-    activeBg: 'bg-amber-600 dark:bg-amber-500',
+    activeBg: 'bg-emerald-600 dark:bg-emerald-500',
     activeText: 'text-white dark:text-white',
   },
   checklist: {
     labelKey: 'checklists',
-    bg: 'bg-violet-50 dark:bg-violet-950/40',
-    text: 'text-violet-700 dark:text-violet-300',
-    border: 'border-violet-200 dark:border-violet-800',
+    bg: 'bg-stone-100 dark:bg-stone-800',
+    text: 'text-stone-600 dark:text-stone-300',
+    border: 'border-stone-200 dark:border-stone-700',
     icon: CheckSquare,
-    activeBg: 'bg-violet-600 dark:bg-violet-500',
+    activeBg: 'bg-emerald-600 dark:bg-emerald-500',
     activeText: 'text-white dark:text-white',
   },
   regulation: {
     labelKey: 'regulations',
-    bg: 'bg-rose-50 dark:bg-rose-950/40',
-    text: 'text-rose-700 dark:text-rose-300',
-    border: 'border-rose-200 dark:border-rose-800',
+    bg: 'bg-stone-100 dark:bg-stone-800',
+    text: 'text-stone-600 dark:text-stone-300',
+    border: 'border-stone-200 dark:border-stone-700',
     icon: Scale,
-    activeBg: 'bg-rose-600 dark:bg-rose-500',
+    activeBg: 'bg-emerald-600 dark:bg-emerald-500',
     activeText: 'text-white dark:text-white',
   },
 }
@@ -461,21 +461,9 @@ function ArticleCard({
         {article.excerpt}
       </p>
 
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap gap-1.5">
-          {article.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="text-[10px] px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400 font-medium"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div className="flex items-center gap-1 text-[10px] text-stone-400 dark:text-stone-500 shrink-0">
-          <Calendar className="w-3 h-3" />
-          {article.lastUpdated}
-        </div>
+      <div className="flex items-center gap-1 text-[10px] text-stone-400 dark:text-stone-500">
+        <Calendar className="w-3 h-3" />
+        {article.lastUpdated}
       </div>
     </button>
   )
@@ -721,17 +709,6 @@ function DetailView({
               <Calendar className="w-3.5 h-3.5" />
               {t.updated} {article.lastUpdated}
             </span>
-          </div>
-
-          <div className="flex flex-wrap gap-2 mb-5">
-            {article.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-xs px-2.5 py-1 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 font-medium"
-              >
-                {tag}
-              </span>
-            ))}
           </div>
 
           {/* Template actions */}

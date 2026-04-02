@@ -231,7 +231,7 @@ export function RegistrationStep({
                         type="tel"
                         value={formatPhone(formData.phoneNumber)}
                         onChange={handlePhoneChange}
-                        placeholder="98765 43210"
+                        placeholder="Enter phone number"
                         className={`
                           flex-1 px-4 py-3 rounded-r-xl border text-base
                           bg-white dark:bg-stone-900
@@ -313,7 +313,7 @@ export function RegistrationStep({
                         inputMode="numeric"
                         value={formData.pincode}
                         onChange={handlePincodeChange}
-                        placeholder="110001"
+                        placeholder="Enter pin code"
                         className={inputClassName('pincode')}
                       />
                       <ErrorMessage field="pincode" />

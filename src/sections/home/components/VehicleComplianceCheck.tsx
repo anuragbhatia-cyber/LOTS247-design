@@ -77,10 +77,10 @@ export function VehicleComplianceCheck({ open, onClose, onShowResults }: Vehicle
                   type="text"
                   value={vehicleNumber}
                   onChange={(e) => handleVehicleNumberChange(e.target.value)}
-                  placeholder="UP32MM1113"
+                  placeholder="Enter vehicle number"
                   maxLength={10}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit() }}
-                  className="w-full px-3.5 pr-9 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                  className="w-full px-3.5 pr-9 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                 />
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>

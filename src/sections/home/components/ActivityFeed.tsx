@@ -51,6 +51,8 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     alerts: 'Alerts',
     alert: 'alert',
     alertsPlural: 'alerts',
+    pendingAlerts: 'Pending Alerts',
+    view: 'View',
     vehicle: 'Vehicle',
     payNow: 'Pay Now',
     raiseProposal: 'Raise Proposal',
@@ -60,6 +62,8 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     alerts: 'अलर्ट',
     alert: 'अलर्ट',
     alertsPlural: 'अलर्ट',
+    pendingAlerts: 'लंबित अलर्ट',
+    view: 'देखें',
     vehicle: 'वाहन',
     payNow: 'अभी भुगतान करें',
     raiseProposal: 'प्रस्ताव उठाएं',
@@ -73,18 +77,20 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
   return (
     <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
-        <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
-          {t.alerts}
-        </h2>
-        {items.length > 0 && (
-          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-            {items.length} {items.length === 1 ? t.alert : t.alertsPlural}
-          </span>
-        )}
+      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-stone-200 dark:border-stone-800">
+        <div className="flex items-center gap-3">
+          <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
+            {t.alerts}
+          </h2>
+          {items.length > 0 && (
+            <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+              {items.length} {t.pendingAlerts}
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Alerts — first 4 */}
+      {/* Alerts — first 3 items */}
       <div className="divide-y divide-stone-200 dark:divide-stone-800">
         {items.slice(0, 3).map((item) => {
           const Icon = categoryIcons[item.category]
@@ -121,7 +127,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
       </div>
 
       {/* See all */}
-      {items.length > 3 && (
+      {items.length > 0 && (
         <button
           onClick={onViewAll}
           className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-200 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
