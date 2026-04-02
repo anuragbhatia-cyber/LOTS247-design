@@ -1,0 +1,238 @@
+{
+  "_meta": {
+    "models": {
+      "subscriptionPlans": "The available subscription tiers that users can choose from during onboarding. Each plan defines vehicle limits, incident coverage, support levels, and pricing.",
+      "onboardingState": "Tracks the user's progress through the onboarding flow, including which step they're on and what data they've completed.",
+      "formExamples": "Sample data showing what completed forms would look like for design purposes. These are examples only - actual onboarding forms start empty.",
+      "validationErrors": "Example error messages that appear when validation fails at each step of the onboarding process.",
+      "uiStates": "Different UI states for loading, success, and error scenarios during the onboarding flow."
+    },
+    "relationships": [
+      "Each Subscription Plan has specific feature limits and pricing tiers",
+      "Onboarding State tracks progress through Sign Up → Add Vehicle → Add Driver → Choose Plan",
+      "Form Examples demonstrate what user-entered data looks like for design mockups",
+      "Validation Errors link to specific form fields and steps in the onboarding flow"
+    ]
+  },
+  "subscriptionPlans": [
+    {
+      "id": "plan-free",
+      "name": "Free",
+      "displayName": "Free Trial",
+      "description": "Get started with basic compliance tracking",
+      "price": 0,
+      "billingPeriod": "month",
+      "isRecommended": false,
+      "features": {
+        "vehicleLimit": 1,
+        "onCallResolution": false,
+        "onSiteResolution": false,
+        "challanResolution": { "online": false, "lokAdalat": false, "court": false },
+        "rtoService": false,
+        "dashboardAccess": true,
+        "numberOfUsers": 1,
+        "automatedReports": false,
+        "personalizedReports": false,
+        "whatsappUpdates": false,
+        "addOns": false,
+        "valueAddedServices": false,
+        "accountManager": false,
+        "bulkChallanResolution": false,
+        "apiIntegration": false
+      },
+      "limitations": [
+        "Limited to 1 vehicle only",
+        "No legal support services",
+        "No challan resolution assistance"
+      ]
+    },
+    {
+      "id": "plan-udrive",
+      "name": "U Drive",
+      "displayName": "U Drive",
+      "description": "Perfect for individual vehicle owners",
+      "price": 0,
+      "billingPeriod": "month",
+      "isRecommended": false,
+      "features": {
+        "vehicleLimit": 1,
+        "onCallResolution": true,
+        "onSiteResolution": "payPerUse",
+        "challanResolution": { "online": 79, "lokAdalat": 1000, "court": 2000 },
+        "rtoService": "payPerUse",
+        "dashboardAccess": true,
+        "numberOfUsers": 1,
+        "automatedReports": false,
+        "personalizedReports": false,
+        "whatsappUpdates": false,
+        "addOns": "payPerUse",
+        "valueAddedServices": "payPerUse",
+        "accountManager": false,
+        "bulkChallanResolution": false,
+        "apiIntegration": false
+      },
+      "highlights": [
+        "24/7 on-call legal support",
+        "Challan resolution starting at ₹79",
+        "Full dashboard access"
+      ]
+    },
+    {
+      "id": "plan-bsafe",
+      "name": "B Safe",
+      "displayName": "B Safe",
+      "description": "Comprehensive protection for growing fleets",
+      "price": 0,
+      "billingPeriod": "month",
+      "isRecommended": false,
+      "features": {
+        "vehicleLimit": null,
+        "onCallResolution": true,
+        "onSiteResolution": "payPerUse",
+        "challanResolution": { "online": 49, "lokAdalat": 1000, "court": 2000 },
+        "rtoService": "payPerUse",
+        "dashboardAccess": true,
+        "numberOfUsers": 3,
+        "automatedReports": true,
+        "personalizedReports": false,
+        "whatsappUpdates": true,
+        "addOns": "payPerUse",
+        "valueAddedServices": "payPerUse",
+        "accountManager": false,
+        "bulkChallanResolution": false,
+        "apiIntegration": false
+      },
+      "highlights": [
+        "24/7 on-call legal support",
+        "Lower challan fees (₹49)",
+        "Multi-user access (3 users)",
+        "Automated compliance reports",
+        "WhatsApp incident updates"
+      ]
+    },
+    {
+      "id": "plan-vcare",
+      "name": "V Care",
+      "displayName": "V Care",
+      "description": "Complete fleet management with premium support",
+      "price": 0,
+      "billingPeriod": "month",
+      "isRecommended": true,
+      "features": {
+        "vehicleLimit": null,
+        "onCallResolution": true,
+        "onSiteResolution": "payPerUse",
+        "challanResolution": { "online": 39, "lokAdalat": "asPerAddOn", "court": "asPerAddOn" },
+        "rtoService": "payPerUse",
+        "dashboardAccess": true,
+        "numberOfUsers": 10,
+        "automatedReports": true,
+        "personalizedReports": true,
+        "whatsappUpdates": true,
+        "addOns": "included",
+        "valueAddedServices": "worth20k",
+        "accountManager": true,
+        "bulkChallanResolution": true,
+        "apiIntegration": true
+      },
+      "highlights": [
+        "24/7 on-call legal support",
+        "Best challan rates (₹39)",
+        "Up to 10 users",
+        "Personalized compliance reports",
+        "Dedicated account manager",
+        "Bulk challan resolution",
+        "API integration support",
+        "₹20K value-added services included"
+      ],
+      "badge": "Top Seller"
+    }
+  ],
+  "onboardingSteps": [
+    { "id": "step-signup", "stepNumber": 1, "name": "Sign Up", "title": "Verify your phone number", "description": "We'll send you a one-time password to verify your account", "isRequired": true, "canSkip": false },
+    { "id": "step-vehicle", "stepNumber": 2, "name": "Add Vehicle", "title": "Add your first vehicle", "description": "Enter your RC number to get started with compliance tracking", "isRequired": true, "canSkip": false },
+    { "id": "step-driver", "stepNumber": 3, "name": "Add Driver", "title": "Add a driver (optional)", "description": "Assign a driver to track license compliance and incidents", "isRequired": false, "canSkip": true },
+    { "id": "step-plan", "stepNumber": 4, "name": "Choose Plan", "title": "Select your subscription plan", "description": "Choose the plan that best fits your needs", "isRequired": true, "canSkip": false }
+  ],
+  "formExamples": {
+    "phoneVerification": {
+      "phoneNumber": "918976543210",
+      "countryCode": "+91",
+      "otp": "123456",
+      "otpSentAt": "2024-02-16T10:30:00Z",
+      "otpExpiresAt": "2024-02-16T10:35:00Z",
+      "resendAvailableAt": "2024-02-16T10:31:00Z"
+    },
+    "vehicleDetails": {
+      "rcNumber": "DL3CAF1234",
+      "vehicleName": "Maruti Suzuki Swift VXi",
+      "vehicleType": "Car",
+      "registrationDate": "2020-03-15",
+      "ownerName": "Rajesh Kumar",
+      "fuelType": "Petrol",
+      "isFetching": false,
+      "fetchedFromApi": true,
+      "manualEntry": false
+    },
+    "vehicleDetailsManual": {
+      "rcNumber": "UP32VV9991",
+      "vehicleName": "Honda City",
+      "vehicleType": "Car",
+      "registrationDate": "",
+      "ownerName": "",
+      "fuelType": "",
+      "isFetching": false,
+      "fetchedFromApi": false,
+      "manualEntry": true
+    },
+    "driverDetails": {
+      "driverName": "Amit Sharma",
+      "driverId": "DRV-001",
+      "licenseNumber": "DL-0420110012345",
+      "assignedVehicleId": "DL3CAF1234",
+      "licenseExpiryDate": "2028-06-15"
+    }
+  },
+  "validationErrors": {
+    "phoneNumber": {
+      "invalid": "Please enter a valid 10-digit phone number",
+      "rateLimited": "Too many attempts. Please try again in 15 minutes.",
+      "alreadyExists": "This phone number is already registered. Please log in instead."
+    },
+    "otp": {
+      "invalid": "The OTP you entered is incorrect. Please try again.",
+      "expired": "This OTP has expired. Please request a new one.",
+      "tooManyAttempts": "Too many failed attempts. Please request a new OTP."
+    },
+    "vehicle": {
+      "duplicateRC": "This vehicle is already registered in your account.",
+      "invalidRC": "Please enter a valid RC number (e.g., DL3CAF1234)",
+      "apiFailed": "Unable to fetch vehicle details. Please enter manually.",
+      "requiredFields": "Please fill in all required vehicle details."
+    },
+    "driver": {
+      "invalidLicense": "Please enter a valid driving license number",
+      "requiredFields": "Driver name and license number are required"
+    },
+    "payment": {
+      "failed": "Payment failed. Please try again or use a different payment method.",
+      "timeout": "Payment request timed out. Please try again.",
+      "declined": "Your payment was declined. Please check your card details."
+    }
+  },
+  "uiStates": {
+    "otpCountdown": { "initialSeconds": 60, "resendEnabled": false, "message": "Resend OTP in {seconds}s" },
+    "vehicleFetching": { "isLoading": true, "message": "Fetching vehicle details...", "subMessage": "This may take a few seconds" },
+    "vehicleFetchSuccess": { "isLoading": false, "message": "Vehicle details fetched successfully!", "autoPopulated": true },
+    "vehicleFetchFailed": { "isLoading": false, "message": "Unable to fetch vehicle details", "fallbackMessage": "Please enter your vehicle details manually" },
+    "paymentProcessing": { "isLoading": true, "message": "Processing your payment...", "subMessage": "Please do not close this window" },
+    "activationSuccess": { "isLoading": false, "message": "Welcome to LOTS247!", "subMessage": "Redirecting to your dashboard...", "redirectDelay": 2000 }
+  },
+  "onboardingProgress": {
+    "newUser": { "userId": null, "currentStep": "step-signup", "completedSteps": [], "phoneVerified": false, "vehicleAdded": false, "driverAdded": false, "planSelected": false, "paymentCompleted": false, "isActivated": false },
+    "phoneVerified": { "userId": "user-temp-123", "currentStep": "step-vehicle", "completedSteps": ["step-signup"], "phoneVerified": true, "vehicleAdded": false, "driverAdded": false, "planSelected": false, "paymentCompleted": false, "isActivated": false },
+    "vehicleAdded": { "userId": "user-temp-123", "currentStep": "step-driver", "completedSteps": ["step-signup", "step-vehicle"], "phoneVerified": true, "vehicleAdded": true, "driverAdded": false, "planSelected": false, "paymentCompleted": false, "isActivated": false },
+    "readyForPlan": { "userId": "user-temp-123", "currentStep": "step-plan", "completedSteps": ["step-signup", "step-vehicle", "step-driver"], "phoneVerified": true, "vehicleAdded": true, "driverAdded": true, "planSelected": false, "paymentCompleted": false, "isActivated": false },
+    "readyForPlanSkippedDriver": { "userId": "user-temp-123", "currentStep": "step-plan", "completedSteps": ["step-signup", "step-vehicle"], "phoneVerified": true, "vehicleAdded": true, "driverAdded": false, "planSelected": false, "paymentCompleted": false, "isActivated": false }
+  }
+}

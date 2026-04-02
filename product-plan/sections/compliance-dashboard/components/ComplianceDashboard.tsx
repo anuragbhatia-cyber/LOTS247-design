@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
   ArrowLeft,
-  ArrowUpDown,
   ArrowUpRight,
   ArrowDownRight,
   TrendingUp,
@@ -49,7 +48,7 @@ import type {
   PermitType,
   MonthlyChallanTrendPoint,
   VehicleHistoryEventType,
-} from '@/../product/sections/compliance-dashboard/types'
+} from '../types'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -186,7 +185,7 @@ function ProposalToast({ show, onClose }: { show: boolean; onClose: () => void }
           <p className="text-sm font-semibold text-white dark:text-stone-900">Proposal Submitted</p>
           <p className="text-xs text-stone-400 dark:text-stone-500">Your proposal request has been submitted successfully</p>
         </div>
-        <button onClick={onClose} className="ml-2 p-1 rounded-xl text-stone-500 hover:text-stone-300 dark:hover:text-stone-700 transition-colors">
+        <button onClick={onClose} className="ml-2 p-1 rounded-lg text-stone-500 hover:text-stone-300 dark:hover:text-stone-700 transition-colors">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -271,16 +270,16 @@ function CategoryCard({
       </div>
 
       <div className="flex items-center gap-2 flex-wrap mt-auto">
-        <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
+        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
           {category.compliant} Valid
         </span>
         {(category.expiring ?? 0) > 0 && (
-          <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
             {category.expiring} Expiring
           </span>
         )}
         {(category.total - category.compliant - (category.expiring ?? 0)) > 0 && (
-          <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
             {category.total - category.compliant - (category.expiring ?? 0)} Expired
           </span>
         )}
@@ -550,7 +549,7 @@ function DrilldownTable({ headers, children }: { headers: string[]; children: Re
     <div className="overflow-x-auto -mx-1">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
+          <tr className="border-b border-stone-200 dark:border-stone-800">
             {headers.map(h => (
               <th key={h} className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
             ))}
@@ -564,7 +563,7 @@ function DrilldownTable({ headers, children }: { headers: string[]; children: Re
 
 function StatusBadge({ status }: { status: DocumentStatus }) {
   const s = DOC_STATUS_BADGE[status]
-  return <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}`}>{s.label}</span>
+  return <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${s.bg} ${s.text}`}>{s.label}</span>
 }
 
 function CategoryDrilldownView({
@@ -583,10 +582,6 @@ function CategoryDrilldownView({
   const colors = STATUS_COLORS[category.status]
   const Icon = CATEGORY_ICONS[categoryId]
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState<string>('default')
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
-  const [showSortDropdown, setShowSortDropdown] = useState(false)
 
   // Filter options per category
   const filterOptions = useMemo(() => {
@@ -620,43 +615,19 @@ function CategoryDrilldownView({
     ]
   }, [categoryId])
 
-  // Search + status filtered rows
-  const sq = searchQuery.toLowerCase()
-  const matchesSearch = (vehicleNumber: string) => !sq || vehicleNumber.toLowerCase().includes(sq)
-  const matchesDriverSearch = (name: string, license: string) => !sq || name.toLowerCase().includes(sq) || license.toLowerCase().includes(sq)
-  const filteredRc = useMemo(() => drilldowns.rc.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.rc, statusFilter, sq])
-  const filteredInsurance = useMemo(() => drilldowns.insurance.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.insurance, statusFilter, sq])
-  const filteredPucc = useMemo(() => drilldowns.pucc.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.pucc, statusFilter, sq])
-  const filteredPermits = useMemo(() => drilldowns.permits.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.permits, statusFilter, sq])
-  const filteredDl = useMemo(() => drilldowns.dl.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesDriverSearch(r.driverName, r.licenseNumber)), [drilldowns.dl, statusFilter, sq])
+  // Filtered rows
+  const filteredRc = useMemo(() => statusFilter === 'all' ? drilldowns.rc : drilldowns.rc.filter(r => r.status === statusFilter), [drilldowns.rc, statusFilter])
+  const filteredInsurance = useMemo(() => statusFilter === 'all' ? drilldowns.insurance : drilldowns.insurance.filter(r => r.status === statusFilter), [drilldowns.insurance, statusFilter])
+  const filteredPucc = useMemo(() => statusFilter === 'all' ? drilldowns.pucc : drilldowns.pucc.filter(r => r.status === statusFilter), [drilldowns.pucc, statusFilter])
+  const filteredPermits = useMemo(() => statusFilter === 'all' ? drilldowns.permits : drilldowns.permits.filter(r => r.status === statusFilter), [drilldowns.permits, statusFilter])
+  const filteredDl = useMemo(() => statusFilter === 'all' ? drilldowns.dl : drilldowns.dl.filter(r => r.status === statusFilter), [drilldowns.dl, statusFilter])
   const filteredChallans = useMemo(() => {
-    return drilldowns.challans.filter(r => {
-      const statusMatch = statusFilter === 'all' || (statusFilter === 'pending' ? r.outstandingCount > 0 : r.outstandingCount === 0)
-      return statusMatch && matchesSearch(r.vehicleNumber)
-    })
-  }, [drilldowns.challans, statusFilter, sq])
-  const filteredBlacklisted = useMemo(() => drilldowns.blacklisted.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.blacklisted, statusFilter, sq])
-  const filteredNtbt = useMemo(() => drilldowns.ntbt.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.ntbt, statusFilter, sq])
-
-  // Sort helper
-  const applySort = <T extends { vehicleNumber?: string; expiryDate?: string; driverName?: string; licenseNumber?: string }>(rows: T[]) => {
-    if (sortBy === 'default') return rows
-    const sorted = [...rows]
-    if (sortBy === 'az') sorted.sort((a, b) => (a.vehicleNumber || a.driverName || '').localeCompare(b.vehicleNumber || b.driverName || ''))
-    if (sortBy === 'za') sorted.sort((a, b) => (b.vehicleNumber || b.driverName || '').localeCompare(a.vehicleNumber || a.driverName || ''))
-    if (sortBy === 'date-asc') sorted.sort((a, b) => new Date(a.expiryDate || '').getTime() - new Date(b.expiryDate || '').getTime())
-    if (sortBy === 'date-desc') sorted.sort((a, b) => new Date(b.expiryDate || '').getTime() - new Date(a.expiryDate || '').getTime())
-    return sorted
-  }
-
-  const sortedRc = useMemo(() => applySort(filteredRc), [filteredRc, sortBy])
-  const sortedInsurance = useMemo(() => applySort(filteredInsurance), [filteredInsurance, sortBy])
-  const sortedPucc = useMemo(() => applySort(filteredPucc), [filteredPucc, sortBy])
-  const sortedPermits = useMemo(() => applySort(filteredPermits), [filteredPermits, sortBy])
-  const sortedDl = useMemo(() => applySort(filteredDl), [filteredDl, sortBy])
-  const sortedChallans = useMemo(() => applySort(filteredChallans), [filteredChallans, sortBy])
-  const sortedBlacklisted = useMemo(() => applySort(filteredBlacklisted), [filteredBlacklisted, sortBy])
-  const sortedNtbt = useMemo(() => applySort(filteredNtbt), [filteredNtbt, sortBy])
+    if (statusFilter === 'all') return drilldowns.challans
+    if (statusFilter === 'pending') return drilldowns.challans.filter(r => r.outstandingCount > 0)
+    return drilldowns.challans.filter(r => r.outstandingCount === 0)
+  }, [drilldowns.challans, statusFilter])
+  const filteredBlacklisted = useMemo(() => statusFilter === 'all' ? drilldowns.blacklisted : drilldowns.blacklisted.filter(r => r.status === statusFilter), [drilldowns.blacklisted, statusFilter])
+  const filteredNtbt = useMemo(() => statusFilter === 'all' ? drilldowns.ntbt : drilldowns.ntbt.filter(r => r.status === statusFilter), [drilldowns.ntbt, statusFilter])
 
   const getRows = () => {
     switch (categoryId) {
@@ -673,16 +644,6 @@ function CategoryDrilldownView({
   }
   const rowCounts = getRows()
 
-  const sortOptions = [
-    { value: 'default', label: 'Default' },
-    { value: 'az', label: categoryId === 'dl' ? 'Name (A-Z)' : 'Vehicle (A-Z)' },
-    { value: 'za', label: categoryId === 'dl' ? 'Name (Z-A)' : 'Vehicle (Z-A)' },
-    { value: 'date-asc', label: 'Expiry (Soonest)' },
-    { value: 'date-desc', label: 'Expiry (Latest)' },
-  ]
-
-  const activeFilterCount = (statusFilter !== 'all' ? 1 : 0)
-
   const emptyRow = (cols: number) => (
     <tr><td colSpan={cols} className="py-8 text-center text-sm text-stone-400 dark:text-stone-500">No records match this filter</td></tr>
   )
@@ -693,11 +654,19 @@ function CategoryDrilldownView({
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={onBack}
-          className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          className="w-9 h-9 rounded-lg flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
         </button>
-        <h2 className="text-lg font-bold text-stone-900 dark:text-stone-50">{category.fullLabel}</h2>
+        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${colors.bg}`}>
+          <Icon className={`w-4.5 h-4.5 ${colors.text}`} />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-50">{category.fullLabel}</h2>
+          <p className="text-sm text-stone-500 dark:text-stone-400">
+            {category.compliant}/{category.total} compliant &middot; <span className={colors.text}>{category.percentage}%</span>
+          </p>
+        </div>
       </div>
 
       {/* Permits sub-breakdown cards */}
@@ -718,121 +687,36 @@ function CategoryDrilldownView({
         </div>
       )}
 
-      {/* Search + Filter + Sort */}
-      <div className="mb-4 space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
-            <input
-              type="text"
-              placeholder={categoryId === 'dl' ? 'Search driver or license...' : 'Search vehicle number...'}
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
-            />
-          </div>
-
-          {/* Filter button */}
-          <div className="relative">
+      {/* Filter Buttons */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-1 rounded-lg bg-stone-100 dark:bg-stone-800/60 p-1">
+          {filterOptions.map(opt => (
             <button
-              onClick={() => { setShowFilterDropdown(!showFilterDropdown); setShowSortDropdown(false) }}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
-                activeFilterCount > 0
-                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
-                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+              key={opt.value}
+              onClick={() => setStatusFilter(opt.value)}
+              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                statusFilter === opt.value
+                  ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm'
+                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
               }`}
             >
-              <SlidersHorizontal className="w-4 h-4" />
-              <span className="hidden sm:inline">Filters</span>
-              {activeFilterCount > 0 && (
-                <span className="ml-0.5 w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">{activeFilterCount}</span>
-              )}
+              {opt.label}
             </button>
-            {showFilterDropdown && (
-              <div className="absolute right-0 top-full mt-1.5 w-48 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/40 dark:shadow-stone-950/60 overflow-hidden z-20">
-                {filterOptions.map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => { setStatusFilter(opt.value); setShowFilterDropdown(false) }}
-                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                      statusFilter === opt.value
-                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold'
-                        : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Sort button */}
-          <div className="relative">
-            <button
-              onClick={() => { setShowSortDropdown(!showSortDropdown); setShowFilterDropdown(false) }}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
-                sortBy !== 'default'
-                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
-                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
-              }`}
-            >
-              <ArrowUpDown className="w-4 h-4" />
-              <span className="hidden sm:inline">Sort</span>
-            </button>
-            {showSortDropdown && (
-              <div className="absolute right-0 top-full mt-1.5 w-48 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/40 dark:shadow-stone-950/60 overflow-hidden z-20">
-                {sortOptions.map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => { setSortBy(opt.value); setShowSortDropdown(false) }}
-                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                      sortBy === opt.value
-                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold'
-                        : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          ))}
         </div>
-
-        {(statusFilter !== 'all' || sortBy !== 'default' || searchQuery) && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-stone-500 dark:text-stone-400">
-              Showing {rowCounts.filtered} of {rowCounts.total}
-            </span>
-            {statusFilter !== 'all' && (
-              <button
-                onClick={() => setStatusFilter('all')}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-colors"
-              >
-                {filterOptions.find(o => o.value === statusFilter)?.label}
-                <X className="w-3 h-3" />
-              </button>
-            )}
-            {sortBy !== 'default' && (
-              <button
-                onClick={() => setSortBy('default')}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
-              >
-                {sortOptions.find(o => o.value === sortBy)?.label}
-                <X className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-        )}
+        <span className="text-xs text-stone-400 dark:text-stone-500">
+          {statusFilter !== 'all'
+            ? `${rowCounts.filtered} of ${rowCounts.total}`
+            : `${rowCounts.total} total`}
+        </span>
       </div>
 
       {/* Table */}
       <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
         {categoryId === 'rc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Issue Date', 'Expiry Date', 'RTO Office']}>
-            {sortedRc.length === 0 ? emptyRow(5) : sortedRc.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+            {filteredRc.length === 0 ? emptyRow(5) : filteredRc.map(row => (
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(row.issueDate)}</td>
@@ -845,8 +729,8 @@ function CategoryDrilldownView({
 
         {categoryId === 'insurance' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Provider', 'Policy No.', 'Expiry Date']}>
-            {sortedInsurance.length === 0 ? emptyRow(5) : sortedInsurance.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+            {filteredInsurance.length === 0 ? emptyRow(5) : filteredInsurance.map(row => (
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.provider}</td>
@@ -859,8 +743,8 @@ function CategoryDrilldownView({
 
         {categoryId === 'pucc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Test Centre', 'Expiry Date']}>
-            {sortedPucc.length === 0 ? emptyRow(4) : sortedPucc.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+            {filteredPucc.length === 0 ? emptyRow(4) : filteredPucc.map(row => (
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.testCenter}</td>
@@ -872,8 +756,8 @@ function CategoryDrilldownView({
 
         {categoryId === 'permits' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Type', 'Permit No.', 'Expiry Date']}>
-            {sortedPermits.length === 0 ? emptyRow(5) : sortedPermits.map(row => (
-              <tr key={row.vehicleNumber + row.permitNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+            {filteredPermits.length === 0 ? emptyRow(5) : filteredPermits.map(row => (
+              <tr key={row.vehicleNumber + row.permitNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3">
@@ -890,12 +774,12 @@ function CategoryDrilldownView({
 
         {categoryId === 'dl' && (
           <DrilldownTable headers={['Driver', 'License Number', 'License Expiry', 'Assigned Vehicles', 'Status']}>
-            {sortedDl.length === 0 ? emptyRow(5) : sortedDl.map(row => {
+            {filteredDl.length === 0 ? emptyRow(5) : filteredDl.map(row => {
               const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
               const isValid = row.status === 'valid'
 
               return (
-                <tr key={row.licenseNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                <tr key={row.licenseNumber} className="transition-colors">
                   <td className="py-4 px-3">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
@@ -936,8 +820,8 @@ function CategoryDrilldownView({
 
         {categoryId === 'challans' && (
           <DrilldownTable headers={['Vehicle', 'Pending Challans', 'Amount']}>
-            {sortedChallans.length === 0 ? emptyRow(3) : sortedChallans.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+            {filteredChallans.length === 0 ? emptyRow(3) : filteredChallans.map(row => (
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3">
                   <div className="flex items-center gap-3">
@@ -962,14 +846,14 @@ function CategoryDrilldownView({
 
         {categoryId === 'blacklisted' && (
           <DrilldownTable headers={['Vehicle', 'Flag Reason', 'Authority', 'Date', 'Status']}>
-            {sortedBlacklisted.length === 0 ? emptyRow(5) : sortedBlacklisted.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+            {filteredBlacklisted.length === 0 ? emptyRow(5) : filteredBlacklisted.map(row => (
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400 max-w-[250px]">{row.flagReason}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.flaggingAuthority}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(row.flagDate)}</td>
                 <td className="py-3 px-3">
-                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
                     row.status === 'active' ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
                   }`}>{row.status === 'active' ? 'Active' : 'Resolved'}</span>
                 </td>
@@ -980,15 +864,15 @@ function CategoryDrilldownView({
 
         {categoryId === 'ntbt' && (
           <DrilldownTable headers={['Vehicle', 'Hold Reason', 'Authority', 'Date', 'Case Ref', 'Status']}>
-            {sortedNtbt.length === 0 ? emptyRow(6) : sortedNtbt.map(row => (
-              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+            {filteredNtbt.length === 0 ? emptyRow(6) : filteredNtbt.map(row => (
+              <tr key={row.vehicleNumber} className="transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400 max-w-[250px]">{row.holdReason}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.issuingAuthority}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(row.holdDate)}</td>
                 <td className="py-3 px-3 font-mono text-xs text-stone-500 dark:text-stone-400">{row.caseReference}</td>
                 <td className="py-3 px-3">
-                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
                     row.status === 'active' ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
                   }`}>{row.status === 'active' ? 'Active' : 'Resolved'}</span>
                 </td>
@@ -1174,7 +1058,7 @@ function FleetChallanView({
       <div className="flex gap-6">
         {/* Sidebar */}
         <div className="w-56 shrink-0 hidden md:block">
-          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
               { key: 'pending' as const, label: 'Pending', count: pendingCount, icon: FileText, countColor: 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400' },
               { key: 'paid' as const, label: 'Paid', count: paidCount, icon: ShieldCheck, countColor: 'bg-stone-100 dark:bg-stone-800 text-stone-500' },
@@ -1243,7 +1127,7 @@ function FleetChallanView({
             const isSelected = selectedVehicles.has(vehNum)
             return (
               <div key={vehNum} className={`rounded-2xl bg-white dark:bg-stone-900 shadow-sm border overflow-hidden transition-colors ${
-                isSelected ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-200 dark:border-stone-800'
+                isSelected ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-100 dark:border-stone-800'
               }`}>
                 <div className="flex items-center p-4 hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors">
                   {/* Checkbox — only on pending tab */}
@@ -1290,7 +1174,7 @@ function FleetChallanView({
                   </button>
                 </div>
                 {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-stone-200 dark:border-stone-800">
+                  <div className="px-4 pb-4 border-t border-stone-100 dark:border-stone-800">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-4">
                       {challans.map(c => (
                         <div key={c.id} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/40 p-4">
@@ -1320,7 +1204,7 @@ function FleetChallanView({
                             </span>
                           </div>
                           <div className="border-t border-stone-200 dark:border-stone-700 pt-3 flex items-center justify-between">
-                            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
                               c.challanType === 'court'
                                 ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400'
                                 : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
@@ -1328,7 +1212,7 @@ function FleetChallanView({
                               {c.challanType === 'court' ? 'Court Challans' : 'Online Challans'}
                             </span>
                             {filter === 'pending' && (
-                              <button className="px-4 py-1.5 rounded-xl text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
+                              <button className="px-4 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
                                 Pay Now
                               </button>
                             )}
@@ -1343,11 +1227,7 @@ function FleetChallanView({
           })}
           {grouped.length === 0 && (
             <div className="text-center py-16">
-              <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
-                <CreditCard className="w-5 h-5 text-stone-400 dark:text-stone-500" />
-              </div>
-              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">No {filter} challans</p>
-              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">No {filter} challans found for any vehicle</p>
+              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} challans found</p>
             </div>
           )}
         </div>
@@ -1364,7 +1244,7 @@ function FleetChallanView({
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
             >
               Request Proposal
             </button>
@@ -1420,7 +1300,7 @@ function FleetRcView({
       <div className="flex gap-6">
         {/* Sidebar */}
         <div className="w-56 shrink-0 hidden md:block">
-          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
               { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
               { key: 'valid' as const, label: 'Valid', count: validItems.length, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
@@ -1489,11 +1369,7 @@ function FleetRcView({
           </div>
           {filtered.length === 0 && (
             <div className="text-center py-16">
-              <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
-                <FileText className="w-5 h-5 text-stone-400 dark:text-stone-500" />
-              </div>
-              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">No {filter} certificates</p>
-              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">No {filter} registration certificates found</p>
+              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} registration certificates found</p>
             </div>
           )}
         </div>
@@ -1508,7 +1384,7 @@ function FleetRcView({
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
             >
               Request Proposal
             </button>
@@ -1524,7 +1400,7 @@ function FleetRcView({
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
             >
               Request Proposal
             </button>
@@ -1579,7 +1455,7 @@ function FleetDlView({
       <div className="flex gap-6">
         {/* Sidebar */}
         <div className="w-56 shrink-0 hidden md:block">
-          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
               { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
               { key: 'valid' as const, label: 'Valid', count: validItems.length, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
@@ -1655,11 +1531,7 @@ function FleetDlView({
           </div>
           {filtered.length === 0 && (
             <div className="text-center py-16">
-              <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
-                <IdCard className="w-5 h-5 text-stone-400 dark:text-stone-500" />
-              </div>
-              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">No {filter} licenses</p>
-              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">No {filter} driving licenses found</p>
+              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} driving licenses found</p>
             </div>
           )}
         </div>
@@ -1674,7 +1546,7 @@ function FleetDlView({
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
             >
               Request Proposal
             </button>
@@ -1690,7 +1562,7 @@ function FleetDlView({
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
             >
               Request Proposal
             </button>
@@ -1733,8 +1605,6 @@ export function ComplianceDashboard({
   const [scopeApplied, setScopeApplied] = useState(initialView === 'vehicle')
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [urgencyPage, setUrgencyPage] = useState(0)
-  const [urgencySortKey, setUrgencySortKey] = useState<'vehicleNumber' | 'documentType' | 'expiryDate' | null>(null)
-  const [urgencySortDir, setUrgencySortDir] = useState<'asc' | 'desc'>('asc')
   const [checkVehicleOpen, setCheckVehicleOpen] = useState(false)
   const [checkVehicleNumber, setCheckVehicleNumber] = useState('')
   const [activeCardView, setActiveCardView] = useState<'dl' | 'rc' | 'challan' | null>(
@@ -1758,33 +1628,11 @@ export function ComplianceDashboard({
     return []
   }, [scope, scopeSearch, vehicles, drivers])
 
-  const sortedUrgencyItems = useMemo(() => {
-    if (!urgencySortKey) return expiryUrgencyItems
-    const sorted = [...expiryUrgencyItems].sort((a, b) => {
-      let cmp = 0
-      if (urgencySortKey === 'vehicleNumber') cmp = a.vehicleNumber.localeCompare(b.vehicleNumber)
-      else if (urgencySortKey === 'documentType') cmp = a.documentType.localeCompare(b.documentType)
-      else if (urgencySortKey === 'expiryDate') cmp = new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()
-      return urgencySortDir === 'asc' ? cmp : -cmp
-    })
-    return sorted
-  }, [expiryUrgencyItems, urgencySortKey, urgencySortDir])
-
-  const urgencyTotalPages = Math.ceil(sortedUrgencyItems.length / URGENCY_PAGE_SIZE)
+  const urgencyTotalPages = Math.ceil(expiryUrgencyItems.length / URGENCY_PAGE_SIZE)
   const paginatedUrgencyItems = useMemo(
-    () => sortedUrgencyItems.slice(urgencyPage * URGENCY_PAGE_SIZE, (urgencyPage + 1) * URGENCY_PAGE_SIZE),
-    [sortedUrgencyItems, urgencyPage]
+    () => expiryUrgencyItems.slice(urgencyPage * URGENCY_PAGE_SIZE, (urgencyPage + 1) * URGENCY_PAGE_SIZE),
+    [expiryUrgencyItems, urgencyPage]
   )
-
-  function handleUrgencySort(key: 'vehicleNumber' | 'documentType' | 'expiryDate') {
-    if (urgencySortKey === key) {
-      setUrgencySortDir(d => d === 'asc' ? 'desc' : 'asc')
-    } else {
-      setUrgencySortKey(key)
-      setUrgencySortDir('asc')
-    }
-    setUrgencyPage(0)
-  }
 
   const handleCategoryClick = (id: CategoryId) => {
     setSelectedCategory(id)
@@ -1863,14 +1711,14 @@ export function ComplianceDashboard({
         {!activeCardView && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Fleet Compliance</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50">Fleet Compliance</h1>
             <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Fleet compliance health at a glance</p>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
           {/* Refresh */}
             <button
-              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
             >
               <RefreshCw className="w-4 h-4 text-stone-400" />
               <span className="hidden sm:inline">Refresh</span>
@@ -1878,7 +1726,7 @@ export function ComplianceDashboard({
 
           {/* Download PDF */}
             <button
-              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
             >
               <Download className="w-4 h-4 text-stone-400" />
               <span className="hidden sm:inline">Download PDF</span>
@@ -1888,7 +1736,7 @@ export function ComplianceDashboard({
             <div className="relative">
               <button
                 onClick={() => { setDateDropdownOpen(!dateDropdownOpen); setScopeDropdownOpen(false) }}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm"
               >
                 <Calendar className="w-4 h-4 text-stone-400" />
                 <span className="font-medium text-stone-700 dark:text-stone-300">
@@ -1927,7 +1775,7 @@ export function ComplianceDashboard({
             setSelectedScopeId(null)
             setScopeApplied(false)
           }}
-          className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Fleet
@@ -1953,7 +1801,7 @@ export function ComplianceDashboard({
                 const isValid = row.status === 'valid'
 
                 return (
-                  <tr key={row.licenseNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                  <tr key={row.licenseNumber} className="transition-colors">
                     <td className="py-4 px-3">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
@@ -2042,6 +1890,7 @@ export function ComplianceDashboard({
                           <div key={cat.id}>
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full flex-shrink-0 bg-emerald-500" />
                                 <span className="text-sm text-stone-700 dark:text-stone-300">{HEALTH_CARD_LABEL[cat.id]}</span>
                               </div>
                               <span className={`text-sm font-semibold tabular-nums ${cfg.color}`}>
@@ -2230,7 +2079,7 @@ export function ComplianceDashboard({
                               <ChevronDown className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : '-rotate-90'}`} />
                               <p className="text-sm font-medium text-stone-800 dark:text-stone-200">{cat.fullLabel}</p>
                             </div>
-                            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
                               isCompliant
                                 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
                                 : cat.status === 'warning'
@@ -2334,7 +2183,7 @@ export function ComplianceDashboard({
                       <div key={d.label} className="rounded-xl bg-stone-50 dark:bg-stone-800/40 p-4">
                         <p className="text-[11px] uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-1.5">{d.label}</p>
                         {d.badge ? (
-                          <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${d.badgeColor}`}>{d.value}</span>
+                          <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${d.badgeColor}`}>{d.value}</span>
                         ) : (
                           <p className="text-sm font-bold text-stone-900 dark:text-stone-100">{d.value}</p>
                         )}
@@ -2419,7 +2268,7 @@ export function ComplianceDashboard({
                     <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{formatCurrency(historicalStats.totalChallanAmount)}</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between">
+                <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
                   <div className="text-center flex-1">
                     <p className="text-[11px] text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Avg Score</p>
                     <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">{historicalStats.avgComplianceScore}</p>
@@ -2442,35 +2291,17 @@ export function ComplianceDashboard({
             {/* Expiry Urgency Table                                            */}
             {/* -------------------------------------------------------------- */}
             <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
-              <div className="px-5 sm:px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+              <div className="px-5 sm:px-6 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider">Documents Expiry</h3>
                 <span className="text-xs text-stone-400 dark:text-stone-500">{expiryUrgencyItems.length} items</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
-                      <th
-                        onClick={() => handleUrgencySort('vehicleNumber')}
-                        className="text-left py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[18%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
-                      >
-                        Vehicle
-                        <span className="ml-1 text-[10px]">{urgencySortKey === 'vehicleNumber' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
-                      </th>
-                      <th
-                        onClick={() => handleUrgencySort('documentType')}
-                        className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[14%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
-                      >
-                        Document
-                        <span className="ml-1 text-[10px]">{urgencySortKey === 'documentType' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
-                      </th>
-                      <th
-                        onClick={() => handleUrgencySort('expiryDate')}
-                        className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[16%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
-                      >
-                        Expiry Date
-                        <span className="ml-1 text-[10px]">{urgencySortKey === 'expiryDate' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
-                      </th>
+                    <tr className="border-b border-stone-200 dark:border-stone-800">
+                      <th className="text-left py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[18%]">Vehicle</th>
+                      <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[14%]">Document</th>
+                      <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[16%]">Expiry Date</th>
                       <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[10%]">Days</th>
                       <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[12%]">Urgency</th>
                       <th className="text-right py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">Action</th>
@@ -2480,7 +2311,7 @@ export function ComplianceDashboard({
                     {paginatedUrgencyItems.map(item => {
                       const badge = URGENCY_BADGE[item.urgency]
                       return (
-                        <tr key={item.id} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
+                        <tr key={item.id} className="transition-colors">
                           <td className="py-3 px-4 sm:px-6 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{item.vehicleNumber}</td>
                           <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{item.documentType}</td>
                           <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(item.expiryDate)}</td>
@@ -2490,7 +2321,7 @@ export function ComplianceDashboard({
                             </span>
                           </td>
                           <td className="py-3 px-3">
-                            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>{badge.label}</span>
+                            <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>{badge.label}</span>
                           </td>
                           <td className="py-3 px-4 sm:px-6 text-right">
                             <button
@@ -2499,7 +2330,7 @@ export function ComplianceDashboard({
                                   window.parent.postMessage({ type: 'navigate', href: '/incidents', params: { vehicle: item.vehicleNumber, document: item.documentType } }, '*')
                                 }
                               }}
-                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
                             >
                               Raise Proposal
                               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -2512,7 +2343,7 @@ export function ComplianceDashboard({
                 </table>
               </div>
               {urgencyTotalPages > 1 && (
-                <div className="px-5 sm:px-6 py-3 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between">
+                <div className="px-5 sm:px-6 py-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
                   <span className="text-xs text-stone-500 dark:text-stone-400">
                     Showing {urgencyPage * URGENCY_PAGE_SIZE + 1}–{Math.min((urgencyPage + 1) * URGENCY_PAGE_SIZE, expiryUrgencyItems.length)} of {expiryUrgencyItems.length}
                   </span>
@@ -2520,7 +2351,7 @@ export function ComplianceDashboard({
                     <button
                       onClick={() => setUrgencyPage(p => Math.max(0, p - 1))}
                       disabled={urgencyPage === 0}
-                      className="w-8 h-8 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
                     </button>
@@ -2528,7 +2359,7 @@ export function ComplianceDashboard({
                       <button
                         key={i}
                         onClick={() => setUrgencyPage(i)}
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-semibold transition-colors ${
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-semibold transition-colors ${
                           urgencyPage === i
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                             : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -2540,7 +2371,7 @@ export function ComplianceDashboard({
                     <button
                       onClick={() => setUrgencyPage(p => Math.min(urgencyTotalPages - 1, p + 1))}
                       disabled={urgencyPage === urgencyTotalPages - 1}
-                      className="w-8 h-8 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4 text-stone-600 dark:text-stone-400" />
                     </button>
@@ -2558,14 +2389,14 @@ export function ComplianceDashboard({
         <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
           <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }} />
           <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
               <div>
                 <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">Check Vehicle</h2>
                 <p className="text-xs text-stone-500 dark:text-stone-400">Enter a vehicle number to view its compliance report</p>
               </div>
               <button
                 onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }}
-                className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2582,22 +2413,22 @@ export function ComplianceDashboard({
                   setCheckVehicleError('')
                 }}
                 onKeyDown={e => { if (e.key === 'Enter') handleCheckVehicle() }}
-                placeholder="Enter vehicle number"
+                placeholder="e.g. UP32MM1113"
                 maxLength={10}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
                 autoFocus
               />
             </div>
-            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
+            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
               <button
                 onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }}
-                className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCheckVehicle}
-                className="px-5 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white"
               >
                 Check
               </button>

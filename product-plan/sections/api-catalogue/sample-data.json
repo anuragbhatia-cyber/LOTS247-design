@@ -1,0 +1,164 @@
+{
+  "_meta": {
+    "models": {
+      "apis": "Each API represents a service available in the LOTS247 catalogue that external developers or businesses can integrate with for vehicle compliance, challan, and licence data.",
+      "endpoints": "Endpoints are the individual operations available within each API, defined by HTTP method, path, and a short description of what they do.",
+      "features": "Features are the key highlights or selling points of each API, shown on the detail page's Description tab."
+    },
+    "relationships": [
+      "Each API contains one or more Endpoints (the available operations)",
+      "Each API contains one or more Features (the key benefits displayed on the detail page)"
+    ]
+  },
+  "apis": [
+    {
+      "id": "api-001",
+      "name": "Challan API",
+      "provider": "LOTS247",
+      "shortDescription": "Retrieve real-time traffic challan records, payment status, and violation history for any registered vehicle across India.",
+      "fullDescription": "The Challan API provides programmatic access to traffic violation records from all major Indian states. Query challans by vehicle registration number, check payment statuses, and retrieve detailed violation information including fine amounts, offence codes, and issuing authorities. Ideal for fleet managers, insurance companies, and compliance platforms.",
+      "documentationUrl": "https://docs.lots247.com/challan-api",
+      "category": "Compliance",
+      "icon": "shield-check",
+      "features": [
+        {
+          "title": "Real-Time Challan Lookup",
+          "description": "Fetch pending and paid challans for any vehicle registration number instantly. Data is sourced from state transport authorities and updated in near real-time, so you always have the latest violation records."
+        },
+        {
+          "title": "Bulk Vehicle Queries",
+          "description": "Submit up to 500 vehicle registration numbers in a single batch request. Perfect for fleet operators who need to audit challan status across their entire fleet without hitting rate limits."
+        },
+        {
+          "title": "Webhook Notifications",
+          "description": "Register webhook endpoints to receive instant notifications when a new challan is issued against a monitored vehicle. No more polling — get alerts as they happen."
+        }
+      ],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/v1/challans/{vehicleNumber}",
+          "description": "Retrieve all challans for a specific vehicle registration number"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/challans/{vehicleNumber}/pending",
+          "description": "Retrieve only unpaid/pending challans for a vehicle"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/challans/bulk-lookup",
+          "description": "Submit a batch of up to 500 vehicle numbers for bulk challan lookup"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/challans/{challanId}/details",
+          "description": "Get detailed information for a specific challan including offence code and issuing authority"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/challans/webhooks",
+          "description": "Register a webhook endpoint to receive new challan notifications"
+        },
+        {
+          "method": "DELETE",
+          "path": "/v1/challans/webhooks/{webhookId}",
+          "description": "Remove a previously registered webhook"
+        }
+      ]
+    },
+    {
+      "id": "api-002",
+      "name": "Driving Licence API",
+      "provider": "LOTS247",
+      "shortDescription": "Verify driving licence authenticity, retrieve licence details, and check validity status in real time.",
+      "fullDescription": "The Driving Licence API enables instant verification of Indian driving licences by licence number. Retrieve holder details, licence class, validity dates, and endorsement history. Used by fleet operators for driver onboarding, insurance companies for policy verification, and compliance platforms for audit automation.",
+      "documentationUrl": "https://docs.lots247.com/dl-api",
+      "category": "Identity",
+      "icon": "id-card",
+      "features": [
+        {
+          "title": "Instant DL Verification",
+          "description": "Verify any Indian driving licence in under 2 seconds. Returns holder name, date of birth, licence class (LMV, HMV, etc.), and current validity status directly from the Sarathi database."
+        },
+        {
+          "title": "Endorsement & Suspension Check",
+          "description": "Go beyond basic verification — check if a licence has any active endorsements, suspensions, or disqualifications. Critical for fleet operators hiring new drivers."
+        }
+      ],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/v1/licence/{dlNumber}",
+          "description": "Retrieve complete driving licence details by licence number"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/licence/verify",
+          "description": "Verify licence authenticity and return holder details with validity status"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/licence/{dlNumber}/endorsements",
+          "description": "Check endorsements, suspensions, and disqualifications on a licence"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/licence/bulk-verify",
+          "description": "Submit up to 200 licence numbers for batch verification"
+        }
+      ]
+    },
+    {
+      "id": "api-003",
+      "name": "RC API",
+      "provider": "LOTS247",
+      "shortDescription": "Look up vehicle registration certificate details, ownership history, and compliance status by registration number.",
+      "fullDescription": "The RC API provides comprehensive access to vehicle Registration Certificate data from the Vahan database. Query any Indian vehicle registration number to retrieve owner details, vehicle specifications, registration validity, hypothecation status, and insurance information. Essential for used vehicle marketplaces, fleet compliance, and insurance underwriting.",
+      "documentationUrl": "https://docs.lots247.com/rc-api",
+      "category": "Vehicle Data",
+      "icon": "truck",
+      "features": [
+        {
+          "title": "Complete RC Data Extraction",
+          "description": "Get the full Registration Certificate breakdown — owner name, vehicle make and model, engine and chassis numbers, registration date, fuel type, seating capacity, and more. All from a single API call."
+        },
+        {
+          "title": "Insurance & Hypothecation Status",
+          "description": "Check whether a vehicle has active insurance and if it is under hypothecation with a financier. Invaluable for used vehicle transactions and loan verification."
+        },
+        {
+          "title": "Fitness & PUC Validity",
+          "description": "Retrieve fitness certificate and PUC expiry dates for commercial vehicles. Automate compliance monitoring without manual document checks."
+        }
+      ],
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/v1/rc/{vehicleNumber}",
+          "description": "Retrieve full RC details for a vehicle registration number"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/rc/{vehicleNumber}/insurance",
+          "description": "Check active insurance status and policy details for a vehicle"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/rc/{vehicleNumber}/fitness",
+          "description": "Get fitness certificate and PUC expiry details for a vehicle"
+        },
+        {
+          "method": "POST",
+          "path": "/v1/rc/bulk-lookup",
+          "description": "Submit up to 500 vehicle numbers for batch RC data retrieval"
+        },
+        {
+          "method": "GET",
+          "path": "/v1/rc/{vehicleNumber}/hypothecation",
+          "description": "Check hypothecation/financier status for a vehicle"
+        }
+      ]
+    }
+  ]
+}

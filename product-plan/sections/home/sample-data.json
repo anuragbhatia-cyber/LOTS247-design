@@ -1,0 +1,127 @@
+{
+  "_meta": {
+    "models": {
+      "subscriber": "The currently logged-in fleet owner or vehicle operator using LOTS247.",
+      "subscription": "The subscriber's active plan, which controls feature access, vehicle limits, and support levels.",
+      "stats": "Aggregated real-time counts and amounts derived from the subscriber's vehicles, drivers, challans, and incidents — displayed as overview cards on the Home screen.",
+      "complianceScore": "Overall and per-category compliance health across the fleet, derived from document validity and pending challans.",
+      "alerts": "Urgency-sorted alerts for vehicles with expiring PUC, insurance, or pending challans."
+    },
+    "relationships": [
+      "The Subscriber has one active Subscription that determines plan limits",
+      "Stats are derived from the Subscriber's Vehicles, Drivers, Challans, and Incidents",
+      "activeVehicles.used reflects vehicles counted against the plan's vehicle limit",
+      "pendingChallans.totalAmount is the sum of all pending challan fines",
+      "activeIncidents.count reflects only incidents with non-terminal statuses (New, Assigned, In Progress, Awaiting Action)",
+      "complianceScore.overall is a weighted average of all category scores",
+      "alerts are sorted by urgency — critical first, then warning, then notice"
+    ]
+  },
+  "subscriber": {
+    "id": "sub-001",
+    "name": "Rajesh Kumar",
+    "email": "rajesh.kumar@rktransport.in",
+    "phone": "919820134567",
+    "avatarInitials": "RK",
+    "accountType": "fleet"
+  },
+  "subscription": {
+    "id": "subs-001",
+    "planName": "Fleet",
+    "status": "active",
+    "expiryDate": "2026-03-01",
+    "vehicleLimit": 25,
+    "driverLimit": 50,
+    "includedLegalSupport": true,
+    "incidentLimit": 100
+  },
+  "stats": {
+    "activeVehicles": {
+      "count": 18,
+      "limit": 25,
+      "label": "Active Vehicles"
+    },
+    "activeDrivers": {
+      "count": 22,
+      "label": "Active Drivers"
+    },
+    "pendingChallans": {
+      "count": 12,
+      "totalAmount": 47500,
+      "currency": "INR",
+      "label": "Pending Challans"
+    },
+    "activeIncidents": {
+      "count": 3,
+      "label": "Active Incidents",
+      "breakdown": {
+        "new": 1,
+        "assigned": 1,
+        "inProgress": 1,
+        "awaitingAction": 0
+      }
+    }
+  },
+  "complianceScore": {
+    "overall": 78,
+    "status": "healthy",
+    "changeFromLastMonth": 3,
+    "categories": [
+      { "id": "rc", "label": "RC Validity", "status": "healthy", "score": 94 },
+      { "id": "insurance", "label": "Insurance Status", "status": "healthy", "score": 78 },
+      { "id": "puc", "label": "PUC Status", "status": "warning", "score": 67 },
+      { "id": "permit", "label": "Permit Status", "status": "healthy", "score": 83 },
+      { "id": "dl", "label": "DL Validity", "status": "healthy", "score": 86 }
+    ]
+  },
+  "alerts": [
+    {
+      "id": "alt-1",
+      "category": "puc",
+      "urgency": "critical",
+      "vehicleNumber": "UP32MM1113",
+      "title": "PUC expires in 3 days",
+      "daysRemaining": 3
+    },
+    {
+      "id": "alt-2",
+      "category": "insurance",
+      "urgency": "critical",
+      "vehicleNumber": "UP32NN2224",
+      "title": "Insurance expires in 5 days",
+      "daysRemaining": 5
+    },
+    {
+      "id": "alt-3",
+      "category": "challan",
+      "urgency": "warning",
+      "vehicleNumber": "UP32MM1113",
+      "title": "Pending challan — ₹1,500",
+      "daysRemaining": 10
+    },
+    {
+      "id": "alt-4",
+      "category": "puc",
+      "urgency": "warning",
+      "vehicleNumber": "UP32PP3335",
+      "title": "PUC expires in 12 days",
+      "daysRemaining": 12
+    },
+    {
+      "id": "alt-5",
+      "category": "insurance",
+      "urgency": "notice",
+      "vehicleNumber": "UP32QQ4446",
+      "title": "Insurance expires in 25 days",
+      "daysRemaining": 25
+    },
+    {
+      "id": "alt-6",
+      "category": "challan",
+      "urgency": "notice",
+      "vehicleNumber": "UP32NN2224",
+      "title": "Pending challan — ₹2,000",
+      "daysRemaining": 28
+    }
+  ]
+}

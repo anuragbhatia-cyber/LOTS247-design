@@ -1,0 +1,349 @@
+{
+  "subscribers": [
+    {
+      "id": "sub_001",
+      "name": "Rajesh Sharma",
+      "email": "rajesh.sharma@example.com",
+      "phone": "+919876543210",
+      "avatarInitials": "RS",
+      "accountType": "fleet",
+      "complianceScore": 82
+    },
+    {
+      "id": "sub_002",
+      "name": "Priya Patel",
+      "email": "priya.patel@example.com",
+      "phone": "+919812345678",
+      "avatarInitials": "PP",
+      "accountType": "individual",
+      "complianceScore": 95
+    },
+    {
+      "id": "sub_003",
+      "name": "Gupta Transport Co.",
+      "email": "admin@guptatransport.in",
+      "phone": "+919900112233",
+      "avatarInitials": "GT",
+      "accountType": "business",
+      "complianceScore": 71
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "plan_001",
+      "subscriberId": "sub_001",
+      "planName": "Fleet",
+      "status": "active",
+      "expiryDate": "2026-09-15",
+      "vehicleLimit": 50,
+      "driverLimit": 60,
+      "includedLegalSupport": true,
+      "incidentLimit": 25
+    },
+    {
+      "id": "plan_002",
+      "subscriberId": "sub_002",
+      "planName": "Basic",
+      "status": "expiring_soon",
+      "expiryDate": "2026-04-10",
+      "vehicleLimit": 2,
+      "driverLimit": 2,
+      "includedLegalSupport": false,
+      "incidentLimit": 3
+    },
+    {
+      "id": "plan_003",
+      "subscriberId": "sub_003",
+      "planName": "Enterprise",
+      "status": "active",
+      "expiryDate": "2027-01-31",
+      "vehicleLimit": 500,
+      "driverLimit": 600,
+      "includedLegalSupport": true,
+      "incidentLimit": 100
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "veh_001",
+      "subscriberId": "sub_001",
+      "rcNumber": "MH12AB1234",
+      "vehicleType": "Truck",
+      "make": "Tata",
+      "model": "Prima 4928.S",
+      "year": 2022,
+      "category": "owned",
+      "complianceScore": 88,
+      "insuranceExpiry": "2026-08-20",
+      "pucExpiry": "2026-05-15",
+      "fitnessExpiry": "2027-03-01",
+      "status": "active",
+      "assignedDriverId": "drv_001"
+    },
+    {
+      "id": "veh_002",
+      "subscriberId": "sub_001",
+      "rcNumber": "MH14CD5678",
+      "vehicleType": "Truck",
+      "make": "Ashok Leyland",
+      "model": "BOSS 1920HB",
+      "year": 2021,
+      "category": "leased",
+      "complianceScore": 62,
+      "insuranceExpiry": "2026-04-05",
+      "pucExpiry": "2026-03-28",
+      "fitnessExpiry": "2026-06-30",
+      "status": "active",
+      "assignedDriverId": "drv_002"
+    },
+    {
+      "id": "veh_003",
+      "subscriberId": "sub_002",
+      "rcNumber": "DL8CAF9012",
+      "vehicleType": "Car",
+      "make": "Maruti Suzuki",
+      "model": "Swift Dzire",
+      "year": 2023,
+      "category": "owned",
+      "complianceScore": 95,
+      "insuranceExpiry": "2027-01-10",
+      "pucExpiry": "2026-11-22",
+      "fitnessExpiry": "2028-01-10",
+      "status": "active",
+      "assignedDriverId": null
+    }
+  ],
+  "drivers": [
+    {
+      "id": "drv_001",
+      "subscriberId": "sub_001",
+      "name": "Suresh Kumar",
+      "phone": "+919845123456",
+      "licenseNumber": "MH1220210012345",
+      "licenseExpiry": "2028-06-30",
+      "licenseStatus": "valid",
+      "assignedVehicleIds": ["veh_001"]
+    },
+    {
+      "id": "drv_002",
+      "subscriberId": "sub_001",
+      "name": "Mahesh Yadav",
+      "phone": "+919823456789",
+      "licenseNumber": "MH1420190054321",
+      "licenseExpiry": "2026-04-15",
+      "licenseStatus": "expiring-soon",
+      "assignedVehicleIds": ["veh_002"]
+    },
+    {
+      "id": "drv_003",
+      "subscriberId": "sub_003",
+      "name": "Anil Verma",
+      "phone": "+919911223344",
+      "licenseNumber": "UP3220200098765",
+      "licenseExpiry": "2025-12-01",
+      "licenseStatus": "expired",
+      "assignedVehicleIds": []
+    }
+  ],
+  "payments": [
+    {
+      "id": "pay_001",
+      "subscriberId": "sub_001",
+      "amount": 15000,
+      "currency": "INR",
+      "status": "success",
+      "gatewayReference": "rzp_pay_Lx9kQw3mNp",
+      "description": "Fleet plan subscription renewal",
+      "date": "2026-03-01T10:30:00Z"
+    },
+    {
+      "id": "pay_002",
+      "subscriberId": "sub_001",
+      "amount": 2500,
+      "currency": "INR",
+      "status": "success",
+      "gatewayReference": "rzp_pay_Mk7jRv2oLq",
+      "description": "Challan settlement — MH12AB1234",
+      "date": "2026-03-15T14:45:00Z"
+    },
+    {
+      "id": "pay_003",
+      "subscriberId": "sub_002",
+      "amount": 1999,
+      "currency": "INR",
+      "status": "pending",
+      "gatewayReference": null,
+      "description": "Basic plan subscription renewal",
+      "date": "2026-03-25T09:00:00Z"
+    }
+  ],
+  "incidents": [
+    {
+      "id": "inc_001",
+      "subscriberId": "sub_001",
+      "vehicleId": "veh_002",
+      "driverId": "drv_002",
+      "incidentType": "Accidents",
+      "description": "Truck involved in a rear-end collision on NH48 near Pune. Minor damage to bumper and tail lights. No injuries reported.",
+      "assignedLawyerId": "law_001",
+      "status": "inProgress",
+      "createdAt": "2026-03-20T08:15:00Z",
+      "updatedAt": "2026-03-22T16:30:00Z"
+    },
+    {
+      "id": "inc_002",
+      "subscriberId": "sub_003",
+      "vehicleId": "veh_003",
+      "driverId": null,
+      "incidentType": "Vehicle Impounding",
+      "description": "Vehicle impounded by traffic police at Rajiv Chowk, Delhi for expired PUC certificate. Need immediate legal assistance for release.",
+      "assignedLawyerId": "law_002",
+      "status": "submitted",
+      "createdAt": "2026-03-26T11:00:00Z",
+      "updatedAt": "2026-03-26T11:00:00Z"
+    }
+  ],
+  "challans": [
+    {
+      "id": "chl_001",
+      "vehicleId": "veh_001",
+      "driverId": "drv_001",
+      "challanType": "online",
+      "violationType": "Overspeeding",
+      "amount": 2000,
+      "issueDate": "2026-03-10",
+      "location": "Mumbai-Pune Expressway, Km 42",
+      "status": "submitted",
+      "slaDeadline": "2026-04-10",
+      "paymentReference": null,
+      "createdAt": "2026-03-10T14:20:00Z",
+      "updatedAt": "2026-03-10T14:20:00Z"
+    },
+    {
+      "id": "chl_002",
+      "vehicleId": "veh_002",
+      "driverId": "drv_002",
+      "challanType": "court",
+      "violationType": "Overloading",
+      "amount": 20000,
+      "issueDate": "2026-02-28",
+      "location": "Hinjewadi, Pune",
+      "status": "inProgress",
+      "slaDeadline": "2026-04-30",
+      "paymentReference": null,
+      "createdAt": "2026-02-28T09:45:00Z",
+      "updatedAt": "2026-03-18T11:00:00Z"
+    },
+    {
+      "id": "chl_003",
+      "vehicleId": "veh_003",
+      "driverId": null,
+      "challanType": "online",
+      "violationType": "Red light violation",
+      "amount": 5000,
+      "issueDate": "2026-03-22",
+      "location": "Connaught Place, New Delhi",
+      "status": "resolved",
+      "slaDeadline": "2026-04-22",
+      "paymentReference": "rzp_pay_Nq8tYu4pMs",
+      "createdAt": "2026-03-22T17:30:00Z",
+      "updatedAt": "2026-03-24T10:15:00Z"
+    }
+  ],
+  "lawyers": [
+    {
+      "id": "law_001",
+      "name": "Adv. Neha Deshmukh",
+      "specialization": "Motor Vehicle Act",
+      "location": "Pune, Maharashtra",
+      "phone": "+919876001122",
+      "pinCodes": ["411001", "411002", "411003", "411004", "411005"],
+      "isAvailable": true
+    },
+    {
+      "id": "law_002",
+      "name": "Adv. Vikram Singh",
+      "specialization": "Criminal & Traffic Law",
+      "location": "New Delhi",
+      "phone": "+919812009988",
+      "pinCodes": ["110001", "110002", "110003", "110004", "110005"],
+      "isAvailable": true
+    },
+    {
+      "id": "law_003",
+      "name": "Adv. Kavita Reddy",
+      "specialization": "Insurance Claims & Accidents",
+      "location": "Hyderabad, Telangana",
+      "phone": "+919900556677",
+      "pinCodes": ["500001", "500002", "500003", "500004", "500005"],
+      "isAvailable": false
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc_001",
+      "ownerId": "veh_001",
+      "ownerType": "vehicle",
+      "type": "insurance",
+      "name": "Comprehensive Motor Insurance — ICICI Lombard",
+      "expiry": "2026-08-20",
+      "status": "valid",
+      "fileUrl": "/documents/veh_001_insurance.pdf",
+      "verifiedAt": "2026-01-15T12:00:00Z"
+    },
+    {
+      "id": "doc_002",
+      "ownerId": "veh_002",
+      "ownerType": "vehicle",
+      "type": "puc",
+      "name": "Pollution Under Control Certificate",
+      "expiry": "2026-03-28",
+      "status": "expiring-soon",
+      "fileUrl": "/documents/veh_002_puc.pdf",
+      "verifiedAt": "2025-09-28T10:00:00Z"
+    },
+    {
+      "id": "doc_003",
+      "ownerId": "drv_003",
+      "ownerType": "driver",
+      "type": "drivingLicense",
+      "name": "Driving License — Anil Verma",
+      "expiry": "2025-12-01",
+      "status": "expired",
+      "fileUrl": "/documents/drv_003_license.pdf",
+      "verifiedAt": "2025-06-01T09:00:00Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "ntf_001",
+      "subscriberId": "sub_001",
+      "type": "compliance",
+      "title": "PUC Expiring Soon",
+      "message": "PUC for vehicle MH14CD5678 expires on 28 Mar 2026. Renew immediately to avoid penalties.",
+      "read": false,
+      "createdAt": "2026-03-25T08:00:00Z",
+      "channel": "both"
+    },
+    {
+      "id": "ntf_002",
+      "subscriberId": "sub_001",
+      "type": "incident",
+      "title": "Lawyer Assigned",
+      "message": "Adv. Neha Deshmukh has been assigned to your accident case (INC-001). She will contact you within 30 minutes.",
+      "read": true,
+      "createdAt": "2026-03-20T08:45:00Z",
+      "channel": "app"
+    },
+    {
+      "id": "ntf_003",
+      "subscriberId": "sub_002",
+      "type": "subscription",
+      "title": "Subscription Expiring",
+      "message": "Your Basic plan expires on 10 Apr 2026. Renew now to maintain uninterrupted legal coverage.",
+      "read": false,
+      "createdAt": "2026-03-26T09:00:00Z",
+      "channel": "both"
+    }
+  ]
+}

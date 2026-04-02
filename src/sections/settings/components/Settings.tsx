@@ -29,6 +29,7 @@ import {
   MoreVertical,
   Mail,
   Phone,
+  UserMinus,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 import type {
@@ -612,8 +613,19 @@ export function Settings({
   const [showPlanModal, setShowPlanModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false)
+  // Track unchecked permissions per role (some start unchecked)
+  const [uncheckedPerms, setUncheckedPerms] = useState<Record<string, Set<number>>>({
+    admin: new Set([4, 5]),
+    manager: new Set([2, 4]),
+    viewer: new Set([1, 3]),
+  })
+
+  const sendOverlay = (show: boolean) => {
+    window.parent.postMessage({ type: show ? 'showOverlay' : 'hideOverlay' }, '*')
+  }
   const [newPaymentType, setNewPaymentType] = useState<PaymentMethodType>('upi')
   const [teamSubTab, setTeamSubTab] = useState<'members' | 'roles'>('members')
+  const [openMemberMenu, setOpenMemberMenu] = useState<string | null>(null)
   const [localQuietHours, setLocalQuietHours] = useState(quietHours)
   const [localLanding, setLocalLanding] = useState(appPreferences.defaultLandingPage)
   const [localBadges, setLocalBadges] = useState(appPreferences.showSidebarBadges)
@@ -813,7 +825,7 @@ export function Settings({
                   {t.defaultLandingPage}
                 </h3>
                 <p className="text-xs text-stone-500 dark:text-stone-400 mb-4">{t.defaultLandingPageDesc}</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="flex flex-wrap gap-3">
                   {LANDING_OPTIONS.map((opt) => {
                     const LandingIcon = opt.icon
                     const isSelected = localLanding === opt.key
@@ -824,31 +836,31 @@ export function Settings({
                           setLocalLanding(opt.key)
                           onChangeLandingPage?.(opt.key)
                         }}
-                        className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                        className={`relative flex items-center gap-2.5 px-3 py-3 rounded-xl border-2 transition-all ${
                           isSelected
                             ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/20'
                             : 'border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600'
                         }`}
                       >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                        {isSelected && <Check className="w-3.5 h-3.5 text-emerald-500 absolute top-1.5 right-1.5" />}
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                           isSelected
                             ? 'bg-emerald-100 dark:bg-emerald-900/50'
                             : 'bg-stone-100 dark:bg-stone-800'
                         }`}>
-                          <LandingIcon className={`w-4.5 h-4.5 ${
+                          <LandingIcon className={`w-4 h-4 ${
                             isSelected
                               ? 'text-emerald-600 dark:text-emerald-400'
                               : 'text-stone-400 dark:text-stone-500'
                           }`} />
                         </div>
-                        <span className={`text-sm font-medium ${
+                        <span className={`text-sm font-medium whitespace-nowrap ${
                           isSelected
                             ? 'text-stone-900 dark:text-stone-100'
                             : 'text-stone-600 dark:text-stone-400'
                         }`}>
                           {t[LANDING_LABELS[opt.key]]}
                         </span>
-                        {isSelected && <Check className="w-4 h-4 text-emerald-500 ml-auto" />}
                       </button>
                     )
                   })}
@@ -899,7 +911,7 @@ export function Settings({
                     </div>
                   </div>
                   <button
-                    onClick={() => setShowPlanModal(true)}
+                    onClick={() => { setShowPlanModal(true); sendOverlay(true) }}
                     className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shrink-0"
                   >
                     <Sparkles className="w-4 h-4" />
@@ -959,7 +971,7 @@ export function Settings({
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">{t.paymentMethods}</h3>
                   <button
-                    onClick={() => { setNewPaymentType('upi'); setShowAddPaymentModal(true) }}
+                    onClick={() => { setNewPaymentType('upi'); setShowAddPaymentModal(true); sendOverlay(true) }}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -1119,7 +1131,7 @@ export function Settings({
                       </p>
                     </div>
                     <button
-                      onClick={() => setShowInviteModal(true)}
+                      onClick={() => { setShowInviteModal(true); sendOverlay(true) }}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
                     >
                       <UserPlus className="w-3.5 h-3.5" />
@@ -1166,12 +1178,28 @@ export function Settings({
                             <div className="flex items-center gap-2 shrink-0">
                               <span className="text-xs text-stone-400 dark:text-stone-500 hidden lg:inline">{t.joined} {member.joinedDate}</span>
                               {member.role !== 'owner' && (
-                                <button
-                                  onClick={() => onRemoveMember?.(member.id)}
-                                  className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                                >
-                                  <MoreVertical className="w-4 h-4" />
-                                </button>
+                                <div className="relative">
+                                  <button
+                                    onClick={() => setOpenMemberMenu(openMemberMenu === member.id ? null : member.id)}
+                                    className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                                  >
+                                    <MoreVertical className="w-4 h-4" />
+                                  </button>
+                                  {openMemberMenu === member.id && (
+                                    <>
+                                      <div className="fixed inset-0 z-30" onClick={() => setOpenMemberMenu(null)} />
+                                      <div className="absolute right-0 top-full mt-1 z-40 w-44 bg-white dark:bg-stone-800 rounded-xl shadow-lg border border-stone-200 dark:border-stone-700 py-1 overflow-hidden">
+                                        <button
+                                          onClick={() => { onRemoveMember?.(member.id); setOpenMemberMenu(null) }}
+                                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                                        >
+                                          <UserMinus className="w-4 h-4" />
+                                          Remove Access
+                                        </button>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
                               )}
                             </div>
                           </div>
@@ -1198,12 +1226,28 @@ export function Settings({
                         </div>
                         <div className="px-5 py-4">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            {activities.map((activity: string, i: number) => (
-                              <label key={i} className="flex items-center gap-2.5 cursor-default">
-                                <input type="checkbox" checked readOnly className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30" />
-                                <span className="text-sm text-stone-600 dark:text-stone-400">{activity.trim()}</span>
-                              </label>
-                            ))}
+                            {activities.map((activity: string, i: number) => {
+                              const isChecked = !(uncheckedPerms[role]?.has(i))
+                              return (
+                                <label key={i} className="flex items-center gap-2.5 cursor-pointer select-none">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => {
+                                      setUncheckedPerms(prev => {
+                                        const next = { ...prev }
+                                        const set = new Set(prev[role] || [])
+                                        if (set.has(i)) set.delete(i); else set.add(i)
+                                        next[role] = set
+                                        return next
+                                      })
+                                    }}
+                                    className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30 cursor-pointer"
+                                  />
+                                  <span className="text-sm text-stone-600 dark:text-stone-400">{activity.trim()}</span>
+                                </label>
+                              )
+                            })}
                           </div>
                         </div>
                       </div>
@@ -1376,8 +1420,9 @@ export function Settings({
           onSelect={(planId) => {
             onChangePlan?.(planId)
             setShowPlanModal(false)
+            sendOverlay(false)
           }}
-          onClose={() => setShowPlanModal(false)}
+          onClose={() => { setShowPlanModal(false); sendOverlay(false) }}
           t={t}
         />
       )}
@@ -1385,11 +1430,11 @@ export function Settings({
       {/* Add Payment Method Modal */}
       {showAddPaymentModal && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAddPaymentModal(false)} />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setShowAddPaymentModal(false); sendOverlay(false) }} />
           <div className="relative bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full max-w-md">
             <div className="border-b border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-between rounded-t-2xl">
               <h3 className="text-lg font-semibold text-stone-900 dark:text-stone-100">{t.addPaymentTitle}</h3>
-              <button onClick={() => setShowAddPaymentModal(false)} className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 transition-colors">
+              <button onClick={() => { setShowAddPaymentModal(false); sendOverlay(false) }} className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1518,13 +1563,13 @@ export function Settings({
             </div>
             <div className="border-t border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-end gap-3">
               <button
-                onClick={() => setShowAddPaymentModal(false)}
+                onClick={() => { setShowAddPaymentModal(false); sendOverlay(false) }}
                 className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 {t.cancel}
               </button>
               <button
-                onClick={() => setShowAddPaymentModal(false)}
+                onClick={() => { setShowAddPaymentModal(false); sendOverlay(false) }}
                 className="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
               >
                 {t.addMethod}
@@ -1538,11 +1583,11 @@ export function Settings({
       {/* Invite Member Modal */}
       {showInviteModal && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowInviteModal(false)} />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setShowInviteModal(false); sendOverlay(false) }} />
           <div className="relative bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full max-w-md">
             <div className="border-b border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-between rounded-t-2xl">
               <h3 className="text-lg font-semibold text-stone-900 dark:text-stone-100">{t.inviteTitle}</h3>
-              <button onClick={() => setShowInviteModal(false)} className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 transition-colors">
+              <button onClick={() => { setShowInviteModal(false); sendOverlay(false) }} className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1582,7 +1627,7 @@ export function Settings({
             </div>
             <div className="border-t border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-end gap-3">
               <button
-                onClick={() => setShowInviteModal(false)}
+                onClick={() => { setShowInviteModal(false); sendOverlay(false) }}
                 className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 {t.cancel}
@@ -1591,6 +1636,7 @@ export function Settings({
                 onClick={() => {
                   onInviteMember?.()
                   setShowInviteModal(false)
+                  sendOverlay(false)
                 }}
                 className="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
               >

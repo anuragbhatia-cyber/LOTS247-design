@@ -1,0 +1,197 @@
+{
+  "_meta": {
+    "models": {
+      "walletSummary": "The subscriber's current wallet state — balance, last recharge details, and the threshold below which a low-balance warning is shown.",
+      "transactions": "Each transaction is a single credit or debit entry in the wallet ledger. Credits come from recharges and refunds; debits go towards subscriptions, challans, and legal fees.",
+      "quickAmounts": "Preset recharge amounts displayed as quick-select buttons in the Add Money modal."
+    },
+    "relationships": [
+      "walletSummary.currentBalance reflects the net of all successful transactions",
+      "Each transaction has a category linking it to the system area that triggered it (Recharge, Subscription, Challan, Legal Fee, Refund)",
+      "Debit transactions include a relatedEntityId linking back to the challan, subscription, or incident that caused the charge",
+      "The runningBalance on each transaction shows the wallet balance after that transaction was applied",
+      "quickAmounts are configuration values used by the Add Money modal UI"
+    ]
+  },
+  "walletSummary": {
+    "currentBalance": 12750,
+    "currency": "INR",
+    "lowBalanceThreshold": 2000,
+    "lastRecharge": {
+      "amount": 5000,
+      "date": "2026-03-22T14:30:00",
+      "referenceId": "pay_QR7x9kLmN2pV8s"
+    }
+  },
+  "quickAmounts": [500, 1000, 2000, 5000],
+  "transactions": [
+    {
+      "id": "txn-001",
+      "type": "credit",
+      "category": "recharge",
+      "amount": 5000,
+      "currency": "INR",
+      "description": "Wallet recharge via Razorpay",
+      "referenceId": "pay_QR7x9kLmN2pV8s",
+      "status": "success",
+      "date": "2026-03-22T14:30:00",
+      "runningBalance": 12750,
+      "relatedEntityId": null,
+      "relatedEntityType": null
+    },
+    {
+      "id": "txn-002",
+      "type": "debit",
+      "category": "challan",
+      "amount": 1500,
+      "currency": "INR",
+      "description": "Challan payment — UP32MM1113",
+      "referenceId": "CLN-UP11279200417102541",
+      "status": "success",
+      "date": "2026-03-21T10:15:00",
+      "runningBalance": 7750,
+      "relatedEntityId": "UP11279200417102541",
+      "relatedEntityType": "challan"
+    },
+    {
+      "id": "txn-003",
+      "type": "debit",
+      "category": "subscription",
+      "amount": 2999,
+      "currency": "INR",
+      "description": "Fleet plan — monthly renewal",
+      "referenceId": "SUB-FLEET-MAR26",
+      "status": "success",
+      "date": "2026-03-20T00:05:00",
+      "runningBalance": 9250,
+      "relatedEntityId": "subs-001",
+      "relatedEntityType": "subscription"
+    },
+    {
+      "id": "txn-004",
+      "type": "credit",
+      "category": "recharge",
+      "amount": 10000,
+      "currency": "INR",
+      "description": "Wallet recharge via Razorpay",
+      "referenceId": "pay_PP4m8jKnR1oT6q",
+      "status": "success",
+      "date": "2026-03-18T09:45:00",
+      "runningBalance": 12249,
+      "relatedEntityId": null,
+      "relatedEntityType": null
+    },
+    {
+      "id": "txn-005",
+      "type": "debit",
+      "category": "legalFee",
+      "amount": 3500,
+      "currency": "INR",
+      "description": "On-site lawyer dispatch — Accident case IRN-11106557",
+      "referenceId": "LGL-IRN11106557",
+      "status": "success",
+      "date": "2026-03-17T16:20:00",
+      "runningBalance": 2249,
+      "relatedEntityId": "IRN-11106557",
+      "relatedEntityType": "incident"
+    },
+    {
+      "id": "txn-006",
+      "type": "credit",
+      "category": "refund",
+      "amount": 750,
+      "currency": "INR",
+      "description": "Challan dispute refund — UP32NN2224",
+      "referenceId": "RFD-DID5209",
+      "status": "success",
+      "date": "2026-03-15T11:00:00",
+      "runningBalance": 5749,
+      "relatedEntityId": "DID-5209",
+      "relatedEntityType": "dispute"
+    },
+    {
+      "id": "txn-007",
+      "type": "debit",
+      "category": "challan",
+      "amount": 2000,
+      "currency": "INR",
+      "description": "Challan payment — UP32NN2224",
+      "referenceId": "CLN-UP11279200518203652",
+      "status": "success",
+      "date": "2026-03-14T08:30:00",
+      "runningBalance": 4999,
+      "relatedEntityId": "UP11279200518203652",
+      "relatedEntityType": "challan"
+    },
+    {
+      "id": "txn-008",
+      "type": "debit",
+      "category": "legalFee",
+      "amount": 1500,
+      "currency": "INR",
+      "description": "Legal consultation — Vehicle seizure advisory",
+      "referenceId": "LGL-IRN11207891",
+      "status": "success",
+      "date": "2026-03-12T14:10:00",
+      "runningBalance": 6999,
+      "relatedEntityId": "IRN-11207891",
+      "relatedEntityType": "incident"
+    },
+    {
+      "id": "txn-009",
+      "type": "credit",
+      "category": "recharge",
+      "amount": 2000,
+      "currency": "INR",
+      "description": "Wallet recharge via Razorpay",
+      "referenceId": "pay_NN2k6hJmQ0nS5p",
+      "status": "success",
+      "date": "2026-03-10T17:55:00",
+      "runningBalance": 8499,
+      "relatedEntityId": null,
+      "relatedEntityType": null
+    },
+    {
+      "id": "txn-010",
+      "type": "debit",
+      "category": "challan",
+      "amount": 500,
+      "currency": "INR",
+      "description": "Challan payment — UP32PP3335",
+      "referenceId": "CLN-UP11279200619304763",
+      "status": "success",
+      "date": "2026-03-08T12:40:00",
+      "runningBalance": 6499,
+      "relatedEntityId": "UP11279200619304763",
+      "relatedEntityType": "challan"
+    },
+    {
+      "id": "txn-011",
+      "type": "credit",
+      "category": "recharge",
+      "amount": 1000,
+      "currency": "INR",
+      "description": "Wallet recharge via Razorpay",
+      "referenceId": "pay_MM1j5gImP9mR4o",
+      "status": "failed",
+      "date": "2026-03-07T20:15:00",
+      "runningBalance": 6999,
+      "relatedEntityId": null,
+      "relatedEntityType": null
+    },
+    {
+      "id": "txn-012",
+      "type": "debit",
+      "category": "subscription",
+      "amount": 2999,
+      "currency": "INR",
+      "description": "Fleet plan — monthly renewal",
+      "referenceId": "SUB-FLEET-FEB26",
+      "status": "success",
+      "date": "2026-02-20T00:05:00",
+      "runningBalance": 6999,
+      "relatedEntityId": "subs-001",
+      "relatedEntityType": "subscription"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+/* Design Tokens for LOTS247 */
+
+:root {
+  /* Colors — Tailwind Emerald, Amber, Stone */
+  --color-primary: theme('colors.emerald.600');
+  --color-primary-light: theme('colors.emerald.400');
+  --color-primary-dark: theme('colors.emerald.700');
+  --color-secondary: theme('colors.amber.500');
+  --color-secondary-light: theme('colors.amber.400');
+  --color-secondary-dark: theme('colors.amber.600');
+  --color-neutral: theme('colors.stone.500');
+
+  /* Typography */
+  --font-heading: 'DM Sans', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}

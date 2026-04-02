@@ -1,0 +1,362 @@
+{
+  "_meta": {
+    "models": {
+      "proposals": "A service request sent from Compliance for challan resolution, DL verification, or RC verification. Tracks type, quantity, amount, status, and links to created incidents when converted.",
+      "proposalActivities": "Timeline entries for a proposal — status changes, team actions, and system events.",
+      "comments": "Messages in the follow-up thread between the user and the LOTS team on a proposal."
+    },
+    "relationships": [
+      "Each Proposal has ProposalActivities (timeline of status changes and events)",
+      "Each Proposal has Comments (follow-up thread between user and team)",
+      "Converted Proposals link to an Incident via linkedIncidentId"
+    ]
+  },
+  "proposals": [
+    {
+      "id": "prp-001",
+      "displayId": "PRP-1001",
+      "type": "Challan",
+      "description": "Bulk challan resolution for 12 pending challans across Lucknow fleet vehicles",
+      "quantity": 12,
+      "amount": 240000,
+      "status": "sent",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-22T09:15:00Z",
+      "updatedAt": "2026-03-22T09:15:00Z"
+    },
+    {
+      "id": "prp-002",
+      "displayId": "PRP-1002",
+      "type": "DL",
+      "description": "DL verification for 5 newly onboarded drivers — licenses issued from UP and MP RTOs",
+      "quantity": 5,
+      "amount": 7500,
+      "status": "sent",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-20T14:30:00Z",
+      "updatedAt": "2026-03-21T10:00:00Z"
+    },
+    {
+      "id": "prp-003",
+      "displayId": "PRP-1003",
+      "type": "RC",
+      "description": "RC verification for 8 trucks recently transferred from Jaipur depot",
+      "quantity": 8,
+      "amount": 12000,
+      "status": "sent",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-18T11:45:00Z",
+      "updatedAt": "2026-03-19T08:30:00Z"
+    },
+    {
+      "id": "prp-004",
+      "displayId": "PRP-1004",
+      "type": "Challan",
+      "description": "Overloading challans for 3 vehicles flagged on NH48 Pune stretch",
+      "quantity": 3,
+      "amount": 60000,
+      "status": "sent",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-24T16:00:00Z",
+      "updatedAt": "2026-03-24T16:00:00Z"
+    },
+    {
+      "id": "prp-009",
+      "displayId": "PRP-1009",
+      "type": "Challan",
+      "description": "Quote received for 5 pending court challans — Lok Adalat batch processing via Delhi RTO",
+      "quantity": 5,
+      "amount": 95000,
+      "status": "received",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-23T11:00:00Z",
+      "updatedAt": "2026-03-23T14:30:00Z"
+    },
+    {
+      "id": "prp-010",
+      "displayId": "PRP-1010",
+      "type": "RC",
+      "description": "RC transfer documentation quote for 4 vehicles acquired from Jaipur depot",
+      "quantity": 4,
+      "amount": 18000,
+      "status": "received",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-21T09:30:00Z",
+      "updatedAt": "2026-03-22T10:15:00Z"
+    },
+    {
+      "id": "prp-011",
+      "displayId": "PRP-1011",
+      "type": "DL",
+      "description": "DL renewal processing quote for 3 drivers with licenses expiring in April",
+      "quantity": 3,
+      "amount": 4500,
+      "status": "received",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-19T16:00:00Z",
+      "updatedAt": "2026-03-20T11:00:00Z"
+    },
+    {
+      "id": "prp-005",
+      "displayId": "PRP-1005",
+      "type": "Challan",
+      "description": "Court challans settlement for 7 vehicles — Lok Adalat batch submission for Delhi region",
+      "quantity": 7,
+      "amount": 175000,
+      "status": "converted",
+      "linkedIncidentId": "IRN-11106557",
+      "createdAt": "2026-02-28T10:00:00Z",
+      "updatedAt": "2026-03-10T15:20:00Z"
+    },
+    {
+      "id": "prp-006",
+      "displayId": "PRP-1006",
+      "type": "DL",
+      "description": "DL renewal check for 2 drivers with licenses expiring within 30 days",
+      "quantity": 2,
+      "amount": 3000,
+      "status": "converted",
+      "linkedIncidentId": "IRN-11106590",
+      "createdAt": "2026-02-15T08:45:00Z",
+      "updatedAt": "2026-02-22T12:00:00Z"
+    },
+    {
+      "id": "prp-007",
+      "displayId": "PRP-1007",
+      "type": "RC",
+      "description": "RC verification for 1 vehicle — registration number mismatch flagged during compliance audit",
+      "quantity": 1,
+      "amount": 1500,
+      "status": "rejected",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-01T13:20:00Z",
+      "updatedAt": "2026-03-05T09:45:00Z"
+    },
+    {
+      "id": "prp-008",
+      "displayId": "PRP-1008",
+      "type": "Challan",
+      "description": "Speed violation challans for 15 vehicles captured via highway CCTV — bulk dispute request",
+      "quantity": 15,
+      "amount": 300000,
+      "status": "rejected",
+      "linkedIncidentId": null,
+      "createdAt": "2026-02-10T07:30:00Z",
+      "updatedAt": "2026-02-18T14:10:00Z"
+    }
+  ],
+  "proposalActivities": [
+    {
+      "id": "pa-001",
+      "proposalId": "prp-001",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal submitted for 12 challans — awaiting team review",
+      "timestamp": "2026-03-22T09:15:00Z"
+    },
+    {
+      "id": "pa-002",
+      "proposalId": "prp-002",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal submitted for DL verification of 5 drivers",
+      "timestamp": "2026-03-20T14:30:00Z"
+    },
+    {
+      "id": "pa-003",
+      "proposalId": "prp-002",
+      "actionType": "note",
+      "performedBy": "LOTS Team",
+      "notes": "DL verification initiated — 3 of 5 licenses confirmed valid, 2 pending RTO response",
+      "timestamp": "2026-03-21T10:00:00Z"
+    },
+    {
+      "id": "pa-004",
+      "proposalId": "prp-003",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal submitted for RC verification of 8 trucks",
+      "timestamp": "2026-03-18T11:45:00Z"
+    },
+    {
+      "id": "pa-005",
+      "proposalId": "prp-004",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal submitted for 3 overloading challans",
+      "timestamp": "2026-03-24T16:00:00Z"
+    },
+    {
+      "id": "pa-006",
+      "proposalId": "prp-005",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal submitted for Lok Adalat batch — 7 court challans",
+      "timestamp": "2026-02-28T10:00:00Z"
+    },
+    {
+      "id": "pa-007",
+      "proposalId": "prp-005",
+      "actionType": "note",
+      "performedBy": "LOTS Team",
+      "notes": "Lok Adalat date confirmed for 8 Mar. All 7 challans eligible for hearing.",
+      "timestamp": "2026-03-04T11:30:00Z"
+    },
+    {
+      "id": "pa-008",
+      "proposalId": "prp-005",
+      "actionType": "statusChange",
+      "performedBy": "LOTS Team",
+      "notes": "Proposal converted — incident IRN-11106557 created for case tracking",
+      "timestamp": "2026-03-10T15:20:00Z"
+    },
+    {
+      "id": "pa-009",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal submitted for DL renewal check — 2 drivers",
+      "timestamp": "2026-02-15T08:45:00Z"
+    },
+    {
+      "id": "pa-010",
+      "proposalId": "prp-006",
+      "actionType": "statusChange",
+      "performedBy": "LOTS Team",
+      "notes": "Proposal converted — incident IRN-11106590 created for renewal follow-up",
+      "timestamp": "2026-02-22T12:00:00Z"
+    },
+    {
+      "id": "pa-011",
+      "proposalId": "prp-007",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal submitted for RC verification — registration mismatch",
+      "timestamp": "2026-03-01T13:20:00Z"
+    },
+    {
+      "id": "pa-012",
+      "proposalId": "prp-007",
+      "actionType": "statusChange",
+      "performedBy": "LOTS Team",
+      "notes": "Rejected — vehicle registration number was corrected by the fleet owner directly at RTO. No action needed.",
+      "timestamp": "2026-03-05T09:45:00Z"
+    },
+    {
+      "id": "pa-013",
+      "proposalId": "prp-008",
+      "actionType": "statusChange",
+      "performedBy": "System",
+      "notes": "Proposal submitted for bulk dispute — 15 speed violation challans",
+      "timestamp": "2026-02-10T07:30:00Z"
+    },
+    {
+      "id": "pa-014",
+      "proposalId": "prp-008",
+      "actionType": "note",
+      "performedBy": "LOTS Team",
+      "notes": "Reviewed CCTV evidence — challans are valid. Dispute not viable.",
+      "timestamp": "2026-02-15T16:00:00Z"
+    },
+    {
+      "id": "pa-015",
+      "proposalId": "prp-008",
+      "actionType": "statusChange",
+      "performedBy": "LOTS Team",
+      "notes": "Rejected — CCTV evidence confirms violations. Recommend direct payment to avoid penalties.",
+      "timestamp": "2026-02-18T14:10:00Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "cmt-p001",
+      "entityType": "proposal",
+      "entityId": "prp-001",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "Please prioritise the 4 court challans in this batch — hearing dates are approaching.",
+      "createdAt": "2026-03-22T10:00:00Z"
+    },
+    {
+      "id": "cmt-p002",
+      "entityType": "proposal",
+      "entityId": "prp-001",
+      "authorType": "team",
+      "authorName": "Amit Verma",
+      "message": "Noted. Court challans flagged as priority. We'll process those first.",
+      "createdAt": "2026-03-22T11:30:00Z"
+    },
+    {
+      "id": "cmt-p003",
+      "entityType": "proposal",
+      "entityId": "prp-002",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "Two of the drivers are currently on long-haul routes — will that delay the verification?",
+      "createdAt": "2026-03-20T15:00:00Z"
+    },
+    {
+      "id": "cmt-p004",
+      "entityType": "proposal",
+      "entityId": "prp-002",
+      "authorType": "team",
+      "authorName": "Priya Sharma",
+      "message": "No delay expected. DL verification is done digitally through the Parivahan portal. Physical presence is not needed.",
+      "createdAt": "2026-03-20T16:45:00Z"
+    },
+    {
+      "id": "cmt-p005",
+      "entityType": "proposal",
+      "entityId": "prp-003",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "These trucks were transferred last week. The previous owner's RC details may still show in the system.",
+      "createdAt": "2026-03-18T12:30:00Z"
+    },
+    {
+      "id": "cmt-p006",
+      "entityType": "proposal",
+      "entityId": "prp-005",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "Thanks for the quick turnaround on this. When can we expect the Lok Adalat results?",
+      "createdAt": "2026-03-10T16:00:00Z"
+    },
+    {
+      "id": "cmt-p007",
+      "entityType": "proposal",
+      "entityId": "prp-005",
+      "authorType": "team",
+      "authorName": "Amit Verma",
+      "message": "Hearing was successful for 5 of 7 challans. Remaining 2 adjourned to next sitting. Full update in the incident timeline.",
+      "createdAt": "2026-03-11T09:15:00Z"
+    },
+    {
+      "id": "cmt-p008",
+      "entityType": "proposal",
+      "entityId": "prp-008",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "Can we at least get the penalty amount reduced? ₹3,00,000 is a significant hit.",
+      "createdAt": "2026-02-18T15:00:00Z"
+    },
+    {
+      "id": "cmt-p009",
+      "entityType": "proposal",
+      "entityId": "prp-008",
+      "authorType": "team",
+      "authorName": "Priya Sharma",
+      "message": "Unfortunately the CCTV evidence is clear. We recommend paying promptly to avoid the late penalty surcharge which adds 25% after 60 days.",
+      "createdAt": "2026-02-19T10:30:00Z"
+    },
+    {
+      "id": "cmt-p010",
+      "entityType": "proposal",
+      "entityId": "prp-004",
+      "authorType": "user",
+      "authorName": "Rajesh Kumar",
+      "message": "All 3 vehicles were within permissible limits. We have weigh bridge receipts as proof.",
+      "createdAt": "2026-03-24T17:00:00Z"
+    }
+  ]
+}
