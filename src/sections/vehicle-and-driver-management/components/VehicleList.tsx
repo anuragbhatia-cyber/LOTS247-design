@@ -1298,16 +1298,6 @@ export function VehicleList({
                                 </button>
                                 <button
                                   onClick={() => {
-                                    onEditVehicle?.(vehicle.id)
-                                    setOpenDropdownId(null)
-                                  }}
-                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                  {t.edit}
-                                </button>
-                                <button
-                                  onClick={() => {
                                     onDeleteVehicle?.(vehicle.id)
                                     setOpenDropdownId(null)
                                   }}

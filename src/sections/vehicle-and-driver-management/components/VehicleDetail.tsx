@@ -1297,6 +1297,16 @@ export function VehicleDetail({
   const [detailsFetched, setDetailsFetched] = useState(vehicle.detailsFetched !== false)
   const [detailsFetching, setDetailsFetching] = useState(false)
 
+  const navigateToIncidentScreen = (screenName: string, extraParams?: Record<string, string>) => {
+    const params = new URLSearchParams(window.location.search)
+    const embed = params.get('embed') === 'true' ? 'embed=true' : ''
+    const extra = extraParams
+      ? Object.entries(extraParams).map(([k, v]) => `${k}=${v}`).join('&')
+      : ''
+    const qs = [embed, extra].filter(Boolean).join('&')
+    window.location.href = `/sections/incident-management/screen-designs/${screenName}/fullscreen${qs ? `?${qs}` : ''}`
+  }
+
   const handleFetchDetails = () => {
     setDetailsFetching(true)
     setTimeout(() => {
@@ -2038,7 +2048,7 @@ export function VehicleDetail({
                 challans={vehicleChallans}
                 vehicles={incidentData.vehicles}
                 drivers={incidentData.drivers}
-                onView={(id) => console.log('View challan:', id)}
+                onView={(id) => navigateToIncidentScreen('ChallanDetail', { id })}
                 onPay={(id) => console.log('Pay challan:', id)}
                 onDispute={(id) => console.log('Dispute challan:', id)}
                 onEscalateToCase={(id) => console.log('Escalate to case:', id)}
@@ -2052,7 +2062,7 @@ export function VehicleDetail({
                 vehicles={incidentData.vehicles}
                 drivers={incidentData.drivers}
                 lawyers={incidentData.lawyers}
-                onView={(id) => console.log('View case:', id)}
+                onView={(id) => navigateToIncidentScreen('CaseDetail', { id })}
                 onCreate={() => console.log('Create new case')}
               />
             )}
