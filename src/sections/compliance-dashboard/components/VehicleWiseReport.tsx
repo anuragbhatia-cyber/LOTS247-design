@@ -293,27 +293,20 @@ export function VehicleWiseReport({ vehicles, vehicleHistory }: VehicleWiseRepor
           {/* Left column — Vehicle Summary + Compliance Status */}
           <div className="lg:col-span-3 space-y-4">
             {/* Vehicle Summary */}
-            <div className="rounded-2xl bg-white shadow-md shadow-stone-200/60 p-5 sm:p-6">
-              <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider mb-4">
-                Vehicle Summary
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="rounded-xl bg-stone-50 p-4">
-                  <p className="text-xs font-medium text-stone-500 mb-2">Total Incidents</p>
-                  <p className="text-2xl font-bold text-stone-900 tabular-nums">5</p>
-                  <p className="text-base font-semibold text-stone-700 mt-1 tabular-nums">Amount: ₹48,500</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                { label: 'Total Incidents', count: '5', amount: '₹48,500' },
+                { label: 'Total Cases', count: '3', amount: '₹32,000' },
+                { label: 'Total Renewals', count: '7', amount: '₹18,200' },
+              ].map(card => (
+                <div key={card.label} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm p-5 sm:p-6">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums mb-1">
+                    {card.count}
+                  </p>
+                  <p className="text-sm font-medium text-stone-900 dark:text-stone-100 mb-2">{card.label}</p>
+                  <p className="text-xs text-stone-500 dark:text-stone-400 tabular-nums">{card.amount}</p>
                 </div>
-                <div className="rounded-xl bg-stone-50 p-4">
-                  <p className="text-xs font-medium text-stone-500 mb-2">Total Cases</p>
-                  <p className="text-2xl font-bold text-stone-900 tabular-nums">3</p>
-                  <p className="text-base font-semibold text-stone-700 mt-1 tabular-nums">Amount: ₹32,000</p>
-                </div>
-                <div className="rounded-xl bg-stone-50 p-4">
-                  <p className="text-xs font-medium text-stone-500 mb-2">Total Renewals</p>
-                  <p className="text-2xl font-bold text-stone-900 tabular-nums">7</p>
-                  <p className="text-base font-semibold text-stone-700 mt-1 tabular-nums">Amount: ₹18,200</p>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Compliance Status */}

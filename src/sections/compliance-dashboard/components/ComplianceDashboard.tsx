@@ -1243,7 +1243,7 @@ function FleetChallanView({
             const isSelected = selectedVehicles.has(vehNum)
             return (
               <div key={vehNum} className={`rounded-2xl bg-white dark:bg-stone-900 shadow-sm border overflow-hidden transition-colors ${
-                isSelected ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-200 dark:border-stone-800'
+                isSelected && filter === 'pending' ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-200 dark:border-stone-800'
               }`}>
                 <div className="flex items-center p-4 hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors">
                   {/* Checkbox — only on pending tab */}
@@ -1855,7 +1855,7 @@ export function ComplianceDashboard({
   const changeIsPositive = complianceScore.change >= 0
 
   return (
-    <div className="bg-stone-100 dark:bg-stone-950">
+    <div className="bg-stone-50 dark:bg-stone-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* ---------------------------------------------------------------- */}
         {/* Top Bar: Filters — hidden during card drilldowns                 */}

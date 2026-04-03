@@ -1330,16 +1330,6 @@ export function VehicleDetail({
               </p>
             </div>
           )}
-          {expiredDocs.length === 0 && expiringDocs.length > 0 && (
-            <div className="px-5 py-3 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-900/40 flex items-center gap-2.5">
-              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                <span className="font-semibold">{expiringDocs.length} {expiringDocs.length > 1 ? t.documentsExpiringSoon : t.documentExpiringSoon}</span>
-                {' — '}
-                {expiringDocs.map((d) => { const keys = DOC_TYPE_LABEL_KEY[d.type]; return keys ? t[keys.label] : d.name }).join(', ')}
-              </p>
-            </div>
-          )}
 
           <div className="p-5 sm:p-6 lg:p-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
@@ -1457,6 +1447,21 @@ export function VehicleDetail({
         {/* ================================================================= */}
         {activeTab === 'details' && (
           <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6">
+            {!detailsFetched && (
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={handleFetchDetails}
+                  disabled={detailsFetching}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-stone-900 text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors disabled:opacity-60"
+                >
+                  {detailsFetching ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" />{t.fetchingDetails}</>
+                  ) : (
+                    <><RefreshCw className="w-4 h-4" />{t.fetchDetails}</>
+                  )}
+                </button>
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.rcNumber}</p>
@@ -1466,7 +1471,7 @@ export function VehicleDetail({
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.vehicleType}</p>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.vehicleType}</p>
               </div>
-              {detailsFetched ? (
+              {detailsFetched && (
                 <>
                   <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                     <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.make}</p>
@@ -1481,20 +1486,6 @@ export function VehicleDetail({
                     <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.year}</p>
                   </div>
                 </>
-              ) : (
-                <div className="p-4 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-lg border border-dashed border-emerald-200 dark:border-emerald-800 col-span-1 sm:col-span-2 lg:col-span-3 flex items-center justify-center">
-                  <button
-                    onClick={handleFetchDetails}
-                    disabled={detailsFetching}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-stone-900 text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors disabled:opacity-60"
-                  >
-                    {detailsFetching ? (
-                      <><Loader2 className="w-4 h-4 animate-spin" />{t.fetchingDetails}</>
-                    ) : (
-                      <><RefreshCw className="w-4 h-4" />{t.fetchDetails}</>
-                    )}
-                  </button>
-                </div>
               )}
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.status}</p>
