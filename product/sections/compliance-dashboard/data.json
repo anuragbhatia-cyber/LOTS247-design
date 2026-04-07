@@ -253,7 +253,13 @@
       { "vehicleNumber": "RJ14SB2345", "status": "expiring", "issueDate": "2011-04-02", "expiryDate": "2026-04-02", "rtoOffice": "RTO Jaipur" },
       { "vehicleNumber": "UP78BT5678", "status": "valid", "issueDate": "2023-07-18", "expiryDate": "2038-07-17", "rtoOffice": "RTO Kanpur" },
       { "vehicleNumber": "GJ01JX9012", "status": "valid", "issueDate": "2020-05-25", "expiryDate": "2035-05-24", "rtoOffice": "RTO Ahmedabad" },
-      { "vehicleNumber": "KA01MV7890", "status": "expired", "issueDate": "2011-02-14", "expiryDate": "2026-02-13", "rtoOffice": "RTO Bangalore" }
+      { "vehicleNumber": "KA01MV7890", "status": "expired", "issueDate": "2011-02-14", "expiryDate": "2026-02-13", "rtoOffice": "RTO Bangalore" },
+      { "vehicleNumber": "MP09NK3456", "status": "expiring", "issueDate": "2011-05-18", "expiryDate": "2026-05-17", "rtoOffice": "RTO Bhopal" },
+      { "vehicleNumber": "TN01AZ6712", "status": "expired", "issueDate": "2010-12-20", "expiryDate": "2025-12-19", "rtoOffice": "RTO Chennai" },
+      { "vehicleNumber": "PB10DX4390", "status": "expiring", "issueDate": "2011-07-09", "expiryDate": "2026-07-08", "rtoOffice": "RTO Ludhiana" },
+      { "vehicleNumber": "WB06FR8821", "status": "expired", "issueDate": "2010-08-25", "expiryDate": "2025-08-24", "rtoOffice": "RTO Kolkata" },
+      { "vehicleNumber": "AP07GH5543", "status": "expiring", "issueDate": "2011-09-14", "expiryDate": "2026-09-13", "rtoOffice": "RTO Vijayawada" },
+      { "vehicleNumber": "CG04JK2278", "status": "expired", "issueDate": "2011-01-03", "expiryDate": "2026-01-02", "rtoOffice": "RTO Raipur" }
     ],
     "insurance": [
       { "vehicleNumber": "UP32MM1113", "status": "valid", "provider": "ICICI Lombard", "policyNumber": "POL-2025-44821", "expiryDate": "2026-09-14" },
@@ -295,7 +301,13 @@
       { "driverName": "Ajay Sharma", "licenseNumber": "RJ20180045678", "status": "valid", "expiryDate": "2028-09-30", "vehiclesAssigned": ["UP78BT5678", "GJ01JX9012"] },
       { "driverName": "Deepak Verma", "licenseNumber": "GJ01160078901", "status": "expired", "expiryDate": "2026-02-10", "vehiclesAssigned": ["MP09NK3456"] },
       { "driverName": "Sanjay Patel", "licenseNumber": "KA01170089012", "status": "valid", "expiryDate": "2029-07-14", "vehiclesAssigned": ["KA01MV7890"] },
-      { "driverName": "Ravi Kumar", "licenseNumber": "UP32190090123", "status": "valid", "expiryDate": "2030-01-20", "vehiclesAssigned": ["UP32MM1113"] }
+      { "driverName": "Ravi Kumar", "licenseNumber": "UP32190090123", "status": "valid", "expiryDate": "2030-01-20", "vehiclesAssigned": ["UP32MM1113"] },
+      { "driverName": "Pradeep Chauhan", "licenseNumber": "MP09200056789", "status": "expiring", "expiryDate": "2026-05-22", "vehiclesAssigned": ["MP09NK3456"] },
+      { "driverName": "Arvind Mishra", "licenseNumber": "TN01210045678", "status": "expired", "expiryDate": "2025-11-30", "vehiclesAssigned": ["TN01AZ6712"] },
+      { "driverName": "Bhupender Rana", "licenseNumber": "PB10220034567", "status": "expiring", "expiryDate": "2026-06-15", "vehiclesAssigned": ["PB10DX4390", "HR26DK4521"] },
+      { "driverName": "Gopal Nath", "licenseNumber": "WB06230023456", "status": "expired", "expiryDate": "2026-01-05", "vehiclesAssigned": ["WB06FR8821"] },
+      { "driverName": "Kishan Lal", "licenseNumber": "AP07240012345", "status": "valid", "expiryDate": "2029-03-18", "vehiclesAssigned": ["AP07GH5543"] },
+      { "driverName": "Sunil Rawat", "licenseNumber": "CG04250067890", "status": "expiring", "expiryDate": "2026-04-28", "vehiclesAssigned": ["CG04JK2278"] }
     ],
     "challans": [
       { "vehicleNumber": "UP32MM1113", "outstandingCount": 3, "courtCount": 1, "onlineCount": 2, "totalAmount": 15500, "latestDate": "2026-03-10" },

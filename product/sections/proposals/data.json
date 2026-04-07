@@ -61,6 +61,102 @@
       "updatedAt": "2026-03-24T16:00:00Z"
     },
     {
+      "id": "prp-012",
+      "displayId": "PRP-1012",
+      "type": "RC",
+      "description": "RC fitness renewal for 6 heavy trucks due in April — form submission and inspection coordination",
+      "quantity": 6,
+      "amount": 9000,
+      "status": "sent",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-28T10:30:00Z",
+      "updatedAt": "2026-03-28T10:30:00Z"
+    },
+    {
+      "id": "prp-013",
+      "displayId": "PRP-1013",
+      "type": "DL",
+      "description": "Badge renewal for 4 commercial drivers — HGMV endorsement upgrade required",
+      "quantity": 4,
+      "amount": 6000,
+      "status": "sent",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-30T09:00:00Z",
+      "updatedAt": "2026-03-30T09:00:00Z"
+    },
+    {
+      "id": "prp-014",
+      "displayId": "PRP-1014",
+      "type": "Challan",
+      "description": "Signal violation challans for 9 vehicles across Mumbai-Pune corridor — bulk dispute filing",
+      "quantity": 9,
+      "amount": 135000,
+      "status": "sent",
+      "linkedIncidentId": null,
+      "createdAt": "2026-04-01T14:15:00Z",
+      "updatedAt": "2026-04-01T14:15:00Z"
+    },
+    {
+      "id": "prp-015",
+      "displayId": "PRP-1015",
+      "type": "RC",
+      "description": "Address update on RC for 2 vehicles relocated from Nagpur to Hyderabad depot",
+      "quantity": 2,
+      "amount": 3000,
+      "status": "sent",
+      "linkedIncidentId": null,
+      "createdAt": "2026-04-03T11:00:00Z",
+      "updatedAt": "2026-04-03T11:00:00Z"
+    },
+    {
+      "id": "prp-023",
+      "displayId": "PRP-1023",
+      "type": "Challan",
+      "description": "Review of 6 highway challans from NH44 — documents submitted, awaiting LOTS team assessment",
+      "quantity": 6,
+      "amount": 90000,
+      "status": "under_review",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-31T10:00:00Z",
+      "updatedAt": "2026-04-01T09:00:00Z"
+    },
+    {
+      "id": "prp-024",
+      "displayId": "PRP-1024",
+      "type": "DL",
+      "description": "DL endorsement upgrade for 3 drivers — documents under verification",
+      "quantity": 3,
+      "amount": 4500,
+      "status": "under_review",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-29T14:00:00Z",
+      "updatedAt": "2026-03-30T10:30:00Z"
+    },
+    {
+      "id": "prp-025",
+      "displayId": "PRP-1025",
+      "type": "RC",
+      "description": "Fitness certificate renewal for 5 trucks — inspections scheduled",
+      "quantity": 5,
+      "amount": 7500,
+      "status": "under_review",
+      "linkedIncidentId": null,
+      "createdAt": "2026-04-02T11:00:00Z",
+      "updatedAt": "2026-04-02T11:00:00Z"
+    },
+    {
+      "id": "prp-026",
+      "displayId": "PRP-1026",
+      "type": "Challan",
+      "description": "Court challan batch — 4 vehicles flagged in Lok Adalat pending list",
+      "quantity": 4,
+      "amount": 64000,
+      "status": "under_review",
+      "linkedIncidentId": null,
+      "createdAt": "2026-04-04T08:30:00Z",
+      "updatedAt": "2026-04-04T08:30:00Z"
+    },
+    {
       "id": "prp-009",
       "displayId": "PRP-1009",
       "type": "Challan",
@@ -95,6 +191,42 @@
       "linkedIncidentId": null,
       "createdAt": "2026-03-19T16:00:00Z",
       "updatedAt": "2026-03-20T11:00:00Z"
+    },
+    {
+      "id": "prp-016",
+      "displayId": "PRP-1016",
+      "type": "Challan",
+      "description": "Quote for Lok Adalat batch — 8 pending challans from Bengaluru RTO",
+      "quantity": 8,
+      "amount": 112000,
+      "status": "received",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-26T13:45:00Z",
+      "updatedAt": "2026-03-27T09:30:00Z"
+    },
+    {
+      "id": "prp-017",
+      "displayId": "PRP-1017",
+      "type": "RC",
+      "description": "Hypothecation removal quote for 5 vehicles with cleared loans",
+      "quantity": 5,
+      "amount": 7500,
+      "status": "received",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-25T10:00:00Z",
+      "updatedAt": "2026-03-25T15:00:00Z"
+    },
+    {
+      "id": "prp-018",
+      "displayId": "PRP-1018",
+      "type": "DL",
+      "description": "PSV badge renewal quote for 7 bus drivers — validity lapsed last month",
+      "quantity": 7,
+      "amount": 10500,
+      "status": "received",
+      "linkedIncidentId": null,
+      "createdAt": "2026-03-29T08:30:00Z",
+      "updatedAt": "2026-03-29T14:00:00Z"
     },
     {
       "id": "prp-005",
@@ -143,6 +275,54 @@
       "linkedIncidentId": null,
       "createdAt": "2026-02-10T07:30:00Z",
       "updatedAt": "2026-02-18T14:10:00Z"
+    },
+    {
+      "id": "prp-019",
+      "displayId": "PRP-1019",
+      "type": "DL",
+      "description": "DL verification for 6 drivers from a newly acquired sub-contractor fleet",
+      "quantity": 6,
+      "amount": 9000,
+      "status": "converted",
+      "linkedIncidentId": "IRN-11106612",
+      "createdAt": "2026-01-20T09:00:00Z",
+      "updatedAt": "2026-02-01T11:30:00Z"
+    },
+    {
+      "id": "prp-020",
+      "displayId": "PRP-1020",
+      "type": "RC",
+      "description": "RC renewal for 10 vehicles with fitness certificates expiring in Feb",
+      "quantity": 10,
+      "amount": 25000,
+      "status": "converted",
+      "linkedIncidentId": "IRN-11106634",
+      "createdAt": "2026-01-15T13:00:00Z",
+      "updatedAt": "2026-01-28T16:00:00Z"
+    },
+    {
+      "id": "prp-021",
+      "displayId": "PRP-1021",
+      "type": "Challan",
+      "description": "Parking challans for 4 vehicles — depot relocation caused temporary violations",
+      "quantity": 4,
+      "amount": 8000,
+      "status": "rejected",
+      "linkedIncidentId": null,
+      "createdAt": "2026-01-10T10:00:00Z",
+      "updatedAt": "2026-01-14T09:00:00Z"
+    },
+    {
+      "id": "prp-022",
+      "displayId": "PRP-1022",
+      "type": "DL",
+      "description": "Duplicate DL request for 2 drivers with lost original licenses",
+      "quantity": 2,
+      "amount": 3000,
+      "status": "rejected",
+      "linkedIncidentId": null,
+      "createdAt": "2026-02-05T11:30:00Z",
+      "updatedAt": "2026-02-07T14:00:00Z"
     }
   ],
   "proposalActivities": [

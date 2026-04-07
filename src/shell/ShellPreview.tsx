@@ -29,7 +29,7 @@ const navTranslations: Record<Language, Record<string, string>> = {
     reports: 'Reports',
     apiCatalogue: 'API Catalogue',
     wallet: 'Wallet',
-    proposals: 'Proposals',
+    proposals: 'Request Proposals',
     knowledgeBase: 'Knowledge Base',
     settings: 'Settings',
     help: 'Help',
@@ -42,7 +42,7 @@ const navTranslations: Record<Language, Record<string, string>> = {
     reports: 'रिपोर्ट',
     apiCatalogue: 'API कैटलॉग',
     wallet: 'वॉलेट',
-    proposals: 'प्रस्ताव',
+    proposals: 'Request Proposals',
     knowledgeBase: 'ज्ञान आधार',
     settings: 'सेटिंग्स',
     help: 'सहायता',
@@ -113,7 +113,8 @@ function ShellContent() {
       }
       if (event.data?.type === 'navigate' && event.data?.href) {
         setActivePath(event.data.href)
-        setExtraParams(event.data.params || {})
+        const mapping = hrefToScreen[event.data.href]
+        setExtraParams(event.data.params || mapping?.params || {})
       }
     }
     window.addEventListener('message', handleMessage)

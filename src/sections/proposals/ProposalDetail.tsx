@@ -8,7 +8,6 @@ export default function ProposalDetailPreview() {
 
   const proposal = data.proposals.find((p) => p.id === proposalId) || data.proposals[0]
   const activities = data.proposalActivities.filter((a) => a.proposalId === proposal.id)
-  const comments = data.comments.filter((c) => c.entityId === proposal.id)
 
   const BASE = '/sections/proposals/screen-designs'
 
@@ -25,8 +24,6 @@ export default function ProposalDetailPreview() {
     <ProposalDetail
       proposal={proposal}
       activities={activities}
-      comments={comments}
-      onAddComment={(message) => console.log('Add comment:', message)}
       onCancel={() => console.log('Cancel proposal:', proposal.id)}
       onBack={() => navigateToScreen('ProposalManagement')}
     />

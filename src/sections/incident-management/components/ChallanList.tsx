@@ -243,7 +243,7 @@ function formatDate(dateStr: string, language: Language): string {
 }
 
 function getSlaInfo(slaDeadline: string, status: ChallanStatus, t: Record<string, string>) {
-  if (status === 'resolved') return { label: t.slaCompleted, color: 'text-emerald-600 dark:text-emerald-400', breached: false }
+  if (status === 'resolved') return { label: t.slaCompleted, color: 'text-stone-600 dark:text-stone-400', breached: false }
 
   const now = new Date()
   const deadline = new Date(slaDeadline)
@@ -251,12 +251,12 @@ function getSlaInfo(slaDeadline: string, status: ChallanStatus, t: Record<string
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
-    return { label: `${Math.abs(diffDays)}${t.slaDaysOverdue}`, color: 'text-red-600 dark:text-red-400', breached: true }
+    return { label: `${Math.abs(diffDays)}${t.slaDaysOverdue}`, color: 'text-stone-900 dark:text-stone-100', breached: true }
   }
   if (diffDays <= 7) {
-    return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-amber-600 dark:text-amber-400', breached: false }
+    return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-stone-900 dark:text-stone-100', breached: false }
   }
-  return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-stone-500 dark:text-stone-400', breached: false }
+  return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-stone-900 dark:text-stone-100', breached: false }
 }
 
 function resolveVehicle(vehicleId: string, vehicles: Vehicle[]): Vehicle | undefined {

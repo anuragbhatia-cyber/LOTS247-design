@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import {
   ArrowLeft,
   ArrowUpDown,
@@ -109,10 +110,10 @@ const DOC_STATUS_BADGE: Record<DocumentStatus, { bg: string; text: string; label
 }
 
 const URGENCY_BADGE: Record<UrgencyLevel, { bg: string; text: string; label: string }> = {
-  expired: { bg: 'bg-red-100 dark:bg-red-950/50', text: 'text-red-700 dark:text-red-400', label: 'Expired' },
-  critical: { bg: 'bg-red-100 dark:bg-red-950/50', text: 'text-red-700 dark:text-red-400', label: 'Expired' },
-  warning: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', label: 'Warning' },
-  notice: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', label: 'Warning' },
+  expired: { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-400', label: 'Expired' },
+  critical: { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-400', label: 'Expired' },
+  warning: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', label: 'Expiring Soon' },
+  notice: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', label: 'Expiring Soon' },
 }
 
 const INSIGHT_STYLE: Record<InsightType, { bg: string; border: string; icon: string }> = {
@@ -270,21 +271,23 @@ function CategoryCard({
         <span className="text-2xl font-bold text-stone-900 dark:text-stone-100">{category.compliant}<span className="text-base font-semibold text-stone-400 dark:text-stone-500">/{category.total}</span></span>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap mt-auto">
-        <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
-          {category.compliant} Valid
-        </span>
-        {(category.expiring ?? 0) > 0 && (
-          <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
-            {category.expiring} Expiring
+      {category.id !== 'challans' && category.id !== 'blacklisted' && category.id !== 'ntbt' && (
+        <div className="flex items-center gap-2 flex-wrap mt-auto">
+          <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
+            {category.compliant} Valid
           </span>
-        )}
-        {(category.total - category.compliant - (category.expiring ?? 0)) > 0 && (
-          <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
-            {category.total - category.compliant - (category.expiring ?? 0)} Expired
-          </span>
-        )}
-      </div>
+          {(category.expiring ?? 0) > 0 && (
+            <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
+              {category.expiring} Expiring
+            </span>
+          )}
+          {(category.total - category.compliant - (category.expiring ?? 0)) > 0 && (
+            <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
+              {category.total - category.compliant - (category.expiring ?? 0)} Expired
+            </span>
+          )}
+        </div>
+      )}
 
 
     </button>
@@ -1042,6 +1045,18 @@ function FleetChallanView({
   const [showProposalToast, setShowProposalToast] = useState(false)
   const [selectedVehiclesInit, setSelectedVehiclesInit] = useState(false)
   const [selectedVehicles, setSelectedVehicles] = useState<Set<string>>(new Set())
+  const [selectedChallans, setSelectedChallans] = useState<Set<string>>(new Set())
+  const [searchVehicle, setSearchVehicle] = useState('')
+  const [challanTypeFilter, setChallanTypeFilter] = useState<'all' | 'court' | 'online'>('all')
+
+  const toggleSelectChallan = (challanId: string) => {
+    setSelectedChallans(prev => {
+      const next = new Set(prev)
+      if (next.has(challanId)) next.delete(challanId)
+      else next.add(challanId)
+      return next
+    })
+  }
 
   const toggleSelectVehicle = (vehNum: string) => {
     setSelectedVehicles(prev => {
@@ -1116,7 +1131,13 @@ function FleetChallanView({
     return result
   }, [challanRows])
 
-  const filtered = useMemo(() => allChallans.filter(c => c.status === filter), [allChallans, filter])
+  const filtered = useMemo(() => {
+    let result = allChallans.filter(c => c.status === filter)
+    if (challanTypeFilter !== 'all') {
+      result = result.filter(c => c.challanType === challanTypeFilter)
+    }
+    return result
+  }, [allChallans, filter, challanTypeFilter])
 
   const grouped = useMemo(() => {
     const map = new Map<string, IndividualChallan[]>()
@@ -1125,8 +1146,13 @@ function FleetChallanView({
       arr.push(c)
       map.set(c.vehicleNumber, arr)
     }
-    return Array.from(map.entries())
-  }, [filtered])
+    let entries = Array.from(map.entries())
+    if (searchVehicle.trim()) {
+      const q = searchVehicle.toLowerCase()
+      entries = entries.filter(([vehNum]) => vehNum.toLowerCase().includes(q))
+    }
+    return entries
+  }, [filtered, searchVehicle])
 
   // Select all vehicles by default on first render
   useEffect(() => {
@@ -1150,8 +1176,12 @@ function FleetChallanView({
 
   return (
     <div className={`${showBottomBar ? 'pb-20' : ''}`}>
-      <div className="mb-6">
+      <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">All Vehicle Challans</h2>
+        <button className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 hover:border-stone-300 dark:hover:border-stone-600 transition-colors">
+          <Download className="w-4 h-4" />
+          Export
+        </button>
       </div>
 
       {/* Mobile filter tabs */}
@@ -1196,7 +1226,7 @@ function FleetChallanView({
                     <span>{item.label}</span>
                   </div>
                   <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
-                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                    'bg-stone-100 dark:bg-stone-800 text-stone-500'
                   }`}>{item.count}</span>
                 </button>
               )
@@ -1205,7 +1235,45 @@ function FleetChallanView({
         </div>
 
         {/* Content */}
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 min-w-0">
+          {/* Search + Type filter */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search by vehicle number..."
+                value={searchVehicle}
+                onChange={(e) => setSearchVehicle(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+              />
+              {searchVehicle && (
+                <button
+                  onClick={() => setSearchVehicle('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-1 self-start sm:self-auto shrink-0">
+              {(['all', 'court', 'online'] as const).map(type => (
+                <button
+                  key={type}
+                  onClick={() => setChallanTypeFilter(type)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                    challanTypeFilter === type
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  {type === 'all' ? 'All Types' : type === 'court' ? 'Court' : 'Online'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
           {/* Select All — only on pending tab */}
           {filter === 'pending' && grouped.length > 0 && (
             <div className="flex items-center gap-3 px-1">
@@ -1293,23 +1361,43 @@ function FleetChallanView({
                   <div className="px-4 pb-4 border-t border-stone-200 dark:border-stone-800">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-4">
                       {challans.map(c => (
-                        <div key={c.id} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/40 p-4">
-                          <div className="flex items-start justify-between mb-1">
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-sm font-mono font-medium text-stone-900 dark:text-stone-100">{c.challanNumber}</p>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(c.challanNumber) }}
-                                className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                              >
-                                <Copy className="w-3.5 h-3.5" />
-                              </button>
+                        <div key={c.id} className={`rounded-xl border bg-white dark:bg-stone-900 p-5 transition-colors ${
+                          selectedChallans.has(c.id) && filter === 'pending' ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-200 dark:border-stone-800'
+                        }`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-2.5">
+                              {filter === 'pending' && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); toggleSelectChallan(c.id) }}
+                                  className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                                    selectedChallans.has(c.id)
+                                      ? 'bg-emerald-600 border-emerald-600'
+                                      : 'border-stone-300 dark:border-stone-600 hover:border-stone-400 dark:hover:border-stone-500'
+                                  }`}
+                                >
+                                  {selectedChallans.has(c.id) && (
+                                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </button>
+                              )}
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{c.challanNumber}</p>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(c.challanNumber) }}
+                                  className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                                >
+                                  <Copy className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
-                            <span className={`text-lg font-bold tabular-nums ${filter === 'pending' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            <span className="text-lg font-bold tabular-nums text-red-600 dark:text-red-400">
                               {formatCurrency(c.amount)}
                             </span>
                           </div>
-                          <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mt-2">{c.violation}</p>
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500 dark:text-stone-400 mt-2 mb-4">
+                          <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{c.violation}</p>
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
                             <span className="flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5" />
                               {formatDate(c.date)}
@@ -1320,15 +1408,15 @@ function FleetChallanView({
                             </span>
                           </div>
                           <div className="border-t border-stone-200 dark:border-stone-700 pt-3 flex items-center justify-between">
-                            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
                               c.challanType === 'court'
                                 ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400'
-                                : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
+                                : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
                             }`}>
                               {c.challanType === 'court' ? 'Court Challans' : 'Online Challans'}
                             </span>
                             {filter === 'pending' && (
-                              <button className="px-4 py-1.5 rounded-xl text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
+                              <button className="px-5 py-2 rounded-full text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
                                 Pay Now
                               </button>
                             )}
@@ -1350,6 +1438,7 @@ function FleetChallanView({
               <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">No {filter} challans found for any vehicle</p>
             </div>
           )}
+          </div>
         </div>
       </div>
 
@@ -1439,7 +1528,7 @@ function FleetRcView({
                 >
                   <span>{item.label}</span>
                   <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
-                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                    'bg-stone-100 dark:bg-stone-800 text-stone-500'
                   }`}>{item.count}</span>
                 </button>
               )
@@ -1598,7 +1687,7 @@ function FleetDlView({
                 >
                   <span>{item.label}</span>
                   <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
-                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                    'bg-stone-100 dark:bg-stone-800 text-stone-500'
                   }`}>{item.count}</span>
                 </button>
               )
@@ -1636,17 +1725,6 @@ function FleetDlView({
                     <div>
                       <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry Date</p>
                       <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-1">Assigned Vehicles</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {row.vehiclesAssigned.map(v => (
-                          <span key={v} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
-                            <Truck className="w-3 h-3 text-stone-400" />
-                            {v}
-                          </span>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -1855,7 +1933,7 @@ export function ComplianceDashboard({
   const changeIsPositive = complianceScore.change >= 0
 
   return (
-    <div className="bg-stone-50 dark:bg-stone-950">
+    <div className="bg-stone-100 dark:bg-stone-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* ---------------------------------------------------------------- */}
         {/* Top Bar: Filters — hidden during card drilldowns                 */}
@@ -1863,8 +1941,7 @@ export function ComplianceDashboard({
         {!activeCardView && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Fleet Compliance</h1>
-            <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Fleet compliance health at a glance</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Fleet Overview</h1>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -2419,22 +2496,6 @@ export function ComplianceDashboard({
                     <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{formatCurrency(historicalStats.totalChallanAmount)}</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between">
-                  <div className="text-center flex-1">
-                    <p className="text-[11px] text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Avg Score</p>
-                    <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">{historicalStats.avgComplianceScore}</p>
-                  </div>
-                  <div className="w-px h-8 bg-stone-200 dark:bg-stone-700" />
-                  <div className="text-center flex-1">
-                    <p className="text-[11px] text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Best</p>
-                    <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{historicalStats.bestMonth}</p>
-                  </div>
-                  <div className="w-px h-8 bg-stone-200 dark:bg-stone-700" />
-                  <div className="text-center flex-1">
-                    <p className="text-[11px] text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Worst</p>
-                    <p className="text-sm font-bold text-red-600 dark:text-red-400">{historicalStats.worstMonth}</p>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -2485,7 +2546,7 @@ export function ComplianceDashboard({
                           <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{item.documentType}</td>
                           <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(item.expiryDate)}</td>
                           <td className="py-3 px-3">
-                            <span className={`font-semibold ${item.daysRemaining < 0 ? 'text-red-600 dark:text-red-400' : item.daysRemaining <= 7 ? 'text-red-500 dark:text-red-400' : item.daysRemaining <= 15 ? 'text-amber-600 dark:text-amber-400' : 'text-stone-600 dark:text-stone-400'}`}>
+                            <span className="font-semibold text-stone-900 dark:text-stone-100">
                               {Math.abs(item.daysRemaining)} Days
                             </span>
                           </td>
@@ -2501,7 +2562,7 @@ export function ComplianceDashboard({
                               }}
                               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
                             >
-                              Raise Proposal
+                              Create Request
                               <ArrowUpRight className="w-3.5 h-3.5" />
                             </button>
                           </td>
@@ -2554,7 +2615,7 @@ export function ComplianceDashboard({
       </div>
 
       {/* Check Vehicle Modal */}
-      {checkVehicleOpen && (
+      {checkVehicleOpen && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
           <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }} />
           <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
@@ -2603,7 +2664,8 @@ export function ComplianceDashboard({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

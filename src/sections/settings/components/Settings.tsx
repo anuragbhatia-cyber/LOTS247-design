@@ -502,7 +502,7 @@ function PlanComparisonModal({
   t: Record<string, string>
 }) {
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto">
         <div className="sticky top-0 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
@@ -1429,7 +1429,7 @@ export function Settings({
 
       {/* Add Payment Method Modal */}
       {showAddPaymentModal && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setShowAddPaymentModal(false); sendOverlay(false) }} />
           <div className="relative bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full max-w-md">
             <div className="border-b border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-between rounded-t-2xl">
@@ -1582,7 +1582,7 @@ export function Settings({
 
       {/* Invite Member Modal */}
       {showInviteModal && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setShowInviteModal(false); sendOverlay(false) }} />
           <div className="relative bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full max-w-md">
             <div className="border-b border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-between rounded-t-2xl">

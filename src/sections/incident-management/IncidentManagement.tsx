@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { FileWarning, Briefcase, Building2, MoreHorizontal, CheckCircle2, Clock, Plus, Calendar, ChevronDown, Send, FileText, XCircle } from 'lucide-react'
+import { FileWarning, Briefcase, Building2, MoreHorizontal, CheckCircle2, Clock, Plus, Calendar, ChevronDown, Send, FileText, XCircle, Download } from 'lucide-react'
 import data from '@/../product/sections/incident-management/data.json'
 import { ChallanList } from './components/ChallanList'
 import { CaseList } from './components/CaseList'
@@ -146,6 +146,14 @@ export default function IncidentManagementPreview() {
                 </div>
               )}
             </div>
+
+            {/* Download PDF Button */}
+            <button
+              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Download PDF</span>
+            </button>
 
             {/* Add Incident Button */}
             <button

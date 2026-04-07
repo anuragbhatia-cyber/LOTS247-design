@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   ArrowLeft,
@@ -10,8 +11,10 @@ import {
   Search,
   Loader2,
   CheckCircle2,
+  Check,
   Calendar,
   MapPin,
+  Copy,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
@@ -233,6 +236,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
   const [challanLoading, setChallanLoading] = useState(false)
   const [challansFetched, setChallansFetched] = useState(false)
   const [challanTab, setChallanTab] = useState<'pending' | 'paid'>('pending')
+  const [selectedChallans, setSelectedChallans] = useState<Set<string>>(new Set(SAMPLE_CHALLANS.filter(c => c.status === 'pending').map(c => c.id)))
   const [caseType, setCaseType] = useState('')
   const [incidentState, setIncidentState] = useState('')
   const [incidentCity, setIncidentCity] = useState('')
@@ -380,7 +384,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
   const headerTitle = step === 'category' ? t.addIncident : categoryMeta ? t[categoryMeta.labelKey] : t.addIncident
   const headerSubtitle = step === 'category' ? t.selectCategory : undefined
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={resetAndClose} />
@@ -514,19 +518,6 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                     const totalOutstanding = pendingChallans.reduce((sum, c) => sum + c.amount, 0)
                     return (
                       <div className="space-y-3">
-                        {/* Summary bar */}
-                        {pendingChallans.length > 0 && (
-                          <div className="flex items-center justify-between bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl px-4 py-3">
-                            <div>
-                              <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">{t.totalOutstanding}</p>
-                              <p className="text-lg font-bold text-stone-900 dark:text-stone-50 tabular-nums">{formatChallanCurrency(totalOutstanding, language)}</p>
-                            </div>
-                            <span className="text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-200 dark:bg-amber-900/40 px-2 py-1 rounded-full tabular-nums">
-                              {pendingChallans.length} {t.pendingChallans}
-                            </span>
-                          </div>
-                        )}
-
                         {/* Pending / Paid Tabs */}
                         <div className="flex gap-1 bg-stone-100 dark:bg-stone-800 rounded-xl p-1">
                           <button
@@ -553,45 +544,63 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
 
                         {/* Pending challans */}
                         {challanTab === 'pending' && pendingChallans.map((challan) => (
-                          <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4">
-                            {/* Top: ID + Status */}
-                            <div className="flex items-start justify-between mb-3">
-                              <div>
-                                <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 tracking-tight">
-                                  {challan.challanNumber}
-                                </p>
-                                <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                                  {formatChallanDate(challan.issueDate, language)}
-                                </p>
+                          <div key={challan.id} className={`bg-white dark:bg-stone-900 border rounded-xl p-5 transition-colors ${selectedChallans.has(challan.id) ? 'border-emerald-300 dark:border-emerald-700' : 'border-stone-200 dark:border-stone-800'}`}>
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-2.5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedChallans(prev => {
+                                      const next = new Set(prev)
+                                      if (next.has(challan.id)) next.delete(challan.id)
+                                      else next.add(challan.id)
+                                      return next
+                                    })
+                                  }}
+                                  className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 transition-colors mt-0.5 ${
+                                    selectedChallans.has(challan.id)
+                                      ? 'bg-emerald-600 text-white'
+                                      : 'border-2 border-stone-300 dark:border-stone-600'
+                                  }`}
+                                >
+                                  {selectedChallans.has(challan.id) && (
+                                    <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                                  )}
+                                </button>
+                                <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(challan.challanNumber) }}
+                                  className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                                >
+                                  <Copy className="w-3.5 h-3.5" />
+                                </button>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-stone-500 dark:text-stone-400">
-                                  {challan.category === 'court' ? t.courtChallan : t.onlineChallan}
-                                </span>
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300">
-                                  {t.pendingChallans}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Middle: Details */}
-                            <div className="space-y-1.5 mb-3">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs text-stone-500 dark:text-stone-400">{t.violation}</span>
-                                <span className="text-sm font-medium text-stone-800 dark:text-stone-200">{challan.violationType}</span>
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs text-stone-500 dark:text-stone-400">{t.location}</span>
-                                <span className="text-sm text-stone-600 dark:text-stone-300 text-right">{challan.location}</span>
-                              </div>
-                            </div>
-
-                            {/* Bottom: Amount + Pay */}
-                            <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
-                              <p className="text-lg font-bold text-stone-900 dark:text-stone-50 tabular-nums">
+                              <span className="text-lg font-bold text-red-600 dark:text-red-400 tabular-nums">
                                 {formatChallanCurrency(challan.amount, language)}
-                              </p>
-                              <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors">
+                              </span>
+                            </div>
+                            <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
+                            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
+                              <span className="inline-flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5" />
+                                {formatChallanDate(challan.issueDate, language)}
+                              </span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <MapPin className="w-3.5 h-3.5" />
+                                {challan.location}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
+                              {challan.category === 'court' ? (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400">
+                                  {t.courtChallan}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400">
+                                  {t.onlineChallan}
+                                </span>
+                              )}
+                              <button className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-sm">
                                 {t.payNow}
                               </button>
                             </div>
@@ -600,46 +609,40 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
 
                         {/* Paid challans */}
                         {challanTab === 'paid' && paidChallans.length > 0 && paidChallans.map((challan) => (
-                              <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4">
-                                {/* Top: ID + Status */}
-                                <div className="flex items-start justify-between mb-3">
-                                  <div>
-                                    <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 tracking-tight">
-                                      {challan.challanNumber}
-                                    </p>
-                                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                                      {formatChallanDate(challan.issueDate, language)}
-                                    </p>
+                              <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex items-center gap-1.5">
+                                    <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(challan.challanNumber) }}
+                                      className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                                    >
+                                      <Copy className="w-3.5 h-3.5" />
+                                    </button>
                                   </div>
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300">
-                                    {t.paidChallans}
-                                  </span>
-                                </div>
-
-                                {/* Middle: Details */}
-                                <div className="space-y-1.5 mb-3">
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs text-stone-500 dark:text-stone-400">{t.violation}</span>
-                                    <span className="text-sm font-medium text-stone-800 dark:text-stone-200">{challan.violationType}</span>
-                                  </div>
-                                  {challan.paidDate && (
-                                    <div className="flex items-center justify-between">
-                                      <span className="text-xs text-stone-500 dark:text-stone-400">{t.paidOn}</span>
-                                      <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{formatChallanDate(challan.paidDate, language)}</span>
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Bottom: Amount */}
-                                <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
-                                  <p className="text-lg font-bold text-stone-900 dark:text-stone-50 tabular-nums">
+                                  <span className="inline-flex items-center gap-1.5 text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                                    <CheckCircle2 className="w-4 h-4" />
                                     {formatChallanCurrency(challan.amount, language)}
-                                  </p>
-                                  <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                                    <CheckCircle2 className="w-3.5 h-3.5" />
-                                    {t.paidChallans}
                                   </span>
                                 </div>
+                                <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
+                                <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
+                                  <span className="inline-flex items-center gap-1.5">
+                                    <Calendar className="w-3.5 h-3.5" />
+                                    {formatChallanDate(challan.issueDate, language)}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1.5">
+                                    <MapPin className="w-3.5 h-3.5" />
+                                    {challan.location}
+                                  </span>
+                                </div>
+                                {challan.paidDate && (
+                                  <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
+                                    <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                      {t.paidOn}: {formatChallanDate(challan.paidDate, language)}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                         ))}
 
@@ -653,6 +656,19 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                           <div className="py-8 text-center">
                             <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
                             <p className="text-sm text-stone-500 dark:text-stone-400">{t.noPendingChallans}</p>
+                          </div>
+                        )}
+
+                        {/* Summary bar */}
+                        {pendingChallans.length > 0 && (
+                          <div className="flex items-center justify-between bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-800 rounded-xl px-4 py-3">
+                            <div>
+                              <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">{t.totalOutstanding}</p>
+                              <p className="text-lg font-bold text-stone-900 dark:text-stone-50 tabular-nums">{formatChallanCurrency(totalOutstanding, language)}</p>
+                            </div>
+                            <span className="text-xs font-semibold text-stone-600 dark:text-stone-300 bg-stone-200 dark:bg-stone-700 px-2 py-1 rounded-full tabular-nums">
+                              {pendingChallans.length} {t.pendingChallans}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -962,6 +978,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

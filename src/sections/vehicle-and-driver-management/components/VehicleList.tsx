@@ -26,6 +26,7 @@ import {
   UserMinus,
   RefreshCw,
   Loader2,
+  Download,
 } from 'lucide-react'
 import type {
   VehicleAndDriverManagementProps,
@@ -385,8 +386,7 @@ function resolveDriver(driverId: string | null, drivers: Driver[]): Driver | und
 function ComplianceScoreBadge({ score }: { score: number }) {
   const colors = getComplianceColor(score)
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold tabular-nums ${colors.bg} ${colors.text} ring-1 ${colors.ring}`}>
-      <ShieldCheck className="w-3 h-3" />
+    <span className={`text-sm font-bold tabular-nums ${colors.text}`}>
       {score}
     </span>
   )
@@ -846,6 +846,12 @@ export function VehicleList({
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Download PDF</span>
+            </button>
             <button
               onClick={() => window.parent.postMessage({ type: 'openAddDriver' }, '*')}
               className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"

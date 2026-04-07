@@ -304,7 +304,7 @@ export function VehicleWiseReport({ vehicles, vehicleHistory }: VehicleWiseRepor
                     {card.count}
                   </p>
                   <p className="text-sm font-medium text-stone-900 dark:text-stone-100 mb-2">{card.label}</p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 tabular-nums">{card.amount}</p>
+                  <p className="text-sm font-bold text-stone-900 dark:text-stone-100 tabular-nums">{card.amount}</p>
                 </div>
               ))}
             </div>

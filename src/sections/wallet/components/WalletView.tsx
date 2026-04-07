@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Wallet,
@@ -334,6 +334,11 @@ function TransactionDetail({
   const catConfig = CATEGORY_CONFIG[transaction.category]
   const CatIcon = catConfig.icon
   const isCredit = transaction.type === 'credit'
+
+  useEffect(() => {
+    window.parent.postMessage({ type: 'showOverlay' }, '*')
+    return () => { window.parent.postMessage({ type: 'hideOverlay' }, '*') }
+  }, [])
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">

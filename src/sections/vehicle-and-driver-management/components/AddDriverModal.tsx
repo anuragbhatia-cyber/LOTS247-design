@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   UserPlus,
@@ -77,7 +78,7 @@ export function AddDriverModal({
 
   const isValid = name.trim().length >= 2 && phone.trim().length >= 10 && licenseNumber.trim().length >= 6
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={handleClose} />
@@ -86,18 +87,13 @@ export function AddDriverModal({
       <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/50 flex items-center justify-center">
-              <UserPlus className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
-                {t.addDriver}
-              </h2>
-              <p className="text-xs text-stone-500 dark:text-stone-400">
-                {t.subtitle}
-              </p>
-            </div>
+          <div>
+            <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
+              {t.addDriver}
+            </h2>
+            <p className="text-xs text-stone-500 dark:text-stone-400">
+              {t.subtitle}
+            </p>
           </div>
           <button
             onClick={handleClose}
@@ -187,6 +183,7 @@ export function AddDriverModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Search, Loader2 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
@@ -79,7 +80,7 @@ export function CheckChallanModal({ isOpen, onClose, onCheck, onShowResults }: C
     onClose()
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={step === 'form' ? handleClose : undefined} />
 
@@ -138,6 +139,7 @@ export function CheckChallanModal({ isOpen, onClose, onCheck, onShowResults }: C
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Wallet, CheckCircle2 } from 'lucide-react'
 
 interface TopUpModalProps {
@@ -32,8 +33,8 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
     setAmount(String(value))
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 dark:bg-black/50"
@@ -138,6 +139,7 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

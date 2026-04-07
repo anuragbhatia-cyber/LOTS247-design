@@ -600,7 +600,7 @@ export function AppShell({
               }}
               aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
               aria-expanded={notifOpen}
-              className="relative p-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              className="relative p-3 text-stone-900 dark:text-stone-100 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -668,10 +668,10 @@ export function AppShell({
                 setNotifOpen(false)
                 setProfileOpen(false)
               }}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-900 dark:text-stone-100 hover:text-stone-700 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium"
             >
               <span className="text-xs font-medium">{language === 'en' ? 'English' : 'हिन्दी'}</span>
-              <ChevronDown className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-150 ${langOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-150 ${langOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {langOpen && (
@@ -728,11 +728,7 @@ export function AppShell({
                 <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden">
                   <div className="px-4 py-3 border-b border-stone-100 dark:border-stone-800">
                     <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 truncate">{user.name}</p>
-                    {user.plan && (
-                      <span className="inline-flex items-center mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400">
-                        {user.plan} {t.plan}
-                      </span>
-                    )}
+                    <p className="text-xs text-stone-500 dark:text-stone-400 truncate mt-0.5">ABC Logistics Pvt Ltd</p>
                   </div>
                   <div className="py-1">
                     <button

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   Download,
@@ -100,7 +101,7 @@ export function BulkUploadModal({
     }
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       {/* Backdrop */}
       <div
@@ -232,6 +233,7 @@ export function BulkUploadModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

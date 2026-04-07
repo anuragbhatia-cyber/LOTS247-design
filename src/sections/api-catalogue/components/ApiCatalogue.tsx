@@ -127,54 +127,55 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
   }
 
   return (
-    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex">
-      {/* Sidebar */}
-      <div className="w-64 lg:w-72 shrink-0 hidden md:block p-5 sm:p-6 lg:p-8">
-        <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
-          {SIDEBAR_ITEMS.map((item) => {
-            const Icon = item.icon
-            const isActive = activeTab === item.id && !selectedApi
-            const count = item.id === 'all' ? apis.length : apis.filter((a) => MY_API_IDS.includes(a.id)).length
-            return (
-              <button
-                key={item.id}
-                onClick={() => { setActiveTab(item.id); setSelectedApiId(null) }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
-                    : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Icon className="w-4 h-4" />
-                  <span>{item.label}</span>
-                </div>
-                <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
-                  isActive ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
-                }`}>{count}</span>
-              </button>
-            )
-          })}
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
+      {/* Header — full width above sidebar */}
+      {!selectedApi && (
+        <div className="px-5 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8 pb-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+            {activeTab === 'all' ? 'API Catalogue' : 'My APIs'}
+          </h1>
+          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+            {activeTab === 'all'
+              ? 'Browse available APIs to integrate vehicle compliance, challan, and licence data into your systems.'
+              : 'APIs you have subscribed to and are currently using.'}
+          </p>
         </div>
-      </div>
+      )}
 
-      {/* Main content area */}
-      <div className="flex-1 min-w-0 p-5 sm:p-6 lg:p-8">
-        {/* Header — above cards */}
-        {!selectedApi && (
-          <div className="mb-6">
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
-              {activeTab === 'all' ? 'API Catalogue' : 'My APIs'}
-            </h1>
-            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-              {activeTab === 'all'
-                ? 'Browse available APIs to integrate vehicle compliance, challan, and licence data into your systems.'
-                : 'APIs you have subscribed to and are currently using.'}
-            </p>
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 lg:w-72 shrink-0 hidden md:block px-5 sm:px-6 lg:px-8 pb-5 sm:pb-6 lg:pb-8 pt-0">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+            {SIDEBAR_ITEMS.map((item) => {
+              const Icon = item.icon
+              const isActive = activeTab === item.id && !selectedApi
+              const count = item.id === 'all' ? apis.length : apis.filter((a) => MY_API_IDS.includes(a.id)).length
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveTab(item.id); setSelectedApiId(null) }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </div>
+                  <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
+                    isActive ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                  }`}>{count}</span>
+                </button>
+              )
+            })}
           </div>
-        )}
+        </div>
 
-        {/* Mobile Tab Switcher */}
+        {/* Main content area */}
+        <div className="flex-1 min-w-0 px-5 sm:px-6 lg:px-8 pb-5 sm:pb-6 lg:pb-8 pt-0">
+          {/* Mobile Tab Switcher */}
         {!selectedApi && (
           <div className="flex md:hidden items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-5">
             {SIDEBAR_ITEMS.map((item) => {
@@ -218,63 +219,27 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
               />
             ) : (
               <>
-                {/* All APIs tab — split into Available APIs + My APIs sections */}
+                {/* All APIs tab — single grid with all APIs */}
                 {activeTab === 'all' ? (
-                  <>
-                    {/* Available APIs section */}
-                    {apis.filter((a) => !MY_API_IDS.includes(a.id)).length > 0 && (
-                      <div className="mb-8">
-                        <h3 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-4">Available APIs</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {apis.filter((a) => !MY_API_IDS.includes(a.id)).map((api) => (
-                            <div
-                              key={api.id}
-                              onClick={() => handleViewDetail(api.id)}
-                              className="group bg-white dark:bg-stone-900 rounded-xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col cursor-pointer"
-                            >
-                              <div className="flex items-center gap-2 mb-3">
-                                <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
-                              </div>
-                              <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
-                              <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
-                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
-                                >
-                                  Check Details
-                                  <ArrowRight className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); setContactApiId(api.id) }}
-                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-                                >
-                                  <Mail className="w-3.5 h-3.5" />
-                                  Contact for Pricing
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* My APIs section */}
-                    {apis.filter((a) => MY_API_IDS.includes(a.id)).length > 0 && (
-                      <div>
-                        <h3 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-4">My APIs</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {apis.filter((a) => MY_API_IDS.includes(a.id)).map((api) => (
-                            <div
-                              key={api.id}
-                              onClick={() => handleViewDetail(api.id)}
-                              className="group bg-white dark:bg-stone-900 rounded-xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col cursor-pointer"
-                            >
-                              <div className="flex items-center gap-2 mb-3">
-                                <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
-                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
-                              </div>
-                              <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
-                              <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {apis.map((api) => {
+                      const isMyApi = MY_API_IDS.includes(api.id)
+                      return (
+                        <div
+                          key={api.id}
+                          onClick={() => handleViewDetail(api.id)}
+                          className="group bg-white dark:bg-stone-900 rounded-xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2 mb-3">
+                            <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
+                            {isMyApi && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
+                            )}
+                          </div>
+                          <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
+                          <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
+                            {isMyApi ? (
+                              <>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setShowTopUp(true) }}
                                   className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
@@ -289,13 +254,30 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                                   Check Details
                                   <ArrowRight className="w-3.5 h-3.5" />
                                 </button>
-                              </div>
-                            </div>
-                          ))}
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                                >
+                                  Check Details
+                                  <ArrowRight className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setContactApiId(api.id) }}
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                                >
+                                  <Mail className="w-3.5 h-3.5" />
+                                  Contact for Pricing
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </>
+                      )
+                    })}
+                  </div>
                 ) : (
                   <>
                     {/* My APIs tab */}
@@ -356,6 +338,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                 )}
               </>
             )}
+      </div>
       </div>
 
       {/* Contact Modal */}
