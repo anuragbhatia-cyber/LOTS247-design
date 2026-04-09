@@ -168,30 +168,26 @@ const SCOPE_OPTIONS: { value: ScopeFilter; label: string; icon: typeof Truck }[]
 // ---------------------------------------------------------------------------
 
 function ProposalToast({ show, onClose }: { show: boolean; onClose: () => void }) {
-  useEffect(() => {
-    if (show) {
-      const t = setTimeout(onClose, 3000)
-      return () => clearTimeout(t)
-    }
-  }, [show, onClose])
-
   if (!show) return null
 
-  return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in fade-in slide-in-from-top-2 duration-300">
-      <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-stone-900 dark:bg-stone-100 shadow-xl shadow-stone-900/20 dark:shadow-stone-100/20">
-        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-          <ShieldCheck className="w-4.5 h-4.5 text-white" />
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
+      <div className="relative z-[201] w-full max-w-sm bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl p-6 text-center">
+        <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center mx-auto mb-4">
+          <ShieldCheck className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
         </div>
-        <div>
-          <p className="text-sm font-semibold text-white dark:text-stone-900">Proposal Submitted</p>
-          <p className="text-xs text-stone-400 dark:text-stone-500">Your proposal request has been submitted successfully</p>
-        </div>
-        <button onClick={onClose} className="ml-2 p-1 rounded-xl text-stone-500 hover:text-stone-300 dark:hover:text-stone-700 transition-colors">
-          <X className="w-4 h-4" />
+        <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 mb-1">Request Submitted</h3>
+        <p className="text-sm text-stone-500 dark:text-stone-400 mb-5">Your proposal request has been submitted successfully. You can track it in Request Proposals.</p>
+        <button
+          onClick={onClose}
+          className="w-full px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
+        >
+          OK
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -1035,10 +1031,12 @@ function FleetChallanView({
   challanRows,
   vehicles,
   onBack,
+  hideTitle,
 }: {
   challanRows: ChallanDrilldownRow[]
   vehicles: Vehicle[]
   onBack: () => void
+  hideTitle?: boolean
 }) {
   const [filter, setFilter] = useState<'pending' | 'paid'>('pending')
   const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set())
@@ -1176,6 +1174,7 @@ function FleetChallanView({
 
   return (
     <div className={`${showBottomBar ? 'pb-20' : ''}`}>
+      {!hideTitle && (
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">All Vehicle Challans</h2>
         <button className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 hover:border-stone-300 dark:hover:border-stone-600 transition-colors">
@@ -1183,6 +1182,7 @@ function FleetChallanView({
           Export
         </button>
       </div>
+      )}
 
       {/* Mobile filter tabs */}
       <div className="flex md:hidden gap-2 mb-5">
@@ -1470,10 +1470,12 @@ function FleetRcView({
   rcRows,
   vehicles,
   onBack,
+  hideTitle,
 }: {
   rcRows: RcDrilldownRow[]
   vehicles: Vehicle[]
   onBack: () => void
+  hideTitle?: boolean
 }) {
   const [filter, setFilter] = useState<'valid' | 'expiring' | 'invalid'>('expiring')
   const [showProposalToast, setShowProposalToast] = useState(false)
@@ -1485,9 +1487,11 @@ function FleetRcView({
 
   return (
     <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
+      {!hideTitle && (
       <div className="mb-6">
         <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Registration Certificates</h2>
       </div>
+      )}
 
       {/* Mobile tabs */}
       <div className="flex md:hidden gap-2 mb-5">
@@ -1629,10 +1633,12 @@ function FleetDlView({
   dlRows,
   drivers,
   onBack,
+  hideTitle,
 }: {
   dlRows: DlDrilldownRow[]
   drivers: Driver[]
   onBack: () => void
+  hideTitle?: boolean
 }) {
   const [filter, setFilter] = useState<'valid' | 'invalid' | 'expiring'>('expiring')
   const [showProposalToast, setShowProposalToast] = useState(false)
@@ -1644,9 +1650,11 @@ function FleetDlView({
 
   return (
     <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
+      {!hideTitle && (
       <div className="mb-6">
         <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Driving Licenses</h2>
       </div>
+      )}
 
       {/* Mobile tabs */}
       <div className="flex md:hidden gap-2 mb-5">
@@ -2016,11 +2024,11 @@ export function ComplianceDashboard({
         {/* ---------------------------------------------------------------- */}
         {activeCardView ? (
           activeCardView === 'challan' ? (
-            <FleetChallanView challanRows={categoryDrilldowns.challans} vehicles={vehicles} onBack={() => setActiveCardView(null)} />
+            <FleetChallanView challanRows={categoryDrilldowns.challans} vehicles={vehicles} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={!!initialView} />
           ) : activeCardView === 'rc' ? (
-            <FleetRcView rcRows={categoryDrilldowns.rc} vehicles={vehicles} onBack={() => setActiveCardView(null)} />
+            <FleetRcView rcRows={categoryDrilldowns.rc} vehicles={vehicles} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={!!initialView} />
           ) : (
-            <FleetDlView dlRows={categoryDrilldowns.dl} drivers={drivers} onBack={() => setActiveCardView(null)} />
+            <FleetDlView dlRows={categoryDrilldowns.dl} drivers={drivers} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={!!initialView} />
           )
         ) : scope === 'driver' ? (
           <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">

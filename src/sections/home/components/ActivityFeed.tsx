@@ -55,7 +55,7 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     view: 'View',
     vehicle: 'Vehicle',
     payNow: 'Pay Now',
-    raiseProposal: 'Raise Proposal',
+    raiseProposal: 'Create Request',
     seeAllAlerts: 'See all alerts',
   },
   hi: {
@@ -66,7 +66,7 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     view: 'देखें',
     vehicle: 'वाहन',
     payNow: 'अभी भुगतान करें',
-    raiseProposal: 'प्रस्ताव उठाएं',
+    raiseProposal: 'अनुरोध बनाएं',
     seeAllAlerts: 'सभी अलर्ट देखें',
   },
 }

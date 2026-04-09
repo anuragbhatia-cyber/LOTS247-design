@@ -130,7 +130,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       {/* Header — full width above sidebar */}
       {!selectedApi && (
-        <div className="px-5 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8 pb-1">
+        <div className="px-5 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8 pb-4 sm:pb-5">
           <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
             {activeTab === 'all' ? 'API Catalogue' : 'My APIs'}
           </h1>

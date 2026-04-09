@@ -16,12 +16,15 @@ import {
   Truck,
   User,
   CreditCard,
+  MessageSquare,
+  ShieldCheck,
 } from 'lucide-react'
 import type {
   ProposalDetailProps,
   ProposalStatus,
   ProposalType,
   ProposalActivity,
+  Comment,
 } from '@/../product/sections/proposals/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
@@ -66,6 +69,11 @@ const translations: Record<Language, Record<string, string>> = {
     rcNumber: 'RC Number',
     ownerName: 'Owner Name',
     incidents: 'Incidents',
+    notes: 'Notes',
+    writeNote: 'Write a note...',
+    you: 'You',
+    lotsTeam: 'LOTS Team',
+    send: 'Send',
   },
   hi: {
     backToProposals: 'प्रस्तावों पर वापस',
@@ -103,6 +111,11 @@ const translations: Record<Language, Record<string, string>> = {
     rcNumber: 'आरसी नंबर',
     ownerName: 'मालिक का नाम',
     incidents: 'इंसिडेंट',
+    notes: 'नोट्स',
+    writeNote: 'नोट लिखें...',
+    you: 'आप',
+    lotsTeam: 'LOTS टीम',
+    send: 'भेजें',
   },
 }
 
@@ -278,22 +291,33 @@ const ACTIVITY_HEADING: Record<string, string> = {
 type TimelineEntry =
   | { kind: 'created'; timestamp: string }
   | { kind: 'activity'; activity: ProposalActivity }
+  | { kind: 'comment'; comment: Comment }
 
 function Timeline({
   activities,
   createdAt,
+  comments,
   language,
 }: {
   activities: ProposalActivity[]
   createdAt: string
+  comments?: Comment[]
   language: Language
 }) {
-  const sorted = [...activities].sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-  )
+  const t = translations[language]
+
+  const activityEntries: TimelineEntry[] = activities.map((a) => ({ kind: 'activity', activity: a }))
+  const commentEntries: TimelineEntry[] = (comments ?? []).map((c) => ({ kind: 'comment', comment: c }))
+
+  const allEntries: TimelineEntry[] = [...activityEntries, ...commentEntries]
+  allEntries.sort((a, b) => {
+    const tsA = a.kind === 'created' ? a.timestamp : a.kind === 'activity' ? a.activity.timestamp : a.comment.createdAt
+    const tsB = b.kind === 'created' ? b.timestamp : b.kind === 'activity' ? b.activity.timestamp : b.comment.createdAt
+    return new Date(tsB).getTime() - new Date(tsA).getTime()
+  })
 
   const entries: TimelineEntry[] = [
-    ...sorted.map((a): TimelineEntry => ({ kind: 'activity', activity: a })),
+    ...allEntries,
     { kind: 'created', timestamp: createdAt },
   ]
 
@@ -313,6 +337,30 @@ function Timeline({
                 </p>
                 <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
                   {formatDate(entry.timestamp, language)}
+                </p>
+              </div>
+            </div>
+          )
+        }
+        if (entry.kind === 'comment') {
+          const isTeam = entry.comment.authorType === 'team'
+          return (
+            <div key={entry.comment.id} className="flex gap-4">
+              <div className="flex flex-col items-center flex-shrink-0">
+                <div className="w-3 h-3 rounded-full bg-emerald-500 dark:bg-emerald-400 mt-1.5 flex-shrink-0" />
+                {!isLast && (
+                  <div className="flex-1 w-px bg-stone-200 dark:bg-stone-700 my-1" />
+                )}
+              </div>
+              <div className="pb-5 min-w-0">
+                <p className="text-sm font-semibold text-stone-900 dark:text-stone-100 leading-snug">
+                  {isTeam ? t.lotsTeam : t.you}
+                </p>
+                <p className="text-xs text-stone-600 dark:text-stone-400 mt-0.5 line-clamp-2">
+                  {entry.comment.message}
+                </p>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
+                  {formatDate(entry.comment.createdAt, language)}
                 </p>
               </div>
             </div>
@@ -608,23 +656,142 @@ function IncidentsTab({
 }
 
 // ---------------------------------------------------------------------------
+// Notes Tab — conversation thread between user and LOTS team
+// ---------------------------------------------------------------------------
+
+function NotesTab({
+  comments,
+  onAddComment,
+  language,
+}: {
+  comments: Comment[]
+  onAddComment?: (message: string) => void
+  language: Language
+}) {
+  const t = translations[language]
+  const [draft, setDraft] = useState('')
+
+  const sorted = [...comments].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  )
+
+  const handleSend = () => {
+    const text = draft.trim()
+    if (!text) return
+    onAddComment?.(text)
+    setDraft('')
+  }
+
+  return (
+    <div className="flex flex-col">
+      {/* Messages */}
+      <div className="p-4 sm:p-5 space-y-3">
+        {sorted.length === 0 && (
+          <div className="py-12 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
+              <MessageSquare className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+            </div>
+            <p className="text-sm font-medium text-stone-500 dark:text-stone-400">No notes yet</p>
+            <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">{t.writeNote}</p>
+          </div>
+        )}
+        {sorted.map((comment) => {
+          const isTeam = comment.authorType === 'team'
+          return (
+            <div
+              key={comment.id}
+              className={`rounded-xl p-4 ${
+                isTeam
+                  ? 'bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/40'
+                  : 'bg-stone-50 dark:bg-stone-800/50 border border-stone-200/60 dark:border-stone-700/50'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 mb-2">
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                  isTeam
+                    ? 'bg-emerald-500 dark:bg-emerald-600'
+                    : 'bg-stone-700 dark:bg-stone-600'
+                }`}>
+                  {isTeam
+                    ? <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                    : <User className="w-3.5 h-3.5 text-white" />
+                  }
+                </div>
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="text-[13px] font-semibold text-stone-900 dark:text-stone-100 truncate">
+                    {comment.authorName}
+                  </span>
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                    isTeam
+                      ? 'bg-emerald-200/70 dark:bg-emerald-800/50 text-emerald-800 dark:text-emerald-300'
+                      : 'bg-stone-200/70 dark:bg-stone-700/50 text-stone-600 dark:text-stone-400'
+                  }`}>
+                    {isTeam ? t.lotsTeam : t.you}
+                  </span>
+                </div>
+                <span className="text-[11px] text-stone-400 dark:text-stone-500 flex-shrink-0 tabular-nums">
+                  {formatDate(comment.createdAt, language)}
+                </span>
+              </div>
+              <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed pl-[38px]">
+                {comment.message}
+              </p>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Compose */}
+      <div className="border-t border-stone-200 dark:border-stone-800 p-4 sm:p-5">
+        <div className="flex items-center gap-2.5">
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                handleSend()
+              }
+            }}
+            placeholder={t.writeNote}
+            rows={1}
+            className="flex-1 resize-none rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 px-3.5 py-2 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 dark:focus:border-emerald-500 transition-colors"
+          />
+          <button
+            onClick={handleSend}
+            disabled={!draft.trim()}
+            className="flex-shrink-0 h-[34px] px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-30 disabled:cursor-not-allowed text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
+          >
+            <Send className="w-3.5 h-3.5" />
+            {t.send}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Main Component
 // ---------------------------------------------------------------------------
 
 export function ProposalDetail({
   proposal,
   activities,
+  comments = [],
+  onAddComment,
   onCancel,
   onBack,
   onAccept,
   onReject,
-}: Omit<ProposalDetailProps, 'comments' | 'onAddComment'> & {
+}: ProposalDetailProps & {
   onAccept?: () => void
   onReject?: () => void
 }) {
   const { language } = useLanguage()
   const t = translations[language]
-  const [activeTab, setActiveTab] = useState<'details' | 'quantity' | 'incidents'>('details')
+  const [activeTab, setActiveTab] = useState<'details' | 'quantity' | 'notes' | 'incidents'>('details')
+  const [localComments, setLocalComments] = useState<Comment[]>(comments)
 
   const statusConfig = STATUS_CONFIG[proposal.status]
   const StatusIcon = statusConfig.icon
@@ -633,9 +800,24 @@ export function ProposalDetail({
 
   const incidentCount = proposal.linkedIncidentId ? INCIDENT_ITEMS.length : 3
 
-  const TABS: { id: 'details' | 'quantity' | 'incidents'; label: string; icon: typeof Info; count?: number }[] = [
+  const handleAddComment = (message: string) => {
+    const newComment: Comment = {
+      id: `cmt-local-${Date.now()}`,
+      entityType: 'proposal',
+      entityId: proposal.id,
+      authorType: 'user',
+      authorName: 'You',
+      message,
+      createdAt: new Date().toISOString(),
+    }
+    setLocalComments((prev) => [...prev, newComment])
+    onAddComment?.(message)
+  }
+
+  const TABS: { id: 'details' | 'quantity' | 'notes' | 'incidents'; label: string; icon?: typeof Info; count?: number }[] = [
     { id: 'details', label: t.details, icon: Info },
     { id: 'quantity', label: t.quantityTab, icon: Layers, count: proposal.quantity },
+    { id: 'notes', label: t.notes, count: localComments.length || undefined },
     ...(proposal.status === 'converted' ? [{ id: 'incidents' as const, label: t.incidents, icon: Activity, count: incidentCount }] : []),
   ]
 
@@ -723,7 +905,7 @@ export function ProposalDetail({
                       : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
                   }`}
                 >
-                  <TabIcon className="w-4 h-4" />
+                  {TabIcon && <TabIcon className="w-4 h-4" />}
                   {tab.label}
                   {tab.count !== undefined && (
                     <span className={`text-xs px-1.5 py-0.5 rounded-full ${
@@ -753,13 +935,17 @@ export function ProposalDetail({
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
               <QuantityTab proposal={proposal} language={language} />
             </div>
+          ) : activeTab === 'notes' ? (
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
+              <NotesTab comments={localComments} onAddComment={handleAddComment} language={language} />
+            </div>
           ) : (
             <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
               <IncidentsTab proposal={proposal} language={language} />
             </div>
           )}
-          <SectionCard title={t.timeline} icon={Activity} count={activities.length}>
-            <Timeline activities={activities} createdAt={proposal.createdAt} language={language} />
+          <SectionCard title={t.timeline} icon={Activity} count={activities.length + localComments.length}>
+            <Timeline activities={activities} comments={localComments} createdAt={proposal.createdAt} language={language} />
           </SectionCard>
         </div>
 

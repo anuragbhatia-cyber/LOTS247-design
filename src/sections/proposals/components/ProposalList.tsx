@@ -19,8 +19,9 @@ import {
   IndianRupee,
   ChevronDown,
   IdCard,
+  SlidersHorizontal,
 } from 'lucide-react'
-import type { ProposalListProps, Proposal, ProposalStatus, ProposalType } from '@/../product/sections/proposals/types'
+import type { ProposalListProps, Proposal, ProposalStatus, ProposalType, ServiceStatus } from '@/../product/sections/proposals/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 // ---------------------------------------------------------------------------
@@ -63,7 +64,7 @@ const translations: Record<Language, Record<string, string>> = {
     typeDL: 'DL',
     typeRC: 'RC',
     linkedIncident: 'Linked',
-    searchPlaceholder: 'Search proposals...',
+    searchPlaceholder: 'Search by ID, type or description...',
     createRequest: 'Create Request',
     incidentCreated: 'Incident Created',
     yes: 'Yes',
@@ -76,6 +77,30 @@ const translations: Record<Language, Record<string, string>> = {
     vehicleRCDesc: 'Request for RC renewal or transfer',
     drivingLicense: 'Driving License',
     drivingLicenseDesc: 'Request for DL renewal or verification',
+    filters: 'Filters',
+    typeFilter: 'Type',
+    allTypes: 'All Types',
+    sortBy: 'Sort',
+    dateNewest: 'Date: Newest',
+    dateOldest: 'Date: Oldest',
+    amountHigh: 'Amount: High → Low',
+    amountLow: 'Amount: Low → High',
+    qtyHigh: 'Qty: High → Low',
+    qtyLow: 'Qty: Low → High',
+    clearAll: 'Clear All',
+    filteredBy: 'Filtered by:',
+    serviceStatus: 'Service Status',
+    serviceStatusPending: 'Pending',
+    serviceStatusInProgress: 'In Progress',
+    serviceStatusCompleted: 'Completed',
+    serviceStatusNA: 'N/A',
+    dateRange: 'Date Range',
+    from: 'From',
+    to: 'To',
+    statusFilter: 'Status',
+    allStatuses: 'All Statuses',
+    serviceStatusFilter: 'Service Status',
+    allServiceStatuses: 'All',
   },
   hi: {
     pageTitle: 'Request Proposals',
@@ -112,7 +137,7 @@ const translations: Record<Language, Record<string, string>> = {
     typeDL: 'डीएल',
     typeRC: 'आरसी',
     linkedIncident: 'लिंक',
-    searchPlaceholder: 'प्रस्ताव खोजें...',
+    searchPlaceholder: 'आईडी, प्रकार या विवरण से खोजें...',
     createRequest: 'अनुरोध बनाएं',
     incidentCreated: 'इंसिडेंट बनाया',
     yes: 'हाँ',
@@ -125,6 +150,30 @@ const translations: Record<Language, Record<string, string>> = {
     vehicleRCDesc: 'आरसी नवीनीकरण या हस्तांतरण के लिए अनुरोध',
     drivingLicense: 'ड्राइविंग लाइसेंस',
     drivingLicenseDesc: 'डीएल नवीनीकरण या सत्यापन के लिए अनुरोध',
+    filters: 'फ़िल्टर',
+    typeFilter: 'प्रकार',
+    allTypes: 'सभी प्रकार',
+    sortBy: 'क्रमबद्ध',
+    dateNewest: 'तारीख: नवीनतम',
+    dateOldest: 'तारीख: पुरानी',
+    amountHigh: 'राशि: अधिक → कम',
+    amountLow: 'राशि: कम → अधिक',
+    qtyHigh: 'मात्रा: अधिक → कम',
+    qtyLow: 'मात्रा: कम → अधिक',
+    clearAll: 'सब हटाएं',
+    filteredBy: 'फ़िल्टर:',
+    serviceStatus: 'सेवा स्थिति',
+    serviceStatusPending: 'लंबित',
+    serviceStatusInProgress: 'प्रगति में',
+    serviceStatusCompleted: 'पूर्ण',
+    serviceStatusNA: 'लागू नहीं',
+    dateRange: 'तारीख सीमा',
+    from: 'से',
+    to: 'तक',
+    statusFilter: 'स्थिति',
+    allStatuses: 'सभी स्थिति',
+    serviceStatusFilter: 'सेवा स्थिति',
+    allServiceStatuses: 'सभी',
   },
 }
 
@@ -186,6 +235,32 @@ const TYPE_CONFIG: Record<ProposalType, { labelKey: string; bg: string; text: st
   },
 }
 
+const SERVICE_STATUS_CONFIG: Record<
+  ServiceStatus,
+  { labelKey: string; bg: string; text: string }
+> = {
+  pending: {
+    labelKey: 'serviceStatusPending',
+    bg: 'bg-amber-50 dark:bg-amber-950/40',
+    text: 'text-amber-700 dark:text-amber-300',
+  },
+  in_progress: {
+    labelKey: 'serviceStatusInProgress',
+    bg: 'bg-blue-50 dark:bg-blue-950/40',
+    text: 'text-blue-700 dark:text-blue-300',
+  },
+  completed: {
+    labelKey: 'serviceStatusCompleted',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+    text: 'text-emerald-700 dark:text-emerald-300',
+  },
+  not_applicable: {
+    labelKey: 'serviceStatusNA',
+    bg: 'bg-stone-100 dark:bg-stone-800',
+    text: 'text-stone-500 dark:text-stone-400',
+  },
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -219,6 +294,24 @@ function EmptyState({ title, description }: { title: string; description: string
       <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">{title}</p>
       <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">{description}</p>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Filter Pill
+// ---------------------------------------------------------------------------
+
+function FilterPill({ label, onClear }: { label: string; onClear: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+      {label}
+      <button
+        onClick={onClear}
+        className="ml-0.5 p-0.5 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors"
+      >
+        <X className="w-3 h-3" />
+      </button>
+    </span>
   )
 }
 
@@ -286,6 +379,16 @@ function ProposalRow({
         {proposal.description}
       </p>
 
+      {/* Mobile: Service Status (past tab only) */}
+      {showIncidentColumn && proposal.serviceStatus && proposal.serviceStatus !== 'not_applicable' && (
+        <div className="flex items-center gap-2 sm:hidden">
+          <span className="text-xs text-stone-500 dark:text-stone-400">{t.serviceStatus}:</span>
+          <span className="text-xs font-medium text-stone-600 dark:text-stone-300">
+            {t[SERVICE_STATUS_CONFIG[proposal.serviceStatus].labelKey]}
+          </span>
+        </div>
+      )}
+
       {/* Mobile: Actions */}
       <div className="flex items-center gap-2 sm:hidden" onClick={(e) => e.stopPropagation()}>
         <button
@@ -352,7 +455,7 @@ function ProposalRow({
         </div>
 
         {/* Status or Accept/Reject */}
-        <div className={`${showIncidentColumn ? 'w-[14%] min-w-[90px]' : 'flex-1 min-w-[80px]'}`}>
+        <div className={`${showIncidentColumn ? 'w-[12%] min-w-[80px]' : 'flex-1 min-w-[80px]'}`}>
           {showProposalActions ? (
             <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               <button
@@ -375,9 +478,22 @@ function ProposalRow({
           )}
         </div>
 
+        {/* Service Status (past tab only) */}
+        {showIncidentColumn && (
+          <div className="w-[12%] min-w-[90px]">
+            {proposal.serviceStatus && proposal.serviceStatus !== 'not_applicable' ? (
+              <span className="text-sm font-medium text-stone-600 dark:text-stone-300">
+                {t[SERVICE_STATUS_CONFIG[proposal.serviceStatus].labelKey]}
+              </span>
+            ) : (
+              <span className="text-sm font-bold text-stone-400 dark:text-stone-500">— —</span>
+            )}
+          </div>
+        )}
+
         {/* Incident Created (past tab only) */}
         {showIncidentColumn && (
-          <div className="flex-1 min-w-[120px]">
+          <div className="flex-1 min-w-[100px]">
             {proposal.status === 'converted' ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-stone-700 dark:text-stone-300">{t.yes}</span>
@@ -748,10 +864,12 @@ function RejectProposalModal({
 function CreateRequestModal({
   isOpen,
   onClose,
+  onCreateRequest,
   t,
 }: {
   isOpen: boolean
   onClose: () => void
+  onCreateRequest?: (type: 'challan' | 'rc' | 'dl') => void
   t: Record<string, string>
 }) {
   useEffect(() => {
@@ -790,7 +908,12 @@ function CreateRequestModal({
 
   function handleSelect(id: string) {
     onClose()
-    window.parent.postMessage({ type: 'navigate', href: `/compliance/${id}` }, '*')
+    if (onCreateRequest) {
+      const typeMap: Record<string, 'challan' | 'rc' | 'dl'> = { challans: 'challan', rc: 'rc', dl: 'dl' }
+      onCreateRequest(typeMap[id] || (id as 'challan' | 'rc' | 'dl'))
+    } else {
+      window.parent.postMessage({ type: 'navigate', href: `/compliance/${id}` }, '*')
+    }
   }
 
   return createPortal(
@@ -864,6 +987,7 @@ export function ProposalList({
   onView,
   onFollowUp,
   onCancel,
+  onCreateRequest,
 }: ProposalListProps) {
   const { language } = useLanguage()
   const t = translations[language]
@@ -873,10 +997,19 @@ export function ProposalList({
   const [acceptingProposal, setAcceptingProposal] = useState<Proposal | null>(null)
   const [rejectingProposal, setRejectingProposal] = useState<Proposal | null>(null)
   const [showCreateRequest, setShowCreateRequest] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
+  const [typeFilter, setTypeFilter] = useState<ProposalType | 'all'>('all')
+  const [statusFilter, setStatusFilter] = useState<ProposalStatus | 'all'>('all')
+  const [serviceStatusFilter, setServiceStatusFilter] = useState<ServiceStatus | 'all'>('all')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [sortBy, setSortBy] = useState<'date' | 'amount' | 'qty'>('date')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const PAGE_SIZE = 5
 
-  const handleTabChange = (tab: Tab) => { setActiveTab(tab); setCurrentPage(1) }
-  const handleSearch = (q: string) => { setSearch(q); setCurrentPage(1) }
+  const activeFilterCount = (typeFilter !== 'all' ? 1 : 0) + (statusFilter !== 'all' ? 1 : 0) + (serviceStatusFilter !== 'all' ? 1 : 0) + (dateFrom ? 1 : 0) + (dateTo ? 1 : 0)
+
+  const handleTabChange = (tab: Tab) => { setActiveTab(tab); setCurrentPage(1); setSearch(''); setTypeFilter('all'); setStatusFilter('all'); setServiceStatusFilter('all'); setDateFrom(''); setDateTo('') }
 
   const sentProposals = proposals.filter((p) => p.status === 'sent')
   const underReviewProposals = proposals.filter((p) => p.status === 'under_review')
@@ -889,14 +1022,51 @@ export function ProposalList({
     activeTab === 'received' ? receivedProposals :
     pastProposals
 
-  const filtered = search.trim()
+  // Apply search
+  let filtered = search.trim()
     ? currentList.filter(
         (p) =>
           p.displayId.toLowerCase().includes(search.toLowerCase()) ||
           p.description.toLowerCase().includes(search.toLowerCase()) ||
           p.type.toLowerCase().includes(search.toLowerCase())
       )
-    : currentList
+    : [...currentList]
+
+  // Apply type filter
+  if (typeFilter !== 'all') {
+    filtered = filtered.filter((p) => p.type === typeFilter)
+  }
+
+  // Apply status filter
+  if (statusFilter !== 'all') {
+    filtered = filtered.filter((p) => p.status === statusFilter)
+  }
+
+  // Apply service status filter
+  if (serviceStatusFilter !== 'all') {
+    filtered = filtered.filter((p) => p.serviceStatus === serviceStatusFilter)
+  }
+
+  // Apply date filter
+  if (dateFrom) {
+    const from = new Date(dateFrom)
+    from.setHours(0, 0, 0, 0)
+    filtered = filtered.filter((p) => new Date(p.createdAt) >= from)
+  }
+  if (dateTo) {
+    const to = new Date(dateTo)
+    to.setHours(23, 59, 59, 999)
+    filtered = filtered.filter((p) => new Date(p.createdAt) <= to)
+  }
+
+  // Apply sort
+  filtered.sort((a, b) => {
+    let cmp = 0
+    if (sortBy === 'date') cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    else if (sortBy === 'amount') cmp = a.amount - b.amount
+    else if (sortBy === 'qty') cmp = a.quantity - b.quantity
+    return sortDir === 'desc' ? -cmp : cmp
+  })
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const safePage = Math.min(currentPage, totalPages)
@@ -966,6 +1136,227 @@ export function ProposalList({
           })}
         </div>
 
+        {/* Search + Filters */}
+        <div className="mb-4 space-y-3">
+          <div className="flex items-center gap-3">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
+              <input
+                type="text"
+                placeholder={t.searchPlaceholder}
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1) }}
+                className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+              />
+            </div>
+
+            {/* Filter toggle */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+                showFilters || activeFilterCount > 0
+                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
+              }`}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="hidden sm:inline">{t.filters}</span>
+              {activeFilterCount > 0 && (
+                <span className="ml-1 w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+
+            {/* Sort dropdown */}
+            <div className="hidden sm:flex items-center gap-1.5 text-sm relative">
+              <select
+                value={`${sortBy}-${sortDir}`}
+                onChange={(e) => {
+                  const [field, dir] = e.target.value.split('-') as [typeof sortBy, 'asc' | 'desc']
+                  setSortBy(field)
+                  setSortDir(dir)
+                }}
+                className="appearance-none pl-3 pr-8 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors cursor-pointer"
+              >
+                <option value="date-desc">{t.dateNewest}</option>
+                <option value="date-asc">{t.dateOldest}</option>
+                <option value="amount-desc">{t.amountHigh}</option>
+                <option value="amount-asc">{t.amountLow}</option>
+                <option value="qty-desc">{t.qtyHigh}</option>
+                <option value="qty-asc">{t.qtyLow}</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Expanded filter panel */}
+          {showFilters && (
+            <div className="flex flex-wrap items-end gap-4 p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+                  {t.typeFilter}
+                </label>
+                <div className="relative">
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => { setTypeFilter(e.target.value as ProposalType | 'all'); setCurrentPage(1) }}
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                  >
+                    <option value="all">{t.allTypes}</option>
+                    <option value="Challan">{t.typeChallan}</option>
+                    <option value="DL">{t.typeDL}</option>
+                    <option value="RC">{t.typeRC}</option>
+                  </select>
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Date From */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+                  {t.from}
+                </label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => { setDateFrom(e.target.value); setCurrentPage(1) }}
+                  className="pl-3 pr-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                />
+              </div>
+
+              {/* Date To */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+                  {t.to}
+                </label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => { setDateTo(e.target.value); setCurrentPage(1) }}
+                  className="pl-3 pr-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                />
+              </div>
+
+              {/* Status filter */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+                  {t.statusFilter}
+                </label>
+                <div className="relative">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => { setStatusFilter(e.target.value as ProposalStatus | 'all'); setCurrentPage(1) }}
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                  >
+                    <option value="all">{t.allStatuses}</option>
+                    <option value="sent">{t.statusSent}</option>
+                    <option value="under_review">{t.statusUnderReview}</option>
+                    <option value="received">{t.statusReceived}</option>
+                    <option value="converted">{t.statusConverted}</option>
+                    <option value="rejected">{t.statusRejected}</option>
+                  </select>
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Service Status filter */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+                  {t.serviceStatusFilter}
+                </label>
+                <div className="relative">
+                  <select
+                    value={serviceStatusFilter}
+                    onChange={(e) => { setServiceStatusFilter(e.target.value as ServiceStatus | 'all'); setCurrentPage(1) }}
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                  >
+                    <option value="all">{t.allServiceStatuses}</option>
+                    <option value="pending">{t.serviceStatusPending}</option>
+                    <option value="in_progress">{t.serviceStatusInProgress}</option>
+                    <option value="completed">{t.serviceStatusCompleted}</option>
+                    <option value="not_applicable">{t.serviceStatusNA}</option>
+                  </select>
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Mobile sort (shown in filter panel on small screens) */}
+              <div className="flex flex-col gap-1 sm:hidden">
+                <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+                  {t.sortBy}
+                </label>
+                <div className="relative">
+                  <select
+                    value={`${sortBy}-${sortDir}`}
+                    onChange={(e) => {
+                      const [field, dir] = e.target.value.split('-') as [typeof sortBy, 'asc' | 'desc']
+                      setSortBy(field)
+                      setSortDir(dir)
+                    }}
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                  >
+                    <option value="date-desc">{t.dateNewest}</option>
+                    <option value="date-asc">{t.dateOldest}</option>
+                    <option value="amount-desc">{t.amountHigh}</option>
+                    <option value="amount-asc">{t.amountLow}</option>
+                    <option value="qty-desc">{t.qtyHigh}</option>
+                    <option value="qty-asc">{t.qtyLow}</option>
+                  </select>
+                  <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={() => { setTypeFilter('all'); setStatusFilter('all'); setServiceStatusFilter('all'); setDateFrom(''); setDateTo(''); setCurrentPage(1) }}
+                  className="px-3 py-2 min-h-11 text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                >
+                  {t.clearAll}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Filter pills (when panel is closed but filters active) */}
+          {activeFilterCount > 0 && !showFilters && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-stone-500 dark:text-stone-400">{t.filteredBy}</span>
+              {typeFilter !== 'all' && (
+                <FilterPill
+                  label={t[TYPE_CONFIG[typeFilter].labelKey]}
+                  onClear={() => { setTypeFilter('all'); setCurrentPage(1) }}
+                />
+              )}
+              {statusFilter !== 'all' && (
+                <FilterPill
+                  label={t[STATUS_CONFIG[statusFilter].labelKey]}
+                  onClear={() => { setStatusFilter('all'); setCurrentPage(1) }}
+                />
+              )}
+              {serviceStatusFilter !== 'all' && (
+                <FilterPill
+                  label={t[SERVICE_STATUS_CONFIG[serviceStatusFilter].labelKey]}
+                  onClear={() => { setServiceStatusFilter('all'); setCurrentPage(1) }}
+                />
+              )}
+              {dateFrom && (
+                <FilterPill
+                  label={`${t.from}: ${dateFrom}`}
+                  onClear={() => { setDateFrom(''); setCurrentPage(1) }}
+                />
+              )}
+              {dateTo && (
+                <FilterPill
+                  label={`${t.to}: ${dateTo}`}
+                  onClear={() => { setDateTo(''); setCurrentPage(1) }}
+                />
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Table Card */}
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
           {/* Desktop Header */}
@@ -975,11 +1366,16 @@ export function ProposalList({
             <div className="w-[12%] min-w-[70px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">{t.type}</div>
             <div className="w-[8%] min-w-[40px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider text-center">{t.quantity}</div>
             <div className="w-[14%] min-w-[90px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">{t.amount}</div>
-            <div className={`${activeTab === 'past' ? 'w-[14%] min-w-[90px]' : 'flex-1 min-w-[140px]'} text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider`}>
+            <div className={`${activeTab === 'past' ? 'w-[12%] min-w-[80px]' : 'flex-1 min-w-[140px]'} text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider`}>
               {activeTab === 'received' ? 'Action' : t.status}
             </div>
             {activeTab === 'past' && (
-              <div className="flex-1 min-w-[120px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+              <div className="w-[12%] min-w-[90px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
+                {t.serviceStatus}
+              </div>
+            )}
+            {activeTab === 'past' && (
+              <div className="flex-1 min-w-[100px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">
                 {t.incidentCreated}
               </div>
             )}
@@ -1070,6 +1466,7 @@ export function ProposalList({
       <CreateRequestModal
         isOpen={showCreateRequest}
         onClose={() => setShowCreateRequest(false)}
+        onCreateRequest={onCreateRequest}
         t={t}
       />
     </div>
