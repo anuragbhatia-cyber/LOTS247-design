@@ -20,6 +20,19 @@ const SIDEBAR_ITEMS: { id: SidebarTab; label: string; icon: LucideIcon }[] = [
 // Simulated "my APIs" — subset the user has subscribed to
 const MY_API_IDS = ['api-001']
 
+// Simulated credit balance for the subscribed API
+const CREDIT_BALANCE = 1753
+
+function CreditBalancePill() {
+  return (
+    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900">
+      <Wallet className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500" />
+      <span className="text-xs font-bold text-stone-900 dark:text-stone-50 tabular-nums">{CREDIT_BALANCE.toLocaleString()}</span>
+      <span className="text-[11px] text-stone-500 dark:text-stone-400">credits</span>
+    </div>
+  )
+}
+
 type DetailTab = 'credits' | 'usage' | 'logs'
 
 const DETAIL_TABS: { id: DetailTab; label: string; icon: LucideIcon }[] = [
@@ -148,7 +161,9 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
           <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {SIDEBAR_ITEMS.map((item) => {
               const Icon = item.icon
-              const isActive = activeTab === item.id && !selectedApi
+              const isActive = selectedApi
+                ? (item.id === 'my' && MY_API_IDS.includes(selectedApi.id)) || (item.id === 'all' && !MY_API_IDS.includes(selectedApi.id))
+                : activeTab === item.id
               const count = item.id === 'all' ? apis.length : apis.filter((a) => MY_API_IDS.includes(a.id)).length
               return (
                 <button
@@ -230,11 +245,14 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                           onClick={() => handleViewDetail(api.id)}
                           className="group bg-white dark:bg-stone-900 rounded-xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col cursor-pointer"
                         >
-                          <div className="flex items-center gap-2 mb-3">
-                            <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
-                            {isMyApi && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
-                            )}
+                          <div className="flex items-start justify-between gap-2 mb-3">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
+                              {isMyApi && (
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
+                              )}
+                            </div>
+                            {isMyApi && <CreditBalancePill />}
                           </div>
                           <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
                           <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
@@ -288,9 +306,12 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                           onClick={() => handleViewDetail(api.id)}
                           className="group bg-white dark:bg-stone-900 rounded-xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 p-5 transition-all duration-200 hover:shadow-md hover:shadow-stone-200/60 dark:hover:shadow-stone-950/40 flex flex-col cursor-pointer"
                         >
-                          <div className="flex items-center gap-2 mb-3">
-                            <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
+                          <div className="flex items-start justify-between gap-2 mb-3">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 leading-tight">{api.name}</h3>
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 uppercase tracking-wider">Active</span>
+                            </div>
+                            <CreditBalancePill />
                           </div>
                           <p className="text-sm text-stone-500 dark:text-stone-400 leading-relaxed line-clamp-2 mb-4 flex-1">{api.shortDescription}</p>
                           <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
@@ -417,12 +438,7 @@ function ApiDetailContent({
           </div>
           {isMyApi && (
             <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700">
-                <Wallet className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500" />
-                <span className="text-xs text-stone-500 dark:text-stone-400">Balance:</span>
-                <span className="text-sm font-bold text-stone-900 dark:text-stone-50 tabular-nums">1,753</span>
-                <span className="text-xs text-stone-500 dark:text-stone-400">credits</span>
-              </div>
+              <CreditBalancePill />
               <button
                 onClick={onTopUp}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"

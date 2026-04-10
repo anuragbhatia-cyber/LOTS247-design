@@ -10,6 +10,8 @@ import {
   BookOpen,
   CheckSquare,
   Scale,
+  Gavel,
+  ScrollText,
   ThumbsUp,
   ThumbsDown,
   Download,
@@ -44,6 +46,8 @@ const translations: Record<Language, Record<string, string>> = {
     guides: 'Guides',
     checklists: 'Checklists',
     regulations: 'Regulations',
+    judgements: 'Judgements',
+    circulars: 'Circulars',
     articles: 'articles',
     readTime: 'read',
     updated: 'Updated',
@@ -86,6 +90,8 @@ const translations: Record<Language, Record<string, string>> = {
     guides: 'गाइड',
     checklists: 'चेकलिस्ट',
     regulations: 'नियम',
+    judgements: 'निर्णय',
+    circulars: 'परिपत्र',
     articles: 'लेख',
     readTime: 'पढ़ें',
     updated: 'अपडेटेड',
@@ -181,6 +187,24 @@ const CATEGORY_CONFIG: Record<
     activeBg: 'bg-emerald-600 dark:bg-emerald-500',
     activeText: 'text-white dark:text-white',
   },
+  judgement: {
+    labelKey: 'judgements',
+    bg: 'bg-stone-100 dark:bg-stone-800',
+    text: 'text-stone-600 dark:text-stone-300',
+    border: 'border-stone-200 dark:border-stone-700',
+    icon: Gavel,
+    activeBg: 'bg-emerald-600 dark:bg-emerald-500',
+    activeText: 'text-white dark:text-white',
+  },
+  circular: {
+    labelKey: 'circulars',
+    bg: 'bg-stone-100 dark:bg-stone-800',
+    text: 'text-stone-600 dark:text-stone-300',
+    border: 'border-stone-200 dark:border-stone-700',
+    icon: ScrollText,
+    activeBg: 'bg-emerald-600 dark:bg-emerald-500',
+    activeText: 'text-white dark:text-white',
+  },
 }
 
 const CATEGORY_TABS: (ArticleCategory | 'all')[] = [
@@ -190,6 +214,8 @@ const CATEGORY_TABS: (ArticleCategory | 'all')[] = [
   'guide',
   'checklist',
   'regulation',
+  'judgement',
+  'circular',
 ]
 
 // =============================================================================

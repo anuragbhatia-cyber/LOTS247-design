@@ -1272,23 +1272,6 @@ export function Settings({
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{report.name}</p>
                         <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{report.description}</p>
-                        <div className="flex items-center gap-3 mt-2">
-                          <span className="inline-flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
-                            <Calendar className="w-3 h-3" />
-                            {t[report.frequency]}
-                          </span>
-                          <span className="inline-flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
-                            <FileText className="w-3 h-3" />
-                            {t[report.format]}
-                          </span>
-                          <span className="inline-flex items-center gap-1 text-xs text-stone-500 dark:text-stone-400">
-                            <Users className="w-3 h-3" />
-                            {report.recipientCount} {t.recipients}
-                          </span>
-                          <span className="text-xs text-stone-400 dark:text-stone-500 hidden sm:inline">
-                            {t.lastGenerated}: {report.lastGenerated}
-                          </span>
-                        </div>
                       </div>
                       <div className="shrink-0">
                         <Toggle

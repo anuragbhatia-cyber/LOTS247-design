@@ -9,6 +9,8 @@ A centralized legal knowledge repository where vehicle owners and fleet managers
 - **Legal Guides** — Step-by-step procedural guides (accident response, challan dispute process, insurance claims, interstate transfer, hypothecation removal, state-wise RTO procedures)
 - **Compliance Checklists** — Actionable checklists (vehicle ownership checklist, pre-travel checklist, accident procedure checklist, fleet compliance checklist)
 - **Regulatory Reference** — Key sections of Motor Vehicles Act 2019, penalty structures, and state-specific regulations
+- **Judgements** — Landmark court rulings and case laws relevant to vehicle owners and fleet operators (Supreme Court, High Court, and MACT decisions on motor insurance, compensation, licensing, and liability)
+- **Circulars** — Official government circulars and notifications from MoRTH, IRDAI, state transport departments, and other regulatory bodies affecting vehicle compliance and fleet operations
 
 ## User Flows
 - User lands on Knowledge Base and sees a search bar, category tabs, and a grid of article cards
@@ -28,7 +30,7 @@ A centralized legal knowledge repository where vehicle owners and fleet managers
 
 ### Browse View
 - Search bar at the top with placeholder text "Search legal guides, templates, FAQs..."
-- Category tabs below search: All | Templates | FAQs | Guides | Checklists | Regulations
+- Category tabs below search: All | Templates | FAQs | Guides | Checklists | Regulations | Judgements | Circulars
 - Tag filter bar below tabs: horizontal scrollable chips for common tags (e.g., Accident, Challan, Insurance, RTO, Fleet, State-specific)
 - Active filters shown as dismissible chips
 - Article cards in a responsive grid (3 columns on desktop, 2 on tablet, 1 on mobile)

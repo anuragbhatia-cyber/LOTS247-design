@@ -2,7 +2,7 @@
 // Data Types
 // =============================================================================
 
-export type ArticleCategory = 'template' | 'faq' | 'guide' | 'checklist' | 'regulation'
+export type ArticleCategory = 'template' | 'faq' | 'guide' | 'checklist' | 'regulation' | 'judgement' | 'circular'
 
 export interface Article {
   id: string

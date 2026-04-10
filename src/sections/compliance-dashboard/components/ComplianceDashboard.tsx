@@ -36,6 +36,8 @@ import {
   MapPin,
   Copy,
   Info,
+  Check,
+  Minus,
 } from 'lucide-react'
 import type {
   ComplianceDashboardProps,
@@ -170,6 +172,11 @@ const SCOPE_OPTIONS: { value: ScopeFilter; label: string; icon: typeof Truck }[]
 function ProposalToast({ show, onClose }: { show: boolean; onClose: () => void }) {
   if (!show) return null
 
+  const handleOk = () => {
+    onClose()
+    window.parent.postMessage({ type: 'navigate', href: '/proposals' }, '*')
+  }
+
   return createPortal(
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
@@ -180,7 +187,7 @@ function ProposalToast({ show, onClose }: { show: boolean; onClose: () => void }
         <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 mb-1">Request Submitted</h3>
         <p className="text-sm text-stone-500 dark:text-stone-400 mb-5">Your proposal request has been submitted successfully. You can track it in Request Proposals.</p>
         <button
-          onClick={onClose}
+          onClick={handleOk}
           className="w-full px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
         >
           OK
@@ -1483,7 +1490,38 @@ function FleetRcView({
   const validItems = rcRows.filter(r => r.status === 'valid')
   const expiringItems = rcRows.filter(r => r.status === 'expiring')
   const invalidItems = rcRows.filter(r => r.status === 'expired')
+
+  const [selectedRcs, setSelectedRcs] = useState<Set<string>>(() => new Set([...expiringItems, ...invalidItems].map(r => r.vehicleNumber)))
   const filtered = filter === 'valid' ? validItems : filter === 'expiring' ? expiringItems : invalidItems
+
+  const showSelection = filter === 'expiring' || filter === 'invalid'
+  const allFilteredSelected = showSelection && filtered.length > 0 && filtered.every(r => selectedRcs.has(r.vehicleNumber))
+  const selectedCount = filtered.filter(r => selectedRcs.has(r.vehicleNumber)).length
+
+  function toggleRc(vehicleNumber: string) {
+    setSelectedRcs(prev => {
+      const next = new Set(prev)
+      if (next.has(vehicleNumber)) next.delete(vehicleNumber)
+      else next.add(vehicleNumber)
+      return next
+    })
+  }
+
+  function toggleAllFiltered() {
+    if (allFilteredSelected) {
+      setSelectedRcs(prev => {
+        const next = new Set(prev)
+        filtered.forEach(r => next.delete(r.vehicleNumber))
+        return next
+      })
+    } else {
+      setSelectedRcs(prev => {
+        const next = new Set(prev)
+        filtered.forEach(r => next.add(r.vehicleNumber))
+        return next
+      })
+    }
+  }
 
   return (
     <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
@@ -1542,14 +1580,51 @@ function FleetRcView({
 
         {/* Content */}
         <div className="flex-1">
+          {showSelection && filtered.length > 0 && (
+            <div className="flex items-center gap-3 mb-4">
+              <button onClick={toggleAllFiltered} className="flex items-center gap-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
+                  allFilteredSelected
+                    ? 'bg-emerald-600 border-emerald-600'
+                    : selectedCount > 0
+                      ? 'bg-emerald-600/20 border-emerald-600'
+                      : 'border-stone-300 dark:border-stone-600'
+                }`}>
+                  {allFilteredSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                  {!allFilteredSelected && selectedCount > 0 && <Minus className="w-3.5 h-3.5 text-emerald-600" />}
+                </div>
+                {selectedCount > 0 ? `${selectedCount} selected` : 'Select all'}
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filtered.map(row => {
               const vehicle = vehicles.find(v => v.vehicleNumber === row.vehicleNumber)
               const badge = DOC_STATUS_BADGE[row.status]
+              const isChecked = selectedRcs.has(row.vehicleNumber)
               return (
-                <div key={row.vehicleNumber} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+                <div
+                  key={row.vehicleNumber}
+                  onClick={showSelection ? () => toggleRc(row.vehicleNumber) : undefined}
+                  className={`rounded-xl border bg-white dark:bg-stone-900 p-4 transition-colors ${
+                    showSelection ? 'cursor-pointer' : ''
+                  } ${
+                    isChecked && showSelection
+                      ? 'border-emerald-500 dark:border-emerald-600 ring-1 ring-emerald-500/20'
+                      : 'border-stone-200 dark:border-stone-800'
+                  }`}
+                >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
+                      {showSelection && (
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                          isChecked
+                            ? 'bg-emerald-600 border-emerald-600'
+                            : 'border-stone-300 dark:border-stone-600'
+                        }`}>
+                          {isChecked && <Check className="w-3.5 h-3.5 text-white" />}
+                        </div>
+                      )}
                       <div className="w-9 h-9 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                         <Truck className="w-4 h-4 text-stone-400" />
                       </div>
@@ -1597,13 +1672,18 @@ function FleetRcView({
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div>
               <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Expiring Registration Certificates</p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{expiringItems.length} vehicles</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{selectedCount > 0 ? `${selectedCount} of ${expiringItems.length}` : expiringItems.length} vehicles</p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              disabled={selectedCount === 0}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors shadow-sm ${
+                selectedCount > 0
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
+                  : 'bg-stone-300 dark:bg-stone-700 cursor-not-allowed'
+              }`}
             >
-              Request Proposal
+              Request Proposal{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </button>
           </div>
         </div>
@@ -1613,13 +1693,18 @@ function FleetRcView({
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div>
               <p className="text-xs font-medium text-red-600 dark:text-red-400">Invalid Registration Certificates</p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{invalidItems.length} vehicles</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{selectedCount > 0 ? `${selectedCount} of ${invalidItems.length}` : invalidItems.length} vehicles</p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              disabled={selectedCount === 0}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors shadow-sm ${
+                selectedCount > 0
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
+                  : 'bg-stone-300 dark:bg-stone-700 cursor-not-allowed'
+              }`}
             >
-              Request Proposal
+              Request Proposal{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </button>
           </div>
         </div>
@@ -1646,7 +1731,38 @@ function FleetDlView({
   const validItems = dlRows.filter(r => r.status === 'valid')
   const expiringItems = dlRows.filter(r => r.status === 'expiring')
   const invalidItems = dlRows.filter(r => r.status === 'expired')
+
+  const [selectedDls, setSelectedDls] = useState<Set<string>>(() => new Set([...expiringItems, ...invalidItems].map(r => r.licenseNumber)))
   const filtered = filter === 'valid' ? validItems : filter === 'invalid' ? invalidItems : expiringItems
+
+  const showSelection = filter === 'expiring' || filter === 'invalid'
+  const allFilteredSelected = showSelection && filtered.length > 0 && filtered.every(r => selectedDls.has(r.licenseNumber))
+  const selectedCount = filtered.filter(r => selectedDls.has(r.licenseNumber)).length
+
+  function toggleDl(licenseNumber: string) {
+    setSelectedDls(prev => {
+      const next = new Set(prev)
+      if (next.has(licenseNumber)) next.delete(licenseNumber)
+      else next.add(licenseNumber)
+      return next
+    })
+  }
+
+  function toggleAllFiltered() {
+    if (allFilteredSelected) {
+      setSelectedDls(prev => {
+        const next = new Set(prev)
+        filtered.forEach(r => next.delete(r.licenseNumber))
+        return next
+      })
+    } else {
+      setSelectedDls(prev => {
+        const next = new Set(prev)
+        filtered.forEach(r => next.add(r.licenseNumber))
+        return next
+      })
+    }
+  }
 
   return (
     <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
@@ -1705,14 +1821,51 @@ function FleetDlView({
 
         {/* Content */}
         <div className="flex-1">
+          {showSelection && filtered.length > 0 && (
+            <div className="flex items-center gap-3 mb-4">
+              <button onClick={toggleAllFiltered} className="flex items-center gap-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
+                  allFilteredSelected
+                    ? 'bg-emerald-600 border-emerald-600'
+                    : selectedCount > 0
+                      ? 'bg-emerald-600/20 border-emerald-600'
+                      : 'border-stone-300 dark:border-stone-600'
+                }`}>
+                  {allFilteredSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                  {!allFilteredSelected && selectedCount > 0 && <Minus className="w-3.5 h-3.5 text-emerald-600" />}
+                </div>
+                {selectedCount > 0 ? `${selectedCount} selected` : 'Select all'}
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filtered.map(row => {
               const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
               const badge = DOC_STATUS_BADGE[row.status]
+              const isChecked = selectedDls.has(row.licenseNumber)
               return (
-                <div key={row.licenseNumber} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+                <div
+                  key={row.licenseNumber}
+                  onClick={showSelection ? () => toggleDl(row.licenseNumber) : undefined}
+                  className={`rounded-xl border bg-white dark:bg-stone-900 p-4 transition-colors ${
+                    showSelection ? 'cursor-pointer' : ''
+                  } ${
+                    isChecked && showSelection
+                      ? 'border-emerald-500 dark:border-emerald-600 ring-1 ring-emerald-500/20'
+                      : 'border-stone-200 dark:border-stone-800'
+                  }`}
+                >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
+                      {showSelection && (
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                          isChecked
+                            ? 'bg-emerald-600 border-emerald-600'
+                            : 'border-stone-300 dark:border-stone-600'
+                        }`}>
+                          {isChecked && <Check className="w-3.5 h-3.5 text-white" />}
+                        </div>
+                      )}
                       <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                         <User className="w-4 h-4 text-stone-400 dark:text-stone-500" />
                       </div>
@@ -1756,13 +1909,18 @@ function FleetDlView({
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div>
               <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Expiring Driving Licenses</p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{expiringItems.length} drivers</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{selectedCount > 0 ? `${selectedCount} of ${expiringItems.length}` : expiringItems.length} drivers</p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              disabled={selectedCount === 0}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors shadow-sm ${
+                selectedCount > 0
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
+                  : 'bg-stone-300 dark:bg-stone-700 cursor-not-allowed'
+              }`}
             >
-              Request Proposal
+              Request Proposal{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </button>
           </div>
         </div>
@@ -1772,13 +1930,18 @@ function FleetDlView({
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div>
               <p className="text-xs font-medium text-red-600 dark:text-red-400">Invalid Driving Licenses</p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{invalidItems.length} drivers</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{selectedCount > 0 ? `${selectedCount} of ${invalidItems.length}` : invalidItems.length} drivers</p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              disabled={selectedCount === 0}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors shadow-sm ${
+                selectedCount > 0
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
+                  : 'bg-stone-300 dark:bg-stone-700 cursor-not-allowed'
+              }`}
             >
-              Request Proposal
+              Request Proposal{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </button>
           </div>
         </div>
