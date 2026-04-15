@@ -105,20 +105,20 @@ export function MainNav({ items, isCollapsed, onNavigate }: MainNavProps) {
                     <span className="flex-1 text-left">{item.label}</span>
 
                     {item.badge !== undefined && !hasChildren && (
-                      <span
-                        className={`
-                          min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center
-                          text-xs font-semibold rounded-full
-                          ${
-                            isParentActive
-                              ? 'bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200'
-                              : 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400'
-                          }
-                        `}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
+                  <span
+                    className={`
+                      min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center
+                      text-xs font-semibold rounded-full
+                      ${
+                        isParentActive
+                          ? 'bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200'
+                          : 'bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400'
+                      }
+                    `}
+                  >
+                    {item.badge}
+                  </span>
+                )}
 
                     {hasChildren && (
                       <ChevronDown

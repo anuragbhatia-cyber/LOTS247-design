@@ -156,6 +156,7 @@ export interface AppShellProps {
   children: React.ReactNode
   navigationItems: NavigationItem[]
   secondaryItems?: NavigationItem[]
+  activePath?: string
   user?: {
     name: string
     avatarUrl?: string
@@ -360,6 +361,7 @@ export function AppShell({
   children,
   navigationItems,
   secondaryItems,
+  activePath,
   user,
   onNavigate,
   onLogout,
@@ -490,7 +492,7 @@ export function AppShell({
           ${isMobileOpen ? 'translate-x-0 z-50' : '-translate-x-full lg:translate-x-0 z-40'}
         `}
       >
-        {/* Logo & Collapse Toggle */}
+        {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-stone-800/50">
           <div className={`flex items-center ${isCollapsed ? 'justify-center w-full' : ''}`}>
             {isCollapsed ? (
@@ -511,6 +513,23 @@ export function AppShell({
             <X className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Collapse Toggle — floats on the right edge of the sidebar */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!isCollapsed}
+          className="hidden lg:flex absolute top-20 -right-3.5 z-50 w-7 h-7 items-center justify-center rounded-full bg-stone-900 border border-stone-700 text-stone-400 hover:bg-stone-800 hover:text-stone-200 shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+        >
+          <svg
+            className={`w-3.5 h-3.5 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+          </svg>
+        </button>
 
         {/* Navigation */}
         <div className="flex flex-col h-[calc(100%-4rem)]">
@@ -540,28 +559,28 @@ export function AppShell({
             )}
           </div>
 
-          {/* Collapse Toggle (Desktop) */}
-          <div className="hidden lg:block px-3 py-3 border-t border-stone-800/50">
+          {/* Settings */}
+          <div className="px-3 py-3 border-t border-stone-800/50">
             <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              aria-expanded={!isCollapsed}
+              onClick={() => {
+                onNavigate?.('/settings')
+                setIsMobileOpen(false)
+              }}
+              title={isCollapsed ? t.settings : undefined}
               className={`
-                w-full flex items-center gap-2 px-2 py-2 text-sm text-stone-400
-                hover:text-stone-200 hover:bg-stone-800
-                rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40
-                ${isCollapsed ? 'justify-center' : ''}
+                w-full flex items-center gap-3 px-3 py-2.5 min-h-11 rounded-lg text-[13px] font-medium
+                transition-all duration-150
+                focus:outline-none focus:ring-2 focus:ring-emerald-500/40
+                ${isCollapsed ? 'justify-center px-2' : ''}
+                ${
+                  activePath === '/settings'
+                    ? 'bg-emerald-950/60 text-emerald-400'
+                    : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+                }
               `}
             >
-              <svg
-                className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-              </svg>
-              {!isCollapsed && <span>{t.collapse}</span>}
+              <Settings className="w-5 h-5 flex-shrink-0" />
+              {!isCollapsed && <span>{t.settings}</span>}
             </button>
           </div>
 
@@ -740,16 +759,6 @@ export function AppShell({
                     >
                       <User className="w-4 h-4 text-stone-400" />
                       {t.myProfile}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setProfileOpen(false)
-                        onNavigate?.('/settings')
-                      }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
-                    >
-                      <Settings className="w-4 h-4 text-stone-400" />
-                      {t.settings}
                     </button>
                     <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
                     <button

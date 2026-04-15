@@ -152,6 +152,7 @@ function ShellContent() {
     <AppShell
       navigationItems={navigationItems}
       secondaryItems={secondaryItems}
+      activePath={activePath}
       user={user}
       onNavigate={(href) => {
         setActivePath(href)

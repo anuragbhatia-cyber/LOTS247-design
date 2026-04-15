@@ -75,7 +75,7 @@ export function AlertsView({ items, onBack, onAlertClick }: AlertsViewProps) {
   const t = viewTranslations[language]
   const catLabels = categoryLabels[language]
 
-  const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
+  const [activeFilter, setActiveFilter] = useState<FilterTab>('challan')
   const filtered = activeFilter === 'all' ? items : items.filter(i => i.category === activeFilter)
 
   return (

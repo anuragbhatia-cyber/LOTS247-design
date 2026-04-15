@@ -79,7 +79,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
   const t = feedTranslations[language]
   const catLabels = categoryLabels[language]
 
-  const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
+  const [activeFilter, setActiveFilter] = useState<FilterTab>('challan')
 
   const filtered = activeFilter === 'all' ? items : items.filter(i => i.category === activeFilter)
 
