@@ -122,6 +122,22 @@
       "vehicleNumber": "UP32NN2224",
       "title": "Pending challan — ₹2,000",
       "daysRemaining": 28
+    },
+    {
+      "id": "alt-7",
+      "category": "renewal",
+      "urgency": "warning",
+      "vehicleNumber": "UP32RR5557",
+      "title": "RC renewal due in 14 days",
+      "daysRemaining": 14
+    },
+    {
+      "id": "alt-8",
+      "category": "renewal",
+      "urgency": "notice",
+      "vehicleNumber": "UP32SS6668",
+      "title": "Permit renewal due in 20 days",
+      "daysRemaining": 20
     }
   ]
 }

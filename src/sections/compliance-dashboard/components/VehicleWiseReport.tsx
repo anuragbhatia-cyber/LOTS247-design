@@ -293,18 +293,19 @@ export function VehicleWiseReport({ vehicles, vehicleHistory }: VehicleWiseRepor
           {/* Left column — Vehicle Summary + Compliance Status */}
           <div className="lg:col-span-3 space-y-4">
             {/* Vehicle Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Total Incidents', count: '5', amount: '₹48,500' },
-                { label: 'Total Cases', count: '3', amount: '₹32,000' },
-                { label: 'Total Renewals', count: '7', amount: '₹18,200' },
+                { label: 'Total Challans', count: '5', amount: '₹48,500', highlight: false },
+                { label: 'Total Cases', count: '3', amount: '₹32,000', highlight: false },
+                { label: 'Total Renewals', count: '7', amount: '₹18,200', highlight: false },
+                { label: 'Amount Saved', count: '₹24,300', amount: null, highlight: true },
               ].map(card => (
-                <div key={card.label} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm p-5 sm:p-6">
-                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums mb-1">
+                <div key={card.label} className={`rounded-xl shadow-sm p-4 sm:p-5 ${card.highlight ? 'bg-emerald-50 border border-emerald-200 dark:bg-emerald-950 dark:border-emerald-800' : 'border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900'}`}>
+                  <p className={`text-xs font-semibold uppercase tracking-wider mb-2 ${card.highlight ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-400'}`}>{card.label}</p>
+                  <p className={`text-2xl font-bold tracking-tight tabular-nums ${card.highlight ? 'text-emerald-700 dark:text-emerald-300' : 'text-stone-900 dark:text-stone-50'}`}>
                     {card.count}
                   </p>
-                  <p className="text-sm font-medium text-stone-900 dark:text-stone-100 mb-2">{card.label}</p>
-                  <p className="text-sm font-bold text-stone-900 dark:text-stone-100 tabular-nums">{card.amount}</p>
+                  {card.amount && <p className={`text-sm font-semibold tabular-nums mt-1 ${card.highlight ? 'text-emerald-500' : 'text-stone-500 dark:text-stone-400'}`}>{card.amount}</p>}
                 </div>
               ))}
             </div>

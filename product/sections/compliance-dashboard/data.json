@@ -310,18 +310,18 @@
       { "driverName": "Sunil Rawat", "licenseNumber": "CG04250067890", "status": "expiring", "expiryDate": "2026-04-28", "vehiclesAssigned": ["CG04JK2278"] }
     ],
     "challans": [
-      { "vehicleNumber": "UP32MM1113", "outstandingCount": 3, "courtCount": 1, "onlineCount": 2, "totalAmount": 15500, "latestDate": "2026-03-10" },
-      { "vehicleNumber": "DL01AB3456", "outstandingCount": 5, "courtCount": 2, "onlineCount": 3, "totalAmount": 28000, "latestDate": "2026-03-15" },
-      { "vehicleNumber": "UP14GT7890", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null },
-      { "vehicleNumber": "HR26DK4521", "outstandingCount": 2, "courtCount": 1, "onlineCount": 1, "totalAmount": 11000, "latestDate": "2026-02-28" },
-      { "vehicleNumber": "MH04EQ6789", "outstandingCount": 4, "courtCount": 1, "onlineCount": 3, "totalAmount": 22500, "latestDate": "2026-03-18" },
-      { "vehicleNumber": "RJ14SB2345", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null },
-      { "vehicleNumber": "UP78BT5678", "outstandingCount": 1, "courtCount": 0, "onlineCount": 1, "totalAmount": 5000, "latestDate": "2026-01-22" },
-      { "vehicleNumber": "GJ01JX9012", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null },
-      { "vehicleNumber": "MP09NK3456", "outstandingCount": 6, "courtCount": 2, "onlineCount": 4, "totalAmount": 35500, "latestDate": "2026-03-20" },
-      { "vehicleNumber": "KA01MV7890", "outstandingCount": 3, "courtCount": 1, "onlineCount": 2, "totalAmount": 18000, "latestDate": "2026-03-05" },
-      { "vehicleNumber": "TN01AB1234", "outstandingCount": 2, "courtCount": 1, "onlineCount": 1, "totalAmount": 8500, "latestDate": "2026-02-15" },
-      { "vehicleNumber": "PB10CD5678", "outstandingCount": 1, "courtCount": 0, "onlineCount": 1, "totalAmount": 3500, "latestDate": "2026-03-01" }
+      { "vehicleNumber": "UP32MM1113", "outstandingCount": 3, "courtCount": 1, "onlineCount": 2, "totalAmount": 15500, "latestDate": "2026-03-10", "submittedCount": 1, "notSubmittedCount": 2, "paidCount": 2, "paidAmount": 7000 },
+      { "vehicleNumber": "DL01AB3456", "outstandingCount": 5, "courtCount": 2, "onlineCount": 3, "totalAmount": 28000, "latestDate": "2026-03-15", "submittedCount": 2, "notSubmittedCount": 3, "paidCount": 3, "paidAmount": 12500 },
+      { "vehicleNumber": "UP14GT7890", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null, "submittedCount": 0, "notSubmittedCount": 0, "paidCount": 1, "paidAmount": 3500 },
+      { "vehicleNumber": "HR26DK4521", "outstandingCount": 2, "courtCount": 1, "onlineCount": 1, "totalAmount": 11000, "latestDate": "2026-02-28", "submittedCount": 1, "notSubmittedCount": 1, "paidCount": 1, "paidAmount": 4000 },
+      { "vehicleNumber": "MH04EQ6789", "outstandingCount": 4, "courtCount": 1, "onlineCount": 3, "totalAmount": 22500, "latestDate": "2026-03-18", "submittedCount": 1, "notSubmittedCount": 3, "paidCount": 2, "paidAmount": 9000 },
+      { "vehicleNumber": "RJ14SB2345", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null, "submittedCount": 0, "notSubmittedCount": 0, "paidCount": 2, "paidAmount": 5500 },
+      { "vehicleNumber": "UP78BT5678", "outstandingCount": 1, "courtCount": 0, "onlineCount": 1, "totalAmount": 5000, "latestDate": "2026-01-22", "submittedCount": 0, "notSubmittedCount": 1, "paidCount": 1, "paidAmount": 2500 },
+      { "vehicleNumber": "GJ01JX9012", "outstandingCount": 0, "courtCount": 0, "onlineCount": 0, "totalAmount": 0, "latestDate": null, "submittedCount": 0, "notSubmittedCount": 0, "paidCount": 1, "paidAmount": 3000 },
+      { "vehicleNumber": "MP09NK3456", "outstandingCount": 6, "courtCount": 2, "onlineCount": 4, "totalAmount": 35500, "latestDate": "2026-03-20", "submittedCount": 2, "notSubmittedCount": 4, "paidCount": 3, "paidAmount": 14000 },
+      { "vehicleNumber": "KA01MV7890", "outstandingCount": 3, "courtCount": 1, "onlineCount": 2, "totalAmount": 18000, "latestDate": "2026-03-05", "submittedCount": 1, "notSubmittedCount": 2, "paidCount": 2, "paidAmount": 8000 },
+      { "vehicleNumber": "TN01AB1234", "outstandingCount": 2, "courtCount": 1, "onlineCount": 1, "totalAmount": 8500, "latestDate": "2026-02-15", "submittedCount": 1, "notSubmittedCount": 1, "paidCount": 1, "paidAmount": 3500 },
+      { "vehicleNumber": "PB10CD5678", "outstandingCount": 1, "courtCount": 0, "onlineCount": 1, "totalAmount": 3500, "latestDate": "2026-03-01", "submittedCount": 0, "notSubmittedCount": 1, "paidCount": 0, "paidAmount": 0 }
     ],
     "blacklisted": [
       { "vehicleNumber": "MP09NK3456", "flagReason": "Multiple unpaid challans exceeding ₹30,000", "flaggingAuthority": "RTO Bhopal", "flagDate": "2026-03-12", "status": "active" },

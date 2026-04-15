@@ -1,4 +1,5 @@
-import { FileWarning, Clock, Shield, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
+import { FileWarning, Clock, Shield, ArrowRight, RefreshCw } from 'lucide-react'
 import type { AlertItem, AlertCategory, AlertUrgency } from '@/../product/sections/home/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
@@ -8,20 +9,18 @@ interface AlertsFeedProps {
   onAlertClick?: (alert: AlertItem) => void
 }
 
+type FilterTab = 'all' | AlertCategory
+
 const categoryLabels: Record<Language, Record<AlertCategory, string>> = {
-  en: { puc: 'PUC', insurance: 'Insurance', challan: 'Challan' },
-  hi: { puc: 'पीयूसी', insurance: 'बीमा', challan: 'चालान' },
+  en: { puc: 'PUC', insurance: 'Insurance', challan: 'Challan', renewal: 'Renewal' },
+  hi: { puc: 'पीयूसी', insurance: 'बीमा', challan: 'चालान', renewal: 'नवीनीकरण' },
 }
 
 const categoryIcons: Record<AlertCategory, typeof FileWarning> = {
   puc: Clock,
   insurance: Shield,
   challan: FileWarning,
-}
-
-const urgencyBadgeLabels: Record<Language, Record<AlertUrgency, string>> = {
-  en: { critical: 'Urgent', warning: 'Expiring soon', notice: 'Upcoming' },
-  hi: { critical: 'तत्काल', warning: 'जल्द समाप्त', notice: 'आगामी' },
+  renewal: RefreshCw,
 }
 
 const urgencyStyles: Record<AlertUrgency, {
@@ -57,6 +56,7 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     payNow: 'Pay Now',
     raiseProposal: 'Create Request',
     seeAllAlerts: 'See all alerts',
+    all: 'All',
   },
   hi: {
     alerts: 'अलर्ट',
@@ -68,17 +68,26 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     payNow: 'अभी भुगतान करें',
     raiseProposal: 'अनुरोध बनाएं',
     seeAllAlerts: 'सभी अलर्ट देखें',
+    all: 'सभी',
   },
 }
+
+const filterTabs: FilterTab[] = ['all', 'challan', 'puc', 'insurance', 'renewal']
 
 export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) {
   const { language } = useLanguage()
   const t = feedTranslations[language]
+  const catLabels = categoryLabels[language]
+
+  const [activeFilter, setActiveFilter] = useState<FilterTab>('all')
+
+  const filtered = activeFilter === 'all' ? items : items.filter(i => i.category === activeFilter)
+
   return (
     <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-stone-200 dark:border-stone-800">
-        <div className="flex items-center gap-3">
+      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-3 border-b border-stone-200 dark:border-stone-800">
+        <div className="flex items-center gap-3 mb-3">
           <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
             {t.alerts}
           </h2>
@@ -88,11 +97,32 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
             </span>
           )}
         </div>
+
+        {/* Filter chips */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {filterTabs.map((tab) => {
+            const isActive = activeFilter === tab
+            const label = tab === 'all' ? t.all : catLabels[tab as AlertCategory]
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveFilter(tab)}
+                className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
+                  isActive
+                    ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900'
+                    : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'
+                }`}
+              >
+                {label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      {/* Alerts — first 3 items */}
+      {/* Alerts — first 3 filtered items */}
       <div className="divide-y divide-stone-200 dark:divide-stone-800">
-        {items.slice(0, 3).map((item) => {
+        {filtered.slice(0, 3).map((item) => {
           const Icon = categoryIcons[item.category]
           const style = urgencyStyles[item.urgency]
           return (
@@ -124,6 +154,11 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
             </div>
           )
         })}
+        {filtered.length === 0 && (
+          <div className="px-5 sm:px-6 py-8 text-center text-sm text-stone-400 dark:text-stone-600">
+            No alerts in this category
+          </div>
+        )}
       </div>
 
       {/* See all */}
