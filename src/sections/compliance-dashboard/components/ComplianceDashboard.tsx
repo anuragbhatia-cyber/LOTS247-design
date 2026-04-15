@@ -52,6 +52,8 @@ import type {
   PermitType,
   MonthlyChallanTrendPoint,
   VehicleHistoryEventType,
+  ChallanDrilldownRow,
+  Vehicle,
 } from '@/../product/sections/compliance-dashboard/types'
 
 // ---------------------------------------------------------------------------
@@ -1022,6 +1024,8 @@ const CHALLAN_VIOLATIONS: { violation: string; location: string }[] = [
   { violation: 'Using Phone While Driving', location: 'Eastern Express Highway, Mumbai' },
 ]
 
+type SubmissionStatus = 'not_submitted' | 'submitted' | 'paid'
+
 type IndividualChallan = {
   id: string
   vehicleNumber: string
@@ -1032,9 +1036,10 @@ type IndividualChallan = {
   location: string
   challanType: 'court' | 'online'
   status: 'pending' | 'paid'
+  submissionStatus: SubmissionStatus
 }
 
-function FleetChallanView({
+function FleetChallanLanding({
   challanRows,
   vehicles,
   onBack,
@@ -1045,7 +1050,246 @@ function FleetChallanView({
   onBack: () => void
   hideTitle?: boolean
 }) {
-  const [filter, setFilter] = useState<'pending' | 'paid'>('pending')
+  const [drillFilter, setDrillFilter] = useState<{ filter: 'pending' | 'paid'; submission: SubmissionStatus } | null>(null)
+
+  // Compute summary numbers from the drilldown rows
+  const notSubmittedCount = challanRows.reduce((s, r) => s + (r.notSubmittedCount || 0), 0)
+  const notSubmittedAmount = useMemo(() => {
+    let total = 0
+    for (const r of challanRows) {
+      if (r.outstandingCount > 0 && (r.notSubmittedCount || 0) > 0) {
+        const perChallan = r.totalAmount / r.outstandingCount
+        total += perChallan * (r.notSubmittedCount || 0)
+      }
+    }
+    return Math.round(total)
+  }, [challanRows])
+
+  const submittedCount = challanRows.reduce((s, r) => s + (r.submittedCount || 0), 0)
+  const submittedAmount = useMemo(() => {
+    let total = 0
+    for (const r of challanRows) {
+      if (r.outstandingCount > 0 && (r.submittedCount || 0) > 0) {
+        const perChallan = r.totalAmount / r.outstandingCount
+        total += perChallan * (r.submittedCount || 0)
+      }
+    }
+    return Math.round(total)
+  }, [challanRows])
+
+  const paidCount = challanRows.reduce((s, r) => s + (r.paidCount || 0), 0)
+  const paidAmount = challanRows.reduce((s, r) => s + (r.paidAmount || 0), 0)
+
+  const totalOutstanding = challanRows.reduce((s, r) => s + r.totalAmount, 0)
+
+  if (drillFilter) {
+    return (
+      <FleetChallanView
+        challanRows={challanRows}
+        vehicles={vehicles}
+        onBack={() => setDrillFilter(null)}
+        hideTitle={false}
+        initialFilter={drillFilter.filter}
+        initialSubmissionFilter={drillFilter.submission}
+      />
+    )
+  }
+
+  const notSubmittedRows = challanRows
+    .filter(r => (r.notSubmittedCount || 0) > 0)
+    .map(r => ({ vehicleNumber: r.vehicleNumber, count: r.notSubmittedCount || 0, amount: r.outstandingCount > 0 ? Math.round((r.totalAmount / r.outstandingCount) * (r.notSubmittedCount || 0)) : 0 }))
+    .sort((a, b) => b.amount - a.amount)
+
+  const submittedRows = challanRows
+    .filter(r => (r.submittedCount || 0) > 0)
+    .map(r => ({ vehicleNumber: r.vehicleNumber, count: r.submittedCount || 0, amount: r.outstandingCount > 0 ? Math.round((r.totalAmount / r.outstandingCount) * (r.submittedCount || 0)) : 0 }))
+    .sort((a, b) => b.amount - a.amount)
+
+  const paidRows = challanRows
+    .filter(r => (r.paidCount || 0) > 0)
+    .map(r => ({ vehicleNumber: r.vehicleNumber, count: r.paidCount || 0, amount: r.paidAmount || 0 }))
+    .sort((a, b) => b.amount - a.amount)
+
+  const cards: {
+    key: string
+    label: string
+    badge: string
+    badgeColor: string
+    count: number
+    amount: number
+    iconBg: string
+    iconColor: string
+    amountColor: string
+    rowTextColor: string
+    rows: { vehicleNumber: string; count: number; amount: number }[]
+    onClick: () => void
+  }[] = [
+    {
+      key: 'not_submitted',
+      label: 'Not Submitted',
+      badge: 'ACTION REQUIRED',
+      badgeColor: 'bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-400',
+      count: notSubmittedCount,
+      amount: notSubmittedAmount,
+      iconBg: 'bg-red-100 dark:bg-red-950/40',
+      iconColor: 'text-red-600 dark:text-red-400',
+      amountColor: 'text-red-700 dark:text-red-400',
+      rowTextColor: 'text-red-600 dark:text-red-400',
+      rows: notSubmittedRows,
+      onClick: () => setDrillFilter({ filter: 'pending', submission: 'not_submitted' }),
+    },
+    {
+      key: 'submitted',
+      label: 'Submitted',
+      badge: 'PROCESSING',
+      badgeColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400',
+      count: submittedCount,
+      amount: submittedAmount,
+      iconBg: 'bg-amber-100 dark:bg-amber-950/40',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+      amountColor: 'text-amber-700 dark:text-amber-400',
+      rowTextColor: 'text-amber-600 dark:text-amber-400',
+      rows: submittedRows,
+      onClick: () => setDrillFilter({ filter: 'pending', submission: 'submitted' }),
+    },
+    {
+      key: 'paid',
+      label: 'Paid',
+      badge: 'PAID',
+      badgeColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400',
+      count: paidCount,
+      amount: paidAmount,
+      iconBg: 'bg-emerald-100 dark:bg-emerald-950/40',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      amountColor: 'text-emerald-700 dark:text-emerald-400',
+      rowTextColor: 'text-emerald-600 dark:text-emerald-400',
+      rows: paidRows,
+      onClick: () => setDrillFilter({ filter: 'paid', submission: 'paid' }),
+    },
+  ]
+
+  return (
+    <div>
+      <div className="mb-6">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
+          </button>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Fleet Challans</h2>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {cards.map(card => (
+          <div key={card.key} className="group flex flex-col transition-all duration-200 hover:drop-shadow-lg">
+            {/* Zigzag top edge */}
+            <svg className="block w-full shrink-0" height="14" viewBox="0 0 300 14" preserveAspectRatio="none">
+              <path
+                d="M0,14 L0,9 L10,0 L20,9 L30,0 L40,9 L50,0 L60,9 L70,0 L80,9 L90,0 L100,9 L110,0 L120,9 L130,0 L140,9 L150,0 L160,9 L170,0 L180,9 L190,0 L200,9 L210,0 L220,9 L230,0 L240,9 L250,0 L260,9 L270,0 L280,9 L290,0 L300,9 L300,14 Z"
+                className="fill-white dark:fill-stone-900"
+              />
+              <path
+                d="M0,9 L10,0 L20,9 L30,0 L40,9 L50,0 L60,9 L70,0 L80,9 L90,0 L100,9 L110,0 L120,9 L130,0 L140,9 L150,0 L160,9 L170,0 L180,9 L190,0 L200,9 L210,0 L220,9 L230,0 L240,9 L250,0 L260,9 L270,0 L280,9 L290,0 L300,9"
+                className="stroke-stone-200 dark:stroke-stone-800"
+                fill="none"
+                strokeWidth="1"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+            {/* Card body */}
+            <div className="flex-1 border-x border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-b-xl p-5 text-left">
+            <div className="flex items-center justify-between mb-4">
+              <span className={`inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider ${card.badgeColor}`}>
+                {card.badge}
+              </span>
+              <div className={`w-8 h-8 rounded-lg ${card.iconBg} flex items-center justify-center`}>
+                {card.key === 'not_submitted' && <AlertTriangle className={`w-4 h-4 ${card.iconColor}`} />}
+                {card.key === 'submitted' && <Clock className={`w-4 h-4 ${card.iconColor}`} />}
+                {card.key === 'paid' && <ShieldCheck className={`w-4 h-4 ${card.iconColor}`} />}
+              </div>
+            </div>
+
+            <p className="text-sm font-medium text-stone-500 dark:text-stone-400">{card.label}</p>
+            <p className={`text-2xl font-bold mt-1 ${card.amountColor}`}>{formatCurrency(card.amount)}</p>
+            <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">{card.count} challans</p>
+
+            {card.rows.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800 space-y-2">
+                {card.rows.slice(0, 3).map(row => (
+                  <div key={row.vehicleNumber} className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-semibold text-stone-700 dark:text-stone-200">{row.vehicleNumber}</span>
+                      <span className="text-xs text-stone-400 dark:text-stone-500 ml-1.5">{row.count} challan{row.count !== 1 ? 's' : ''}</span>
+                    </div>
+                    <span className={`text-xs font-semibold ${card.rowTextColor}`}>{formatCurrency(row.amount)}</span>
+                  </div>
+                ))}
+                {card.rows.length > 3 && (
+                  <p className="text-xs text-stone-400 dark:text-stone-500">+{card.rows.length - 3} more vehicles</p>
+                )}
+              </div>
+            )}
+
+            {card.key === 'not_submitted' && (
+              <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800">
+                <div className="flex items-start gap-2 mb-4">
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-500 dark:text-red-400 mt-0.5 shrink-0" />
+                  <p className="text-xs text-red-600 dark:text-red-400 font-medium leading-snug">Pay now to avoid vehicle blacklisting</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={card.onClick}
+                    className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors text-center"
+                  >
+                    View & Request Proposal
+                  </button>
+                  <button
+                    onClick={card.onClick}
+                    className="w-full py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors text-center"
+                  >
+                    View Challans
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {card.key !== 'not_submitted' && (
+              <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800">
+                <button
+                  onClick={card.onClick}
+                  className="w-full py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors text-center"
+                >
+                  View Challans
+                </button>
+              </div>
+            )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function FleetChallanView({
+  challanRows,
+  vehicles,
+  onBack,
+  hideTitle,
+  initialFilter,
+  initialSubmissionFilter,
+}: {
+  challanRows: ChallanDrilldownRow[]
+  vehicles: Vehicle[]
+  onBack: () => void
+  hideTitle?: boolean
+  initialFilter?: 'pending' | 'paid'
+  initialSubmissionFilter?: SubmissionStatus
+}) {
+  const [filter, setFilter] = useState<'pending' | 'paid'>(initialFilter || 'pending')
   const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set())
   const [showProposalToast, setShowProposalToast] = useState(false)
   const [selectedVehiclesInit, setSelectedVehiclesInit] = useState(false)
@@ -1053,6 +1297,7 @@ function FleetChallanView({
   const [selectedChallans, setSelectedChallans] = useState<Set<string>>(new Set())
   const [searchVehicle, setSearchVehicle] = useState('')
   const [challanTypeFilter, setChallanTypeFilter] = useState<'all' | 'court' | 'online'>('all')
+  const [submissionStatusFilter, setSubmissionStatusFilter] = useState<SubmissionStatus | 'all'>(initialSubmissionFilter || 'all')
 
   const toggleSelectChallan = (challanId: string) => {
     setSelectedChallans(prev => {
@@ -1096,12 +1341,18 @@ function FleetChallanView({
     for (const row of challanRows) {
       if (row.outstandingCount > 0) {
         const baseAmt = Math.round(row.totalAmount / row.outstandingCount / 500) * 500 || 2000
+        let submittedAssigned = 0
         for (let i = 0; i < row.outstandingCount; i++) {
           const m = CHALLAN_VIOLATIONS[idx % CHALLAN_VIOLATIONS.length]
           const isLast = i === row.outstandingCount - 1
           const amount = isLast ? row.totalAmount - baseAmt * (row.outstandingCount - 1) : baseAmt
           const base = new Date(row.latestDate || '2026-02-15')
           base.setDate(base.getDate() - i * 12)
+          let submissionStatus: SubmissionStatus = 'not_submitted'
+          if (submittedAssigned < (row.submittedCount || 0)) {
+            submissionStatus = 'submitted'
+            submittedAssigned++
+          }
           result.push({
             id: `pend-${idx}`,
             vehicleNumber: row.vehicleNumber,
@@ -1112,22 +1363,33 @@ function FleetChallanView({
             location: m.location,
             challanType: i < row.courtCount ? 'court' : 'online',
             status: 'pending',
+            submissionStatus,
           })
           idx++
         }
-        const paidCount = Math.max(1, Math.floor(row.outstandingCount * 0.4))
-        for (let i = 0; i < paidCount; i++) {
+      }
+      // Generate paid challans for vehicles that have paidCount
+      const vehiclePaidCount = row.paidCount || (row.outstandingCount > 0 ? Math.max(1, Math.floor(row.outstandingCount * 0.4)) : 0)
+      if (vehiclePaidCount > 0) {
+        const vehiclePaidAmount = row.paidAmount || 0
+        const paidBaseAmt = vehiclePaidAmount > 0 ? Math.round(vehiclePaidAmount / vehiclePaidCount / 500) * 500 || 2000 : 0
+        for (let i = 0; i < vehiclePaidCount; i++) {
           const m = CHALLAN_VIOLATIONS[(idx + 3) % CHALLAN_VIOLATIONS.length]
+          const isLast = i === vehiclePaidCount - 1
+          const amount = vehiclePaidAmount > 0
+            ? (isLast ? vehiclePaidAmount - paidBaseAmt * (vehiclePaidCount - 1) : paidBaseAmt)
+            : paidAmounts[idx % paidAmounts.length]
           result.push({
             id: `paid-${idx}`,
             vehicleNumber: row.vehicleNumber,
             violation: m.violation,
             challanNumber: `CH${row.vehicleNumber.replace(/[^0-9]/g, '').slice(0, 8)}${String(idx + 200)}`,
-            amount: paidAmounts[idx % paidAmounts.length],
+            amount: Math.max(500, amount),
             date: `2025-${String(7 + (i % 5)).padStart(2, '0')}-${String(5 + ((idx * 3) % 23)).padStart(2, '0')}`,
             location: m.location,
             challanType: i % 2 === 0 ? 'court' : 'online',
             status: 'paid',
+            submissionStatus: 'paid',
           })
           idx++
         }
@@ -1141,8 +1403,11 @@ function FleetChallanView({
     if (challanTypeFilter !== 'all') {
       result = result.filter(c => c.challanType === challanTypeFilter)
     }
+    if (submissionStatusFilter !== 'all') {
+      result = result.filter(c => c.submissionStatus === submissionStatusFilter)
+    }
     return result
-  }, [allChallans, filter, challanTypeFilter])
+  }, [allChallans, filter, challanTypeFilter, submissionStatusFilter])
 
   const grouped = useMemo(() => {
     const map = new Map<string, IndividualChallan[]>()
@@ -1169,6 +1434,9 @@ function FleetChallanView({
 
   const pendingCount = allChallans.filter(c => c.status === 'pending').length
   const paidCount = allChallans.filter(c => c.status === 'paid').length
+  const notSubmittedCount = allChallans.filter(c => c.submissionStatus === 'not_submitted').length
+  const submittedCount = allChallans.filter(c => c.submissionStatus === 'submitted').length
+  const paidSubmissionCount = allChallans.filter(c => c.submissionStatus === 'paid').length
 
   const selectedAmount = useMemo(() => {
     if (selectedVehicles.size === 0) return 0
@@ -1177,13 +1445,21 @@ function FleetChallanView({
       .reduce((s, c) => s + c.amount, 0)
   }, [filtered, selectedVehicles])
 
-  const showBottomBar = filter === 'pending' && selectedVehicles.size > 0
+  const showBottomBar = filter === 'pending' && submissionStatusFilter !== 'submitted' && selectedVehicles.size > 0
 
   return (
     <div className={`${showBottomBar ? 'pb-20' : ''}`}>
       {!hideTitle && (
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">All Vehicle Challans</h2>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
+          </button>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">All Vehicle Challans</h2>
+        </div>
         <button className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 hover:border-stone-300 dark:hover:border-stone-600 transition-colors">
           <Download className="w-4 h-4" />
           Export
@@ -1279,6 +1555,37 @@ function FleetChallanView({
               ))}
             </div>
           </div>
+
+          {/* Submission status filter pills — only on pending tab */}
+          {filter === 'pending' && (
+            <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
+              {([
+                { key: 'all' as const, label: 'All', count: pendingCount },
+                { key: 'not_submitted' as const, label: 'Not Submitted', count: notSubmittedCount },
+                { key: 'submitted' as const, label: 'Submitted', count: submittedCount },
+              ] as const).map(pill => {
+                const isActive = submissionStatusFilter === pill.key
+                return (
+                  <button
+                    key={pill.key}
+                    onClick={() => setSubmissionStatusFilter(pill.key)}
+                    className={`shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                      isActive
+                        ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900'
+                        : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600'
+                    }`}
+                  >
+                    {pill.label}
+                    <span className={`ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full ${
+                      isActive ? 'bg-white/20 text-inherit' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
+                    }`}>
+                      {pill.count}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
 
           <div className="space-y-4">
           {/* Select All — only on pending tab */}
@@ -1527,7 +1834,15 @@ function FleetRcView({
     <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
       {!hideTitle && (
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Registration Certificates</h2>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
+          </button>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Registration Certificates</h2>
+        </div>
       </div>
       )}
 
@@ -1768,7 +2083,15 @@ function FleetDlView({
     <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
       {!hideTitle && (
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Driving Licenses</h2>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
+          </button>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Driving Licenses</h2>
+        </div>
       </div>
       )}
 
@@ -2187,11 +2510,11 @@ export function ComplianceDashboard({
         {/* ---------------------------------------------------------------- */}
         {activeCardView ? (
           activeCardView === 'challan' ? (
-            <FleetChallanView challanRows={categoryDrilldowns.challans} vehicles={vehicles} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={!!initialView} />
+            <FleetChallanLanding challanRows={categoryDrilldowns.challans} vehicles={vehicles} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={false} />
           ) : activeCardView === 'rc' ? (
-            <FleetRcView rcRows={categoryDrilldowns.rc} vehicles={vehicles} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={!!initialView} />
+            <FleetRcView rcRows={categoryDrilldowns.rc} vehicles={vehicles} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={false} />
           ) : (
-            <FleetDlView dlRows={categoryDrilldowns.dl} drivers={drivers} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={!!initialView} />
+            <FleetDlView dlRows={categoryDrilldowns.dl} drivers={drivers} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={false} />
           )
         ) : scope === 'driver' ? (
           <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">

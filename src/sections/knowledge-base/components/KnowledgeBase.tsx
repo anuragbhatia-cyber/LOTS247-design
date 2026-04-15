@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import {
   Search,
   X,
@@ -21,6 +21,10 @@ import {
   ChevronRight,
   ArrowUpToLine,
   SlidersHorizontal,
+  Bot,
+  Send,
+  PanelRight,
+  PanelRightClose,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 import type {
@@ -841,12 +845,278 @@ function DetailView({
       {showBackToTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 w-10 h-10 rounded-full bg-emerald-600 dark:bg-emerald-500 text-white shadow-lg hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-colors flex items-center justify-center"
+          className="fixed bottom-22 right-6 w-10 h-10 rounded-full bg-stone-700 dark:bg-stone-600 text-white shadow-lg hover:bg-stone-800 dark:hover:bg-stone-500 transition-colors flex items-center justify-center"
         >
           <ArrowUpToLine className="w-4 h-4" />
         </button>
       )}
     </div>
+  )
+}
+
+// =============================================================================
+// BOT247 — Types, Search, Component
+// =============================================================================
+
+type BotMessageRole = 'bot' | 'user'
+interface BotMessage {
+  id: string
+  role: BotMessageRole
+  text: string
+  articles?: Article[]
+  faqMatches?: { question: string; answer: string; topic: string }[]
+}
+
+function scoredSearch(query: string, articles: Article[], faqItems: FaqItem[]) {
+  const terms = query.toLowerCase().split(/\s+/).filter((t) => t.length > 1)
+  if (terms.length === 0) return { topArticles: [], topFaqs: [] }
+
+  const articleScores = articles.map((a) => {
+    let score = 0
+    const title = a.title.toLowerCase()
+    const excerpt = a.excerpt.toLowerCase()
+    const content = a.content.toLowerCase()
+    const tags = a.tags.map((t) => t.toLowerCase()).join(' ')
+    const category = a.category.toLowerCase()
+    for (const term of terms) {
+      if (title.includes(term)) score += 6
+      if (tags.includes(term)) score += 4
+      if (category.includes(term)) score += 3
+      if (excerpt.includes(term)) score += 2
+      if (content.includes(term)) score += 1
+    }
+    return { article: a, score }
+  })
+
+  const faqScores = faqItems.map((f) => {
+    let score = 0
+    const q = f.question.toLowerCase()
+    const a = f.answer.toLowerCase()
+    const topic = f.topic.toLowerCase()
+    for (const term of terms) {
+      if (q.includes(term)) score += 5
+      if (topic.includes(term)) score += 3
+      if (a.includes(term)) score += 2
+    }
+    return { faq: f, score }
+  })
+
+  const topArticles = articleScores.filter((s) => s.score > 0).sort((a, b) => b.score - a.score).slice(0, 3).map((s) => s.article)
+  const topFaqs = faqScores.filter((s) => s.score >= 4).sort((a, b) => b.score - a.score).slice(0, 2).map((s) => ({ question: s.faq.question, answer: s.faq.answer, topic: s.faq.topic }))
+  return { topArticles, topFaqs }
+}
+
+function generateBotResponse(query: string, articles: Article[], faqItems: FaqItem[]) {
+  const q = query.toLowerCase().trim()
+  if (/^(hi|hello|hey|namaste)/.test(q)) {
+    return { text: "Namaste! I'm BOT247. Ask me about challans, insurance, affidavits, vehicle transfers, or any legal topic.", articles: [], faqMatches: [] }
+  }
+  if (/^(help|what can you)/.test(q)) {
+    return { text: "I can find:\n• Legal templates (affidavits, RTI)\n• Challan disputes\n• Insurance claim steps\n• Vehicle transfer guides\n• Regulations & penalties\n• Court judgements\n\nJust ask!", articles: [], faqMatches: [] }
+  }
+  const { topArticles, topFaqs } = scoredSearch(query, articles, faqItems)
+  if (topFaqs.length > 0 || topArticles.length > 0) {
+    const text = topFaqs.length > 0
+      ? `Here's what I found for "${query}":`
+      : topArticles.length === 1
+        ? `I found a relevant resource for "${query}":`
+        : `Here are the most relevant resources for "${query}":`
+    return { text, articles: topArticles, faqMatches: topFaqs }
+  }
+  return { text: `I couldn't find a match for "${query}". Try: affidavit, challan, insurance claim, ownership transfer, penalty, or RC.`, articles: [], faqMatches: [] }
+}
+
+const SUGGESTED_QUERIES = ['I need an affidavit', 'How to dispute a challan?', 'Insurance claim documents', 'Transfer vehicle to another state']
+
+function Bot247({
+  articles,
+  faqItems,
+  onOpenArticle,
+}: {
+  articles: Article[]
+  faqItems: FaqItem[]
+  onOpenArticle: (id: string) => void
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isSidebar, setIsSidebar] = useState(false)
+  const [input, setInput] = useState('')
+  const [messages, setMessages] = useState<BotMessage[]>([
+    { id: 'welcome', role: 'bot', text: "Hi! I'm BOT247, ask me anything!" },
+  ])
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+      setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }, [isOpen, messages])
+
+  const sendMessage = (text: string) => {
+    if (!text.trim()) return
+    const userMsg: BotMessage = { id: `u-${Date.now()}`, role: 'user', text: text.trim() }
+    const response = generateBotResponse(text, articles, faqItems)
+    const botMsg: BotMessage = { id: `b-${Date.now()}`, role: 'bot', text: response.text, articles: response.articles, faqMatches: response.faqMatches }
+    setMessages((prev) => [...prev, userMsg, botMsg])
+    setInput('')
+  }
+
+  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); sendMessage(input) }
+
+  return (
+    <>
+      {/* Backdrop */}
+      {isOpen && !isSidebar && (
+        <div className="fixed inset-0 z-40 bg-stone-900/20 dark:bg-stone-950/40" onClick={() => setIsOpen(false)} />
+      )}
+
+      {/* Chat Panel */}
+      {isOpen && (
+        <div className={`fixed z-50 flex flex-col bg-white dark:bg-stone-900 overflow-hidden transition-all duration-200 ${
+          isSidebar
+            ? 'top-0 right-0 h-screen w-[360px] border-l-2 border-stone-300 dark:border-stone-600 shadow-2xl rounded-none'
+            : 'bottom-20 right-6 w-[340px] sm:w-[380px] rounded-2xl border-2 border-stone-300 dark:border-stone-600 shadow-[0_8px_40px_rgba(0,0,0,0.18)] dark:shadow-[0_8px_40px_rgba(0,0,0,0.5)]'
+        }`}
+          style={isSidebar ? {} : { maxHeight: 'calc(100vh - 140px)' }}
+        >
+          {/* Header */}
+          <div className="flex items-center gap-3 px-4 py-3 bg-emerald-600 dark:bg-emerald-700 shrink-0">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-white leading-none">BOT247</p>
+            </div>
+            <button
+              onClick={() => setIsSidebar(!isSidebar)}
+              className="p-1 rounded-lg hover:bg-white/20 text-white/70 hover:text-white transition-colors"
+              title={isSidebar ? 'Collapse to overlay' : 'Expand to sidebar'}
+            >
+              {isSidebar ? <PanelRightClose className="w-4 h-4" /> : <PanelRight className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={() => { setIsOpen(false); setIsSidebar(false) }}
+              className="p-1 rounded-lg hover:bg-white/20 text-white/70 hover:text-white transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+            {messages.map((msg) => (
+              <div key={msg.id} className={`flex gap-2.5 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                {msg.role === 'bot' && (
+                  <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0 mt-0.5">
+                    <Bot className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                )}
+                <div className={`max-w-[85%] space-y-2 ${msg.role === 'user' ? 'items-end' : 'items-start'} flex flex-col`}>
+                  <div className={`px-3 py-2 rounded-xl text-xs leading-relaxed whitespace-pre-wrap ${
+                    msg.role === 'user'
+                      ? 'bg-emerald-600 dark:bg-emerald-500 text-white rounded-tr-sm'
+                      : 'bg-stone-100 dark:bg-stone-800 text-stone-800 dark:text-stone-200 rounded-tl-sm'
+                  }`}>
+                    {msg.text}
+                  </div>
+
+                  {/* FAQ Matches */}
+                  {msg.faqMatches && msg.faqMatches.length > 0 && (
+                    <div className="w-full space-y-2">
+                      {msg.faqMatches.map((faq, i) => (
+                        <div key={i} className="rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/60 p-3">
+                          <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">{faq.topic}</p>
+                          <p className="text-xs font-semibold text-stone-800 dark:text-stone-200 mb-1.5">{faq.question}</p>
+                          <p className="text-[11px] text-stone-600 dark:text-stone-400 leading-relaxed line-clamp-4">{faq.answer}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Article Cards */}
+                  {msg.articles && msg.articles.length > 0 && (
+                    <div className="w-full space-y-2">
+                      {msg.articles.map((article) => {
+                        const config = CATEGORY_CONFIG[article.category]
+                        const Icon = config.icon
+                        return (
+                          <button
+                            key={article.id}
+                            onClick={() => { onOpenArticle(article.id); setIsOpen(false) }}
+                            className="w-full text-left rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-3 hover:border-emerald-400 dark:hover:border-emerald-600 hover:shadow-sm transition-all group"
+                          >
+                            <span className={`inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-semibold mb-1.5 ${config.bg} ${config.text}`}>
+                              <Icon className="w-2.5 h-2.5" />
+                              {article.category}
+                            </span>
+                            <p className="text-xs font-semibold text-stone-800 dark:text-stone-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors line-clamp-2 mb-1">{article.title}</p>
+                            <p className="text-[11px] text-stone-500 dark:text-stone-400 line-clamp-2 leading-relaxed">{article.excerpt}</p>
+                            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium mt-1.5">Open article →</p>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Suggested queries */}
+          {messages.length === 1 && (
+            <div className="px-4 pb-2 shrink-0">
+              <p className="text-[10px] text-stone-400 dark:text-stone-500 mb-2 font-medium">Try asking:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {SUGGESTED_QUERIES.map((q) => (
+                  <button key={q} onClick={() => sendMessage(q)}
+                    className="text-[11px] px-2.5 py-1 rounded-full border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 transition-colors">
+                    {q}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Input */}
+          <form onSubmit={handleSubmit} className="p-3 border-t border-stone-100 dark:border-stone-800 shrink-0">
+            <div className="flex items-center gap-2 bg-stone-100 dark:bg-stone-800 rounded-xl px-3 py-2">
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask about any legal topic..."
+                className="flex-1 bg-transparent text-xs text-stone-800 dark:text-stone-200 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none"
+              />
+              <button type="submit" disabled={!input.trim()}
+                className="w-7 h-7 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-colors shrink-0">
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* FAB */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg shadow-emerald-900/30 flex items-center justify-center transition-all duration-200 ${
+          isSidebar ? 'opacity-0 pointer-events-none' : ''
+        } ${
+          isOpen
+            ? 'bg-stone-700 dark:bg-stone-600 hover:bg-stone-800 dark:hover:bg-stone-500'
+            : 'bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-600 hover:scale-105'
+        }`}
+        title={isOpen ? 'Close BOT247' : 'Ask BOT247'}
+      >
+        {isOpen ? <X className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-white" />}
+        {!isOpen && (
+          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 dark:bg-emerald-300 border-2 border-white dark:border-stone-900 animate-pulse" />
+        )}
+      </button>
+    </>
   )
 }
 
@@ -974,21 +1244,28 @@ export function KnowledgeBase({
     })
   }
 
+  const bot247 = (
+    <Bot247 articles={articles} faqItems={faqItems} onOpenArticle={(id) => setSelectedArticleId(id)} />
+  )
+
   // Detail view
   if (selectedArticle) {
     return (
-      <DetailView
-        article={selectedArticle}
-        faqItems={faqItems}
-        checklistItems={checklistItems}
-        relatedArticles={relatedArticles}
-        onDownloadTemplate={onDownloadTemplate}
-        onCopyTemplate={onCopyTemplate}
-        onHelpful={onHelpful}
-        onNotHelpful={onNotHelpful}
-        onViewRelated={(id) => setSelectedArticleId(id)}
-        onBack={() => setSelectedArticleId(null)}
-      />
+      <>
+        <DetailView
+          article={selectedArticle}
+          faqItems={faqItems}
+          checklistItems={checklistItems}
+          relatedArticles={relatedArticles}
+          onDownloadTemplate={onDownloadTemplate}
+          onCopyTemplate={onCopyTemplate}
+          onHelpful={onHelpful}
+          onNotHelpful={onNotHelpful}
+          onViewRelated={(id) => setSelectedArticleId(id)}
+          onBack={() => setSelectedArticleId(null)}
+        />
+        {bot247}
+      </>
     )
   }
 
@@ -1214,6 +1491,7 @@ export function KnowledgeBase({
           </div>
         )}
       </div>
+      {bot247}
     </div>
   )
 }
