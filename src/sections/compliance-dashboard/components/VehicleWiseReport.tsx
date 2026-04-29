@@ -194,8 +194,8 @@ export function VehicleWiseReport({ vehicles, vehicleHistory }: VehicleWiseRepor
           </div>
 
           {/* Vehicle table */}
-          <div className="bg-white rounded-2xl shadow-md shadow-stone-200/60 overflow-hidden">
-            <table className="w-full">
+          <div className="bg-white rounded-2xl shadow-md shadow-stone-200/60 overflow-x-auto">
+            <table className="w-full min-w-[700px]">
               <thead>
                 <tr className="border-b border-stone-100">
                   <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-stone-400 px-5 py-3">Vehicle</th>

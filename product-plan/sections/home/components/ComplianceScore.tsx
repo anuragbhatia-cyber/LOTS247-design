@@ -1,9 +1,6 @@
 import { Info } from 'lucide-react'
 import type { ComplianceScore as ComplianceScoreType, ComplianceStatus } from '../types'
-// TODO: Replace with your app's language/i18n context
-// import { useLanguage, type Language } from '@/shell/components/LanguageContext'
-type Language = 'en' | 'hi'
-const useLanguage = () => ({ language: 'en' as Language })
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 interface ComplianceScoreProps {
   data: ComplianceScoreType
@@ -135,7 +132,6 @@ export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
               <div key={cat.id}>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full flex-shrink-0 bg-emerald-500" />
                     <span className="text-sm text-stone-700 dark:text-stone-300">{cat.label}</span>
                   </div>
                   <span className={`text-sm font-semibold tabular-nums ${cfg.color}`}>
@@ -156,7 +152,7 @@ export function ComplianceScore({ data, onViewDetails }: ComplianceScoreProps) {
 
       <button
         onClick={onViewDetails}
-        className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+        className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-200 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
       >
         {t.viewDetails} &rarr;
       </button>

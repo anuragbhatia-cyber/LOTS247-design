@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Search, Loader2 } from 'lucide-react'
 
 export interface VehicleComplianceCheckProps {
@@ -53,19 +54,19 @@ export function VehicleComplianceCheck({ open, onClose, onShowResults }: Vehicle
     onClose()
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={step === 'form' ? handleClose : undefined} />
 
       <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {step === 'form' ? (
           <>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
               <div>
                 <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">Check Vehicle-wise Compliance</h2>
                 <p className="text-xs text-stone-500 dark:text-stone-400">Enter a vehicle registration number to check its compliance status</p>
               </div>
-              <button onClick={handleClose} className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
+              <button onClick={handleClose} className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -77,19 +78,19 @@ export function VehicleComplianceCheck({ open, onClose, onShowResults }: Vehicle
                   type="text"
                   value={vehicleNumber}
                   onChange={(e) => handleVehicleNumberChange(e.target.value)}
-                  placeholder="UP32MM1113"
+                  placeholder="Enter vehicle number"
                   maxLength={10}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit() }}
-                  className="w-full px-3.5 pr-9 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                  className="w-full px-3.5 pr-9 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                 />
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>
             </div>
-            <div className="flex items-center justify-end px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-end px-6 py-4 border-t border-stone-200 dark:border-stone-800">
               <button
                 onClick={handleSubmit}
                 disabled={!isValid}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
                   isValid
                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
@@ -112,6 +113,7 @@ export function VehicleComplianceCheck({ open, onClose, onShowResults }: Vehicle
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

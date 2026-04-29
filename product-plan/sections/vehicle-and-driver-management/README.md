@@ -1,48 +1,49 @@
-# Vehicle & Driver Management Section
+# Vehicle & Driver Management
 
-The Vehicle & Driver Management section provides a central repository for managing fleet vehicles and their assigned drivers. It includes list views with search/filter/sort, detail views with tabbed content, and modals for adding vehicles, drivers, and bulk uploading.
+## Overview
 
-## Components
+Vehicle & Driver Management is the core fleet registry. It enables fleet managers to add vehicles (individually via RC auto-fetch or in bulk via CSV), view vehicle details with compliance scores, manage drivers with DL verification, and maintain associations between vehicles and drivers.
 
-| Component | Description |
-|---|---|
-| `VehicleList` | Main list view with vehicle/driver tabs, summary stat cards, search, filters, sorting, pagination, and both desktop table and mobile card layouts. Includes ChangeVehicleModal for driver reassignment. |
-| `VehicleDetail` | Vehicle detail view with 6 tabs: Details, Documents, Compliance, Challans, Incidents, Assigned Driver. Includes edit vehicle modal, assign driver modal, and upload document modal. |
-| `AddVehicleModal` | Modal for adding a single vehicle by RC number or bulk uploading via spreadsheet |
-| `AddDriverModal` | Modal for adding a new driver with name, phone, license details |
-| `BulkUploadModal` | Standalone modal for bulk uploading vehicles from CSV/XLS/XLSX files |
+## User Flows
 
-## Data Requirements
+1. **Vehicle List** — Scrollable list of all fleet vehicles with search, sort (by name, compliance score, date added), and filter (by status, group).
+2. **Add Vehicle** — AddVehicleModal opens with RC number input. On entry, vehicle details are auto-fetched from the Vahan database. User confirms or edits details.
+3. **Bulk Upload** — BulkUploadModal accepts a CSV file with RC numbers. System processes each and shows success/failure summary.
+4. **Vehicle Detail** — VehicleDetail shows full vehicle profile: RC details, compliance score breakdown, linked driver, document statuses, and associated challans.
+5. **Driver Listing** — Driver tab within the section shows all drivers with DL status and linked vehicles.
+6. **Add Driver** — AddDriverModal collects driver name, phone, DL number (with auto-fetch), and links to a vehicle.
 
-- **Vehicle[]**: Vehicles with RC number, type, make, model, compliance score, document statuses
-- **Driver[]**: Drivers with name, phone, license details, assigned vehicle IDs
-- **VehicleDocument[]**: Per-vehicle documents (insurance, PUC, fitness, RC) with expiry status
+## Design Decisions
 
-## External Dependencies
+- Vehicle list uses card layout on mobile, table layout on desktop.
+- Compliance score per vehicle is a small colored badge (green/amber/red) on each card.
+- AddVehicleModal and AddDriverModal are shared components (also used from AppShell quick actions).
+- Bulk upload shows a real-time progress bar with per-row status.
+- Vehicle detail tabs: Overview, Documents, Challans, Driver.
 
-- `lucide-react` - Icon library
-- `LanguageContext` - Provides `{ language }` value (`"en"` | `"hi"`) for bilingual support
-- `react-dom` (createPortal) - Used by ChangeVehicleModal for portal rendering
-- Tailwind CSS v4 with `dark:` variant support
+## Data Used
 
-### Cross-Section Dependencies (VehicleDetail only)
+- `product/sections/vehicle-and-driver-management/data.json` — Sample vehicles, drivers, compliance data.
+- `product/sections/vehicle-and-driver-management/types.ts` — Vehicle, Driver, BulkUploadResult.
 
-VehicleDetail imports from the incident-management section:
-- `ChallanList` component (for the Challans tab)
-- `CaseList` component (for the Incidents tab)
-- `incident-management/data.json` (sample challan/case data)
+## Components Provided
 
-These cross-section imports are commented out in the export. You must wire up challan and incident data via props or your own data layer.
+| Component | File | Description |
+|-----------|------|-------------|
+| VehicleList | VehicleList.tsx | Searchable, filterable vehicle list |
+| VehicleDetail | VehicleDetail.tsx | Full vehicle profile with tabs |
+| AddVehicleModal | AddVehicleModal.tsx | RC entry + auto-fetch modal |
+| AddDriverModal | AddDriverModal.tsx | Driver details + DL fetch modal |
+| BulkUploadModal | BulkUploadModal.tsx | CSV upload with progress |
 
-## Key Patterns
+## Callback Props
 
-- Vehicle list supports 3 sort options: Compliance (High/Low), RC Number (A-Z/Z-A), Expiry (Soonest/Latest)
-- Filters: Document Status (Valid/Expiring/Expired), Vehicle Status (Active/Inactive)
-- Summary cards show: Total Vehicles, Avg Compliance, Expired Docs, Expiring Soon
-- Compliance score badge color-coded: green >= 75, amber >= 50, red < 50
-- "Fetch Details" button simulates government API fetch (1.5s delay)
-- Vehicles with `detailsFetched: false` show a fetch button instead of full details
-- ChangeVehicleModal has 3 steps: Search vehicle -> Confirm assignment -> Success
-- VehicleDetail Challans tab has 3 states: idle (fetch prompt), fetching, results
-- Document upload supports drag-and-drop with file type validation
-- All text supports English/Hindi bilingual rendering
+| Prop | Component | Signature | Purpose |
+|------|-----------|-----------|---------|
+| onVehicleSelect | VehicleList | `(vehicleId: string) => void` | Opens vehicle detail |
+| onAddVehicle | AddVehicleModal | `(data: Vehicle) => void` | Confirms new vehicle |
+| onAddDriver | AddDriverModal | `(data: Driver) => void` | Confirms new driver |
+| onBulkUpload | BulkUploadModal | `(file: File) => void` | Processes CSV upload |
+| onSearch | VehicleList | `(query: string) => void` | Filters by search term |
+| onBack | VehicleDetail | `() => void` | Returns to vehicle list |
+| onLinkDriver | VehicleDetail | `(vehicleId: string, driverId: string) => void` | Associates driver |

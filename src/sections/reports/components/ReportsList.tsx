@@ -21,10 +21,10 @@ import type { ReportsProps, Report, ReportTab, ReportType } from '@/../product/s
 
 const TABS: { id: ReportTab; label: string; description: string }[] = [
   { id: 'All', label: 'All', description: 'All reports' },
-  { id: 'MIS', label: 'MIS', description: 'Monthly Incident Summary' },
-  { id: 'ICR', label: 'ICR', description: 'Incident Closure Report' },
+  { id: 'MIS', label: 'MIS', description: 'Monthly Challan Summary' },
+  { id: 'ICR', label: 'ICR', description: 'Incident Closure Summary' },
   { id: 'ISR', label: 'ISR', description: 'Incident Summary Report' },
-  { id: 'MIS-CHALLAN', label: 'MIS-Challan', description: 'Monthly Challan Summary' },
+  { id: 'MIS-CHALLAN', label: 'MIS-Challan', description: 'MIS Challan' },
 ]
 
 const TYPE_CONFIG: Record<ReportType, { bg: string; text: string; icon: typeof BarChart3; label: string }> = {

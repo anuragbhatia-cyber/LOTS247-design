@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Wallet,
@@ -56,7 +56,7 @@ function formatDateTime(iso: string): string {
 }
 
 function formatCurrency(amount: number): string {
-  return `\u20B9${amount.toLocaleString('en-IN')}`
+  return `₹${amount.toLocaleString('en-IN')}`
 }
 
 function getRelativeDate(iso: string): string {
@@ -221,11 +221,11 @@ function AddMoneyModal({
 
   function handleProceed() {
     if (!effectiveAmount || effectiveAmount < 100) {
-      setError('Minimum amount is \u20B9100')
+      setError('Minimum amount is ₹100')
       return
     }
     if (effectiveAmount > 100000) {
-      setError('Maximum amount is \u20B91,00,000')
+      setError('Maximum amount is ₹1,00,000')
       return
     }
     onAddMoney?.(effectiveAmount)
@@ -237,7 +237,7 @@ function AddMoneyModal({
       <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl dark:shadow-stone-950/50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-200 dark:border-stone-800">
           <div>
             <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 tracking-tight">Add Money</h3>
             <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Top up your LOTS247 wallet</p>
@@ -250,14 +250,14 @@ function AddMoneyModal({
           </button>
         </div>
 
-        <div className="p-4 space-y-4">
+        <div className="p-4 sm:p-6 space-y-4">
           {/* Amount input */}
           <div>
             <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
               Enter Amount
             </label>
             <div className="flex items-center gap-1.5 border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-900 focus-within:ring-2 focus-within:ring-emerald-500/30 focus-within:border-emerald-400 dark:focus-within:border-emerald-600 transition-colors px-3 py-2.5">
-              <span className="text-base font-semibold text-stone-400 dark:text-stone-500 select-none">{'\u20B9'}</span>
+              <span className="text-base font-semibold text-stone-400 dark:text-stone-500 select-none">₹</span>
               <input
                 type="text"
                 inputMode="numeric"
@@ -285,13 +285,13 @@ function AddMoneyModal({
                 <button
                   key={amount}
                   onClick={() => handleQuickSelect(amount)}
-                  className={`py-2.5 rounded-lg text-sm font-semibold transition-colors ${
+                  className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                     selectedAmount === amount
                       ? 'bg-emerald-600 text-white'
                       : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
                   }`}
                 >
-                  {'\u20B9'}{amount.toLocaleString('en-IN')}
+                  ₹{amount.toLocaleString('en-IN')}
                 </button>
               ))}
             </div>
@@ -335,12 +335,17 @@ function TransactionDetail({
   const CatIcon = catConfig.icon
   const isCredit = transaction.type === 'credit'
 
+  useEffect(() => {
+    window.parent.postMessage({ type: 'showOverlay' }, '*')
+    return () => { window.parent.postMessage({ type: 'hideOverlay' }, '*') }
+  }, [])
+
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl dark:shadow-stone-950/50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-200 dark:border-stone-800">
           <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 tracking-tight">Transaction Details</h3>
           <button
             onClick={onClose}
@@ -357,13 +362,13 @@ function TransactionDetail({
               <CatIcon className={`w-5 h-5 ${catConfig.color}`} />
             </div>
             <p className={`text-3xl font-bold tabular-nums tracking-tight ${isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-900 dark:text-stone-50'}`}>
-              {isCredit ? '+' : '\u2212'}{formatCurrency(transaction.amount)}
+              {isCredit ? '+' : '−'}{formatCurrency(transaction.amount)}
             </p>
             <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">{transaction.description}</p>
           </div>
 
           {/* Details */}
-          <div className="rounded-xl border border-stone-200 dark:border-stone-800 divide-y divide-stone-100 dark:divide-stone-800">
+          <div className="rounded-xl border border-stone-200 dark:border-stone-800 divide-y divide-stone-200 dark:divide-stone-800">
             <DetailRow label="Date & Time" value={formatDateTime(transaction.date)} />
             <DetailRow label="Category">
               <CategoryBadge category={transaction.category} />
@@ -384,7 +389,7 @@ function TransactionDetail({
           {transaction.relatedEntityId && transaction.relatedEntityType && (
             <button
               onClick={() => onNavigateToEntity?.(transaction.relatedEntityType!, transaction.relatedEntityId!)}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors group"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors group"
             >
               <div className="flex items-center gap-2.5">
                 <ExternalLink className="w-4 h-4 text-stone-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" />
@@ -558,7 +563,9 @@ export function WalletView({
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* Page Header */}
+        {/* ----------------------------------------------------------------- */}
+        {/* Page Header                                                       */}
+        {/* ----------------------------------------------------------------- */}
         <div className="pt-5 sm:pt-7 pb-5 sm:pb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
@@ -581,7 +588,10 @@ export function WalletView({
                 <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
               </div>
               <button
-                onClick={() => setShowAddMoney(true)}
+                onClick={() => {
+                  setShowAddMoney(true)
+                  window.parent.postMessage({ type: 'showOverlay' }, '*')
+                }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
               >
                 <Plus className="w-4 h-4" />
@@ -591,10 +601,12 @@ export function WalletView({
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* ----------------------------------------------------------------- */}
+        {/* Stats Cards                                                       */}
+        {/* ----------------------------------------------------------------- */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
           {/* Balance */}
-          <div className={`col-span-2 rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-4 sm:p-5`}>
+          <div className={`col-span-2 rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6`}>
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Current Balance</p>
@@ -614,7 +626,7 @@ export function WalletView({
                 <Wallet className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
               <RefreshCw className="w-3.5 h-3.5 text-stone-400" />
               <span className="text-xs text-stone-500 dark:text-stone-400">
                 Last recharge {formatCurrency(walletSummary.lastRecharge.amount)} on {formatDate(walletSummary.lastRecharge.date)}
@@ -623,7 +635,7 @@ export function WalletView({
           </div>
 
           {/* Total In */}
-          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-4 sm:p-5">
+          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Total In</p>
@@ -635,13 +647,13 @@ export function WalletView({
                 <TrendingDown className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-100 dark:border-stone-800">
+            <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
               {transactions.filter((t) => t.type === 'credit' && t.status === 'success').length} credit transactions
             </p>
           </div>
 
           {/* Total Out */}
-          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-4 sm:p-5">
+          <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Total Out</p>
@@ -653,14 +665,17 @@ export function WalletView({
                 <TrendingUp className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
             </div>
-            <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-100 dark:border-stone-800">
+            <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
               {transactions.filter((t) => t.type === 'debit' && t.status === 'success').length} debit transactions
             </p>
           </div>
         </div>
 
-        {/* Search & Filter Bar */}
+        {/* ----------------------------------------------------------------- */}
+        {/* Search & Filter Bar (standalone, outside table card)              */}
+        {/* ----------------------------------------------------------------- */}
         <div className="flex items-center gap-3 mb-4">
+          {/* Search — takes remaining width */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
             <input
@@ -684,9 +699,10 @@ export function WalletView({
             )}
           </div>
 
+          {/* Filters button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium transition-colors shrink-0 ${
+            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors shrink-0 ${
               showFilters || activeFilterCount > 0
                 ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
                 : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
@@ -713,7 +729,7 @@ export function WalletView({
                 <select
                   value={filters.dateRange ?? 'all'}
                   onChange={(e) => updateFilter({ dateRange: e.target.value === 'all' ? undefined : e.target.value as TransactionFilters['dateRange'] })}
-                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                 >
                   <option value="all">All Time</option>
                   {DATE_RANGE_OPTIONS.map((opt) => (
@@ -732,7 +748,7 @@ export function WalletView({
                 <select
                   value={filters.type ?? 'all'}
                   onChange={(e) => updateFilter({ type: e.target.value as TransactionType | 'all' })}
-                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                 >
                   {TYPE_OPTIONS.map((opt) => (
                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -750,7 +766,7 @@ export function WalletView({
                 <select
                   value={filters.category ?? 'all'}
                   onChange={(e) => updateFilter({ category: e.target.value as TransactionCategory | 'all' })}
-                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                  className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                 >
                   {CATEGORY_OPTIONS.map((opt) => (
                     <option key={opt.id} value={opt.id}>{opt.label}</option>
@@ -771,16 +787,23 @@ export function WalletView({
           </div>
         )}
 
-        {/* Transaction History Card */}
+        {/* ----------------------------------------------------------------- */}
+        {/* Transaction History Card                                          */}
+        {/* ----------------------------------------------------------------- */}
         <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 mb-6">
-          <div className="px-5 py-3.5 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+          {/* Card header */}
+          <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-50">Transaction History</h2>
             <span className="text-xs text-stone-400 dark:text-stone-500">{filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''}</span>
           </div>
 
+          {/* Transaction list */}
           {filteredTransactions.length === 0 ? (
             transactions.length === 0 ? (
-              <EmptyState onAddMoney={() => setShowAddMoney(true)} />
+              <EmptyState onAddMoney={() => {
+                setShowAddMoney(true)
+                window.parent.postMessage({ type: 'showOverlay' }, '*')
+              }} />
             ) : (
               <div className="py-16 text-center">
                 <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
@@ -809,7 +832,7 @@ export function WalletView({
                     <col className="w-[15%]" />
                   </colgroup>
                   <thead>
-                    <tr className="border-b border-stone-100 dark:border-stone-800">
+                    <tr className="bg-stone-50 dark:bg-stone-800/60 border-b border-stone-200 dark:border-stone-800">
                       <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3">
                         Transaction
                       </th>
@@ -827,21 +850,26 @@ export function WalletView({
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-stone-100 dark:divide-stone-800/60">
+                  <tbody className="divide-y divide-stone-200 dark:divide-stone-800/60">
                     {paginatedTransactions.map((txn) => {
+                      const catConfig = CATEGORY_CONFIG[txn.category]
+                      const CatIcon = catConfig.icon
                       const isCredit = txn.type === 'credit'
 
                       return (
                         <tr
                           key={txn.id}
                           onClick={() => { setSelectedTxnId(txn.id); onViewTransaction?.(txn.id) }}
-                          className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+                          className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                         >
+                          {/* Transaction */}
                           <td className="px-5 py-3.5">
                             <p className="text-sm font-medium text-stone-900 dark:text-stone-50 font-mono">
                               {txn.referenceId}
                             </p>
                           </td>
+
+                          {/* Date */}
                           <td className="px-5 py-3.5">
                             <p className="text-sm text-stone-700 dark:text-stone-300">
                               {formatDate(txn.date)}
@@ -850,9 +878,13 @@ export function WalletView({
                               {formatTime(txn.date)}
                             </p>
                           </td>
+
+                          {/* Category */}
                           <td className="px-5 py-3.5">
                             <CategoryBadge category={txn.category} />
                           </td>
+
+                          {/* Amount */}
                           <td className="px-5 py-3.5 text-right">
                             <p className={`text-sm font-semibold tabular-nums ${
                               txn.status === 'failed'
@@ -861,7 +893,7 @@ export function WalletView({
                                   ? 'text-emerald-600 dark:text-emerald-400'
                                   : 'text-stone-900 dark:text-stone-50'
                             }`}>
-                              {isCredit ? '+' : '\u2212'}{formatCurrency(txn.amount)}
+                              {isCredit ? '+' : '−'}{formatCurrency(txn.amount)}
                             </p>
                             {txn.status === 'failed' && (
                               <span className="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 font-medium mt-0.5">
@@ -869,6 +901,8 @@ export function WalletView({
                               </span>
                             )}
                           </td>
+
+                          {/* Balance */}
                           <td className="px-5 py-3.5 text-right">
                             <p className="text-sm text-stone-600 dark:text-stone-300 tabular-nums">
                               {formatCurrency(txn.runningBalance)}
@@ -882,7 +916,7 @@ export function WalletView({
               </div>
 
               {/* Mobile Card View */}
-              <div className="md:hidden divide-y divide-stone-100 dark:divide-stone-800/60">
+              <div className="md:hidden divide-y divide-stone-200 dark:divide-stone-800/60">
                 {groupedTransactions.map((group) => (
                   <div key={group.date}>
                     <div className="px-5 py-2.5 bg-stone-50 dark:bg-stone-800/30">
@@ -890,7 +924,7 @@ export function WalletView({
                         {group.label}
                       </span>
                     </div>
-                    <div className="divide-y divide-stone-100 dark:divide-stone-800/60">
+                    <div className="divide-y divide-stone-200 dark:divide-stone-800/60">
                       {group.transactions.map((txn) => {
                         const isCredit = txn.type === 'credit'
 
@@ -898,7 +932,7 @@ export function WalletView({
                           <button
                             key={txn.id}
                             onClick={() => { setSelectedTxnId(txn.id); onViewTransaction?.(txn.id) }}
-                            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors text-left"
+                            className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors text-left"
                           >
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 truncate">
@@ -921,7 +955,7 @@ export function WalletView({
                                     ? 'text-emerald-600 dark:text-emerald-400'
                                     : 'text-stone-900 dark:text-stone-50'
                               }`}>
-                                {isCredit ? '+' : '\u2212'}{formatCurrency(txn.amount)}
+                                {isCredit ? '+' : '−'}{formatCurrency(txn.amount)}
                               </p>
                               <p className="text-[11px] text-stone-400 dark:text-stone-500 tabular-nums mt-0.5">
                                 Bal {formatCurrency(txn.runningBalance)}
@@ -937,7 +971,7 @@ export function WalletView({
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between px-5 py-3.5 border-t border-stone-100 dark:border-stone-800">
+                <div className="flex items-center justify-between px-5 py-3.5 border-t border-stone-200 dark:border-stone-800">
                   <p className="text-xs text-stone-500 dark:text-stone-400">
                     {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredTransactions.length)} of {filteredTransactions.length}
                   </p>
@@ -945,7 +979,7 @@ export function WalletView({
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                      className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -953,10 +987,10 @@ export function WalletView({
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${
+                        className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
                           page === currentPage
                             ? 'bg-emerald-600 text-white shadow-sm'
-                            : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+                            : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
                         }`}
                       >
                         {page}
@@ -965,7 +999,7 @@ export function WalletView({
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                      className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>
@@ -982,7 +1016,10 @@ export function WalletView({
         <AddMoneyModal
           quickAmounts={quickAmounts}
           onAddMoney={onAddMoney}
-          onClose={() => setShowAddMoney(false)}
+          onClose={() => {
+            setShowAddMoney(false)
+            window.parent.postMessage({ type: 'hideOverlay' }, '*')
+          }}
         />
       )}
 

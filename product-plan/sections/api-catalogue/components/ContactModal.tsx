@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Send } from 'lucide-react'
 
 interface ContactModalProps {
@@ -26,8 +27,8 @@ export function ContactModal({ apiName, isOpen, onClose, onSubmit }: ContactModa
     }, 1800)
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 dark:bg-black/50"
@@ -37,13 +38,13 @@ export function ContactModal({ apiName, isOpen, onClose, onSubmit }: ContactModa
       {/* Modal */}
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-2xl shadow-stone-300/30 dark:shadow-stone-950/50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <h3 className="text-base font-bold text-stone-900 dark:text-stone-50">
             Contact for Pricing
           </h3>
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+            className="p-1.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -70,23 +71,23 @@ export function ContactModal({ apiName, isOpen, onClose, onSubmit }: ContactModa
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Describe your use case, expected volume, or any questions..."
                 rows={4}
-                className="w-full px-4 py-3 text-sm bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 dark:focus:border-emerald-600 resize-none transition-colors"
+                className="w-full px-4 py-3 text-sm bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 rounded-lg text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 resize-none transition-colors"
                 autoFocus
               />
             </div>
 
-            <div className="px-6 py-4 border-t border-stone-100 dark:border-stone-800 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-stone-200 dark:border-stone-800 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!message.trim()}
-                className="px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Send Enquiry
               </button>
@@ -94,6 +95,7 @@ export function ContactModal({ apiName, isOpen, onClose, onSubmit }: ContactModa
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

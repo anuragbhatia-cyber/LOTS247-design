@@ -27,7 +27,11 @@
         "vehicleLimit": 1,
         "onCallResolution": false,
         "onSiteResolution": false,
-        "challanResolution": { "online": false, "lokAdalat": false, "court": false },
+        "challanResolution": {
+          "online": false,
+          "lokAdalat": false,
+          "court": false
+        },
         "rtoService": false,
         "dashboardAccess": true,
         "numberOfUsers": 1,
@@ -58,7 +62,11 @@
         "vehicleLimit": 1,
         "onCallResolution": true,
         "onSiteResolution": "payPerUse",
-        "challanResolution": { "online": 79, "lokAdalat": 1000, "court": 2000 },
+        "challanResolution": {
+          "online": 79,
+          "lokAdalat": 1000,
+          "court": 2000
+        },
         "rtoService": "payPerUse",
         "dashboardAccess": true,
         "numberOfUsers": 1,
@@ -89,7 +97,11 @@
         "vehicleLimit": null,
         "onCallResolution": true,
         "onSiteResolution": "payPerUse",
-        "challanResolution": { "online": 49, "lokAdalat": 1000, "court": 2000 },
+        "challanResolution": {
+          "online": 49,
+          "lokAdalat": 1000,
+          "court": 2000
+        },
         "rtoService": "payPerUse",
         "dashboardAccess": true,
         "numberOfUsers": 3,
@@ -122,7 +134,11 @@
         "vehicleLimit": null,
         "onCallResolution": true,
         "onSiteResolution": "payPerUse",
-        "challanResolution": { "online": 39, "lokAdalat": "asPerAddOn", "court": "asPerAddOn" },
+        "challanResolution": {
+          "online": 39,
+          "lokAdalat": "asPerAddOn",
+          "court": "asPerAddOn"
+        },
         "rtoService": "payPerUse",
         "dashboardAccess": true,
         "numberOfUsers": 10,
@@ -149,10 +165,42 @@
     }
   ],
   "onboardingSteps": [
-    { "id": "step-signup", "stepNumber": 1, "name": "Sign Up", "title": "Verify your phone number", "description": "We'll send you a one-time password to verify your account", "isRequired": true, "canSkip": false },
-    { "id": "step-vehicle", "stepNumber": 2, "name": "Add Vehicle", "title": "Add your first vehicle", "description": "Enter your RC number to get started with compliance tracking", "isRequired": true, "canSkip": false },
-    { "id": "step-driver", "stepNumber": 3, "name": "Add Driver", "title": "Add a driver (optional)", "description": "Assign a driver to track license compliance and incidents", "isRequired": false, "canSkip": true },
-    { "id": "step-plan", "stepNumber": 4, "name": "Choose Plan", "title": "Select your subscription plan", "description": "Choose the plan that best fits your needs", "isRequired": true, "canSkip": false }
+    {
+      "id": "step-signup",
+      "stepNumber": 1,
+      "name": "Sign Up",
+      "title": "Verify your phone number",
+      "description": "We'll send you a one-time password to verify your account",
+      "isRequired": true,
+      "canSkip": false
+    },
+    {
+      "id": "step-vehicle",
+      "stepNumber": 2,
+      "name": "Add Vehicle",
+      "title": "Add your first vehicle",
+      "description": "Enter your RC number to get started with compliance tracking",
+      "isRequired": true,
+      "canSkip": false
+    },
+    {
+      "id": "step-driver",
+      "stepNumber": 3,
+      "name": "Add Driver",
+      "title": "Add a driver (optional)",
+      "description": "Assign a driver to track license compliance and incidents",
+      "isRequired": false,
+      "canSkip": true
+    },
+    {
+      "id": "step-plan",
+      "stepNumber": 4,
+      "name": "Choose Plan",
+      "title": "Select your subscription plan",
+      "description": "Choose the plan that best fits your needs",
+      "isRequired": true,
+      "canSkip": false
+    }
   ],
   "formExamples": {
     "phoneVerification": {
@@ -164,7 +212,7 @@
       "resendAvailableAt": "2024-02-16T10:31:00Z"
     },
     "vehicleDetails": {
-      "rcNumber": "DL3CAF1234",
+      "rcNumber": "DL03AF1234",
       "vehicleName": "Maruti Suzuki Swift VXi",
       "vehicleType": "Car",
       "registrationDate": "2020-03-15",
@@ -188,8 +236,8 @@
     "driverDetails": {
       "driverName": "Amit Sharma",
       "driverId": "DRV-001",
-      "licenseNumber": "DL-0420110012345",
-      "assignedVehicleId": "DL3CAF1234",
+      "licenseNumber": "DL04110012345",
+      "assignedVehicleId": "DL03AF1234",
       "licenseExpiryDate": "2028-06-15"
     }
   },
@@ -206,7 +254,7 @@
     },
     "vehicle": {
       "duplicateRC": "This vehicle is already registered in your account.",
-      "invalidRC": "Please enter a valid RC number (e.g., DL3CAF1234)",
+      "invalidRC": "Please enter a valid RC number (e.g., DL03AF1234)",
       "apiFailed": "Unable to fetch vehicle details. Please enter manually.",
       "requiredFields": "Please fill in all required vehicle details."
     },
@@ -221,18 +269,93 @@
     }
   },
   "uiStates": {
-    "otpCountdown": { "initialSeconds": 60, "resendEnabled": false, "message": "Resend OTP in {seconds}s" },
-    "vehicleFetching": { "isLoading": true, "message": "Fetching vehicle details...", "subMessage": "This may take a few seconds" },
-    "vehicleFetchSuccess": { "isLoading": false, "message": "Vehicle details fetched successfully!", "autoPopulated": true },
-    "vehicleFetchFailed": { "isLoading": false, "message": "Unable to fetch vehicle details", "fallbackMessage": "Please enter your vehicle details manually" },
-    "paymentProcessing": { "isLoading": true, "message": "Processing your payment...", "subMessage": "Please do not close this window" },
-    "activationSuccess": { "isLoading": false, "message": "Welcome to LOTS247!", "subMessage": "Redirecting to your dashboard...", "redirectDelay": 2000 }
+    "otpCountdown": {
+      "initialSeconds": 60,
+      "resendEnabled": false,
+      "message": "Resend OTP in {seconds}s"
+    },
+    "vehicleFetching": {
+      "isLoading": true,
+      "message": "Fetching vehicle details...",
+      "subMessage": "This may take a few seconds"
+    },
+    "vehicleFetchSuccess": {
+      "isLoading": false,
+      "message": "Vehicle details fetched successfully!",
+      "autoPopulated": true
+    },
+    "vehicleFetchFailed": {
+      "isLoading": false,
+      "message": "Unable to fetch vehicle details",
+      "fallbackMessage": "Please enter your vehicle details manually"
+    },
+    "paymentProcessing": {
+      "isLoading": true,
+      "message": "Processing your payment...",
+      "subMessage": "Please do not close this window"
+    },
+    "activationSuccess": {
+      "isLoading": false,
+      "message": "Welcome to LOTS247!",
+      "subMessage": "Redirecting to your dashboard...",
+      "redirectDelay": 2000
+    }
   },
   "onboardingProgress": {
-    "newUser": { "userId": null, "currentStep": "step-signup", "completedSteps": [], "phoneVerified": false, "vehicleAdded": false, "driverAdded": false, "planSelected": false, "paymentCompleted": false, "isActivated": false },
-    "phoneVerified": { "userId": "user-temp-123", "currentStep": "step-vehicle", "completedSteps": ["step-signup"], "phoneVerified": true, "vehicleAdded": false, "driverAdded": false, "planSelected": false, "paymentCompleted": false, "isActivated": false },
-    "vehicleAdded": { "userId": "user-temp-123", "currentStep": "step-driver", "completedSteps": ["step-signup", "step-vehicle"], "phoneVerified": true, "vehicleAdded": true, "driverAdded": false, "planSelected": false, "paymentCompleted": false, "isActivated": false },
-    "readyForPlan": { "userId": "user-temp-123", "currentStep": "step-plan", "completedSteps": ["step-signup", "step-vehicle", "step-driver"], "phoneVerified": true, "vehicleAdded": true, "driverAdded": true, "planSelected": false, "paymentCompleted": false, "isActivated": false },
-    "readyForPlanSkippedDriver": { "userId": "user-temp-123", "currentStep": "step-plan", "completedSteps": ["step-signup", "step-vehicle"], "phoneVerified": true, "vehicleAdded": true, "driverAdded": false, "planSelected": false, "paymentCompleted": false, "isActivated": false }
+    "newUser": {
+      "userId": null,
+      "currentStep": "step-signup",
+      "completedSteps": [],
+      "phoneVerified": false,
+      "vehicleAdded": false,
+      "driverAdded": false,
+      "planSelected": false,
+      "paymentCompleted": false,
+      "isActivated": false
+    },
+    "phoneVerified": {
+      "userId": "user-temp-123",
+      "currentStep": "step-vehicle",
+      "completedSteps": ["step-signup"],
+      "phoneVerified": true,
+      "vehicleAdded": false,
+      "driverAdded": false,
+      "planSelected": false,
+      "paymentCompleted": false,
+      "isActivated": false
+    },
+    "vehicleAdded": {
+      "userId": "user-temp-123",
+      "currentStep": "step-driver",
+      "completedSteps": ["step-signup", "step-vehicle"],
+      "phoneVerified": true,
+      "vehicleAdded": true,
+      "driverAdded": false,
+      "planSelected": false,
+      "paymentCompleted": false,
+      "isActivated": false
+    },
+    "readyForPlan": {
+      "userId": "user-temp-123",
+      "currentStep": "step-plan",
+      "completedSteps": ["step-signup", "step-vehicle", "step-driver"],
+      "phoneVerified": true,
+      "vehicleAdded": true,
+      "driverAdded": true,
+      "planSelected": false,
+      "paymentCompleted": false,
+      "isActivated": false
+    },
+    "readyForPlanSkippedDriver": {
+      "userId": "user-temp-123",
+      "currentStep": "step-plan",
+      "completedSteps": ["step-signup", "step-vehicle"],
+      "phoneVerified": true,
+      "vehicleAdded": true,
+      "driverAdded": false,
+      "planSelected": false,
+      "paymentCompleted": false,
+      "isActivated": false
+    }
   }
 }

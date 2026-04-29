@@ -1,103 +1,148 @@
-# API Catalogue Section -- Test Instructions
+# API Catalogue — Test Specifications
 
-## Setup
+## Overview
 
-Render the `ApiCatalogue` component with the sample data from `sample-data.json`. Provide mock callbacks for `onContactPricing`.
+Tests for API card grid, search, detail page with Description/Endpoints tabs, contact modal, and credit top-up flow.
 
 ---
 
-## Test Cases
+## 1. API Catalogue Grid
 
-### 1. Viewing API Cards
+### Success Path
+- [ ] Navigate to API Catalogue
+- [ ] Verify grid of API cards renders
+- [ ] Verify each card shows: name, description (truncated), credit cost chip, status badge
+- [ ] Verify responsive layout: 1 column on mobile, 2 on tablet, 3 on desktop
+- [ ] Search for "Vahan" — verify only matching APIs show
+- [ ] Verify credit balance indicator shows current balance at top
 
-- [ ] Component renders without errors
-- [ ] "API Catalogue" title and subtitle are visible
-- [ ] All 3 sample APIs are displayed as cards
-- [ ] Each card shows: API name, short description, and action buttons
-- [ ] "All APIs" view splits cards into "Available APIs" and "My APIs" sections
-- [ ] "My APIs" cards show an "Active" badge
-- [ ] Available API cards show "Check Details" and "Contact for Pricing" buttons
-- [ ] My API cards show "Top-up Balance" and "Check Details" buttons
+### Failure Path
+- [ ] API list fails to load — verify error state with "Unable to load APIs" and retry
+- [ ] Search with no matches — verify "No APIs found for your search" message
+- [ ] Empty catalogue (new platform) — verify "No APIs available yet" empty state
 
-### 2. Sidebar and Tab Navigation
+---
 
-- [ ] Desktop sidebar shows "All APIs" and "My APIs" items with counts
-- [ ] "All APIs" sidebar item is active by default
-- [ ] Clicking "My APIs" sidebar item filters to show only subscribed APIs (1 API)
-- [ ] Mobile tab switcher is visible on small screens, hidden on desktop
-- [ ] Mobile tabs show count badges matching the sidebar counts
-- [ ] Active sidebar/tab item is highlighted with emerald styling
+## 2. API Detail Page
 
-### 3. Clicking to View API Detail
+### Success Path
+- [ ] Tap "Vahan Vehicle Lookup" card — verify ApiDetail opens
+- [ ] Verify header: API name, status badge, credit cost
+- [ ] Verify "Description" tab is active by default
+- [ ] Verify description shows: overview text, use cases list, pricing info
+- [ ] Tap "Endpoints" tab — verify endpoint list renders
+- [ ] Verify each endpoint shows: HTTP method badge, path, description
+- [ ] Tap an endpoint — verify expanded view with parameters table, sample request, sample response
+- [ ] Verify "Request Access" button is visible
 
-- [ ] Clicking an API card navigates to the detail view
-- [ ] Clicking "Check Details" button on a card navigates to detail view
-- [ ] Detail view shows: API name, full description, "How it Works" flow
-- [ ] "How it Works" shows 4 numbered steps with descriptions
-- [ ] "Back to catalogue" button is visible and returns to the card grid
-- [ ] For available (non-subscribed) APIs: credits table and "Contact for Pricing" button are shown
-- [ ] For subscribed APIs: tabs for Credits per Hit, Usage, and Logs are shown
+### Failure Path
+- [ ] API detail for unavailable API — verify "Coming Soon" overlay with notification opt-in
+- [ ] Endpoint documentation missing — verify "Documentation pending" placeholder
 
-### 4. Detail Tabs (My APIs)
+---
 
-- [ ] "Credits per Hit" tab is selected by default
-- [ ] Credits table shows endpoint names, methods (with colored badges), and credit costs
-- [ ] Free endpoints show "Free" text instead of a number
-- [ ] Switching to "Usage" tab shows a progress bar and daily bar chart
-- [ ] Usage progress bar shows percentage of credits used
-- [ ] Daily bar chart shows 7 days of usage data
-- [ ] Switching to "Logs" tab shows a table of recent API calls
-- [ ] Logs table shows timestamp, method badge, endpoint path, and latency
-- [ ] Active tab has an emerald underline indicator
+## 3. Contact Modal
 
-### 5. Contact for Pricing Modal
+### Success Path
+- [ ] Tap "Request Access" on an API
+- [ ] Verify ContactModal opens with pre-filled API name in dropdown
+- [ ] Fill: Name "Rajesh Kumar", Email "rajesh@fleet.in", Message "Need access for 50 vehicles"
+- [ ] Tap Submit — verify onSubmitContact fires with form data
+- [ ] Verify success message "Request submitted. We'll contact you within 24 hours."
+- [ ] Verify modal closes
 
-- [ ] Clicking "Contact for Pricing" button opens the modal
-- [ ] Modal shows the API name in the description
-- [ ] Textarea is present and auto-focused
-- [ ] "Send Enquiry" button is disabled when textarea is empty
-- [ ] Typing a message enables the "Send Enquiry" button
-- [ ] Submitting shows a success confirmation with "Enquiry sent!" message
-- [ ] Success state auto-closes after ~1.8 seconds
-- [ ] "Cancel" button closes the modal without submitting
-- [ ] Clicking the backdrop closes the modal
-- [ ] Close (X) button closes the modal
+### Failure Path
+- [ ] Submit with empty email — verify "Email is required" error
+- [ ] Submit with invalid email — verify "Enter a valid email" error
+- [ ] Server error on submit — verify "Failed to submit. Please try again." error
+- [ ] Submit with empty message — verify "Please describe your requirements" error
 
-### 6. Top-up Balance Modal
+---
 
-- [ ] Clicking "Top-up Balance" on a My API card opens the top-up modal
-- [ ] Modal shows current balance (1,753 credits)
-- [ ] Preset amount buttons are displayed (500, 1000, 2000, 5000)
-- [ ] Clicking a preset fills the amount input
-- [ ] Selected preset button is highlighted with emerald styling
-- [ ] Custom amount can be typed in the input field
-- [ ] "Add Money" button is disabled when amount is empty or zero
-- [ ] Submitting shows a success confirmation
-- [ ] "Cancel" button and backdrop close the modal
+## 4. Credit Top-Up
 
-### 7. Navigating Back to Catalogue
+### Success Path
+- [ ] Tap credit balance indicator
+- [ ] Verify TopUpModal opens with credit packages (e.g., 100 credits for Rs 499, 500 for Rs 1999)
+- [ ] Select "500 credits" package
+- [ ] Tap "Purchase" — verify payment flow initiates
+- [ ] On payment success — verify credit balance updates
+- [ ] Verify success toast "500 credits added to your account"
 
-- [ ] "Back to catalogue" link in detail view returns to the card grid
-- [ ] Clicking a sidebar item while in detail view returns to the grid and switches tabs
-- [ ] State resets properly when navigating back (selected API is cleared)
+### Failure Path
+- [ ] Payment fails — verify "Payment failed. Credits not added." error with retry
+- [ ] Payment cancelled — verify modal remains open with packages
+- [ ] Network error during payment — verify "Connection lost. Please check and try again."
 
-### 8. Empty State
+---
 
-- [ ] "My APIs" tab with no subscribed APIs shows empty state
-- [ ] Empty state shows "No APIs subscribed yet" message
-- [ ] "Browse All APIs" button switches to the "All APIs" tab
+## Empty State Tests
 
-### 9. Responsive Design
+- [ ] No APIs in catalogue — "APIs will be available soon" with illustration
+- [ ] Zero credit balance — credit indicator shows "0" with "Top Up Now" CTA
+- [ ] API with no endpoints documented — "Endpoints coming soon"
 
-- [ ] Desktop: Sidebar is visible, cards in 2-column grid
-- [ ] Mobile: Sidebar is hidden, mobile tab switcher appears
-- [ ] Cards stack to single column on mobile
-- [ ] Detail view is usable on mobile with scrollable content
-- [ ] All interactive elements have appropriate touch targets
+## Component Interaction Tests
 
-### 10. Accessibility
+- [ ] Search input debounces by 300ms to avoid excessive filtering
+- [ ] Tab switch in ApiDetail preserves scroll position per tab
+- [ ] Opening ContactModal from different APIs pre-fills the correct API name
+- [ ] Credit top-up success updates the balance displayed on all API cards
 
-- [ ] All buttons have visible focus indicators
-- [ ] Modal can be dismissed with backdrop click
-- [ ] Method badges use color + text for HTTP methods (not color alone)
-- [ ] Card click areas are clearly interactive (cursor-pointer)
+## Edge Cases
+
+- [ ] API name with 80+ characters — truncated on card, full name on detail
+- [ ] API with 20+ endpoints — scrollable endpoint list
+- [ ] Sample request/response with deeply nested JSON — properly formatted with indentation
+- [ ] Credit cost of 0 (free API) — shows "Free" instead of credit chip
+- [ ] Concurrent top-up from two tabs — only one succeeds, balance correct
+
+## Accessibility Checks
+
+- [ ] API cards are keyboard navigable with Enter to open detail
+- [ ] Credit cost chips have aria-label (e.g., "Costs 5 credits per request")
+- [ ] HTTP method badges have aria-label (e.g., "GET request")
+- [ ] Code blocks in endpoints have appropriate roles
+- [ ] ContactModal form fields have labels
+- [ ] TopUpModal package selection works with keyboard
+
+## Sample Test Data
+
+```json
+{
+  "apis": [
+    {
+      "id": "api-001",
+      "name": "Vahan Vehicle Lookup",
+      "description": "Fetch vehicle details from RC number via the Vahan database",
+      "creditCost": 5,
+      "status": "active",
+      "category": "Vehicle",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/v1/vehicle/lookup",
+          "description": "Look up vehicle by RC number",
+          "parameters": [{ "name": "rcNumber", "type": "string", "required": true }],
+          "sampleRequest": { "rcNumber": "MH01AB1234" },
+          "sampleResponse": { "make": "Tata", "model": "Ace", "fuelType": "Diesel" }
+        }
+      ]
+    },
+    {
+      "id": "api-002",
+      "name": "Sarathi DL Verification",
+      "description": "Verify driving license details from DL number",
+      "creditCost": 3,
+      "status": "active",
+      "category": "Driver"
+    }
+  ],
+  "creditBalance": 150,
+  "creditPackages": [
+    { "id": "pkg-100", "credits": 100, "price": 499 },
+    { "id": "pkg-500", "credits": 500, "price": 1999 },
+    { "id": "pkg-1000", "credits": 1000, "price": 3499 }
+  ]
+}
+```

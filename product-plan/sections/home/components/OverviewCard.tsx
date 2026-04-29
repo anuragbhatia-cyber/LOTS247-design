@@ -1,8 +1,5 @@
 import { Truck, Users, FileWarning, ShieldAlert, CreditCard, ChevronRight } from 'lucide-react'
-// TODO: Replace with your app's language/i18n context
-// import { useLanguage, type Language } from '@/shell/components/LanguageContext'
-type Language = 'en' | 'hi'
-const useLanguage = () => ({ language: 'en' as Language })
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 const cardTranslations: Record<Language, Record<string, string>> = {
   en: { viewDetails: 'View details' },
@@ -95,11 +92,11 @@ export function OverviewCard({
     >
 {/* accent bar removed */}
 
-      <div className="p-4 sm:p-5 lg:p-6">
+      <div className="p-5 sm:p-6">
         {/* Badge */}
         {badge && (
           <div className="flex justify-end mb-2">
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${styles.badgeBg} ${styles.badgeText}`}>
+            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${styles.badgeBg} ${styles.badgeText}`}>
               {badge}
             </span>
           </div>

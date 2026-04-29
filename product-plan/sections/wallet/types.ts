@@ -52,7 +52,7 @@ export interface Transaction {
 // =============================================================================
 
 export interface WalletProps {
-  /** Current wallet state -- balance, last recharge, threshold */
+  /** Current wallet state — balance, last recharge, threshold */
   walletSummary: WalletSummary
   /** All wallet transactions in reverse chronological order */
   transactions: Transaction[]

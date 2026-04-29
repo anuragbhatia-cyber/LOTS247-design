@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   ArrowLeft,
@@ -8,11 +9,14 @@ import {
   Building2,
   Scale,
   Search,
+  Loader2,
+  CheckCircle2,
+  Check,
+  Calendar,
+  MapPin,
+  Copy,
 } from 'lucide-react'
-// TODO: Replace with your app's language/i18n context
-// import { useLanguage, type Language } from '@/shell/components/LanguageContext'
-type Language = 'en' | 'hi'
-const useLanguage = () => ({ language: 'en' as Language })
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 type Category = 'challan' | 'case' | 'rto' | 'other'
 
@@ -29,9 +33,17 @@ const translations: Record<Language, Record<string, string>> = {
     other: 'Other',
     otherDesc: 'Other incident',
     vehicleNumber: 'Vehicle Number',
-    vehicleNumberPlaceholder: 'UP32MM1113',
-    challanNumber: 'Challan Number',
-    challanNumberPlaceholder: 'e.g. CHL-2026-12345',
+    vehicleNumberPlaceholder: 'Enter vehicle number',
+    fetchingChallans: 'Fetching challans...',
+    pendingChallans: 'Pending',
+    paidChallans: 'Paid',
+    totalOutstanding: 'Total Outstanding',
+    courtChallan: 'Court Challan',
+    onlineChallan: 'Online Challan',
+    noPendingChallans: 'No pending challans found',
+    violation: 'Violation',
+    location: 'Location',
+    paidOn: 'Paid on',
     caseType: 'Case Type',
     selectCaseType: 'Select case type',
     theft: 'Theft',
@@ -50,17 +62,17 @@ const translations: Record<Language, Record<string, string>> = {
     incidentCity: 'Incident City:',
     selectCity: 'Select',
     roadName: 'Road Name',
-    roadNamePlaceholder: '',
+    roadNamePlaceholder: 'Enter road name',
     pin: 'Pin',
-    pinPlaceholder: '',
+    pinPlaceholder: 'Enter pin code',
     incidentReporterPhone: 'Incident Reporter Phone',
-    incidentReporterPhonePlaceholder: '',
+    incidentReporterPhonePlaceholder: 'Enter phone number',
     authorityInvolved: 'Authority Involved:',
     selectAuthority: 'Select',
     incidentArea: 'Incident Area',
-    incidentAreaPlaceholder: '',
+    incidentAreaPlaceholder: 'Enter incident area',
     incidentReporterName: 'Incident Reporter Name',
-    incidentReporterNamePlaceholder: '',
+    incidentReporterNamePlaceholder: 'Enter reporter name',
     rtoType: 'Type',
     selectRtoType: 'Select type',
     rtoRcRenewal: 'RC Renewal',
@@ -95,9 +107,17 @@ const translations: Record<Language, Record<string, string>> = {
     other: 'अन्य',
     otherDesc: 'अन्य घटना',
     vehicleNumber: 'वाहन नंबर',
-    vehicleNumberPlaceholder: 'उदा. UP32MM1113',
-    challanNumber: 'चालान नंबर',
-    challanNumberPlaceholder: 'उदा. CHL-2026-12345',
+    vehicleNumberPlaceholder: 'वाहन नंबर दर्ज करें',
+    fetchingChallans: 'चालान लोड हो रहे हैं...',
+    pendingChallans: 'लंबित',
+    paidChallans: 'भुगतान किया',
+    totalOutstanding: 'कुल बकाया',
+    courtChallan: 'कोर्ट चालान',
+    onlineChallan: 'ऑनलाइन चालान',
+    noPendingChallans: 'कोई लंबित चालान नहीं मिला',
+    violation: 'उल्लंघन',
+    location: 'स्थान',
+    paidOn: 'भुगतान तिथि',
     caseType: 'केस का प्रकार',
     selectCaseType: 'केस प्रकार चुनें',
     theft: 'चोरी',
@@ -116,17 +136,17 @@ const translations: Record<Language, Record<string, string>> = {
     incidentCity: 'घटना शहर:',
     selectCity: 'चुनें',
     roadName: 'सड़क का नाम',
-    roadNamePlaceholder: '',
+    roadNamePlaceholder: 'सड़क का नाम दर्ज करें',
     pin: 'पिन',
-    pinPlaceholder: '',
+    pinPlaceholder: 'पिन कोड दर्ज करें',
     incidentReporterPhone: 'रिपोर्टर फ़ोन',
-    incidentReporterPhonePlaceholder: '',
+    incidentReporterPhonePlaceholder: 'फ़ोन नंबर दर्ज करें',
     authorityInvolved: 'शामिल प्राधिकरण:',
     selectAuthority: 'चुनें',
     incidentArea: 'घटना क्षेत्र',
-    incidentAreaPlaceholder: '',
+    incidentAreaPlaceholder: 'घटना क्षेत्र दर्ज करें',
     incidentReporterName: 'रिपोर्टर का नाम',
-    incidentReporterNamePlaceholder: '',
+    incidentReporterNamePlaceholder: 'रिपोर्टर का नाम दर्ज करें',
     rtoType: 'प्रकार',
     selectRtoType: 'प्रकार चुनें',
     rtoRcRenewal: 'RC नवीनीकरण',
@@ -160,6 +180,34 @@ const FLEET_VEHICLES = [
   { id: 'veh-005', registrationNumber: 'UP32RR5557', type: 'Truck', model: 'Eicher Pro 6049' },
 ]
 
+interface SampleChallan {
+  id: string
+  challanNumber: string
+  violationType: string
+  amount: number
+  issueDate: string
+  location: string
+  status: 'pending' | 'paid'
+  category: 'court' | 'online'
+  paidDate?: string
+}
+
+const SAMPLE_CHALLANS: SampleChallan[] = [
+  { id: 'ch1', challanNumber: 'UP1213390290', violationType: 'Overspeeding', amount: 2000, issueDate: '2026-02-18', location: 'NH-48, Gurugram Toll Plaza', status: 'pending', category: 'court' },
+  { id: 'ch2', challanNumber: 'UP1213390455', violationType: 'Red Light Violation', amount: 5000, issueDate: '2026-02-10', location: 'Mahipalpur Junction, Delhi', status: 'pending', category: 'online' },
+  { id: 'ch3', challanNumber: 'UP1213390178', violationType: 'Overloading', amount: 20000, issueDate: '2026-01-25', location: 'Yamuna Expressway, KM 45', status: 'pending', category: 'court' },
+  { id: 'ch4', challanNumber: 'UP1213389821', violationType: 'Parking Violation', amount: 1500, issueDate: '2025-11-08', location: 'Connaught Place, Delhi', status: 'paid', category: 'online', paidDate: '2025-11-20' },
+  { id: 'ch5', challanNumber: 'UP1213389647', violationType: 'No Seatbelt', amount: 1000, issueDate: '2025-09-15', location: 'Noida Expressway, Sector 62', status: 'paid', category: 'online', paidDate: '2025-10-02' },
+]
+
+function formatChallanDate(dateStr: string, lang: Language): string {
+  return new Date(dateStr).toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function formatChallanCurrency(amount: number, lang: Language): string {
+  return new Intl.NumberFormat(lang === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount)
+}
+
 const CATEGORIES: {
   id: Category
   labelKey: string
@@ -185,7 +233,10 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
   const [vehicleNumber, setVehicleNumber] = useState('')
   const [vehicleSearch, setVehicleSearch] = useState('')
   const [vehicleDropdownOpen, setVehicleDropdownOpen] = useState(false)
-  const [challanNumber, setChallanNumber] = useState('')
+  const [challanLoading, setChallanLoading] = useState(false)
+  const [challansFetched, setChallansFetched] = useState(false)
+  const [challanTab, setChallanTab] = useState<'pending' | 'paid'>('pending')
+  const [selectedChallans, setSelectedChallans] = useState<Set<string>>(new Set(SAMPLE_CHALLANS.filter(c => c.status === 'pending').map(c => c.id)))
   const [caseType, setCaseType] = useState('')
   const [incidentState, setIncidentState] = useState('')
   const [incidentCity, setIncidentCity] = useState('')
@@ -244,6 +295,19 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     )
   })
 
+  // Simulate fetching challans when vehicle is selected in challan mode
+  useEffect(() => {
+    if (category === 'challan' && vehicleNumber) {
+      setChallanLoading(true)
+      setChallansFetched(false)
+      const timer = setTimeout(() => {
+        setChallanLoading(false)
+        setChallansFetched(true)
+      }, 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [category, vehicleNumber])
+
   if (!isOpen) return null
 
   function resetAndClose() {
@@ -252,7 +316,8 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     setVehicleNumber('')
     setVehicleSearch('')
     setVehicleDropdownOpen(false)
-    setChallanNumber('')
+    setChallanLoading(false)
+    setChallansFetched(false)
     setCaseType('')
     setIncidentState('')
     setIncidentCity('')
@@ -273,7 +338,8 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     setVehicleNumber('')
     setVehicleSearch('')
     setVehicleDropdownOpen(false)
-    setChallanNumber('')
+    setChallanLoading(false)
+    setChallansFetched(false)
     setCaseType('')
     setIncidentState('')
     setIncidentCity('')
@@ -302,7 +368,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     if (!vehicleValid) return false
     switch (category) {
       case 'challan':
-        return challanNumber.trim().length > 0
+        return challansFetched
       case 'case':
         return caseType !== '' && description.trim().length > 0
       case 'rto':
@@ -318,20 +384,20 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
   const headerTitle = step === 'category' ? t.addIncident : categoryMeta ? t[categoryMeta.labelKey] : t.addIncident
   const headerSubtitle = step === 'category' ? t.selectCategory : undefined
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={resetAndClose} />
 
       {/* Modal */}
       <div className="relative w-full max-w-lg max-h-[90vh] flex flex-col bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-3">
             {step === 'form' && (
               <button
                 onClick={handleBack}
-                className="p-1.5 -ml-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="p-1.5 -ml-1.5 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
@@ -349,7 +415,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
           </div>
           <button
             onClick={resetAndClose}
-            className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -395,12 +461,14 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                     onChange={(e) => {
                       const val = e.target.value
                       setVehicleNumber('')
+                      setChallansFetched(false)
+                      setChallanLoading(false)
                       setVehicleSearch(val.toUpperCase())
                       setVehicleDropdownOpen(true)
                     }}
                     onFocus={() => setVehicleDropdownOpen(true)}
                     placeholder={t.searchVehicle}
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                   />
                 </div>
 
@@ -435,20 +503,178 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                 )}
               </div>
 
-              {/* Challan-specific fields */}
-              {category === 'challan' && (
-                <div>
-                  <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                    {t.challanNumber}
-                  </label>
-                  <input
-                    type="text"
-                    value={challanNumber}
-                    onChange={(e) => setChallanNumber(e.target.value.toUpperCase())}
-                    placeholder={t.challanNumberPlaceholder}
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
-                  />
-                </div>
+              {/* Challan — loading & results */}
+              {category === 'challan' && vehicleNumber && (
+                <>
+                  {challanLoading && (
+                    <div className="flex items-center justify-center gap-2 py-8">
+                      <Loader2 className="w-5 h-5 text-emerald-500 animate-spin" />
+                      <span className="text-sm text-stone-500 dark:text-stone-400">{t.fetchingChallans}</span>
+                    </div>
+                  )}
+                  {challansFetched && (() => {
+                    const pendingChallans = SAMPLE_CHALLANS.filter((c) => c.status === 'pending')
+                    const paidChallans = SAMPLE_CHALLANS.filter((c) => c.status === 'paid')
+                    const totalOutstanding = pendingChallans.reduce((sum, c) => sum + c.amount, 0)
+                    return (
+                      <div className="space-y-3">
+                        {/* Pending / Paid Tabs */}
+                        <div className="flex gap-1 bg-stone-100 dark:bg-stone-800 rounded-xl p-1">
+                          <button
+                            onClick={() => setChallanTab('pending')}
+                            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                              challanTab === 'pending'
+                                ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm'
+                                : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                            }`}
+                          >
+                            {t.pendingChallans} ({pendingChallans.length})
+                          </button>
+                          <button
+                            onClick={() => setChallanTab('paid')}
+                            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                              challanTab === 'paid'
+                                ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm'
+                                : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                            }`}
+                          >
+                            {t.paidChallans} ({paidChallans.length})
+                          </button>
+                        </div>
+
+                        {/* Pending challans */}
+                        {challanTab === 'pending' && pendingChallans.map((challan) => (
+                          <div key={challan.id} className={`bg-white dark:bg-stone-900 border rounded-xl p-5 transition-colors ${selectedChallans.has(challan.id) ? 'border-emerald-300 dark:border-emerald-700' : 'border-stone-200 dark:border-stone-800'}`}>
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-2.5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedChallans(prev => {
+                                      const next = new Set(prev)
+                                      if (next.has(challan.id)) next.delete(challan.id)
+                                      else next.add(challan.id)
+                                      return next
+                                    })
+                                  }}
+                                  className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 transition-colors mt-0.5 ${
+                                    selectedChallans.has(challan.id)
+                                      ? 'bg-emerald-600 text-white'
+                                      : 'border-2 border-stone-300 dark:border-stone-600'
+                                  }`}
+                                >
+                                  {selectedChallans.has(challan.id) && (
+                                    <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                                  )}
+                                </button>
+                                <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(challan.challanNumber) }}
+                                  className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                                >
+                                  <Copy className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                              <span className="text-lg font-bold text-red-600 dark:text-red-400 tabular-nums">
+                                {formatChallanCurrency(challan.amount, language)}
+                              </span>
+                            </div>
+                            <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
+                            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
+                              <span className="inline-flex items-center gap-1.5">
+                                <Calendar className="w-3.5 h-3.5" />
+                                {formatChallanDate(challan.issueDate, language)}
+                              </span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <MapPin className="w-3.5 h-3.5" />
+                                {challan.location}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
+                              {challan.category === 'court' ? (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400">
+                                  {t.courtChallan}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400">
+                                  {t.onlineChallan}
+                                </span>
+                              )}
+                              <button className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-sm">
+                                {t.payNow}
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+
+                        {/* Paid challans */}
+                        {challanTab === 'paid' && paidChallans.length > 0 && paidChallans.map((challan) => (
+                              <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex items-center gap-1.5">
+                                    <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(challan.challanNumber) }}
+                                      className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                                    >
+                                      <Copy className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                  <span className="inline-flex items-center gap-1.5 text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    {formatChallanCurrency(challan.amount, language)}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
+                                <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
+                                  <span className="inline-flex items-center gap-1.5">
+                                    <Calendar className="w-3.5 h-3.5" />
+                                    {formatChallanDate(challan.issueDate, language)}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1.5">
+                                    <MapPin className="w-3.5 h-3.5" />
+                                    {challan.location}
+                                  </span>
+                                </div>
+                                {challan.paidDate && (
+                                  <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
+                                    <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                      {t.paidOn}: {formatChallanDate(challan.paidDate, language)}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                        ))}
+
+                        {challanTab === 'paid' && paidChallans.length === 0 && (
+                          <div className="py-8 text-center">
+                            <p className="text-sm text-stone-500 dark:text-stone-400">{t.noPendingChallans}</p>
+                          </div>
+                        )}
+
+                        {challanTab === 'pending' && pendingChallans.length === 0 && (
+                          <div className="py-8 text-center">
+                            <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+                            <p className="text-sm text-stone-500 dark:text-stone-400">{t.noPendingChallans}</p>
+                          </div>
+                        )}
+
+                        {/* Summary bar */}
+                        {pendingChallans.length > 0 && (
+                          <div className="flex items-center justify-between bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-800 rounded-xl px-4 py-3">
+                            <div>
+                              <p className="text-xs text-stone-500 dark:text-stone-400 font-medium">{t.totalOutstanding}</p>
+                              <p className="text-lg font-bold text-stone-900 dark:text-stone-50 tabular-nums">{formatChallanCurrency(totalOutstanding, language)}</p>
+                            </div>
+                            <span className="text-xs font-semibold text-stone-600 dark:text-stone-300 bg-stone-200 dark:bg-stone-700 px-2 py-1 rounded-full tabular-nums">
+                              {pendingChallans.length} {t.pendingChallans}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })()}
+                </>
               )}
 
               {/* Case-specific fields */}
@@ -602,7 +828,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                         placeholder={t.pinPlaceholder}
                         inputMode="numeric"
                         maxLength={6}
-                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                       />
                     </div>
                   </div>
@@ -621,34 +847,34 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                     />
                   </div>
 
-                  {/* Incident Reporter Name */}
-                  <div>
-                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                      {t.incidentReporterName}
-                    </label>
-                    <input
-                      type="text"
-                      value={incidentReporterName}
-                      onChange={(e) => setIncidentReporterName(e.target.value)}
-                      placeholder={t.incidentReporterNamePlaceholder}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
-                    />
-                  </div>
-
-                  {/* Incident Reporter Phone */}
-                  <div>
-                    <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
-                      {t.incidentReporterPhone}
-                    </label>
-                    <input
-                      type="tel"
-                      value={incidentReporterPhone}
-                      onChange={(e) => setIncidentReporterPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                      placeholder={t.incidentReporterPhonePlaceholder}
-                      inputMode="tel"
-                      maxLength={10}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
-                    />
+                  {/* Incident Reporter Name & Phone */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                        {t.incidentReporterName}
+                      </label>
+                      <input
+                        type="text"
+                        value={incidentReporterName}
+                        onChange={(e) => setIncidentReporterName(e.target.value)}
+                        placeholder={t.incidentReporterNamePlaceholder}
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-stone-600 dark:text-stone-400 uppercase tracking-wider mb-2">
+                        {t.incidentReporterPhone}
+                      </label>
+                      <input
+                        type="tel"
+                        value={incidentReporterPhone}
+                        onChange={(e) => setIncidentReporterPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        placeholder={t.incidentReporterPhonePlaceholder}
+                        inputMode="tel"
+                        maxLength={10}
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -731,17 +957,17 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
 
         {/* Footer — only on form step */}
         {step === 'form' && (
-          <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+          <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
             <button
               onClick={resetAndClose}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
             >
               {t.cancel}
             </button>
             <button
               onClick={handleSubmit}
               disabled={!isFormValid()}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
                 isFormValid()
                   ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                   : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
@@ -752,6 +978,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

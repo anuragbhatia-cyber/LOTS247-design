@@ -9,6 +9,7 @@ import type {
 import { RegistrationStep } from './RegistrationStep'
 import { LoginStep } from './LoginStep'
 import { PlanSelectionStep } from './PlanSelectionStep'
+import { PaymentSuccessStep } from './PaymentSuccessStep'
 
 interface OnboardingFlowProps {
   /** All onboarding steps */
@@ -25,6 +26,8 @@ interface OnboardingFlowProps {
   onResendOTP?: () => void
   /** Called when user selects a plan */
   onSelectPlan?: (planId: string) => void
+  /** Called when payment is completed */
+  onPaymentComplete?: (planId: string, paymentId: string) => void
   /** Called when onboarding is complete */
   onComplete?: () => void
 }
@@ -36,6 +39,7 @@ export function OnboardingFlow({
   onVerifyOTP,
   onResendOTP,
   onSelectPlan,
+  onPaymentComplete,
   onComplete,
 }: OnboardingFlowProps) {
   const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup')
@@ -50,6 +54,10 @@ export function OnboardingFlow({
   const [resendCountdown, setResendCountdown] = useState(0)
   const [loginResendCountdown, setLoginResendCountdown] = useState(0)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
+  const [paymentId, setPaymentId] = useState<string | null>(null)
+
+  const selectedPlan = plans.find((p) => p.id === selectedPlanId) || null
 
   const startCountdown = () => {
     setResendCountdown(60)
@@ -118,14 +126,27 @@ export function OnboardingFlow({
   // Plan handler
   const handleSelectPlan = (planId: string) => {
     onSelectPlan?.(planId)
+    setSelectedPlanId(planId)
     setCompletedSteps((prev) => [...prev, 'step-plan'])
+
+    // Payment gateway will be opened externally.
+    // Simulate a successful payment return and show the success screen.
+    const pId = `pay_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+    setPaymentId(pId)
+    setCompletedSteps((prev) => [...prev, 'step-payment'])
+    onPaymentComplete?.(planId, pId)
+    setCurrentStepId('step-payment-success')
+  }
+
+  // Payment success → dashboard
+  const handleContinueToDashboard = () => {
     setShowSuccess(true)
     setTimeout(() => {
       onComplete?.()
     }, 2000)
   }
 
-  // Success Screen
+  // Success Screen (dashboard loading)
   if (showSuccess) {
     return (
       <div className="min-h-screen bg-white dark:bg-stone-950 flex flex-col">
@@ -193,6 +214,15 @@ export function OnboardingFlow({
         <PlanSelectionStep
           plans={plans}
           onSelectPlan={handleSelectPlan}
+        />
+      )}
+
+      {currentStepId === 'step-payment-success' && selectedPlan && paymentId && (
+        <PaymentSuccessStep
+          plan={selectedPlan}
+          paymentId={paymentId}
+          amount={0}
+          onContinue={handleContinueToDashboard}
         />
       )}
     </>

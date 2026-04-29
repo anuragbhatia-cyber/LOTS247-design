@@ -18,6 +18,7 @@ interface PlanSelectionStepProps {
 
 const PLAN_STYLES: Record<string, { bg: string; image: string }> = {
   'plan-udrive': { bg: 'bg-sky-400', image: '/Udrive.webp' },
+  'plan-udrive-plus': { bg: 'bg-violet-500', image: '/Udrive.webp' },
   'plan-bsafe':  { bg: 'bg-emerald-500', image: '/Bsafe.webp' },
   'plan-vcare':  { bg: 'bg-orange-400', image: '/Vcare.webp' },
 }
@@ -59,9 +60,12 @@ export function PlanSelectionStep({
     return vehicleCount > plan.features.vehicleLimit
   }
 
-  const challanDisplay = (val: boolean | string | number | null) => {
+  const featureDisplay = (val: boolean | string | number | null | undefined) => {
     if (val === false) return { kind: 'cross' as const }
     if (val === true) return { kind: 'check' as const }
+    if (val === 'payPerUse') return { kind: 'text' as const, text: 'Pay Per Use' }
+    if (val === 'asPerAddOn') return { kind: 'text' as const, text: 'As per Add-on' }
+    if (val === 'unlimited') return { kind: 'text' as const, text: 'Unlimited' }
     if (typeof val === 'number') return { kind: 'text' as const, text: `₹${val}` }
     return { kind: 'text' as const, text: '—' }
   }
@@ -113,7 +117,7 @@ export function PlanSelectionStep({
             const disabled = isPlanDisabled(plan)
             const isProcessing = processingPlanId === plan.id
             const style = PLAN_STYLES[plan.id]
-            const challanVal = challanDisplay(plan.features.challanResolution.online)
+
 
             return (
               <div
@@ -130,11 +134,11 @@ export function PlanSelectionStep({
               >
                 {/* Plan Header */}
                 {style ? (
-                  <div className={`relative ${style.bg} flex items-center justify-center py-6 px-4 min-h-[88px]`}>
+                  <div className={`relative ${style.bg} flex items-center justify-center py-1.5 px-4 min-h-[44px]`}>
                     {plan.badge && (
-                      <div className="absolute top-2.5 right-2.5">
+                      <div className="absolute top-1 right-1">
                         <span
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-white tracking-wide"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold text-white tracking-wide"
                           style={{
                             background: 'linear-gradient(160deg, #505050 0%, #111 45%, #2a2a2a 100%)',
                             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.4)',
@@ -145,11 +149,16 @@ export function PlanSelectionStep({
                         </span>
                       </div>
                     )}
-                    <img
-                      src={style.image}
-                      alt={plan.displayName}
-                      className="h-14 w-auto object-contain"
-                    />
+                    <div className="flex items-center">
+                      <img
+                        src={style.image}
+                        alt={plan.displayName}
+                        className="h-11 w-auto object-contain"
+                      />
+                      {plan.id === 'plan-udrive-plus' && (
+                        <span className="text-3xl font-bold text-white ml-0.5 -mt-0.5">+</span>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="bg-stone-100 dark:bg-stone-800 flex flex-col items-center justify-center py-6 px-4 min-h-[88px]">
@@ -165,83 +174,46 @@ export function PlanSelectionStep({
                 {/* Card Body */}
                 <div className="flex flex-col flex-1 p-5">
 
-                  {/* Key Feature / Vehicle Count */}
+                  {/* Pricing */}
                   <div className="text-center pb-4 mb-4 border-b border-stone-100 dark:border-stone-800">
-                    {plan.features.vehicleLimit === null ? (
-                      <>
-                        <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                          Unlimited
-                        </div>
-                        <div className="text-xs text-stone-400 dark:text-stone-500 mt-0.5 uppercase tracking-wide">
-                          Vehicles
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="text-3xl font-bold text-stone-900 dark:text-white">
-                          {plan.features.vehicleLimit}
-                        </div>
-                        <div className="text-xs text-stone-400 dark:text-stone-500 mt-0.5 uppercase tracking-wide">
-                          {plan.features.vehicleLimit === 1 ? 'Vehicle' : 'Vehicles'}
-                        </div>
-                      </>
-                    )}
+                    <div className="text-2xl font-bold text-stone-900 dark:text-white">
+                      {plan.price >= 1000
+                        ? `₹${Math.round(plan.price / 1000)}K`
+                        : `₹${plan.price}`}
+                    </div>
+                    <div className="text-xs text-stone-400 dark:text-stone-500 mt-0.5 uppercase tracking-wide">
+                      Per {plan.billingPeriod === 'year' ? 'Year' : 'Month'}
+                    </div>
                   </div>
 
-                  {/* Highlights */}
-                  {plan.highlights && plan.highlights.length > 0 && (
-                    <ul className="space-y-2 mb-4">
-                      {plan.highlights.slice(0, 5).map((highlight, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-stone-700 dark:text-stone-300">
-                          <CheckIcon className="text-emerald-500 mt-0.5" />
-                          {highlight}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  {/* Limitations */}
-                  {plan.limitations && plan.limitations.length > 0 && (
-                    <ul className="space-y-2 mb-4">
-                      {plan.limitations.map((limitation, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-stone-400 dark:text-stone-500">
-                          <CrossIcon className="text-stone-300 dark:text-stone-600 mt-0.5" />
-                          {limitation}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
                   {/* Feature Summary Rows */}
-                  <div className="mt-auto pt-4 border-t border-stone-100 dark:border-stone-800 space-y-2.5 text-sm mb-5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-stone-500 dark:text-stone-400">24/7 On-Call</span>
-                      {plan.features.onCallResolution
-                        ? <CheckIcon className="text-emerald-500" />
-                        : <CrossIcon className="text-stone-300 dark:text-stone-600" />
-                      }
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-stone-500 dark:text-stone-400">Online Challan</span>
-                      {challanVal.kind === 'check' ? (
-                        <CheckIcon className="text-emerald-500" />
-                      ) : challanVal.kind === 'cross' ? (
-                        <CrossIcon className="text-stone-300 dark:text-stone-600" />
-                      ) : (
-                        <span className="font-semibold text-stone-800 dark:text-stone-200">{challanVal.text}</span>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-stone-500 dark:text-stone-400">Users</span>
-                      <span className="font-semibold text-stone-800 dark:text-stone-200">{plan.features.numberOfUsers}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-stone-500 dark:text-stone-400">Dashboard</span>
-                      {plan.features.dashboardAccess
-                        ? <CheckIcon className="text-emerald-500" />
-                        : <CrossIcon className="text-stone-300 dark:text-stone-600" />
-                      }
-                    </div>
+                  <div className="mt-auto space-y-3.5 text-xs mb-5">
+                    {[
+                      { label: 'No. of Vehicles', value: { kind: 'text' as const, text: plan.features.vehicleLimit === null ? 'Unlimited' : String(plan.features.vehicleLimit) } },
+                      { label: '24/7 On-Call', value: featureDisplay(plan.features.onCallResolution) },
+                      { label: 'On-Site Legal', value: featureDisplay(plan.features.onSiteResolution) },
+                      { label: 'Challan Service', value: featureDisplay(plan.features.challanResolution.online !== false) },
+                      { label: '  Online', value: featureDisplay(plan.features.challanResolution.online), indent: true },
+                      { label: '  Lok Adalat', value: featureDisplay(plan.features.challanResolution.lokAdalat), indent: true },
+                      { label: '  Court', value: featureDisplay(plan.features.challanResolution.court), indent: true },
+                      { label: 'RTO-as-a-Service', value: featureDisplay(plan.features.rtoService) },
+                      { label: 'Dashboard', value: featureDisplay(plan.features.dashboardAccess) },
+                    ].map((row, idx) => (
+                      <div key={idx} className={`flex items-center justify-between ${row.indent ? 'pl-3' : ''}`}>
+                        <span className={`${row.indent ? 'text-xs text-stone-400 dark:text-stone-500' : 'text-stone-500 dark:text-stone-400'}`}>
+                          {row.label.trim()}
+                        </span>
+                        {row.value.kind === 'check' ? (
+                          <CheckIcon className="text-emerald-500" />
+                        ) : row.value.kind === 'cross' ? (
+                          <CrossIcon className="text-red-400 dark:text-red-500" />
+                        ) : (
+                          <span className={`font-semibold text-xs text-stone-800 dark:text-stone-200`}>
+                            {row.value.text}
+                          </span>
+                        )}
+                      </div>
+                    ))}
                   </div>
 
                   {/* CTA Button */}
@@ -252,9 +224,7 @@ export function PlanSelectionStep({
                       'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200',
                       disabled
                         ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
-                        : plan.id === 'plan-free'
-                          ? 'border border-stone-300 dark:border-stone-600 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer'
-                          : 'bg-stone-900 dark:bg-white hover:bg-stone-700 dark:hover:bg-stone-100 text-white dark:text-stone-900 cursor-pointer',
+                        : 'bg-stone-900 dark:bg-white hover:bg-stone-700 dark:hover:bg-stone-100 text-white dark:text-stone-900 cursor-pointer',
                     ].join(' ')}
                   >
                     {isProcessing ? (
@@ -267,8 +237,6 @@ export function PlanSelectionStep({
                       </span>
                     ) : disabled ? (
                       'Exceeds vehicle limit'
-                    ) : plan.id === 'plan-free' ? (
-                      'Start Free'
                     ) : (
                       'Select Plan'
                     )}
@@ -278,11 +246,6 @@ export function PlanSelectionStep({
             )
           })}
         </div>
-
-        {/* Footer note */}
-        <p className="mt-8 text-xs text-center text-stone-400 dark:text-stone-500">
-          All plans include basic compliance tracking. You can upgrade or change your plan anytime from settings.
-        </p>
       </div>
     </div>
   )

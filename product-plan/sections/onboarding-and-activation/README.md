@@ -1,44 +1,54 @@
-# Onboarding & Activation Section
+# Onboarding & Activation — Multi-Step Wizard
 
-The Onboarding & Activation section handles the user registration and setup flow for new LOTS247 users. It guides them through phone verification, vehicle registration, optional driver addition, and subscription plan selection.
+## Overview
 
-## Components
+The Onboarding & Activation section guides new users through a multi-step registration wizard. It collects phone number, verifies via OTP, fetches vehicle details from RC number, adds driver information, and presents plan selection. The flow is designed for first-time fleet operators with minimal tech familiarity.
 
-| Component | Description |
-|---|---|
-| `OnboardingFlow` | Main flow controller managing the multi-step onboarding process with animated truck illustration |
-| `LoginStep` | Phone number + OTP login form for returning users |
-| `RegistrationStep` | Registration form with business name, type, state, pincode, and terms acceptance |
-| `PhoneVerificationStep` | Phone number entry + OTP verification with countdown timer |
-| `VehicleAdditionStep` | RC number input with auto-fetch from government API or manual entry |
-| `DriverAdditionStep` | Optional driver details form (name, license number, expiry) |
-| `PlanSelectionStep` | Subscription plan cards grid (Free, U Drive, B Safe, V Care) with feature comparison |
-| `ProgressIndicator` | Step progress bar showing current position in the onboarding flow |
+## User Flows
 
-## Data Requirements
+1. **Registration** — User enters name, email, and organization name in RegistrationStep.
+2. **Phone Verification** — User enters mobile number, receives OTP, and verifies in PhoneVerificationStep.
+3. **Login** — Returning users enter phone + OTP to authenticate in LoginStep.
+4. **Vehicle Addition** — User enters RC number, system auto-fetches vehicle details (make, model, registration date, expiry). User confirms or edits in VehicleAdditionStep.
+5. **Driver Addition** — User enters driver name, phone, and DL number. DL details are auto-fetched in DriverAdditionStep.
+6. **Plan Selection** — User reviews available plans (Basic, Pro, Enterprise) with feature comparison and selects one in PlanSelectionStep.
 
-- **SubscriptionPlan[]**: Available plans with features, pricing, and highlights
-- **OnboardingStep[]**: Step definitions (id, name, title, description, isRequired, canSkip)
-- **OnboardingProgress**: Current progress state tracking completed steps
+## Design Decisions
 
-## External Dependencies
+- Wizard uses a horizontal ProgressIndicator with step numbers and labels.
+- Each step is a full-screen card with clear primary CTA at the bottom.
+- RC/DL auto-fetch shows a loading shimmer while the API resolves, then pre-fills fields.
+- Plan cards use a highlighted "Recommended" badge on the suggested plan.
+- Back navigation is supported at every step; data persists across steps.
+- Mobile-first layout with single-column form fields.
 
-- `lucide-react` - Icon library
-- `lottie-react` - Animation library (used for truck animation in OnboardingFlow)
-- `truck.json` - Lottie animation data file (must be provided alongside components)
-- Tailwind CSS v4 with `dark:` variant support
+## Data Used
 
-## Flow Sequence
+- `product/sections/onboarding-and-activation/data.json` — Sample user profiles, OTP mock, vehicle RC data, driver DL data, plans.
+- `product/sections/onboarding-and-activation/types.ts` — RegistrationData, OtpPayload, VehicleRCData, DriverDLData, Plan.
 
-1. **Login / Registration** - User enters phone number and verifies via OTP
-2. **Add Vehicle** - User enters RC number; system fetches details from government API
-3. **Add Driver** (optional) - User can add a driver or skip
-4. **Choose Plan** - User selects a subscription plan (Free, U Drive, B Safe, V Care)
+## Components Provided
 
-## Key Patterns
+| Component | File | Description |
+|-----------|------|-------------|
+| OnboardingFlow | OnboardingFlow.tsx | Top-level wizard orchestrator |
+| RegistrationStep | RegistrationStep.tsx | Name, email, org form |
+| PhoneVerificationStep | PhoneVerificationStep.tsx | Phone input + OTP verification |
+| LoginStep | LoginStep.tsx | Returning user phone + OTP |
+| VehicleAdditionStep | VehicleAdditionStep.tsx | RC number entry + auto-fetch |
+| DriverAdditionStep | DriverAdditionStep.tsx | Driver details + DL fetch |
+| PlanSelectionStep | PlanSelectionStep.tsx | Plan comparison and selection |
+| ProgressIndicator | ProgressIndicator.tsx | Horizontal step tracker |
 
-- OnboardingFlow uses internal state machine (`step`) to navigate between steps
-- VehicleAdditionStep simulates API fetch with timeout for demo purposes
-- PlanSelectionStep displays plan comparison with feature matrix
-- All forms validate input before allowing progression
-- The flow supports both new user registration and returning user login
+## Callback Props
+
+| Prop | Component | Signature | Purpose |
+|------|-----------|-----------|---------|
+| onRegister | RegistrationStep | `(data: RegistrationData) => void` | Submits registration |
+| onVerifyOtp | PhoneVerificationStep | `(phone: string, otp: string) => void` | Verifies OTP |
+| onLogin | LoginStep | `(phone: string, otp: string) => void` | Authenticates returning user |
+| onAddVehicle | VehicleAdditionStep | `(rc: string, data: VehicleRCData) => void` | Confirms vehicle |
+| onAddDriver | DriverAdditionStep | `(data: DriverDLData) => void` | Confirms driver |
+| onSelectPlan | PlanSelectionStep | `(planId: string) => void` | Selects a plan |
+| onBack | OnboardingFlow | `() => void` | Navigates to previous step |
+| onSkip | VehicleAdditionStep, DriverAdditionStep | `() => void` | Skips optional step |

@@ -1,0 +1,236 @@
+{
+  "_meta": {
+    "models": {
+      "subscriberProfile": "The logged-in subscriber's full profile, including personal details, organization/business information, and overall KYC verification status. Extends the basic Subscriber entity from the data model.",
+      "organizationDetails": "The subscriber's business or organization information — business name, type, GST number, CIN, and registered address. Individual accounts have a simplified subset of these fields.",
+      "kycDocuments": "Identity and business verification documents submitted by the subscriber. Each document tracks its verification status, masked identifier, upload date, and rejection reason if applicable.",
+      "subscription": "The subscriber's active subscription plan with current usage against plan limits.",
+      "billingHistory": "A reverse-chronological record of subscription-related payments, including plan renewals, upgrades, and refunds.",
+      "availablePlans": "The subscription plans available for upgrade comparison — same plans shown during onboarding."
+    },
+    "relationships": [
+      "SubscriberProfile contains one OrganizationDetails object describing the business/entity",
+      "SubscriberProfile has an overall kycStatus derived from the individual KycDocuments",
+      "Subscription belongs to the SubscriberProfile and determines feature access and vehicle limits",
+      "BillingHistory records are linked to the Subscription via plan changes and renewals",
+      "Individual accounts require Aadhaar + PAN for KYC; Fleet/Business accounts also require GST Certificate"
+    ]
+  },
+  "subscriberProfile": {
+    "id": "LWD-1167612",
+    "name": "Rajesh Kumar",
+    "email": "rajesh.kumar@rktransport.in",
+    "phone": "919820134567",
+    "dateOfBirth": "15 Aug 1985",
+    "avatarInitials": "RK",
+    "avatarUrl": null,
+    "accountType": "fleet",
+    "kycStatus": "partial",
+    "memberSince": "12 Mar 2024"
+  },
+  "organizationDetails": {
+    "businessName": "RK Transport Solutions",
+    "businessType": "proprietorship",
+    "gstNumber": "09AABCU9603R1ZP",
+    "cinNumber": null,
+    "registeredAddress": "45, Transport Nagar, Sector 12",
+    "city": "Lucknow",
+    "state": "Uttar Pradesh",
+    "pincode": "226012"
+  },
+  "kycDocuments": [
+    {
+      "id": "kyc-001",
+      "type": "aadhaar",
+      "label": "Aadhaar Card",
+      "maskedNumber": "XXXX XXXX 4567",
+      "status": "verified",
+      "uploadedAt": "14 Mar 2024",
+      "verifiedAt": "15 Mar 2024",
+      "rejectionReason": null,
+      "fileName": "aadhaar_front_back.pdf",
+      "fileSize": "1.2 MB"
+    },
+    {
+      "id": "kyc-002",
+      "type": "pan",
+      "label": "PAN Card",
+      "maskedNumber": "AABCU9603R",
+      "status": "verified",
+      "uploadedAt": "14 Mar 2024",
+      "verifiedAt": "15 Mar 2024",
+      "rejectionReason": null,
+      "fileName": "pan_card.jpg",
+      "fileSize": "856 KB"
+    },
+    {
+      "id": "kyc-003",
+      "type": "gst_certificate",
+      "label": "GST Certificate",
+      "maskedNumber": "09AABCU9603R1ZP",
+      "status": "rejected",
+      "uploadedAt": "16 Mar 2024",
+      "verifiedAt": null,
+      "rejectionReason": "Document is not clearly legible. Please upload a higher-resolution scan or photo.",
+      "fileName": "gst_cert_scan.pdf",
+      "fileSize": "2.1 MB"
+    },
+    {
+      "id": "kyc-004",
+      "type": "company_registration",
+      "label": "Company Registration Certificate",
+      "maskedNumber": null,
+      "status": "not_submitted",
+      "uploadedAt": null,
+      "verifiedAt": null,
+      "rejectionReason": null,
+      "fileName": null,
+      "fileSize": null
+    }
+  ],
+  "subscription": {
+    "id": "subs-001",
+    "planId": "plan-bsafe",
+    "planName": "B Safe",
+    "status": "active",
+    "price": 0,
+    "billingPeriod": "month",
+    "startDate": "12 Mar 2024",
+    "nextRenewalDate": "12 Apr 2026",
+    "vehiclesUsed": 18,
+    "vehicleLimit": null,
+    "usersUsed": 2,
+    "userLimit": 3,
+    "features": {
+      "onCallResolution": true,
+      "onSiteResolution": "payPerUse",
+      "challanResolutionOnline": 49,
+      "dashboardAccess": true,
+      "automatedReports": true,
+      "personalizedReports": false,
+      "whatsappUpdates": true,
+      "accountManager": false,
+      "bulkChallanResolution": false,
+      "apiIntegration": false
+    }
+  },
+  "billingHistory": [
+    {
+      "id": "bill-001",
+      "date": "12 Mar 2026",
+      "description": "B Safe Plan — Monthly Renewal",
+      "amount": "₹0.00",
+      "status": "paid",
+      "invoiceId": "INV-2026-0312"
+    },
+    {
+      "id": "bill-002",
+      "date": "12 Feb 2026",
+      "description": "B Safe Plan — Monthly Renewal",
+      "amount": "₹0.00",
+      "status": "paid",
+      "invoiceId": "INV-2026-0212"
+    },
+    {
+      "id": "bill-003",
+      "date": "12 Jan 2026",
+      "description": "B Safe Plan — Monthly Renewal",
+      "amount": "₹0.00",
+      "status": "paid",
+      "invoiceId": "INV-2026-0112"
+    },
+    {
+      "id": "bill-004",
+      "date": "12 Dec 2025",
+      "description": "Plan Upgrade — U Drive to B Safe",
+      "amount": "₹0.00",
+      "status": "paid",
+      "invoiceId": "INV-2025-1212"
+    },
+    {
+      "id": "bill-005",
+      "date": "12 Jun 2024",
+      "description": "U Drive Plan — Monthly Renewal",
+      "amount": "₹0.00",
+      "status": "paid",
+      "invoiceId": "INV-2024-0612"
+    },
+    {
+      "id": "bill-006",
+      "date": "12 Mar 2024",
+      "description": "U Drive Plan — Initial Subscription",
+      "amount": "₹0.00",
+      "status": "paid",
+      "invoiceId": "INV-2024-0312"
+    }
+  ],
+  "availablePlans": [
+    {
+      "id": "plan-free",
+      "name": "Free Trial",
+      "price": 0,
+      "billingPeriod": "month",
+      "vehicleLimit": 1,
+      "userLimit": 1,
+      "isCurrentPlan": false,
+      "isRecommended": false,
+      "highlights": [
+        "1 vehicle only",
+        "Basic dashboard access",
+        "No legal support"
+      ]
+    },
+    {
+      "id": "plan-udrive",
+      "name": "U Drive",
+      "price": 0,
+      "billingPeriod": "month",
+      "vehicleLimit": 1,
+      "userLimit": 1,
+      "isCurrentPlan": false,
+      "isRecommended": false,
+      "highlights": [
+        "24/7 on-call legal support",
+        "Challan resolution from ₹79",
+        "Full dashboard access"
+      ]
+    },
+    {
+      "id": "plan-bsafe",
+      "name": "B Safe",
+      "price": 0,
+      "billingPeriod": "month",
+      "vehicleLimit": null,
+      "userLimit": 3,
+      "isCurrentPlan": true,
+      "isRecommended": false,
+      "highlights": [
+        "Unlimited vehicles",
+        "Challan resolution from ₹49",
+        "3 users",
+        "Automated reports",
+        "WhatsApp updates"
+      ]
+    },
+    {
+      "id": "plan-vcare",
+      "name": "V Care",
+      "price": 0,
+      "billingPeriod": "month",
+      "vehicleLimit": null,
+      "userLimit": 10,
+      "isCurrentPlan": false,
+      "isRecommended": true,
+      "badge": "Top Seller",
+      "highlights": [
+        "Unlimited vehicles",
+        "Challan resolution from ₹39",
+        "10 users",
+        "Dedicated account manager",
+        "Bulk challan resolution",
+        "API integration",
+        "₹20K value-added services"
+      ]
+    }
+  ]
+}

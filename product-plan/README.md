@@ -5,19 +5,19 @@ This folder contains everything needed to implement LOTS247.
 ## What's Included
 
 **Ready-to-Use Prompts:**
-- `prompts/one-shot-prompt.md` — Prompt for full implementation
-- `prompts/section-prompt.md` — Prompt template for section-by-section
+- `prompts/one-shot-prompt.md` — Prompt template for full implementation
+- `prompts/section-prompt.md` — Prompt template for section-by-section implementation
 
 **Instructions:**
-- `product-overview.md` — Product summary (always provide with instructions)
-- `instructions/one-shot-instructions.md` — All milestones combined
-- `instructions/incremental/` — 10 milestone instructions (foundation + 9 sections)
+- `product-overview.md` — Product summary (provide with every implementation)
+- `instructions/one-shot-instructions.md` — All milestones combined for full implementation
+- `instructions/incremental/` — Milestone-by-milestone instructions (foundation, then sections)
 
 **Design Assets:**
-- `design-system/` — Colors, fonts, tokens
-- `data-model/` — Entity types and sample data
+- `design-system/` — Colors, fonts, design tokens
+- `data-model/` — Core entities and TypeScript types
 - `shell/` — Application shell components
-- `sections/` — 9 section component packages with test instructions
+- `sections/` — All section components, types, sample data, and test instructions
 
 ## How to Use This
 
@@ -55,21 +55,6 @@ Each section includes a `tests.md` file with test-writing instructions. For best
 4. Refactor while keeping tests green
 
 The test instructions are **framework-agnostic** — they describe WHAT to test, not HOW. Adapt to your testing setup (Jest, Vitest, Playwright, Cypress, RSpec, Minitest, PHPUnit, etc.).
-
-## Sections Reference
-
-| # | Section | Folder | Milestone |
-|---|---------|--------|-----------|
-| 1 | Foundation | — | `01-foundation.md` |
-| 2 | Home | `home/` | `02-home.md` |
-| 3 | Onboarding & Activation | `onboarding-and-activation/` | `03-onboarding-and-activation.md` |
-| 4 | Compliance Dashboard | `compliance-dashboard/` | `04-compliance-dashboard.md` |
-| 5 | Incident Management | `incident-management/` | `05-incident-management.md` |
-| 6 | Vehicle & Driver Management | `vehicle-and-driver-management/` | `06-vehicle-and-driver-management.md` |
-| 7 | Reports | `reports/` | `07-reports.md` |
-| 8 | API Catalogue | `api-catalogue/` | `08-api-catalogue.md` |
-| 9 | Wallet | `wallet/` | `09-wallet.md` |
-| 10 | Proposals | `proposals/` | `10-proposals.md` |
 
 ## Tips
 

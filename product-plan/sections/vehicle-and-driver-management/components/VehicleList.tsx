@@ -26,6 +26,7 @@ import {
   UserMinus,
   RefreshCw,
   Loader2,
+  Download,
 } from 'lucide-react'
 import type {
   VehicleAndDriverManagementProps,
@@ -35,7 +36,7 @@ import type {
   SubscriptionStatus,
   DocumentStatus,
 } from '../types'
-import { useLanguage, type Language } from './LanguageContext'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 // ---------------------------------------------------------------------------
 // Translations
@@ -385,8 +386,7 @@ function resolveDriver(driverId: string | null, drivers: Driver[]): Driver | und
 function ComplianceScoreBadge({ score }: { score: number }) {
   const colors = getComplianceColor(score)
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold tabular-nums ${colors.bg} ${colors.text} ring-1 ${colors.ring}`}>
-      <ShieldCheck className="w-3 h-3" />
+    <span className={`text-sm font-bold tabular-nums ${colors.text}`}>
       {score}
     </span>
   )
@@ -479,7 +479,7 @@ function ChangeVehicleModal({
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 bg-black/50 dark:bg-black/70" onClick={handleClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6 bg-black/50 dark:bg-black/70" onClick={handleClose}>
 
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto" onClick={(e) => e.stopPropagation()}>
 
@@ -487,7 +487,7 @@ function ChangeVehicleModal({
         {step === 'search' && (
           <>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
               <div>
                 <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
                   {t.changeVehicleTitle}
@@ -498,7 +498,7 @@ function ChangeVehicleModal({
               </div>
               <button
                 onClick={handleClose}
-                className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -534,21 +534,6 @@ function ChangeVehicleModal({
                         : 'border border-transparent hover:bg-stone-50 dark:hover:bg-stone-800/50'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isSelected
-                        ? 'bg-emerald-100 dark:bg-emerald-900/50'
-                        : v.status === 'active'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40'
-                        : 'bg-stone-100 dark:bg-stone-800'
-                    }`}>
-                      <Truck className={`w-4.5 h-4.5 ${
-                        isSelected
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : v.status === 'active'
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : 'text-stone-400 dark:text-stone-500'
-                      }`} />
-                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className={`text-sm font-semibold font-mono tracking-tight truncate ${
@@ -583,10 +568,10 @@ function ChangeVehicleModal({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
               <button
                 onClick={handleClose}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
               >
                 {t.cancel}
               </button>
@@ -595,7 +580,7 @@ function ChangeVehicleModal({
                   if (selectedVehicleId) setStep('confirm')
                 }}
                 disabled={!selectedVehicleId || currentVehicleIds.includes(selectedVehicleId)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
                   selectedVehicleId && !currentVehicleIds.includes(selectedVehicleId)
                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                     : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400 cursor-not-allowed'
@@ -640,16 +625,16 @@ function ChangeVehicleModal({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-center gap-3 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-center gap-3 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
               <button
                 onClick={() => setStep('search')}
-                className="flex-1 max-w-[140px] px-4 py-2.5 rounded-lg text-sm font-medium border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="flex-1 max-w-[140px] px-4 py-2.5 rounded-xl text-sm font-medium border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 {t.no}
               </button>
               <button
                 onClick={handleConfirm}
-                className="flex-1 max-w-[140px] px-4 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+                className="flex-1 max-w-[140px] px-4 py-2.5 rounded-xl text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
               >
                 {t.yes}
               </button>
@@ -673,10 +658,10 @@ function ChangeVehicleModal({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-center px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-center px-6 py-4 border-t border-stone-200 dark:border-stone-800">
               <button
                 onClick={handleClose}
-                className="px-6 py-2.5 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+                className="px-6 py-2.5 rounded-xl text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
               >
                 {t.done}
               </button>
@@ -862,15 +847,21 @@ export function VehicleList({
           </div>
           <div className="flex items-center gap-2">
             <button
+              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Download PDF</span>
+            </button>
+            <button
               onClick={() => window.parent.postMessage({ type: 'openAddDriver' }, '*')}
-              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
             >
               <UserPlus className="w-4 h-4" />
               <span className="hidden sm:inline">{t.addDriver}</span>
             </button>
             <button
               onClick={() => window.parent.postMessage({ type: 'openAddVehicle' }, '*')}
-              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
             >
               <Plus className="w-4 h-4" />
               {t.addVehicle}
@@ -881,7 +872,7 @@ export function VehicleList({
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
                   {stats.total}
@@ -896,7 +887,7 @@ export function VehicleList({
             </div>
           </div>
           <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className={`text-2xl sm:text-3xl font-bold tracking-tight tabular-nums ${getComplianceColor(stats.avgCompliance).text}`}>
                   {stats.avgCompliance}%
@@ -911,7 +902,7 @@ export function VehicleList({
             </div>
           </div>
           <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
                   {stats.expiredCount}
@@ -926,7 +917,7 @@ export function VehicleList({
             </div>
           </div>
           <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">
                   {stats.expiringCount}
@@ -1004,7 +995,7 @@ export function VehicleList({
               <>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
                     showFilters || activeFilterCount > 0
                       ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
                       : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
@@ -1053,7 +1044,7 @@ export function VehicleList({
                   <select
                     value={expiryFilter}
                     onChange={(e) => setExpiryFilter(e.target.value as DocumentStatus | 'all')}
-                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                   >
                     <option value="all">{t.allStatuses}</option>
                     <option value="valid">{t.valid}</option>
@@ -1072,7 +1063,7 @@ export function VehicleList({
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value as VehicleStatus | 'all')}
-                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                   >
                     <option value="all">{t.all}</option>
                     <option value="active">{t.activeStatus}</option>
@@ -1126,7 +1117,7 @@ export function VehicleList({
             <div className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-stone-100 dark:border-stone-800">
+                  <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
                     <th className="w-10 px-0 py-3.5 pl-4">
                       <input
                         type="checkbox"
@@ -1165,7 +1156,7 @@ export function VehicleList({
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100 dark:divide-stone-800/60">
+                <tbody className="divide-y divide-stone-200 dark:divide-stone-800/60">
                   {paginatedVehicles.map((vehicle) => {
                     const driver = resolveDriver(vehicle.assignedDriverId, drivers)
                     const insuranceDoc = vehicle.documents.find((d) => d.type === 'insurance')
@@ -1175,7 +1166,7 @@ export function VehicleList({
                       <tr
                         key={vehicle.id}
                         onClick={() => onViewVehicle?.(vehicle.id)}
-                        className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+                        className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                       >
                         {/* Checkbox */}
                         <td className="w-10 px-0 py-4 pl-4" onClick={(e) => e.stopPropagation()}>
@@ -1274,16 +1265,11 @@ export function VehicleList({
 
                         {/* Subscription Status */}
                         <td className="px-5 py-4 text-center">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
                             vehicle.subscriptionStatus === 'active'
                               ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                               : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
                           }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${
-                              vehicle.subscriptionStatus === 'active'
-                                ? 'bg-emerald-500'
-                                : 'bg-stone-400 dark:bg-stone-500'
-                            }`} />
                             {vehicle.subscriptionStatus === 'active' ? t.subscriptionActive : t.subscriptionInactive}
                           </span>
                         </td>
@@ -1299,7 +1285,7 @@ export function VehicleList({
                               onClick={() =>
                                 setOpenDropdownId(openDropdownId === vehicle.id ? null : vehicle.id)
                               }
-                              className="p-3.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                              className="p-3.5 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                             >
                               <MoreVertical className="w-4 h-4" />
                             </button>
@@ -1315,16 +1301,6 @@ export function VehicleList({
                                 >
                                   <Eye className="w-4 h-4" />
                                   {t.viewDetails}
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    onEditVehicle?.(vehicle.id)
-                                    setOpenDropdownId(null)
-                                  }}
-                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                  {t.edit}
                                 </button>
                                 <button
                                   onClick={() => {
@@ -1373,7 +1349,7 @@ export function VehicleList({
                   <button
                     onClick={() => setVehiclePage((p) => Math.max(1, p - 1))}
                     disabled={vehiclePage === 1}
-                    className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -1381,7 +1357,7 @@ export function VehicleList({
                     <button
                       key={page}
                       onClick={() => setVehiclePage(page)}
-                      className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${
+                      className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
                         page === vehiclePage
                           ? 'bg-emerald-600 text-white shadow-sm'
                           : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
@@ -1393,7 +1369,7 @@ export function VehicleList({
                   <button
                     onClick={() => setVehiclePage((p) => Math.min(vehicleTotalPages, p + 1))}
                     disabled={vehiclePage === vehicleTotalPages}
-                    className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -1481,16 +1457,11 @@ export function VehicleList({
                       <span className="text-xs text-stone-500 dark:text-stone-400">
                         {vehicle.vehicleType}
                       </span>
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium ${
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${
                         vehicle.subscriptionStatus === 'active'
                           ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                           : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
                       }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${
-                          vehicle.subscriptionStatus === 'active'
-                            ? 'bg-emerald-500'
-                            : 'bg-stone-400 dark:bg-stone-500'
-                        }`} />
                         {vehicle.subscriptionStatus === 'active' ? t.subscriptionActive : t.subscriptionInactive}
                       </span>
                       {vehicle.status === 'inactive' && (
@@ -1521,7 +1492,7 @@ export function VehicleList({
                     </div>
 
                     {/* Bottom: Arrow */}
-                    <div className="flex items-center justify-end pt-3 border-t border-stone-100 dark:border-stone-800">
+                    <div className="flex items-center justify-end pt-3 border-t border-stone-200 dark:border-stone-800">
                       <ChevronRight className="w-4 h-4 text-stone-300 dark:text-stone-600" />
                     </div>
                   </div>
@@ -1551,7 +1522,7 @@ export function VehicleList({
             <div className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-stone-100 dark:border-stone-800">
+                  <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
                     <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                       {t.driver}
                     </th>
@@ -1569,7 +1540,7 @@ export function VehicleList({
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-stone-100 dark:divide-stone-800/60">
+                <tbody className="divide-y divide-stone-200 dark:divide-stone-800/60">
                   {paginatedDrivers.map((driver) => {
                     const assignedVehicles = vehicles.filter((v) =>
                       driver.assignedVehicleIds.includes(v.id)
@@ -1579,7 +1550,7 @@ export function VehicleList({
                     return (
                       <tr
                         key={driver.id}
-                        className="hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+                        className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                       >
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
@@ -1627,7 +1598,7 @@ export function VehicleList({
                           <div className="relative inline-block" ref={driverActionId === driver.id ? driverDropdownRef : undefined}>
                             <button
                               onClick={() => setDriverActionId(driverActionId === driver.id ? null : driver.id)}
-                              className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                              className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
                             >
                               <MoreVertical className="w-4 h-4" />
                             </button>
@@ -1684,7 +1655,7 @@ export function VehicleList({
                   <button
                     onClick={() => setDriverPage((p) => Math.max(1, p - 1))}
                     disabled={driverPage === 1}
-                    className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -1692,7 +1663,7 @@ export function VehicleList({
                     <button
                       key={page}
                       onClick={() => setDriverPage(page)}
-                      className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${
+                      className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
                         page === driverPage
                           ? 'bg-emerald-600 text-white shadow-sm'
                           : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
@@ -1704,7 +1675,7 @@ export function VehicleList({
                   <button
                     onClick={() => setDriverPage((p) => Math.min(driverTotalPages, p + 1))}
                     disabled={driverPage === driverTotalPages}
-                    className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -1749,7 +1720,7 @@ export function VehicleList({
                     </div>
 
                     {assignedVehicles.length > 0 && (
-                      <div className="pt-3 border-t border-stone-100 dark:border-stone-800">
+                      <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
                         <p className="text-xs text-stone-500 dark:text-stone-400 mb-1.5">{t.assignedVehicles}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {assignedVehicles.map((v) => (

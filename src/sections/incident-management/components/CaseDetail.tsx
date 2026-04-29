@@ -1087,7 +1087,7 @@ export function CaseDetail({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-6 overflow-x-auto">
+        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-full sm:w-fit mb-6 overflow-x-auto">
           {TABS.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
@@ -1097,13 +1097,13 @@ export function CaseDetail({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                className={`flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 min-h-11 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                   isActive
                     ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                     : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">{t[tab.labelKey]}</span>
                 <span className="sm:hidden">{t[tab.shortLabelKey]}</span>
                 {count > 0 && (

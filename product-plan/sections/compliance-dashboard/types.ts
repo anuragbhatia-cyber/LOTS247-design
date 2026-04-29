@@ -121,6 +121,10 @@ export interface ChallanDrilldownRow {
   onlineCount: number
   totalAmount: number
   latestDate: string | null
+  submittedCount: number
+  notSubmittedCount: number
+  paidCount: number
+  paidAmount: number
 }
 
 export interface BlacklistedDrilldownRow {

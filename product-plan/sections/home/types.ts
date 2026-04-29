@@ -76,7 +76,7 @@ export interface ComplianceScore {
   categories: ComplianceCategory[]
 }
 
-export type AlertCategory = 'puc' | 'insurance' | 'challan'
+export type AlertCategory = 'puc' | 'insurance' | 'challan' | 'renewal'
 export type AlertUrgency = 'critical' | 'warning' | 'notice'
 
 export interface AlertItem {

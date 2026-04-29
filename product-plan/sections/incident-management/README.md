@@ -1,50 +1,48 @@
-# Incident Management Section
+# Incident Management — Challans & Cases
 
-The Incident Management section handles challan tracking and legal case management for LOTS247 fleet operations. It provides list views with search/filter/pagination and detail views with tabs for overview, follow-up timeline, reports, and documents.
+## Overview
 
-## Components
+Incident Management handles two core workflows: Challans (traffic violations with a 45-day SLA for resolution and refund eligibility) and Cases (legal proceedings). The section features sub-navigation between Challans and Cases, rich filtering, detail views with comment threads, case creation from challans, and SLA-based refund tracking.
 
-| Component | Description |
-|---|---|
-| `ChallanList` | Full challan list with search, status/type filters, pagination, and desktop table + mobile card layouts |
-| `ChallanDetail` | Challan detail view with tabs: Overview (SLA progress, violation details), Follow-up (timeline + comments), Reports (documents), Documents (upload modal) |
-| `CaseList` | Case list with search, status/type/vehicle filters, pagination, and desktop table + mobile card layouts |
-| `CaseDetail` | Case detail view with tabs: Overview (case info, SLA), Follow-up (timeline + comments), Reports (PDF reports), Documents (upload modal) |
+## User Flows
 
-## Data Requirements
+1. **Challan List** — User browses challans with filters (status, vehicle, date range, violation type). Receipt-style cards show challan details.
+2. **Challan Detail** — Tapping a challan opens ChallanDetail with full info: violation, amount, SLA countdown, payment status, linked case, and a comment thread.
+3. **Case List** — User browses cases with filters (status, priority, date). Cards show case summary with SLA indicator.
+4. **Case Detail** — CaseDetail shows case overview, linked challans, assigned lawyer, comment thread, and status timeline.
+5. **Create Case from Challan** — From ChallanDetail, user taps "Create Case" to escalate a challan to legal proceedings.
+6. **SLA Refund** — If a challan is resolved within the 45-day SLA, the refund status is tracked and displayed.
 
-- **Challan[]**: Challan records with status, type, amount, SLA deadline
-- **Case[]**: Legal case records with status, type, assigned lawyer, SLA deadline
-- **Vehicle[]**: Vehicles for resolving vehicleId references
-- **Driver[]**: Drivers for resolving driverId references
-- **Lawyer[]**: Lawyers for resolving assignedLawyerId references
-- **Comment[]**: Comments on challans and cases
-- **ChallanActivity[]**: Timeline activities for challans
-- **CaseActivity[]**: Timeline activities for cases
-- **CaseDocument[]**: Documents attached to cases
-- **CaseReport[]**: PDF reports for cases
+## Design Decisions
 
-## External Dependencies
+- Sub-navigation tabs: "Challans" and "Cases" at the top of the section.
+- Challan cards use receipt-style design with dashed border, monospaced challan number, and amount in bold.
+- 45-day SLA is visualized as a progress bar with days remaining.
+- Comment threads support text and attachments (images, PDFs).
+- Case status timeline uses a vertical stepper pattern.
 
-- `lucide-react` - Icon library
-- `LanguageContext` - Provides `{ language }` value (`"en"` | `"hi"`) for bilingual support
-- Tailwind CSS v4 with `dark:` variant support
+## Data Used
 
-## Status Lifecycle
+- `product/sections/incident-management/data.json` — Sample challans, cases, comments, SLA data.
+- `product/sections/incident-management/types.ts` — Challan, Case, Comment, SLAStatus.
 
-### Challans
-`submitted` -> `inProgress` -> `resolved` | `onHold` | `notSettled`
+## Components Provided
 
-### Cases
-`submitted` -> `inProgress` -> `resolved` | `documentRequested` | `extended`
+| Component | File | Description |
+|-----------|------|-------------|
+| ChallanList | ChallanList.tsx | Filterable list of challan cards |
+| ChallanDetail | ChallanDetail.tsx | Full challan view with comments |
+| CaseList | CaseList.tsx | Filterable list of case cards |
+| CaseDetail | CaseDetail.tsx | Full case view with timeline |
 
-## Key Patterns
+## Callback Props
 
-- SLA progress bar shows time remaining until deadline with color coding
-- Timeline activities include status changes, payment attempts, lawyer assignments, notes
-- Comment system supports user and team author types
-- Document upload modal with drag-and-drop file selection
-- Mobile-responsive: table on desktop, card layout on mobile
-- All text supports English/Hindi bilingual rendering
-- Pagination with configurable page size (10 items default)
-- Filter pills show active filters with clear buttons
+| Prop | Component | Signature | Purpose |
+|------|-----------|-----------|---------|
+| onChallanSelect | ChallanList | `(challanId: string) => void` | Opens challan detail |
+| onCreateCase | ChallanDetail | `(challanId: string) => void` | Escalates challan to case |
+| onAddComment | ChallanDetail, CaseDetail | `(entityId: string, comment: string) => void` | Posts comment |
+| onCaseSelect | CaseList | `(caseId: string) => void` | Opens case detail |
+| onFilterChange | ChallanList, CaseList | `(filters: object) => void` | Applies filters |
+| onPayChallan | ChallanDetail | `(challanId: string) => void` | Initiates challan payment |
+| onBack | ChallanDetail, CaseDetail | `() => void` | Returns to list view |

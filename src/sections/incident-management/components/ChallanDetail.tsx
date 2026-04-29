@@ -1104,11 +1104,11 @@ export function ChallanDetail({
               </div>
 
               {/* Right: Amount */}
-              <div className="flex-shrink-0 lg:text-right">
+              <div className="flex-shrink-0 flex items-center justify-between lg:block lg:text-right">
                 <p className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-stone-50 tabular-nums tracking-tight">
                   {formatCurrency(challan.amount)}
                 </p>
-                <p className={`text-sm font-medium mt-1 ${sla.color === 'red' ? 'text-red-600 dark:text-red-400' : sla.color === 'amber' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                <p className={`text-sm font-medium mt-0 lg:mt-1 ${sla.color === 'red' ? 'text-red-600 dark:text-red-400' : sla.color === 'amber' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                   {sla.label}
                 </p>
               </div>
@@ -1117,7 +1117,7 @@ export function ChallanDetail({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-6 overflow-x-auto">
+        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-full sm:w-fit mb-6 overflow-x-auto">
           {tabs.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
@@ -1127,13 +1127,13 @@ export function ChallanDetail({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                className={`flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 min-h-11 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                   isActive
                     ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                     : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">{tab.label}</span>
                 <span className="sm:hidden">{tab.shortLabel}</span>
                 {count > 0 && (

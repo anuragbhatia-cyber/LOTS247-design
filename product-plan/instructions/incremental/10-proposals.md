@@ -1,169 +1,107 @@
 # Milestone 10: Proposals
 
 > **Provide alongside:** `product-overview.md`
-> **Prerequisites:** Milestone 1 (Foundation) complete, Milestone 4 (Compliance Dashboard) recommended, Milestone 5 (Incident Management) recommended
-
----
-
-## About These Instructions
-
-**What you're receiving:**
-- Finished UI designs (React components with full styling)
-- Data model definitions (TypeScript types and sample data)
-- UI/UX specifications (user flows, requirements, screenshots)
-- Design system tokens (colors, typography, spacing)
-- Test-writing instructions for each section (for TDD approach)
-
-**What you need to build:**
-- Backend API endpoints and database schema
-- Authentication and authorization
-- Data fetching and state management
-- Business logic and validation
-- Integration of the provided UI components with real data
-
-**Important guidelines:**
-- **DO NOT** redesign or restyle the provided components — use them as-is
-- **DO** wire up the callback props to your routing and API calls
-- **DO** replace sample data with real data from your backend
-- **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist (first-time users, after deletions)
-- **DO** use test-driven development — write tests first using `tests.md` instructions
-- The components are props-based and ready to integrate — focus on the backend and data layer
-
----
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Proposals section — a tracking hub for service requests originating from Compliance checks, with proposal listing, detail views with timeline and chat-style follow-up, and lifecycle management.
+Implement the Proposals section — a tracking hub for service requests originating from compliance checks, with follow-up capability and conversion tracking.
 
 ## Overview
 
-Proposals is a tracking hub for service requests that originate from Compliance checks (Challan, DL, RC). When a user runs a compliance check and finds issues, they can send a proposal to the LOTS247 team requesting resolution. Users can then track proposal status, follow up with the team, and see when proposals convert into incidents or get rejected. Converted proposals link to the created incidents.
+Proposals is a tracking hub for service requests originating from Compliance checks (Challan, DL, RC). Users can view all sent proposals, track their status, follow up with the LOTS team, and see when proposals convert into incidents or get rejected.
 
 **Key Functionality:**
-- Two-tab layout: Active Proposals / Past Proposals
-- Active proposals table with columns: Created Date, Proposal ID, Type (Challan/DL/RC), Quantity, Amount, Status, Actions
-- Proposal statuses: Sent, Received, Converted, Rejected
-- Proposal detail view with two tabs: Overview (status timeline + details) and Follow-up (chat-style thread)
-- Follow-up tab uses the same chat-style comment thread pattern as Incident Management
-- Cancel action available on active proposals
+- View proposals in two tabs: Active Proposals and Past Proposals
+- Track proposal status: Sent, Converted, Rejected
+- Follow up with LOTS team via chat-style thread (same pattern as Incident Management)
+- View proposal detail with Overview (timeline + details) and Follow-up tabs
 - Converted proposals link to created incidents
-- When a proposal is Converted or Rejected, it moves to Past Proposals
+- Cancel active proposals
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/proposals/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/proposals/components/`:
-- `ProposalList.tsx` — Two-tab proposal list (Active/Past) with table showing Created Date, Proposal ID, Type, Quantity, Amount, Status, and Actions (Follow-up, Cancel, View Detail)
-- `ProposalDetail.tsx` — Detail view with two tabs: Overview (status timeline + proposal details) and Follow-up (chat-style comment thread)
 
-Additional top-level views:
-- `ProposalManagement.tsx` — Preview wrapper for the proposal list
-- `ProposalDetail.tsx` (top-level) — Preview wrapper for the proposal detail
+- `Proposals.tsx` — Main proposals interface with tabs and list
 
 ### Data Layer
 
-Key types from `types.ts`: Proposal, ProposalType, ProposalStatus, ProposalActivity, ProposalActivityType, Comment
+- Proposals list with Active/Past tabs
+- Proposal detail: ID, type (Challan/DL/RC), quantity, amount, status, timeline
+- Follow-up thread (chat-style, matching Incident Management pattern)
+- Status transitions: Sent → Converted / Rejected (moves to Past)
+- Links between converted proposals and created incidents
 
-You'll need to:
-- Create CRUD API endpoints for proposals
-- Implement proposal creation from Compliance checks (Challan check, DL check, RC check)
-- Implement proposal status transitions: Sent -> Received -> Converted / Rejected
-- When a proposal is Converted, create a linked incident and store the `linkedIncidentId`
-- When a proposal is Converted or Rejected, move it to Past Proposals
-- Implement the comment/follow-up thread (same pattern as Incident Management comments)
-- Track proposal activities (status changes, notes) with timestamps
-- Implement proposal cancellation for active proposals
-- Link proposals to their originating compliance check data
-
-### Callbacks — Proposal List
+### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onView` | Navigate to proposal detail page |
-| `onFollowUp` | Open follow-up thread for a proposal |
-| `onCancel` | Cancel an active proposal (with confirmation) |
-
-### Callbacks — Proposal Detail
-
-| Callback | Description |
-|----------|-------------|
-| `onAddComment` | Post a follow-up message to the proposal thread |
-| `onCancel` | Cancel the proposal (with confirmation) |
-| `onBack` | Navigate back to the proposal list |
+| `onViewProposal` | Opens proposal detail view |
+| `onFollowUp` | Posts follow-up message in thread |
+| `onCancelProposal` | Cancels an active proposal |
+| `onTabChange` | Switches between Active and Past tabs |
+| `onViewLinkedIncident` | Navigates to linked incident for converted proposals |
 
 ### Empty States
 
-- No active proposals: Show "No active proposals. Proposals are created from Compliance checks."
-- No past proposals: Show "No past proposals yet"
-- No comments on a proposal: Show "No follow-ups yet — send a message below"
-- No activity on a proposal timeline: Show "No activity recorded yet"
+- **No active proposals:** Show "No active proposals" with context about how proposals originate
+- **No past proposals:** Show "No past proposals yet"
+- **No follow-up messages:** Show empty state in follow-up tab
 
 ## Expected User Flows
 
-### Flow 1: View Active and Past Proposals
+### Flow 1: View Active Proposals
 1. User navigates to Proposals section
-2. User sees "Active Proposals" tab selected by default
-3. User views the table of active proposals with status badges (Sent, Received)
-4. User clicks "Past Proposals" tab
-5. Table switches to show Converted and Rejected proposals
-6. **Outcome:** User can see all proposals organized by lifecycle state
+2. Active Proposals tab shows table with Created Date, ID, Type, Quantity, Amount, Status, Actions
+3. **Outcome:** User sees all pending proposals at a glance
 
-### Flow 2: View Proposal Detail and Timeline
-1. User clicks a proposal row in the Active list
-2. Proposal detail page opens with "Overview" tab active
-3. User sees the status timeline showing progression (Sent -> Received)
-4. User sees proposal details: type, quantity, amount, creation date
-5. **Outcome:** User understands the current state and history of the proposal
+### Flow 2: View Proposal Detail
+1. User clicks a proposal row
+2. Detail view opens with Overview tab (timeline + details) and Follow-up tab
+3. **Outcome:** User sees complete proposal information
 
-### Flow 3: Follow Up on a Proposal
-1. User is on a proposal detail page
-2. User clicks the "Follow-up" tab
-3. User sees the chat-style thread with previous messages from user and LOTS247 team
-4. User types a follow-up message and submits
-5. **Outcome:** Message appears in the thread; LOTS247 team is notified
+### Flow 3: Follow Up on Proposal
+1. User opens a proposal detail
+2. User switches to Follow-up tab
+3. User types and sends a follow-up message
+4. **Outcome:** Message appears in chat-style thread
 
-### Flow 4: Cancel an Active Proposal
-1. User is viewing an active proposal
-2. User clicks "Cancel" action
-3. Confirmation dialog appears
-4. User confirms cancellation
-5. **Outcome:** Proposal is cancelled and moves to Past Proposals
-
-### Flow 5: Navigate from Converted Proposal to Incident
-1. User views a Converted proposal in Past Proposals
-2. User clicks the linked incident reference
-3. **Outcome:** User is navigated to the incident detail page in Incident Management
+### Flow 4: View Converted Proposal
+1. User switches to Past Proposals tab
+2. User clicks a "Converted" proposal
+3. User sees link to the created incident
+4. **Outcome:** User can navigate to the related incident
 
 ## Files to Reference
 
-- `product-plan/sections/proposals/README.md`
-- `product-plan/sections/proposals/tests.md`
-- `product-plan/sections/proposals/components/`
-- `product-plan/sections/proposals/types.ts`
-- `product-plan/sections/proposals/sample-data.json`
+- `product-plan/sections/proposals/README.md` — Feature overview
+- `product-plan/sections/proposals/tests.md` — Test instructions
+- `product-plan/sections/proposals/components/` — React components
+- `product-plan/sections/proposals/types.ts` — TypeScript interfaces
+- `product-plan/sections/proposals/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Two-tab layout works (Active Proposals / Past Proposals)
-- [ ] Active proposals table renders with correct columns and status badges
-- [ ] Past proposals table renders with Converted and Rejected proposals
-- [ ] Proposal detail page renders with Overview and Follow-up tabs
-- [ ] Overview tab shows status timeline and proposal details
-- [ ] Follow-up tab shows chat-style comment thread (matching Incident Management pattern)
-- [ ] Posting follow-up messages works
-- [ ] Cancel action works with confirmation dialog
-- [ ] Cancelled proposals move to Past Proposals
-- [ ] Converted proposals show linked incident reference
-- [ ] Clicking linked incident navigates to Incident Management detail
-- [ ] Proposals can be created from Compliance checks (Challan, DL, RC)
-- [ ] Status transitions work correctly (Sent -> Received -> Converted/Rejected)
-- [ ] Empty states display when no data exists
+- [ ] Two-tab layout works (Active / Past)
+- [ ] Proposals table shows all columns
+- [ ] Detail view with Overview and Follow-up tabs
+- [ ] Follow-up chat thread works (matches Incident Management pattern)
+- [ ] Cancel action works on active proposals
+- [ ] Converted proposals link to incidents
+- [ ] Status badges render correctly (Sent, Converted, Rejected)
+- [ ] Empty states for all views
 - [ ] Responsive on mobile

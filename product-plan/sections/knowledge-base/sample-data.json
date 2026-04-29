@@ -1,0 +1,433 @@
+{
+  "_meta": {
+    "models": {
+      "articles": "Each article is a piece of knowledge base content — a legal template, FAQ collection, step-by-step guide, compliance checklist, or regulatory reference. Articles are curated by the LOTS247 legal team.",
+      "faqItems": "FAQ items are question-answer pairs that belong to FAQ-type articles. They are grouped by topic within the article.",
+      "checklistItems": "Checklist items are individual actionable steps within checklist-type articles, organized into named sections."
+    },
+    "relationships": [
+      "FAQ articles contain one or more FAQ Items (the expandable Q&A pairs)",
+      "Checklist articles contain one or more Checklist Items grouped into sections",
+      "Each Article may reference related articles via relatedArticleIds"
+    ]
+  },
+  "articles": [
+    {
+      "id": "kb-001",
+      "title": "Accident Affidavit Template",
+      "category": "template",
+      "excerpt": "Ready-to-use affidavit format for motor accident insurance claims on ₹100 non-judicial stamp paper.",
+      "tags": ["Accident", "Insurance", "Affidavit"],
+      "readTime": "3 min",
+      "lastUpdated": "15 Mar 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 342,
+      "notHelpfulCount": 12,
+      "content": "## Accident Affidavit\n\nThis affidavit is used when filing a motor insurance claim after a road accident. It must be executed on ₹100 non-judicial stamp paper and notarised before submission to the insurance company.\n\n### When to Use\n- Filing an own-damage insurance claim after an accident\n- Supporting a Motor Accident Claims Tribunal (MACT) petition\n- Documenting accident circumstances for legal proceedings\n\n### Template\n\n**AFFIDAVIT**\n\nI, [Full Name], S/o (D/o, W/o) [Parent/Spouse Name], aged [Age] years, R/o [Full Address], do hereby solemnly affirm and state as under:\n\n1. That I am the registered owner of the vehicle bearing Registration No. [Vehicle Number], make [Vehicle Make & Model], engine no. [Engine No.], chassis no. [Chassis No.].\n\n2. That on [Date of Accident], at approximately [Time], while the said vehicle was being driven by [Driver Name] holding valid Driving Licence No. [DL Number] issued by RTO [RTO Name], valid up to [DL Expiry Date], an accident occurred at [Location of Accident].\n\n3. That the circumstances of the accident are as follows: [Detailed description of how the accident occurred, road conditions, weather, and sequence of events].\n\n4. That as a result of the said accident, the vehicle suffered damage to [describe damaged parts]. Photographs of the damage are enclosed herewith.\n\n5. That an FIR/NCR bearing No. [FIR Number] was lodged at [Police Station Name] on [FIR Date].\n\n6. That no claim has been made or is pending for the said accident from any other insurance company.\n\n7. That the statements made above are true and correct to the best of my knowledge and belief.\n\n**DEPONENT**\n\nVerified at [City] on this [Day] day of [Month], [Year].\n\n> **Important:** This affidavit must be executed on ₹100 non-judicial stamp paper and notarised. Attach copies of RC, insurance policy, driving licence, FIR/NCR, and damage photographs.",
+      "relatedArticleIds": ["kb-003", "kb-006", "kb-009"]
+    },
+    {
+      "id": "kb-002",
+      "title": "RTI Application for Vehicle Records",
+      "category": "template",
+      "excerpt": "Standard RTI application format to request vehicle ownership, challan records, or registration details from RTO.",
+      "tags": ["RTO", "RTI", "Vehicle"],
+      "readTime": "2 min",
+      "lastUpdated": "8 Feb 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 189,
+      "notHelpfulCount": 7,
+      "content": "## RTI Application — Vehicle Records from RTO\n\nUse this template to file a Right to Information (RTI) application with the Regional Transport Office (RTO) to obtain vehicle ownership details, challan records, or registration data.\n\n### When to Use\n- Obtaining ownership details of a vehicle involved in an accident\n- Requesting challan records for your own vehicle\n- Verifying vehicle registration details before purchase\n- Checking hypothecation or blacklist status\n\n### Filing Fee\n₹10 by Indian Postal Order, demand draft, or online payment via the RTI portal.\n\n### Template\n\n**To,**\nThe Public Information Officer,\n[RTO Office Name],\n[Full Address of RTO]\n\n**Subject:** Application under Right to Information Act, 2005\n\n**Respected Sir/Madam,**\n\nI, [Full Name], R/o [Full Address], do hereby request the following information under Section 6(1) of the Right to Information Act, 2005:\n\n1. [Specify the information needed, e.g., \"Complete registration details of vehicle bearing Registration No. [Vehicle Number] including owner name, address, and hypothecation status.\"]\n\n2. [Additional queries if any, e.g., \"All challan records issued against the above vehicle from [Start Date] to [End Date].\"]\n\n3. [Any other specific information required]\n\nI am enclosing an Indian Postal Order/Demand Draft of ₹10 (Rupees Ten only) bearing No. [IPO/DD Number] dated [Date] as the prescribed fee.\n\nKindly provide the above information within 30 days as mandated under the Act.\n\n**Yours faithfully,**\n[Full Name]\n[Address]\n[Phone Number]\n[Date]\n\n> **Tip:** File online via rtionline.gov.in for faster processing. You can also file at the state RTI portal for state transport departments.",
+      "relatedArticleIds": ["kb-005", "kb-010"]
+    },
+    {
+      "id": "kb-003",
+      "title": "Challan & Traffic Violation FAQs",
+      "category": "faq",
+      "excerpt": "Common questions about traffic challans — disputing wrong challans, payment deadlines, Lok Adalat, and licence suspension.",
+      "tags": ["Challan", "Traffic", "Dispute"],
+      "readTime": "6 min",
+      "lastUpdated": "22 Mar 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 891,
+      "notHelpfulCount": 34,
+      "content": "",
+      "relatedArticleIds": ["kb-004", "kb-006", "kb-010"]
+    },
+    {
+      "id": "kb-004",
+      "title": "Insurance Claims & Coverage FAQs",
+      "category": "faq",
+      "excerpt": "Answers to frequently asked questions about motor insurance claims, third-party coverage, claim denials, and IRDAI grievances.",
+      "tags": ["Insurance", "Claims", "IRDAI"],
+      "readTime": "7 min",
+      "lastUpdated": "18 Mar 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 567,
+      "notHelpfulCount": 21,
+      "content": "",
+      "relatedArticleIds": ["kb-001", "kb-003", "kb-006"]
+    },
+    {
+      "id": "kb-005",
+      "title": "How to Transfer Vehicle Ownership Across States",
+      "category": "guide",
+      "excerpt": "Complete step-by-step guide for interstate vehicle ownership transfer including NOC, Form 29/30, fees, and timelines.",
+      "tags": ["RTO", "Ownership Transfer", "Interstate"],
+      "readTime": "8 min",
+      "lastUpdated": "10 Mar 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 1203,
+      "notHelpfulCount": 45,
+      "content": "## Interstate Vehicle Ownership Transfer — Complete Guide\n\nTransferring vehicle ownership from one state to another involves obtaining a No Objection Certificate (NOC) from the current state RTO and re-registering the vehicle in the new state. This guide covers the full process.\n\n### Before You Begin\n- Ensure there are no pending challans on the vehicle\n- Clear any hypothecation with the financier (get Form 35/NOC from the bank)\n- Obtain valid insurance and PUC certificate\n- Keep original RC, insurance, and PUC documents ready\n\n### Step 1: Obtain NOC from Current State RTO\n1. Visit the RTO where the vehicle is currently registered\n2. Submit **Form 28** (Application for NOC) with:\n   - Original RC book\n   - Valid insurance certificate\n   - Valid PUC certificate\n   - Address proof of the new state\n   - ID proof (Aadhaar/PAN)\n3. Pay the prescribed fee (₹300–₹500 depending on state)\n4. The RTO issues a NOC valid for **6 months**\n\n> **Tip:** Some states like Maharashtra offer online NOC applications through their Parivahan portal.\n\n### Step 2: Seller Files Form 29 (Notice of Transfer)\n1. The seller submits **Form 29** to the current state RTO\n2. This is a declaration that the vehicle has been sold/transferred\n3. Required documents: sale agreement, buyer's ID proof, Form 29 filled and signed\n\n### Step 3: Buyer Files Form 30 in New State\n1. The buyer visits the RTO in the new state within **45 days** of receiving the NOC\n2. Submit **Form 30** (Application for Transfer of Ownership) with:\n   - NOC from the previous state\n   - Original RC book\n   - Sale deed/agreement\n   - Valid insurance transferred to buyer's name\n   - Valid PUC\n   - Address proof in the new state\n   - ID proof\n   - Passport-size photographs\n3. Pay the transfer fee and road tax difference (varies by state)\n\n### Step 4: Vehicle Inspection\n- The new state RTO may conduct a physical inspection of the vehicle\n- Ensure the vehicle is in roadworthy condition\n- Engine and chassis numbers must match the RC\n\n### Step 5: New RC Issued\n- The new state RTO issues a new RC with the new state registration number\n- Delivery typically takes **7–15 working days**\n- The old registration number becomes invalid\n\n### Fees & Timelines\n| Item | Approximate Cost | Timeline |\n|---|---|---|\n| NOC from current RTO | ₹300–₹500 | 3–7 days |\n| Form 29 filing | ₹50–₹100 | Same day |\n| Form 30 + transfer fee | ₹500–₹2,000 | Same day |\n| Road tax (differential) | Varies by state | At time of filing |\n| New RC delivery | — | 7–15 working days |\n\n> **Warning:** If you do not re-register within 12 months of moving states, you may face penalties and your vehicle can be impounded during traffic checks.\n\n### Common Issues\n- **Hypothecation not cleared:** The transfer will be rejected. Get Form 35 from your financier first.\n- **Pending challans:** Clear all challans before applying for NOC.\n- **Expired insurance:** Transfer your insurance to the buyer's name or get a new policy before filing Form 30.\n- **NOC expired:** If the 6-month NOC window has passed, you must apply for a fresh NOC.",
+      "relatedArticleIds": ["kb-002", "kb-010", "kb-008"]
+    },
+    {
+      "id": "kb-006",
+      "title": "What to Do After a Road Accident — Step-by-Step Guide",
+      "category": "guide",
+      "excerpt": "Immediate actions, evidence collection, FIR filing, insurance intimation, and legal steps after a vehicle accident in India.",
+      "tags": ["Accident", "Insurance", "FIR", "Emergency"],
+      "readTime": "10 min",
+      "lastUpdated": "25 Mar 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 2104,
+      "notHelpfulCount": 38,
+      "content": "## What to Do After a Road Accident\n\nA road accident is stressful, but following the right steps immediately can protect you legally and ensure smooth insurance claim processing. This guide covers the first 72 hours after an accident.\n\n### Immediately After the Accident (First 30 Minutes)\n\n1. **Ensure safety first** — Move to a safe spot if possible. Turn on hazard lights.\n2. **Call emergency services** — Dial 112 (national emergency) or 108 (ambulance) if anyone is injured.\n3. **Do NOT move the vehicle** if there are injuries or fatalities — wait for police.\n4. **Call LOTS247 helpline** — Our 24/7 legal support will guide you through every step and can deploy a lawyer on-site within 2 hours.\n\n### Collect Evidence (First 1 Hour)\n\n5. **Photograph everything** — Vehicle damage (all angles), road conditions, traffic signals, skid marks, weather conditions, and the accident scene from multiple angles.\n6. **Note details** — Time, location (use Google Maps pin), vehicle numbers of all parties, and witness names and phone numbers.\n7. **Get witness statements** — Ask bystanders if they are willing to provide a brief written or recorded statement.\n8. **Do NOT admit fault** — Do not say \"sorry\" or accept blame at the scene. This can be used against you later.\n\n> **Important:** Evidence collected within the first hour is the most valuable for insurance claims and legal proceedings.\n\n### File FIR / NCR (Within 24 Hours)\n\n9. **Visit the nearest police station** or the one with jurisdiction over the accident location.\n10. **File an FIR** if there are injuries, fatalities, or significant damage. File an **NCR (Non-Cognizable Report)** for minor incidents.\n11. **Collect the FIR copy** — You will need this for the insurance claim.\n12. **If police refuse to file FIR** — Send a written complaint to the SP/SSP of the district, or call LOTS247 for legal assistance.\n\n### Intimate Your Insurance Company (Within 24–48 Hours)\n\n13. **Call your insurer's claim helpline** — Provide policy number, date/time of accident, and brief description.\n14. **Submit online claim** if available — Most insurers have mobile apps for claim intimation.\n15. **Required documents for claim:**\n    - FIR/NCR copy\n    - RC book copy\n    - Driving licence of the driver at the time of accident\n    - Insurance policy copy\n    - Damage photographs\n    - Repair estimate from authorised workshop\n\n> **Warning:** Delay in intimation beyond the policy's prescribed period (usually 24–72 hours) can lead to claim rejection.\n\n### Get Vehicle Assessed (Within 72 Hours)\n\n16. **Do NOT repair the vehicle** before the insurance surveyor inspects it.\n17. **Take the vehicle to an authorised workshop** recommended by your insurer.\n18. **Insurance surveyor** will inspect the damage and prepare an assessment report.\n19. **Keep all repair invoices and receipts** — You may need them for reimbursement claims.\n\n### Legal Steps (If Needed)\n\n20. **For third-party claims** — If the other party caused the accident, you can file a claim before the Motor Accident Claims Tribunal (MACT) within 6 months.\n21. **For vehicle seizure** — If police seize your vehicle, contact LOTS247 immediately for legal assistance in getting it released.\n22. **For fatalities** — Engage a lawyer immediately. LOTS247 can assign a specialist from our network.\n\n### LOTS247 Support\n- **24/7 Helpline:** Call for immediate legal guidance\n- **On-site lawyer:** Deployed within 2 hours at 98% of India's pin codes\n- **Insurance claim support:** End-to-end assistance with documentation and follow-up\n- **MACT representation:** Full legal representation for tribunal claims",
+      "relatedArticleIds": ["kb-001", "kb-004", "kb-007"]
+    },
+    {
+      "id": "kb-007",
+      "title": "Vehicle Ownership Compliance Checklist",
+      "category": "checklist",
+      "excerpt": "Essential compliance checklist for every vehicle owner — RC, insurance, PUC, fitness certificate, and driving licence validity.",
+      "tags": ["Compliance", "Vehicle", "Documents"],
+      "readTime": "3 min",
+      "lastUpdated": "20 Mar 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 756,
+      "notHelpfulCount": 15,
+      "content": "",
+      "relatedArticleIds": ["kb-008", "kb-009", "kb-005"]
+    },
+    {
+      "id": "kb-008",
+      "title": "Fleet Compliance Audit Checklist",
+      "category": "checklist",
+      "excerpt": "Comprehensive compliance audit checklist for fleet operators covering vehicles, drivers, permits, insurance, and safety equipment.",
+      "tags": ["Fleet", "Compliance", "Audit"],
+      "readTime": "5 min",
+      "lastUpdated": "12 Mar 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 423,
+      "notHelpfulCount": 18,
+      "content": "",
+      "relatedArticleIds": ["kb-007", "kb-010", "kb-005"]
+    },
+    {
+      "id": "kb-009",
+      "title": "Motor Vehicles Act 2019 — Key Penalty Provisions",
+      "category": "regulation",
+      "excerpt": "Quick reference of updated penalty amounts under the Motor Vehicles (Amendment) Act, 2019 for common traffic offences.",
+      "tags": ["Regulation", "Penalties", "MVA 2019"],
+      "readTime": "5 min",
+      "lastUpdated": "1 Jan 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 1567,
+      "notHelpfulCount": 29,
+      "content": "## Motor Vehicles (Amendment) Act, 2019 — Key Penalties\n\nThe Motor Vehicles (Amendment) Act, 2019 significantly increased penalties for traffic violations across India. Below are the updated penalty amounts for the most common offences.\n\n> **Note:** Some states have adopted the revised penalties while others continue with lower state-specific rates. Check your state's notification for applicable amounts.\n\n### General Offences\n\n| Offence | Section | First Offence | Repeat Offence |\n|---|---|---|---|\n| Driving without licence | Sec 181 | ₹5,000 | ₹10,000 |\n| Driving without insurance | Sec 196 | ₹2,000 | ₹4,000 |\n| Driving without registration | Sec 192 | Up to ₹5,000 | Up to ₹10,000 |\n| Driving without PUC | Sec 190(2) | ₹10,000 | ₹10,000 |\n| Driving without seatbelt | Sec 194B | ₹1,000 | ₹1,000 |\n| Riding without helmet | Sec 194D | ₹1,000 + 3-month DL suspension | ₹1,000 |\n| Using mobile phone while driving | Sec 184(d) | ₹5,000 | ₹10,000 |\n\n### Serious Offences\n\n| Offence | Section | Penalty |\n|---|---|---|\n| Drunk driving | Sec 185 | ₹10,000 and/or 6 months imprisonment |\n| Overspeeding | Sec 183 | ₹1,000–₹2,000 (LMV), ₹2,000–₹4,000 (HMV) |\n| Dangerous driving | Sec 184 | ₹5,000 (first), imprisonment up to 1 year (repeat) |\n| Racing / speeding trials | Sec 189 | ₹5,000 (first), ₹10,000 (repeat) |\n| Overloading (passengers) | Sec 194A | ₹1,000 per extra passenger |\n| Overloading (goods) | Sec 194(1) | ₹20,000 + ₹2,000 per extra tonne |\n| Hit and run | Sec 161 | Up to ₹2,00,000 (injury), up to ₹5,00,000 (death) |\n\n### Vehicle Fitness & Compliance\n\n| Offence | Section | Penalty |\n|---|---|---|\n| Vehicle without fitness certificate | Sec 192 | Up to ₹5,000 |\n| Alteration of vehicle without permit | Sec 52 | Up to ₹5,000 |\n| Violation of road regulations | Sec 190(1) | ₹500–₹1,000 |\n| Failure to obey traffic signals | Sec 184(c) | ₹1,000–₹5,000 |\n| No emergency information on vehicle | Sec 190(2) | ₹500–₹1,000 |\n\n### Juvenile Offences\n\n| Offence | Section | Penalty |\n|---|---|---|\n| Juvenile driving | Sec 199A | ₹25,000 + 3 years imprisonment for guardian + cancellation of vehicle registration |\n\n> **Important:** These are the central penalties under the amended Act. States like Gujarat, Uttarakhand, and West Bengal have notified lower penalty amounts. Always check with your local RTO or LOTS247 for state-specific rates.\n\n### Key Changes from the 2019 Amendment\n- Penalties increased by 5x to 10x compared to the original 1988 Act\n- New provisions for electronic enforcement (speed cameras, CCTV)\n- Good Samaritan protection for those helping accident victims\n- Increased hit-and-run compensation from ₹25,000 to ₹2,00,000\n- Motor Vehicle Accident Fund established for all road users\n- Cashless treatment for accident victims during the golden hour",
+      "relatedArticleIds": ["kb-003", "kb-010", "kb-007"]
+    },
+    {
+      "id": "kb-010",
+      "title": "State-Wise RTO Contact Directory & Online Portals",
+      "category": "regulation",
+      "excerpt": "Reference directory of RTO offices, online portals, and helpline numbers for major Indian states.",
+      "tags": ["RTO", "State-specific", "Directory"],
+      "readTime": "4 min",
+      "lastUpdated": "5 Jan 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 634,
+      "notHelpfulCount": 42,
+      "content": "## State-Wise RTO Directory & Online Portals\n\nQuick reference for RTO online portals, helpline numbers, and key services available online in major Indian states.\n\n### National Portals\n| Portal | URL | Services |\n|---|---|---|\n| Parivahan (MoRTH) | parivahan.gov.in | RC details, DL verification, vehicle status, fitness, PUC |\n| eChallan | echallan.parivahan.gov.in | Challan lookup, payment, dispute filing |\n| Sarathi | sarathi.parivahan.gov.in | DL application, renewal, slot booking |\n| Vahan | vahan.parivahan.gov.in | Vehicle registration, tax, fitness, NOC |\n\n### State-Wise Directory\n\n#### Delhi\n- **Portal:** transport.delhi.gov.in\n- **Helpline:** 011-23450099\n- **Online Services:** RC transfer, DL renewal, challan payment, fitness booking\n- **Key RTO Offices:** IP Estate, Janakpuri, Sarai Kale Khan, Vasant Vihar\n\n#### Maharashtra\n- **Portal:** transport.maharashtra.gov.in\n- **Helpline:** 022-22614747\n- **Online Services:** Faceless RC transfer, NOC application, learning licence, slot booking\n- **Key RTO Offices:** Andheri (MH-02), Tardeo (MH-01), Pune (MH-12), Nagpur (MH-31)\n\n#### Karnataka\n- **Portal:** transport.karnataka.gov.in\n- **Helpline:** 080-22352065\n- **Online Services:** RC transfer, DL services, tax payment, NOC\n- **Key RTO Offices:** Koramangala (KA-01), Jayanagar (KA-51), Indiranagar (KA-53)\n\n#### Tamil Nadu\n- **Portal:** tnsta.gov.in\n- **Helpline:** 044-25384999\n- **Online Services:** RC details, challan payment, DL renewal, fitness\n- **Key RTO Offices:** Anna Nagar (TN-09), Guindy (TN-07), Coimbatore (TN-38)\n\n#### Uttar Pradesh\n- **Portal:** uptransport.upsdc.gov.in\n- **Helpline:** 0522-2638610\n- **Online Services:** RC transfer, challan, DL, tax payment\n- **Key RTO Offices:** Lucknow (UP-32), Noida (UP-15), Ghaziabad (UP-14), Agra (UP-80)\n\n#### Gujarat\n- **Portal:** rtogujarat.gov.in\n- **Helpline:** 079-23250802\n- **Online Services:** RC, DL, tax, NOC, fitness\n- **Key RTO Offices:** Ahmedabad (GJ-01), Surat (GJ-05), Vadodara (GJ-06)\n\n#### Rajasthan\n- **Portal:** transport.rajasthan.gov.in\n- **Helpline:** 0141-2222531\n- **Online Services:** RC, DL, tax payment, vehicle NOC\n- **Key RTO Offices:** Jaipur (RJ-14), Jodhpur (RJ-19), Udaipur (RJ-27)\n\n> **Tip:** For any RTO-related assistance, contact LOTS247's 24/7 helpline. Our legal team can handle all RTO interactions on your behalf through our RTO-as-a-Service offering.",
+      "relatedArticleIds": ["kb-002", "kb-005", "kb-009"]
+    },
+    {
+      "id": "kb-011",
+      "title": "National Insurance Co. Ltd. v. Pranay Sethi (2017) — MACT Compensation Framework",
+      "category": "judgement",
+      "excerpt": "Landmark Supreme Court constitution bench ruling that standardised 'future prospects' additions and conventional heads in motor accident compensation claims.",
+      "tags": ["MACT", "Supreme Court", "Compensation", "Insurance"],
+      "readTime": "6 min",
+      "lastUpdated": "2 Feb 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 812,
+      "notHelpfulCount": 18,
+      "content": "## National Insurance Co. Ltd. v. Pranay Sethi\n\n**Citation:** (2017) 16 SCC 680\n**Court:** Supreme Court of India (Constitution Bench, 5 Judges)\n**Date:** 31 October 2017\n**Bench:** Dipak Misra CJI, A.K. Sikri, A.M. Khanwilkar, D.Y. Chandrachud, Ashok Bhushan JJ.\n\n### Background\nThe case was referred to a Constitution Bench to resolve conflicting precedents on how 'future prospects' should be added to income while computing compensation under the Motor Vehicles Act, 1988. Earlier rulings in **Sarla Verma v. DTC (2009)** and **Reshma Kumari v. Madan Mohan (2013)** had offered different multipliers and percentages.\n\n### Key Issue\nHow should compensation be calculated in motor accident claims, particularly the addition for 'future prospects' for:\n1. Salaried employees (permanent vs. self-employed)\n2. Self-employed persons\n3. Persons on fixed wages\n\n### The Ruling\nThe Constitution Bench laid down the following binding framework:\n\n#### Future Prospects Addition\n\n| Age of Deceased | Permanent Job | Self-Employed / Fixed Wage |\n|---|---|---|\n| Below 40 years | 50% addition | 40% addition |\n| 40–50 years | 30% addition | 25% addition |\n| 50–60 years | 15% addition | 10% addition |\n| Above 60 years | No addition | No addition |\n\n#### Conventional Heads\nThe Court also standardised the conventional heads of compensation:\n- **Loss of Estate:** ₹15,000\n- **Loss of Consortium:** ₹40,000\n- **Funeral Expenses:** ₹15,000\n\nThese amounts are to be enhanced at the rate of **10% every three years**.\n\n### Multiplier Table Affirmed\nThe Court reaffirmed the multiplier structure from **Sarla Verma**:\n\n| Age Group | Multiplier |\n|---|---|\n| 15–20 | 18 |\n| 21–25 | 18 |\n| 26–30 | 17 |\n| 31–35 | 16 |\n| 36–40 | 15 |\n| 41–45 | 14 |\n| 46–50 | 13 |\n| 51–55 | 11 |\n| 56–60 | 9 |\n| 61–65 | 7 |\n| 66–70 | 5 |\n\n### Significance for Vehicle Owners & Fleet Operators\n- **Predictable liability:** Insurers and fleet operators can now estimate third-party exposure with greater accuracy.\n- **Higher compensation floor:** Families of deceased victims benefit from a uniform, upward-revised computation method.\n- **Self-employed drivers:** Even self-employed persons are entitled to 'future prospects' addition, reversing earlier restrictive rulings.\n\n> **Important:** This judgement is binding on all High Courts and MACTs across India. Any compensation award that does not follow the Pranay Sethi framework is liable to be modified in appeal.\n\n### Practical Application\nWhen filing or defending a MACT claim, ensure the tribunal applies:\n1. Correct age-based multiplier\n2. Appropriate future prospects percentage\n3. Updated conventional head amounts (revised every 3 years from 2017)\n\nLOTS247's MACT defence team uses the Pranay Sethi framework as the baseline for all tribunal representations and appeals.",
+      "relatedArticleIds": ["kb-001", "kb-006", "kb-004"]
+    },
+    {
+      "id": "kb-012",
+      "title": "Mukund Dewangan v. Oriental Insurance Co. Ltd. (2017) — LMV Licence Covers Transport Vehicles",
+      "category": "judgement",
+      "excerpt": "Three-judge Supreme Court ruling holding that a driver with an LMV licence is authorised to drive a transport vehicle of light motor vehicle class without a separate endorsement.",
+      "tags": ["Driving Licence", "Supreme Court", "Insurance", "Transport Vehicle"],
+      "readTime": "5 min",
+      "lastUpdated": "14 Jan 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 654,
+      "notHelpfulCount": 22,
+      "content": "## Mukund Dewangan v. Oriental Insurance Co. Ltd.\n\n**Citation:** (2017) 14 SCC 663\n**Court:** Supreme Court of India (Three-Judge Bench)\n**Date:** 3 July 2017\n**Bench:** Amitava Roy, Arun Mishra, Sanjay Kishan Kaul JJ.\n\n### Background\nInsurance companies routinely repudiated third-party claims on the ground that the driver held only a Light Motor Vehicle (LMV) licence and was driving a transport vehicle (taxi, auto, light goods carrier) without a separate 'transport vehicle' endorsement. This question was referred to a larger bench after conflicting decisions in **National Insurance Co. v. Annappa Irappa Nesaria (2008)** and **S. Iyyapan v. United India Insurance (2013)**.\n\n### Key Issue\nWhether a person holding a licence to drive a Light Motor Vehicle (LMV) is required to obtain a separate endorsement to drive a 'transport vehicle' of the same LMV class (i.e., unladen weight up to 7,500 kg).\n\n### The Ruling\nThe three-judge bench answered the reference as follows:\n\n> A licence issued under Section 10(2)(d) for driving a Light Motor Vehicle authorises the holder to drive a transport vehicle of the LMV class (unladen weight not exceeding 7,500 kg) without a separate endorsement. The requirement of a separate endorsement applies only to medium and heavy transport vehicles.\n\n### Reasoning\n1. **Statutory interpretation:** Section 10(2) of the Motor Vehicles Act 1988 classifies vehicles by category, and 'light motor vehicle' is defined by weight, not by use (transport or non-transport).\n2. **Purpose of the Act:** The licensing regime is intended to ensure driver competence. A driver qualified for an LMV is equally capable of driving a light transport vehicle of the same class.\n3. **Consumer protection:** Denying third-party claims on a technical licence distinction would defeat the protective purpose of compulsory motor insurance.\n\n### Impact on Insurance Claims\n- **Third-party claims cannot be denied** solely because an LMV licence holder drove a taxi, auto, or light goods vehicle without a separate endorsement.\n- **Insurers must honour claims** where the driver holds a valid LMV licence and the vehicle falls within the LMV weight class (up to 7,500 kg unladen).\n- **Repudiation on this ground** is liable to be set aside by consumer forums and MACTs.\n\n### Continuing Relevance\nThe Supreme Court has, in subsequent cases, reaffirmed the Mukund Dewangan position. A larger bench reference in 2022 sought to revisit the issue, but until a contrary ruling is delivered, **Mukund Dewangan remains good law and is binding on all courts**.\n\n> **Tip:** If your insurer has denied a claim citing LMV vs. transport vehicle licence, cite the Mukund Dewangan judgement and escalate through IRDAI's grievance portal or Insurance Ombudsman. LOTS247 can draft the representation and handle end-to-end follow-up.\n\n### Documents to Carry\nWhen operating a light transport vehicle (Ola/Uber driver, light goods carrier, school van up to 7,500 kg), ensure you have:\n1. Valid LMV licence\n2. Vehicle RC showing unladen weight\n3. Valid insurance policy\n4. Copy of the Mukund Dewangan judgement (for roadside disputes with traffic officials)",
+      "relatedArticleIds": ["kb-009", "kb-004", "kb-006"]
+    },
+    {
+      "id": "kb-013",
+      "title": "MoRTH Circular on Vehicle Scrappage Policy 2021",
+      "category": "circular",
+      "excerpt": "Ministry of Road Transport & Highways notification on mandatory fitness testing and end-of-life vehicle scrappage for private and commercial vehicles.",
+      "tags": ["MoRTH", "Scrappage", "Fitness", "Commercial"],
+      "readTime": "5 min",
+      "lastUpdated": "28 Mar 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 389,
+      "notHelpfulCount": 14,
+      "content": "## MoRTH Circular — Vehicle Scrappage Policy 2021\n\n**Issuing Authority:** Ministry of Road Transport & Highways (MoRTH)\n**Notification:** S.O. 3348(E)\n**Date of Issue:** 23 September 2021\n**Applicability:** All private and commercial vehicles registered in India\n\n### Overview\nThe Voluntary Vehicle Fleet Modernisation Programme (V-VMP), commonly called the **Scrappage Policy**, aims to phase out old, polluting, and unfit vehicles by mandating periodic fitness testing at Registered Vehicle Scrapping Facilities (RVSFs) and Automated Testing Stations (ATSs).\n\n### Key Provisions\n\n#### Mandatory Fitness Testing\n- **Commercial vehicles:** Fitness testing mandatory after **15 years** from the date of first registration\n- **Private vehicles:** Fitness testing mandatory after **20 years** from the date of first registration\n- Failure to pass fitness testing = vehicle declared 'End-of-Life' and must be scrapped\n\n#### Automated Testing Stations (ATSs)\n- All fitness tests to be conducted at ATSs (not manual inspection)\n- ATS equipment includes brake testers, headlight aligners, emission analysers, and computerised diagnostic tools\n- Phased rollout: metros first (from 1 Apr 2023), then Tier-2 cities\n\n#### Green Tax\nVehicles older than the threshold that wish to continue operation (after passing fitness) will attract a **Green Tax**:\n\n| Vehicle Type | Green Tax Rate |\n|---|---|\n| Private cars | 10–25% of road tax |\n| Commercial vehicles | 10–25% of road tax |\n| Hybrid/CNG/Electric | Exempt |\n\n#### Incentives for Scrapping\n\n| Incentive | Details |\n|---|---|\n| Scrap Certificate | Issued by RVSF on scrapping, can be used to buy a new vehicle |\n| Road Tax Rebate | 15–25% rebate on new vehicle road tax |\n| OEM Discount | 5% discount from manufacturers on new vehicle purchase |\n| Registration Fee Waiver | Full waiver for new vehicle registered against scrap certificate |\n\n### Timeline for Implementation\n\n| Date | Milestone |\n|---|---|\n| 1 Oct 2021 | Policy notified |\n| 1 Apr 2022 | Rules for RVSFs published |\n| 1 Apr 2023 | Mandatory fitness testing for government vehicles (15+ years) |\n| 1 Jun 2024 | Mandatory testing for heavy commercial vehicles (15+ years) |\n| 1 Jun 2025 | Mandatory testing for other commercial vehicles (15+ years) |\n| 1 Jun 2026 | Mandatory testing for private vehicles (20+ years) |\n\n### Impact on Fleet Operators\n- **Mandatory compliance:** Any commercial vehicle over 15 years must pass ATS testing or be scrapped.\n- **Planning horizon:** Fleet operators should plan replacement cycles based on the 15-year threshold.\n- **Cost of non-compliance:** Unfit vehicles will be de-registered and cannot operate on public roads.\n- **Scrap value optimisation:** Scrapping through an RVSF yields better returns than scrap dealers (plus incentives).\n\n> **Important:** Commercial vehicles failing the fitness test are automatically de-registered. Do not attempt to re-register or use such vehicles — penalties include seizure and heavy fines under the MV Act.\n\n### Action Items for Vehicle Owners\n1. Check the age of each vehicle in your fleet\n2. For vehicles approaching 15 years (commercial) or 20 years (private), book an ATS fitness test slot in advance\n3. Identify nearest RVSF via **vahan.parivahan.gov.in/rvsf**\n4. Factor in Green Tax in operating cost projections\n5. Plan vehicle replacement aligned with scrappage incentives to maximise savings\n\n> **Tip:** LOTS247's compliance dashboard automatically flags vehicles approaching the fitness testing threshold and helps schedule ATS appointments and RVSF scrapping.\n\n### Related Resources\n- **MoRTH Scrappage Portal:** scrappage.parivahan.gov.in\n- **Find ATS Centres:** vahan.parivahan.gov.in/ats\n- **Find RVSFs:** vahan.parivahan.gov.in/rvsf",
+      "relatedArticleIds": ["kb-007", "kb-008", "kb-009"]
+    },
+    {
+      "id": "kb-014",
+      "title": "IRDAI Circular on Long-Term Motor Insurance Policies",
+      "category": "circular",
+      "excerpt": "Insurance Regulatory and Development Authority notification mandating long-term third-party cover for new private cars and two-wheelers.",
+      "tags": ["IRDAI", "Insurance", "Third-Party", "Long-Term"],
+      "readTime": "4 min",
+      "lastUpdated": "18 Feb 2026",
+      "author": "LOTS247 Legal Team",
+      "helpfulCount": 478,
+      "notHelpfulCount": 11,
+      "content": "## IRDAI Circular — Long-Term Motor Third-Party Insurance\n\n**Issuing Authority:** Insurance Regulatory and Development Authority of India (IRDAI)\n**Circular Reference:** IRDAI/NL/CIR/MOT/158/08/2018\n**Date of Issue:** 28 August 2018 (with subsequent clarifications)\n**Applicability:** All new private cars and two-wheelers purchased on or after 1 September 2018\n\n### Background\nThe Supreme Court in **S. Rajaseekaran v. Union of India** directed IRDAI to implement long-term third-party motor insurance to prevent lapses in coverage, which were a major cause of uninsured vehicles on Indian roads. IRDAI subsequently notified the long-term cover requirement.\n\n### Key Provisions\n\n#### Mandatory Long-Term Third-Party Cover\n- **New private cars:** **3-year** third-party insurance mandatory at the time of first registration\n- **New two-wheelers:** **5-year** third-party insurance mandatory at the time of first registration\n- Applicable to all vehicles purchased on or after **1 September 2018**\n\n#### Own-Damage Component\nThe own-damage (OD) component of comprehensive insurance remains **annually renewable**. Vehicle owners can choose:\n1. **Bundled policy:** Long-term TP + annual OD (most common option)\n2. **Long-term comprehensive:** Both TP and OD for the full 3/5 year term\n3. **TP-only long-term:** Just the mandatory third-party cover (cheapest, but no own-damage protection)\n\n#### Premium Structure\nLong-term third-party premiums are paid upfront at the time of vehicle purchase. Key points:\n- Premium calculated based on the engine capacity (for cars) or kerb weight (for two-wheelers)\n- Discounts available for multi-year policies vs. annual policies\n- IRDAI revises third-party premium rates annually (usually in April)\n\n### Why It Matters\n- **Reduced lapse risk:** Eliminates the problem of owners forgetting to renew annually.\n- **Compliance safeguard:** Drivers cannot face the 'expired insurance' challan during the mandatory period.\n- **Third-party protection:** Victims of accidents are guaranteed compensation because coverage is uninterrupted.\n\n### Important Clarifications\n\n#### Cancellation & Refund\n- If the vehicle is sold or transferred, the long-term policy can be cancelled with pro-rata refund for the unused period.\n- If the vehicle is totally damaged and scrapped, a refund is available after deducting the used period.\n\n#### Renewal After Term Ends\n- After the 3/5 year mandatory period ends, owners can choose annual or multi-year renewal.\n- Continuous coverage is still legally required under the Motor Vehicles Act.\n\n#### Existing Vehicles\n- Vehicles purchased **before 1 September 2018** continue on annual third-party policies.\n- They are not required to switch to long-term cover at renewal.\n\n### Impact on Fleet Operators\n- **Does NOT apply** to commercial vehicles (trucks, buses, taxis) — they continue with annual third-party cover.\n- **Does apply** to private cars and two-wheelers used by company employees (pool cars, management cars).\n- Fleet operators should ensure their procurement team requests long-term cover for all new private vehicle additions.\n\n> **Tip:** When buying a new car or two-wheeler, compare bundled (long-term TP + annual OD) vs. fully long-term policies. Bundled is usually cheaper and gives you flexibility to change insurer for the OD portion annually.\n\n### Penalty for Non-Compliance\nDriving a vehicle without valid third-party insurance is an offence under **Section 196 of the Motor Vehicles Act, 2019**:\n- **First offence:** ₹2,000\n- **Repeat offence:** ₹4,000\n- The vehicle can also be impounded until proof of insurance is produced.\n\n> **Important:** If you purchased a new vehicle after 1 September 2018 and the dealer did not provide long-term third-party cover, raise a complaint with IRDAI at **igms.irda.gov.in**. The dealer is legally obligated to sell the vehicle with the mandatory cover.\n\n### Related Resources\n- **IRDAI Portal:** irdai.gov.in\n- **IRDAI Grievance:** igms.irda.gov.in\n- **Insurance Ombudsman:** cioins.co.in",
+      "relatedArticleIds": ["kb-004", "kb-009", "kb-012"]
+    }
+  ],
+  "faqItems": [
+    {
+      "id": "faq-001",
+      "articleId": "kb-003",
+      "topic": "Challan Disputes",
+      "question": "How do I dispute a wrong eChallan?",
+      "answer": "Visit echallan.parivahan.gov.in and click 'Challan Complaint'. Enter your challan number or vehicle registration number, select the reason for complaint (wrong vehicle, wrong location, wrong violation, etc.), upload supporting evidence (GPS logs, photos, witness statements), and submit. The traffic authority reviews complaints within 15 working days. If rejected, you can escalate through LOTS247's legal team or approach the traffic court."
+    },
+    {
+      "id": "faq-002",
+      "articleId": "kb-003",
+      "topic": "Challan Disputes",
+      "question": "How long do I have to pay a challan?",
+      "answer": "Most states allow 60 days from the date of issue to pay a challan without additional penalties. After 60 days, a late fee or compounding fine may apply. Some states like Delhi issue a court date for unpaid challans after 90 days. For e-challans issued via CCTV cameras, the notice is sent to the registered owner's address and the payment deadline starts from the date of receipt."
+    },
+    {
+      "id": "faq-003",
+      "articleId": "kb-003",
+      "topic": "Challan Disputes",
+      "question": "Can my driving licence be suspended for unpaid challans?",
+      "answer": "Yes. Under Section 206 of the Motor Vehicles Act, a traffic officer can recommend suspension of your driving licence for certain violations including drunk driving, racing, and repeat offences. Accumulated unpaid challans beyond a threshold (varies by state, typically 5–10 pending challans) can also trigger a suspension notice from the RTO. You have 30 days to appeal a suspension order."
+    },
+    {
+      "id": "faq-004",
+      "articleId": "kb-003",
+      "topic": "Lok Adalat",
+      "question": "What is Lok Adalat and how can I resolve challans through it?",
+      "answer": "Lok Adalat (People's Court) is a government-run dispute resolution forum where traffic challans can be settled at significantly reduced amounts — typically 50–75% off the original fine. Lok Adalats are held periodically (usually monthly) at district court complexes. To participate, submit your challan details through the National Legal Services Authority portal or through LOTS247. Cases are resolved in a single sitting with no appeal, making it the fastest way to clear pending challans."
+    },
+    {
+      "id": "faq-005",
+      "articleId": "kb-003",
+      "topic": "Payment & Records",
+      "question": "How do I check if my challan payment was successful?",
+      "answer": "Visit echallan.parivahan.gov.in, enter your vehicle number, and check the 'Payment Status' column for each challan. If the status shows 'Disposed' or 'Paid', the payment was successful. Save the transaction receipt as proof. If the status still shows 'Pending' after 48 hours, contact your payment gateway or the issuing traffic authority. LOTS247's dashboard also shows real-time payment status for all your tracked challans."
+    },
+    {
+      "id": "faq-006",
+      "articleId": "kb-004",
+      "topic": "Filing Claims",
+      "question": "What documents do I need to file a motor insurance claim?",
+      "answer": "You need: (1) Duly filled claim form from your insurer, (2) Copy of FIR/NCR from police, (3) Copy of Registration Certificate (RC), (4) Copy of valid driving licence of the person driving at the time of accident, (5) Copy of insurance policy, (6) Original repair bills and payment receipts, (7) Photographs of damage, (8) Surveyor's report (arranged by the insurer). For theft claims, you also need a non-traceable certificate from police after 90 days."
+    },
+    {
+      "id": "faq-007",
+      "articleId": "kb-004",
+      "topic": "Filing Claims",
+      "question": "What is the deadline for intimating my insurer about an accident?",
+      "answer": "Most policies require intimation within 24 to 72 hours of the incident. However, the Supreme Court of India has ruled that mere delay in intimation cannot be a sole ground for claim rejection if the insurer suffers no prejudice. That said, it's always best to intimate immediately to avoid complications. For theft claims, you must file an FIR immediately and intimate the insurer within 24 hours."
+    },
+    {
+      "id": "faq-008",
+      "articleId": "kb-004",
+      "topic": "Claim Denials",
+      "question": "My insurance claim was denied. What are my options?",
+      "answer": "You have multiple escalation paths: (1) **Grievance Redressal Officer (GRO):** Every insurer has a GRO who must acknowledge within 3 days and resolve within 15 days. (2) **IRDAI Complaint:** File via igms.irda.gov.in if the insurer doesn't respond. (3) **Insurance Ombudsman:** For claims up to ₹50 lakh, approach the Insurance Ombudsman (free service, binding award within 3 months). (4) **Consumer Court:** File a complaint at the District/State/National Consumer Disputes Redressal Commission. (5) **Civil Court:** For larger claims or complex disputes. LOTS247 can assist with all escalation paths."
+    },
+    {
+      "id": "faq-009",
+      "articleId": "kb-004",
+      "topic": "Coverage & Policy",
+      "question": "What is the difference between third-party and comprehensive insurance?",
+      "answer": "**Third-party insurance** (mandatory under MV Act) covers damage or injury caused to others by your vehicle — you cannot claim for your own vehicle's damage. **Comprehensive insurance** covers both third-party liability AND your own vehicle's damage from accidents, theft, fire, natural disasters, and vandalism. Comprehensive policies cost more but provide complete protection. For fleet operators, we recommend comprehensive coverage with add-ons like zero depreciation and engine protection."
+    },
+    {
+      "id": "faq-010",
+      "articleId": "kb-004",
+      "topic": "MACT Claims",
+      "question": "What is MACT and when can I file a claim?",
+      "answer": "The Motor Accident Claims Tribunal (MACT) is a quasi-judicial body under Section 166 of the Motor Vehicles Act that adjudicates compensation claims arising from motor vehicle accidents. You can file a MACT claim if: (1) You suffered injury or property damage in an accident, (2) A family member died in an accident (dependents can file), (3) The accident involved a motor vehicle on a public road. The limitation period is 6 months from the date of accident, though tribunals often condone delays with valid reasons. Claims are independent of insurance — even uninsured vehicle owners can be held liable."
+    }
+  ],
+  "checklistItems": [
+    {
+      "id": "cl-001",
+      "articleId": "kb-007",
+      "section": "Vehicle Registration",
+      "label": "Registration Certificate (RC) is valid and details are correct",
+      "description": "Check that owner name, address, vehicle number, engine number, and chassis number are accurate on the RC."
+    },
+    {
+      "id": "cl-002",
+      "articleId": "kb-007",
+      "section": "Vehicle Registration",
+      "label": "RC renewal filed before expiry (for vehicles 15+ years old)",
+      "description": "Private vehicles must renew RC every 5 years after 15 years. Commercial vehicles renew every year after 8 years."
+    },
+    {
+      "id": "cl-003",
+      "articleId": "kb-007",
+      "section": "Insurance",
+      "label": "Active motor insurance policy with valid coverage dates",
+      "description": "At minimum, third-party insurance is mandatory. Verify policy start and end dates."
+    },
+    {
+      "id": "cl-004",
+      "articleId": "kb-007",
+      "section": "Insurance",
+      "label": "Insurance policy covers all drivers assigned to the vehicle",
+      "description": "Named driver policies must list all drivers. Any-driver policies cover all valid licence holders."
+    },
+    {
+      "id": "cl-005",
+      "articleId": "kb-007",
+      "section": "Pollution & Environment",
+      "label": "Valid PUC (Pollution Under Control) certificate",
+      "description": "PUC is valid for 6 months (new vehicles get 1 year from registration). Renewal costs ₹60–₹100."
+    },
+    {
+      "id": "cl-006",
+      "articleId": "kb-007",
+      "section": "Pollution & Environment",
+      "label": "Vehicle meets BS-VI emission standards (if purchased after April 2020)",
+      "description": "Vehicles registered after 1 Apr 2020 must comply with BS-VI norms."
+    },
+    {
+      "id": "cl-007",
+      "articleId": "kb-007",
+      "section": "Fitness & Safety",
+      "label": "Fitness Certificate is valid (commercial vehicles)",
+      "description": "Required for all transport/commercial vehicles. Valid for 2 years initially, then renewed annually."
+    },
+    {
+      "id": "cl-008",
+      "articleId": "kb-007",
+      "section": "Fitness & Safety",
+      "label": "Fire extinguisher and first-aid kit present in vehicle",
+      "description": "Mandatory for commercial vehicles. Recommended for all vehicles."
+    },
+    {
+      "id": "cl-009",
+      "articleId": "kb-007",
+      "section": "Driver Documents",
+      "label": "All drivers have valid driving licences for the vehicle category",
+      "description": "LMV licence for cars/small vehicles, HMV licence for trucks/buses. Check expiry dates."
+    },
+    {
+      "id": "cl-010",
+      "articleId": "kb-007",
+      "section": "Driver Documents",
+      "label": "Digital copies of all documents saved on DigiLocker or mParivahan",
+      "description": "Digital documents are accepted by traffic police. Keep physical copies as backup."
+    },
+    {
+      "id": "cl-011",
+      "articleId": "kb-008",
+      "section": "Fleet Vehicle Compliance",
+      "label": "All vehicles have valid RC, insurance, PUC, and fitness certificates",
+      "description": "Run a fleet-wide compliance check monthly. Use LOTS247 dashboard for real-time tracking."
+    },
+    {
+      "id": "cl-012",
+      "articleId": "kb-008",
+      "section": "Fleet Vehicle Compliance",
+      "label": "Speed limiters installed and certified on all heavy vehicles (>3.5 tonnes)",
+      "description": "Mandatory under CMVR. Speed limit: 80 km/h for trucks, 60 km/h for buses in city."
+    },
+    {
+      "id": "cl-013",
+      "articleId": "kb-008",
+      "section": "Fleet Vehicle Compliance",
+      "label": "GPS/AIS 140 tracking devices installed on all commercial vehicles",
+      "description": "Required by MoRTH for all interstate commercial vehicles. Must be AIS 140 compliant."
+    },
+    {
+      "id": "cl-014",
+      "articleId": "kb-008",
+      "section": "Driver Compliance",
+      "label": "All drivers have verified, valid driving licences for their vehicle category",
+      "description": "Verify via Sarathi portal. Check for endorsements, suspensions, or pending violations."
+    },
+    {
+      "id": "cl-015",
+      "articleId": "kb-008",
+      "section": "Driver Compliance",
+      "label": "Driver medical fitness certificates are current (for HMV licence holders)",
+      "description": "HMV drivers need medical fitness certification. Renewed at time of DL renewal."
+    },
+    {
+      "id": "cl-016",
+      "articleId": "kb-008",
+      "section": "Permits & Taxation",
+      "label": "Valid permits for all operational routes (All-India, National, or State permits)",
+      "description": "All-India permit covers all states. State permits limited to specific states. Check expiry dates."
+    },
+    {
+      "id": "cl-017",
+      "articleId": "kb-008",
+      "section": "Permits & Taxation",
+      "label": "Road tax paid and up to date for all operational states",
+      "description": "Interstate vehicles need to pay road tax in each state of operation. Keep receipts."
+    },
+    {
+      "id": "cl-018",
+      "articleId": "kb-008",
+      "section": "Insurance & Risk",
+      "label": "Comprehensive fleet insurance policy covers all registered vehicles",
+      "description": "Verify that newly added vehicles are added to the policy. Check coverage limits."
+    },
+    {
+      "id": "cl-019",
+      "articleId": "kb-008",
+      "section": "Insurance & Risk",
+      "label": "Third-party liability coverage meets minimum statutory requirements",
+      "description": "Minimum ₹7.5 lakh for death, unlimited for third-party property damage under MV Act."
+    },
+    {
+      "id": "cl-020",
+      "articleId": "kb-008",
+      "section": "Record Keeping",
+      "label": "Vehicle maintenance logs maintained for the last 12 months",
+      "description": "Include service dates, mileage, parts replaced, and mechanic details. Required during audits."
+    },
+    {
+      "id": "cl-021",
+      "articleId": "kb-008",
+      "section": "Record Keeping",
+      "label": "All challans tracked and resolved within 60 days of issue",
+      "description": "Use LOTS247 challan dashboard for automated tracking. Unresolved challans affect compliance score."
+    }
+  ]
+}

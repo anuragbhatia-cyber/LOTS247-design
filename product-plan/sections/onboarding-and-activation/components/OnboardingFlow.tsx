@@ -1,8 +1,6 @@
 import { useState } from 'react'
-// TODO: Replace with your Lottie animation library
-// import Lottie from 'lottie-react'
-// TODO: Replace with your truck animation JSON file
-// import truckAnimation from '../truck.json'
+import Lottie from 'lottie-react'
+import truckAnimation from '../truck.json'
 import type {
   OnboardingStep,
   OnboardingProgress,
@@ -136,11 +134,8 @@ export function OnboardingFlow({
         </header>
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="text-center">
-            {/* TODO: Replace with Lottie animation: <Lottie animationData={truckAnimation} loop={true} /> */}
             <div className="w-72 mx-auto mb-2">
-              <div className="w-full h-48 bg-stone-100 dark:bg-stone-800 rounded-xl flex items-center justify-center">
-                <span className="text-stone-400 dark:text-stone-500 text-sm">Truck Animation Placeholder</span>
-              </div>
+              <Lottie animationData={truckAnimation} loop={true} />
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-stone-900 dark:text-white mb-8">
               Your dashboard is getting ready

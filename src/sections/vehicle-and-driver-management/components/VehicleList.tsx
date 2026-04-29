@@ -845,20 +845,22 @@ export function VehicleList({
               {t.centralRepository}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Download PDF</span>
-            </button>
-            <button
-              onClick={() => window.parent.postMessage({ type: 'openAddDriver' }, '*')}
-              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.addDriver}</span>
-            </button>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <button
+                className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Download PDF</span>
+              </button>
+              <button
+                onClick={() => window.parent.postMessage({ type: 'openAddDriver' }, '*')}
+                className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span className="hidden sm:inline">{t.addDriver}</span>
+              </button>
+            </div>
             <button
               onClick={() => window.parent.postMessage({ type: 'openAddVehicle' }, '*')}
               className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
@@ -934,10 +936,10 @@ export function VehicleList({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-5">
+        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-full sm:w-fit mb-5">
           <button
             onClick={() => setActiveTab('vehicles')}
-            className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'vehicles'
                 ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                 : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
@@ -955,7 +957,7 @@ export function VehicleList({
           </button>
           <button
             onClick={() => setActiveTab('drivers')}
-            className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'drivers'
                 ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                 : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
@@ -1339,44 +1341,6 @@ export function VehicleList({
 
             </div>
 
-            {/* Pagination */}
-            {vehicleTotalPages > 1 && (
-              <div className="flex items-center justify-between mt-4 pb-4">
-                <p className="text-xs text-stone-500 dark:text-stone-400">
-                  {(vehiclePage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(vehiclePage * ITEMS_PER_PAGE, filteredVehicles.length)} {t.of} {filteredVehicles.length}
-                </p>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setVehiclePage((p) => Math.max(1, p - 1))}
-                    disabled={vehiclePage === 1}
-                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  {Array.from({ length: vehicleTotalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setVehiclePage(page)}
-                      className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
-                        page === vehiclePage
-                          ? 'bg-emerald-600 text-white shadow-sm'
-                          : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setVehiclePage((p) => Math.min(vehicleTotalPages, p + 1))}
-                    disabled={vehiclePage === vehicleTotalPages}
-                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Mobile Card View */}
             <div className="md:hidden space-y-3">
               {paginatedVehicles.map((vehicle) => {
@@ -1510,6 +1474,44 @@ export function VehicleList({
               )}
 
             </div>
+
+            {/* Pagination */}
+            {vehicleTotalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 pb-4">
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  {(vehiclePage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(vehiclePage * ITEMS_PER_PAGE, filteredVehicles.length)} {t.of} {filteredVehicles.length}
+                </p>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setVehiclePage((p) => Math.max(1, p - 1))}
+                    disabled={vehiclePage === 1}
+                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  {Array.from({ length: vehicleTotalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setVehiclePage(page)}
+                      className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
+                        page === vehiclePage
+                          ? 'bg-emerald-600 text-white shadow-sm'
+                          : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setVehiclePage((p) => Math.min(vehicleTotalPages, p + 1))}
+                    disabled={vehiclePage === vehicleTotalPages}
+                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
 
@@ -1645,44 +1647,6 @@ export function VehicleList({
 
             </div>
 
-            {/* Pagination */}
-            {driverTotalPages > 1 && (
-              <div className="flex items-center justify-between mt-4 pb-4">
-                <p className="text-xs text-stone-500 dark:text-stone-400">
-                  {(driverPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(driverPage * ITEMS_PER_PAGE, filteredDrivers.length)} {t.of} {filteredDrivers.length}
-                </p>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setDriverPage((p) => Math.max(1, p - 1))}
-                    disabled={driverPage === 1}
-                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  {Array.from({ length: driverTotalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setDriverPage(page)}
-                      className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
-                        page === driverPage
-                          ? 'bg-emerald-600 text-white shadow-sm'
-                          : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setDriverPage((p) => Math.min(driverTotalPages, p + 1))}
-                    disabled={driverPage === driverTotalPages}
-                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Mobile Card View */}
             <div className="md:hidden space-y-3">
               {paginatedDrivers.map((driver) => {
@@ -1750,6 +1714,44 @@ export function VehicleList({
               )}
 
             </div>
+
+            {/* Pagination */}
+            {driverTotalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 pb-4">
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  {(driverPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(driverPage * ITEMS_PER_PAGE, filteredDrivers.length)} {t.of} {filteredDrivers.length}
+                </p>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setDriverPage((p) => Math.max(1, p - 1))}
+                    disabled={driverPage === 1}
+                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  {Array.from({ length: driverTotalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setDriverPage(page)}
+                      className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
+                        page === driverPage
+                          ? 'bg-emerald-600 text-white shadow-sm'
+                          : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setDriverPage((p) => Math.min(driverTotalPages, p + 1))}
+                    disabled={driverPage === driverTotalPages}
+                    className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
 

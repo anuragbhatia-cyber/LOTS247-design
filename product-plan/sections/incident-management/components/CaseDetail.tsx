@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import {
   ArrowLeft,
   Clock,
@@ -35,7 +36,7 @@ import type {
   CaseReport,
   Comment,
 } from '../types'
-import { useLanguage, type Language } from './LanguageContext'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 // ---------------------------------------------------------------------------
 // Translations
@@ -396,7 +397,7 @@ function SectionCard({
   return (
     <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
       {title && (
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-2">
             {Icon && <Icon className="w-4 h-4 text-stone-400 dark:text-stone-500" />}
             <h3 className="text-sm font-semibold text-stone-700 dark:text-stone-300">
@@ -556,11 +557,11 @@ function UploadDocumentModal({ onClose, onUpload }: { onClose: () => void; onUpl
     if (file) setSelectedFile(file)
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 dark:bg-black/60" onClick={onClose} />
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-2">
             <Upload className="w-4 h-4 text-stone-500 dark:text-stone-400" />
             <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">Upload Document</h3>
@@ -615,23 +616,24 @@ function UploadDocumentModal({ onClose, onUpload }: { onClose: () => void; onUpl
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-end gap-2.5 px-5 py-4 border-t border-stone-200 dark:border-stone-800">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+            className="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={() => { if (selectedFile && onUpload) onUpload(selectedFile); onClose() }}
             disabled={!selectedFile}
-            className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 text-sm font-semibold transition-colors"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 text-sm font-semibold transition-colors"
           >
             Upload
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -656,7 +658,7 @@ function DocumentsSection({
         action={
           <button
             onClick={() => setShowUpload(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
           >
             <Upload className="w-3.5 h-3.5" />
             Upload
@@ -666,7 +668,7 @@ function DocumentsSection({
         {documents.length === 0 ? (
           <EmptyState icon={Paperclip} message={t.noDocumentsUploaded} />
         ) : (
-          <div className="divide-y divide-stone-100 dark:divide-stone-800">
+          <div className="divide-y divide-stone-200 dark:divide-stone-800">
             {documents.map((doc) => {
               const ext = doc.fileName.split('.').pop()?.toLowerCase() || ''
               const isPdf = ext === 'pdf'
@@ -830,7 +832,7 @@ function CommentsTab({
         </div>
       )}
 
-      <div className="pt-4 border-t border-stone-100 dark:border-stone-800">
+      <div className="pt-4 border-t border-stone-200 dark:border-stone-800">
         <div className="flex items-end gap-2.5">
           <textarea
             value={newMessage}
@@ -848,7 +850,7 @@ function CommentsTab({
           <button
             onClick={handleSubmit}
             disabled={!newMessage.trim()}
-            className="flex items-center justify-center w-11 h-11 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 transition-colors flex-shrink-0"
+            className="flex items-center justify-center w-11 h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-700 disabled:cursor-not-allowed text-white disabled:text-stone-400 dark:disabled:text-stone-500 transition-colors flex-shrink-0"
           >
             <Send className="w-4 h-4" />
           </button>
@@ -908,7 +910,7 @@ function OverviewTab({
       </div>
 
       {/* Detail fields */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0 pt-2 border-t border-stone-100 dark:border-stone-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0 pt-2 border-t border-stone-200 dark:border-stone-800">
         <DetailRow
           icon={Truck}
           label={t.vehicle}
@@ -932,7 +934,7 @@ function OverviewTab({
 
       {/* Incident Location */}
       {(caseData.incidentState || caseData.incidentCity || caseData.roadName || caseData.incidentArea || caseData.pin) && (
-        <div className="pt-2 border-t border-stone-100 dark:border-stone-800">
+        <div className="pt-2 border-t border-stone-200 dark:border-stone-800">
           <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-2">{t.incidentLocation}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
             {caseData.incidentState && (
@@ -956,7 +958,7 @@ function OverviewTab({
 
       {/* Authority Involved */}
       {caseData.authorityInvolved && (
-        <div className="pt-2 border-t border-stone-100 dark:border-stone-800">
+        <div className="pt-2 border-t border-stone-200 dark:border-stone-800">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
             <DetailRow icon={Shield} label={t.authorityInvolved} value={caseData.authorityInvolved} />
           </div>
@@ -965,7 +967,7 @@ function OverviewTab({
 
       {/* Reporter Information */}
       {(caseData.incidentReporterName || caseData.incidentReporterPhone) && (
-        <div className="pt-2 border-t border-stone-100 dark:border-stone-800">
+        <div className="pt-2 border-t border-stone-200 dark:border-stone-800">
           <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-2">{t.reporterInfo}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
             {caseData.incidentReporterName && (
@@ -1023,7 +1025,7 @@ export function CaseDetail({
 
         {/* Hero Header Card */}
         <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden mb-6">
-          <div className="p-5 sm:p-6 lg:p-8">
+          <div className="p-5 sm:p-6">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
               {/* Left: Case Info */}
               <div className="flex-1">

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import {
   ArrowLeft,
   Truck,
@@ -41,10 +42,10 @@ import type {
   DocumentStatus,
   VehicleDocument,
 } from '../types'
-import { useLanguage, type Language } from './LanguageContext'
-import { ChallanList } from '../../incident-management/components/ChallanList'
-import { CaseList } from '../../incident-management/components/CaseList'
-import incidentData from '../../incident-management/sample-data.json'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { ChallanList } from '@/sections/incident-management/components/ChallanList'
+import { CaseList } from '@/sections/incident-management/components/CaseList'
+import incidentData from '@/../product/sections/incident-management/data.json'
 
 // ---------------------------------------------------------------------------
 // Translations
@@ -536,7 +537,7 @@ function DocumentCard({ doc, t, language }: { doc: VehicleDocument; t: Record<st
             <div className="relative">
               <button
                 onClick={() => setShowMenu(!showMenu)}
-                className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="p-1.5 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 <MoreVertical className="w-4 h-4" />
               </button>
@@ -623,15 +624,15 @@ function EditVehicleModal({
     onClose()
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={handleClose} />
 
       {/* Modal */}
       <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div>
             <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
               {t.editVehicle}
@@ -642,7 +643,7 @@ function EditVehicleModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -659,7 +660,7 @@ function EditVehicleModal({
               type="text"
               value={vehicle.rcNumber}
               disabled
-              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50 text-sm font-mono text-stone-500 dark:text-stone-400 tracking-wider cursor-not-allowed"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50 text-sm text-stone-500 dark:text-stone-400 cursor-not-allowed"
             />
           </div>
 
@@ -722,7 +723,7 @@ function EditVehicleModal({
                   <button
                     key={s}
                     onClick={() => setStatus(s)}
-                    className={`flex-1 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                    className={`flex-1 px-3 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
                       isSelected
                         ? s === 'active'
                           ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-current'
@@ -739,22 +740,23 @@ function EditVehicleModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
           <button
             onClick={handleClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
             {t.cancel}
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+            className="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
           >
             {t.saveChanges}
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -804,13 +806,13 @@ function AssignDriverModal({
     onClose()
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={handleClose} />
 
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div>
             <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
               {currentDriverId ? t.changeDriver : t.assignDriver}
@@ -821,7 +823,7 @@ function AssignDriverModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -890,10 +892,6 @@ function AssignDriverModal({
                     <span className="text-xs text-stone-500 dark:text-stone-400 font-mono">
                       {d.licenseNumber}
                     </span>
-                    <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${licenseStyle.text}`}>
-                      <LicenseIcon className="w-2.5 h-2.5" />
-                      {licenseLabel}
-                    </span>
                   </div>
                 </div>
                 {isSelected && (
@@ -911,17 +909,17 @@ function AssignDriverModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
           <button
             onClick={handleClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
             {t.cancel}
           </button>
           <button
             onClick={handleAssign}
             disabled={!selectedId || selectedId === currentDriverId}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
               selectedId && selectedId !== currentDriverId
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400 cursor-not-allowed'
@@ -931,7 +929,8 @@ function AssignDriverModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -1141,13 +1140,13 @@ function UploadDocumentModal({
     onClose()
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={handleClose} />
 
       <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div>
             <h2 className="text-base font-semibold text-stone-900 dark:text-stone-50">
               {t.uploadDocument}
@@ -1158,7 +1157,7 @@ function UploadDocumentModal({
           </div>
           <button
             onClick={handleClose}
-            className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -1252,17 +1251,17 @@ function UploadDocumentModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
           <button
             onClick={handleClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
             {t.cancel}
           </button>
           <button
             onClick={handleUpload}
             disabled={!selectedFile || !selectedType}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
               selectedFile && selectedType
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400 cursor-not-allowed'
@@ -1273,7 +1272,8 @@ function UploadDocumentModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -1300,6 +1300,16 @@ export function VehicleDetail({
   const [expandedCompliance, setExpandedCompliance] = useState<Set<string>>(new Set())
   const [detailsFetched, setDetailsFetched] = useState(vehicle.detailsFetched !== false)
   const [detailsFetching, setDetailsFetching] = useState(false)
+
+  const navigateToIncidentScreen = (screenName: string, extraParams?: Record<string, string>) => {
+    const params = new URLSearchParams(window.location.search)
+    const embed = params.get('embed') === 'true' ? 'embed=true' : ''
+    const extra = extraParams
+      ? Object.entries(extraParams).map(([k, v]) => `${k}=${v}`).join('&')
+      : ''
+    const qs = [embed, extra].filter(Boolean).join('&')
+    window.location.href = `/sections/incident-management/screen-designs/${screenName}/fullscreen${qs ? `?${qs}` : ''}`
+  }
 
   const handleFetchDetails = () => {
     setDetailsFetching(true)
@@ -1334,16 +1344,6 @@ export function VehicleDetail({
               </p>
             </div>
           )}
-          {expiredDocs.length === 0 && expiringDocs.length > 0 && (
-            <div className="px-5 py-3 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-900/40 flex items-center gap-2.5">
-              <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                <span className="font-semibold">{expiringDocs.length} {expiringDocs.length > 1 ? t.documentsExpiringSoon : t.documentExpiringSoon}</span>
-                {' — '}
-                {expiringDocs.map((d) => { const keys = DOC_TYPE_LABEL_KEY[d.type]; return keys ? t[keys.label] : d.name }).join(', ')}
-              </p>
-            </div>
-          )}
 
           <div className="p-5 sm:p-6 lg:p-8">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
@@ -1352,7 +1352,7 @@ export function VehicleDetail({
                 <div className="flex items-start gap-4 mb-5">
                   <button
                     onClick={() => onBack?.()}
-                    className="mt-1 p-2 -ml-1 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex-shrink-0"
+                    className="mt-1 p-2 -ml-1 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex-shrink-0"
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
@@ -1384,7 +1384,7 @@ export function VehicleDetail({
                       <button
                         onClick={handleFetchDetails}
                         disabled={detailsFetching}
-                        className="mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-xs font-medium hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-colors disabled:opacity-60"
+                        className="mt-1 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-xs font-medium hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-colors disabled:opacity-60"
                       >
                         {detailsFetching ? (
                           <><Loader2 className="w-3 h-3 animate-spin" />{t.fetchingDetails}</>
@@ -1400,21 +1400,21 @@ export function VehicleDetail({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setShowEditModal(true)}
-                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     {t.editVehicle}
                   </button>
                   <button
                     onClick={() => setShowAssignDriver(true)}
-                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                   >
                     <UserPlus className="w-3.5 h-3.5" />
                     {driver ? t.changeDriver : t.assignDriver}
                   </button>
                   <button
                     onClick={() => onDelete?.()}
-                    className="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-amber-600 dark:text-amber-400 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-colors"
+                    className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-amber-600 dark:text-amber-400 hover:border-amber-300 dark:hover:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-colors"
                   >
                     <Ban className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">{t.deactivate}</span>
@@ -1461,6 +1461,21 @@ export function VehicleDetail({
         {/* ================================================================= */}
         {activeTab === 'details' && (
           <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6">
+            {!detailsFetched && (
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={handleFetchDetails}
+                  disabled={detailsFetching}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-stone-900 text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors disabled:opacity-60"
+                >
+                  {detailsFetching ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" />{t.fetchingDetails}</>
+                  ) : (
+                    <><RefreshCw className="w-4 h-4" />{t.fetchDetails}</>
+                  )}
+                </button>
+              </div>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.rcNumber}</p>
@@ -1470,7 +1485,7 @@ export function VehicleDetail({
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.vehicleType}</p>
                 <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.vehicleType}</p>
               </div>
-              {detailsFetched ? (
+              {detailsFetched && (
                 <>
                   <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                     <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.make}</p>
@@ -1485,20 +1500,6 @@ export function VehicleDetail({
                     <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{vehicle.year}</p>
                   </div>
                 </>
-              ) : (
-                <div className="p-4 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-lg border border-dashed border-emerald-200 dark:border-emerald-800 col-span-1 sm:col-span-2 lg:col-span-3 flex items-center justify-center">
-                  <button
-                    onClick={handleFetchDetails}
-                    disabled={detailsFetching}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-stone-900 text-emerald-700 dark:text-emerald-400 text-sm font-medium hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors disabled:opacity-60"
-                  >
-                    {detailsFetching ? (
-                      <><Loader2 className="w-4 h-4 animate-spin" />{t.fetchingDetails}</>
-                    ) : (
-                      <><RefreshCw className="w-4 h-4" />{t.fetchDetails}</>
-                    )}
-                  </button>
-                </div>
               )}
               <div className="p-4 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
                 <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1">{t.status}</p>
@@ -1519,7 +1520,7 @@ export function VehicleDetail({
         {/* ================================================================= */}
         {activeTab === 'documents' && (
           <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-stone-200 dark:border-stone-800">
               <div className="flex items-center gap-2">
                 <Paperclip className="w-4 h-4 text-stone-400 dark:text-stone-500" />
                 <h3 className="text-sm font-semibold text-stone-700 dark:text-stone-300">
@@ -1531,13 +1532,13 @@ export function VehicleDetail({
               </div>
               <button
                 onClick={() => setShowUploadDoc(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-sm font-medium text-stone-700 dark:text-stone-300 transition-colors"
               >
                 <Upload className="w-3.5 h-3.5" />
                 {t.uploadDocument}
               </button>
             </div>
-            <div className="divide-y divide-stone-100 dark:divide-stone-800">
+            <div className="divide-y divide-stone-200 dark:divide-stone-800">
               {vehicle.documents.map((doc) => {
                 const ext = doc.name.split('.').pop()?.toLowerCase() || ''
                 const isPdf = ext === 'pdf'
@@ -1560,10 +1561,10 @@ export function VehicleDetail({
                       </p>
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                      <button className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors flex-shrink-0">
+                      <button className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors flex-shrink-0">
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors flex-shrink-0">
+                      <button className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors flex-shrink-0">
                         <Download className="w-4 h-4" />
                       </button>
                     </div>
@@ -1579,8 +1580,34 @@ export function VehicleDetail({
         {/* ================================================================= */}
         {activeTab === 'compliance' && (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            {/* Compliance Status — left */}
-            <div className="lg:col-span-3 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+            {/* Left column — Vehicle Summary + Compliance Status */}
+            <div className="lg:col-span-3 space-y-4">
+              {/* Vehicle Summary Card */}
+              <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+                <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
+                  Vehicle Summary
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                    <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Incidents</p>
+                    <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">5</p>
+                    <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹48,500</p>
+                  </div>
+                  <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                    <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Cases</p>
+                    <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">3</p>
+                    <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹32,000</p>
+                  </div>
+                  <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                    <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Renewals</p>
+                    <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">7</p>
+                    <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹18,200</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Compliance Status */}
+              <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
               <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
                 Compliance Status
               </h3>
@@ -1682,9 +1709,9 @@ export function VehicleDetail({
                       >
                         <div className="flex items-center gap-3">
                           <ChevronDown className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : '-rotate-90'}`} />
-                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200">Pending Challans</p>
+                          <p className="text-sm font-medium text-stone-800 dark:text-stone-200">Challans</p>
                         </div>
-                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">Expired</span>
+                        <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">{t.pending}</span>
                       </button>
                       {isExpanded && (
                         <div className="px-4 pb-4 pt-0.5 ml-7">
@@ -1746,6 +1773,7 @@ export function VehicleDetail({
                 })()}
               </div>
             </div>
+            </div>
 
             {/* Vehicle History — right */}
             <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
@@ -1770,11 +1798,7 @@ export function VehicleDetail({
                     ].map((item, i) => (
                       <div key={i} className="relative flex gap-3 pl-0">
                         {/* Dot */}
-                        <div className={`w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 ${
-                          item.event === 'Added to LOTS247' ? 'bg-blue-500 dark:bg-blue-400'
-                            : item.event === 'Incident Solved' ? 'bg-emerald-500 dark:bg-emerald-400'
-                            : 'bg-amber-500 dark:bg-amber-400'
-                        }`} />
+                        <div className="w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 bg-emerald-500 dark:bg-emerald-400" />
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{item.event}</p>
@@ -1814,7 +1838,7 @@ export function VehicleDetail({
                       setChallanFetchState('done')
                     }, 2500)
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
                 >
                   <RefreshCw className="w-4 h-4" />
                   {t.fetchChallans}
@@ -1899,7 +1923,7 @@ export function VehicleDetail({
                             setChallanFetchState('done')
                           }, 2500)
                         }}
-                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 min-h-9 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 min-h-9 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-xs font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         {t.reFetch}
@@ -1912,7 +1936,7 @@ export function VehicleDetail({
                         {displayChallans.map((challan) => (
                           <div
                             key={challan.id}
-                            className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 sm:p-5 flex flex-col"
+                            className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6 flex flex-col"
                           >
                             {/* Top: Violation + Amount */}
                             <div className="flex items-start justify-between mb-3">
@@ -1942,7 +1966,7 @@ export function VehicleDetail({
                             </div>
 
                             {/* Footer: Type badge + Pay Now */}
-                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-stone-100 dark:border-stone-800">
+                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-stone-200 dark:border-stone-800">
                               <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${
                                 challan.challanType === 'court'
                                   ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
@@ -1957,7 +1981,7 @@ export function VehicleDetail({
                                       prev.map(c => c.id === challan.id ? { ...c, status: 'submitted' as const } : c)
                                     )
                                   }}
-                                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm"
+                                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm"
                                 >
                                   {t.payNow}
                                 </button>
@@ -2028,7 +2052,7 @@ export function VehicleDetail({
                 challans={vehicleChallans}
                 vehicles={incidentData.vehicles}
                 drivers={incidentData.drivers}
-                onView={(id) => console.log('View challan:', id)}
+                onView={(id) => navigateToIncidentScreen('ChallanDetail', { id })}
                 onPay={(id) => console.log('Pay challan:', id)}
                 onDispute={(id) => console.log('Dispute challan:', id)}
                 onEscalateToCase={(id) => console.log('Escalate to case:', id)}
@@ -2042,7 +2066,7 @@ export function VehicleDetail({
                 vehicles={incidentData.vehicles}
                 drivers={incidentData.drivers}
                 lawyers={incidentData.lawyers}
-                onView={(id) => console.log('View case:', id)}
+                onView={(id) => navigateToIncidentScreen('CaseDetail', { id })}
                 onCreate={() => console.log('Create new case')}
               />
             )}
@@ -2121,7 +2145,7 @@ export function VehicleDetail({
                 </p>
                 <button
                   onClick={() => setShowAssignDriver(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors"
                 >
                   <UserPlus className="w-4 h-4" />
                   {t.assignDriver}

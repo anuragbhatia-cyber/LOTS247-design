@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Wallet, CheckCircle2 } from 'lucide-react'
 
 interface TopUpModalProps {
@@ -32,8 +33,8 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
     setAmount(String(value))
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 dark:bg-black/50"
@@ -43,7 +44,7 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
       {/* Modal */}
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-2xl shadow-stone-300/30 dark:shadow-stone-950/50 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
               <Wallet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -54,7 +55,7 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+            className="p-1.5 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -94,7 +95,7 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0"
                     min="1"
-                    className="w-full pl-8 pr-4 py-3 text-sm bg-white dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full pl-8 pr-4 py-3 text-sm bg-white dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 rounded-lg text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     autoFocus
                   />
                 </div>
@@ -107,7 +108,7 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
                     key={preset}
                     type="button"
                     onClick={() => handlePreset(preset)}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-lg border transition-colors ${
+                    className={`flex-1 py-2 text-xs font-semibold rounded-xl border transition-colors ${
                       amount === String(preset)
                         ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400'
                         : 'bg-white dark:bg-stone-800 border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400 hover:border-stone-300 dark:hover:border-stone-600'
@@ -119,18 +120,18 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-stone-100 dark:border-stone-800 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-stone-200 dark:border-stone-800 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={!amount || Number(amount) <= 0}
-                className="px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-5 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Add Money
               </button>
@@ -138,6 +139,7 @@ export function TopUpModal({ isOpen, onClose, onSubmit }: TopUpModalProps) {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

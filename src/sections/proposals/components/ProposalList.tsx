@@ -389,38 +389,53 @@ function ProposalRow({
         </div>
       )}
 
-      {/* Mobile: Actions */}
-      <div className="flex items-center gap-2 sm:hidden" onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={onView}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-100 dark:hover:bg-stone-700 text-xs font-medium text-stone-600 dark:text-stone-300 transition-colors"
-        >
-          <Eye className="w-3 h-3" />
-          {t.viewDetail}
-        </button>
-        {isActive && (
-          <>
-            <button
-              onClick={onFollowUp}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-xs font-medium text-white transition-colors"
-            >
-              <MessageSquare className="w-3 h-3" />
-              {t.followUp}
-            </button>
-            <button
-              onClick={onCancel}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-200 dark:border-red-800 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-            >
-              {t.cancel}
-            </button>
-          </>
-        )}
+      {/* Mobile: Actions — three-dot menu */}
+      <div className="flex items-center justify-between sm:hidden">
         {proposal.linkedIncidentId && (
           <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
             <ArrowUpRight className="w-3 h-3" />
             {proposal.linkedIncidentId}
           </span>
         )}
+        <div className="relative ml-auto" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+          {menuOpen && (
+            <>
+              <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
+              <div className="absolute right-0 bottom-full mb-1 w-44 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/40 dark:shadow-stone-950/60 overflow-hidden z-30">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onView?.() }}
+                  className="w-full text-left px-3.5 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                >
+                  {t.viewDetail}
+                </button>
+                {isActive && (
+                  <>
+                    <div className="border-t border-stone-200 dark:border-stone-800" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onFollowUp?.() }}
+                      className="w-full text-left px-3.5 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      {t.followUp}
+                    </button>
+                    <div className="border-t border-stone-200 dark:border-stone-800" />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onCancel?.() }}
+                      className="w-full text-left px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    >
+                      {t.cancel}
+                    </button>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Desktop: Table columns */}

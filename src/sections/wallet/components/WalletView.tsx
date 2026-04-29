@@ -572,13 +572,13 @@ export function WalletView({
               <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Wallet</h1>
               <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">Manage your balance and transaction history</p>
             </div>
-            <div className="flex items-center gap-3 self-start sm:self-auto">
-              <div className="relative">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-initial">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
                 <select
                   value={filters.dateRange ?? 'all'}
                   onChange={(e) => updateFilter({ dateRange: e.target.value === 'all' ? undefined : e.target.value as TransactionFilters['dateRange'] })}
-                  className="appearance-none pl-9 pr-8 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                  className="w-full appearance-none pl-9 pr-8 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                 >
                   <option value="all">All Time</option>
                   {DATE_RANGE_OPTIONS.map((opt) => (
@@ -592,7 +592,7 @@ export function WalletView({
                   setShowAddMoney(true)
                   window.parent.postMessage({ type: 'showOverlay' }, '*')
                 }}
-                className="inline-flex items-center gap-2 px-4 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Add Money
@@ -610,7 +610,7 @@ export function WalletView({
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Current Balance</p>
-                <p className={`text-2xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 ${
+                <p className={`text-xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 ${
                   isLowBalance ? 'text-amber-600 dark:text-amber-400' : 'text-stone-900 dark:text-stone-50'
                 }`}>
                   {formatCurrency(walletSummary.currentBalance)}
@@ -622,8 +622,8 @@ export function WalletView({
                   </div>
                 )}
               </div>
-              <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40">
-                <Wallet className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-1.5 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40">
+                <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
             <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
@@ -639,12 +639,12 @@ export function WalletView({
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Total In</p>
-                <p className="text-2xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 text-stone-900 dark:text-stone-50">
+                <p className="text-xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 text-stone-900 dark:text-stone-50">
                   {formatCurrency(totalCredits)}
                 </p>
               </div>
-              <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40">
-                <TrendingDown className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-1.5 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40">
+                <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
             <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
@@ -657,12 +657,12 @@ export function WalletView({
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Total Out</p>
-                <p className="text-2xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 text-stone-900 dark:text-stone-50">
+                <p className="text-xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 text-stone-900 dark:text-stone-50">
                   {formatCurrency(totalDebits)}
                 </p>
               </div>
-              <div className="p-2 sm:p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40">
-                <TrendingUp className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <div className="p-1.5 sm:p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400" />
               </div>
             </div>
             <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">

@@ -1,139 +1,146 @@
-# Wallet Section -- Test Instructions
+# Wallet — Test Specifications
 
-## Setup
+## Overview
 
-Render the `WalletView` component with the sample data from `sample-data.json`. Provide mock callbacks for `onAddMoney`, `onViewTransaction`, `onNavigateToEntity`, `onFilterChange`, and `onSearch`.
+Tests for wallet balance display, add money flow with Razorpay, transaction ledger, filters, and transaction detail panel.
 
 ---
 
-## Test Cases
+## 1. Balance Card
 
-### 1. Viewing Current Balance
+### Success Path
+- [ ] Navigate to Wallet section
+- [ ] Verify balance card renders with current amount in INR format (e.g., "Rs 12,500")
+- [ ] Verify last recharge date is displayed
+- [ ] Verify "Add Money" button is prominent and clickable
+- [ ] Verify balance card has gradient background
 
-- [ ] Component renders without errors
-- [ ] Page title "Wallet" and subtitle are visible
-- [ ] Current Balance card shows the correct amount (12,750 in sample data)
-- [ ] Balance is formatted in Indian currency format with rupee symbol
-- [ ] Last recharge info is shown (amount and date)
-- [ ] Wallet icon is displayed in the balance card
-- [ ] "Total In" card shows the sum of all successful credit transactions
-- [ ] "Total Out" card shows the sum of all successful debit transactions
-- [ ] Credit and debit transaction counts are displayed
+### Failure Path
+- [ ] Balance API fails — verify "Unable to load balance" with retry
+- [ ] Balance is zero — verify "Rs 0" displayed with "Add Money" CTA highlighted
 
-### 2. Adding Money (Success Flow)
+---
 
-- [ ] "Add Money" button is visible in the header
-- [ ] Clicking "Add Money" opens the Add Money modal
-- [ ] Modal shows "Add Money" title and "Top up your LOTS247 wallet" subtitle
-- [ ] Custom amount input accepts numeric values
-- [ ] Rupee symbol is displayed before the input
-- [ ] Quick-select buttons show the 4 preset amounts (500, 1000, 2000, 5000)
-- [ ] Clicking a quick-select button fills the input with that amount
-- [ ] Selected quick-select button is highlighted in emerald
-- [ ] Typing a custom amount deselects any quick-select button
-- [ ] "Pay via Razorpay" button shows the selected amount
-- [ ] Button is disabled when no amount is entered
-- [ ] Clicking proceed calls `onAddMoney` with the amount and closes the modal
-- [ ] Payment info text shows "Secured by Razorpay" with accepted methods
+## 2. Add Money Flow
 
-### 3. Adding Money (Failure/Validation)
+### Success Path
+- [ ] Tap "Add Money" button
+- [ ] Verify amount input or preset amount options appear (Rs 500, Rs 1000, Rs 5000, custom)
+- [ ] Select Rs 1000 — verify Razorpay checkout opens
+- [ ] Complete payment successfully
+- [ ] Verify balance updates to previous + Rs 1000
+- [ ] Verify success toast "Rs 1,000 added to wallet"
+- [ ] Verify new credit transaction appears at top of ledger
 
-- [ ] Amount below 100 shows "Minimum amount is 100" error
-- [ ] Amount above 1,00,000 shows "Maximum amount is 1,00,000" error
-- [ ] Error message includes an AlertTriangle icon
-- [ ] Error clears when user modifies the amount
+### Failure Path
+- [ ] Razorpay payment cancelled — verify "Payment cancelled" message, balance unchanged
+- [ ] Razorpay payment failed — verify "Payment failed. Amount not deducted." error
+- [ ] Enter custom amount Rs 0 — verify "Enter an amount greater than 0" error
+- [ ] Enter amount exceeding Rs 100,000 — verify "Maximum single transaction is Rs 1,00,000" error
+- [ ] Network error during payment verification — verify "Verifying payment..." with auto-retry
 
-### 4. Viewing Transaction List
+---
 
-- [ ] Transaction History card is visible with transaction count
-- [ ] All 12 sample transactions are available (across pages)
-- [ ] Desktop table shows: Reference ID, Date, Category badge, Amount, Balance
-- [ ] Credit amounts are shown in green with "+" prefix
-- [ ] Debit amounts are shown in default color with minus prefix
-- [ ] Failed transactions show strikethrough amount and "Failed" label with red icon
-- [ ] Running balance is displayed for each transaction
-- [ ] Transactions are displayed in reverse chronological order
+## 3. Transaction Ledger
 
-### 5. Mobile Transaction View
+### Success Path
+- [ ] Verify transaction list renders below balance card
+- [ ] Verify each row shows: date, description, amount (with +/- prefix), type badge
+- [ ] Verify credits shown in green, debits in red, refunds in amber
+- [ ] Verify transactions sorted by date (newest first)
+- [ ] Scroll to bottom — verify "Load More" button or infinite scroll loads next page
+- [ ] Verify date separators group transactions by date
 
-- [ ] Mobile view groups transactions by date
-- [ ] Date group headers show relative labels ("Today", "Yesterday", "X days ago")
-- [ ] Each transaction row shows description, time, and amount
-- [ ] Balance is shown as "Bal" with amount on mobile
-- [ ] Tapping a transaction opens the detail modal
+### Failure Path
+- [ ] Transaction list API error — verify "Unable to load transactions" with retry
+- [ ] Empty transaction list — verify "No transactions yet. Add money to get started."
 
-### 6. Filtering and Searching Transactions
+---
 
-- [ ] Search input is visible with placeholder text
-- [ ] Typing a description keyword filters transactions
-- [ ] Typing a reference ID filters transactions
-- [ ] Clear button (X) appears when search has text; clicking clears it
-- [ ] `onSearch` callback is called with the query
-- [ ] Filters button toggles the filter panel
-- [ ] Date Range dropdown filters by Today / This Week / This Month
-- [ ] Type dropdown filters by Credit / Debit / All
-- [ ] Category dropdown filters by Recharge / Subscription / Challan / Legal Fee / Refund / All
-- [ ] Active filter count badge appears on the Filters button
-- [ ] "Clear all" link resets all filters
-- [ ] `onFilterChange` callback is called when filters change
-- [ ] Header date range selector also works for filtering
-- [ ] Search and filters work together
-- [ ] Filters reset pagination to page 1
+## 4. Transaction Filters
 
-### 7. Viewing Transaction Detail
+### Success Path
+- [ ] Open filter controls
+- [ ] Filter by type "Credit" — verify only credit transactions show
+- [ ] Filter by date range "Last 7 days" — verify filtered results
+- [ ] Combine type "Debit" + date "This month" — verify intersection
+- [ ] Verify active filter count badge
+- [ ] Tap "Clear All" — verify full list returns
 
-- [ ] Clicking a transaction row opens the detail modal
-- [ ] `onViewTransaction` callback is called with the transaction ID
-- [ ] Modal shows large amount display with sign (+ for credit, minus for debit)
-- [ ] Category icon is displayed in the amount hero area
-- [ ] Credit amounts are green; debit amounts are default
-- [ ] Detail rows show: Date & Time, Category badge, Type, Reference ID, Status badge, Balance After
-- [ ] Reference ID is displayed in monospace font with code-style background
-- [ ] Status badge shows Success (green), Pending (amber), or Failed (red) with icon
-- [ ] For transactions with a related entity, a link button is displayed
-- [ ] Clicking the related entity link calls `onNavigateToEntity` with type and ID
-- [ ] Close button (X) dismisses the modal
-- [ ] Clicking the backdrop dismisses the modal
+### Failure Path
+- [ ] Filters return zero results — verify "No transactions match your filters"
+- [ ] Verify clear button resets all filters
 
-### 8. Empty State -- No Transactions
+---
 
-- [ ] When `transactions` array is empty, empty state is shown
-- [ ] Empty state shows wallet icon, "Your wallet is empty" message
-- [ ] "Add Money" button in empty state opens the Add Money modal
+## Empty State Tests
 
-### 9. Empty State -- No Matching Results
+- [ ] New wallet with zero balance and no transactions — balance shows "Rs 0", ledger shows onboarding message
+- [ ] Wallet with balance but no transactions in selected filter — shows filter-specific empty state
 
-- [ ] When search/filters produce no results, a different empty state is shown
-- [ ] Shows "No matching transactions" message
-- [ ] "Clear all filters" link resets search and filters
+## Component Interaction Tests
 
-### 10. Low Balance Warning
+- [ ] Successful add money immediately updates both balance card and transaction ledger
+- [ ] Transaction detail panel shows linked entity (e.g., "API credit purchase" links to API catalogue)
+- [ ] Filter chips scroll horizontally on mobile if they overflow
+- [ ] Pull-to-refresh on mobile reloads balance and latest transactions
 
-- [ ] When balance is at or below the threshold (2,000), balance text turns amber
-- [ ] Low balance warning icon and "Low balance" text appear below the balance
-- [ ] Warning is not shown when balance is above the threshold
+## Edge Cases
 
-### 11. Pagination
+- [ ] Balance with large amount (Rs 99,99,999) formats correctly with Indian number system
+- [ ] Transaction amount with decimals (Rs 499.50) displays correctly
+- [ ] 500+ transactions — verify pagination does not degrade performance
+- [ ] Two add-money transactions in quick succession — both reflect correctly
+- [ ] Refund transaction shows linked original debit transaction ID
+- [ ] Transaction timestamp shows "Just now" for transactions within 1 minute
 
-- [ ] When more than 8 transactions exist, pagination controls appear
-- [ ] Shows "X-Y of Z" text
-- [ ] Page number buttons with active state (emerald background)
-- [ ] Previous/Next buttons with disabled states at boundaries
-- [ ] Clicking a page number shows the correct slice of transactions
-- [ ] Search/filter changes reset to page 1
+## Accessibility Checks
 
-### 12. Responsive Design
+- [ ] Balance card has aria-label "Wallet balance: Rs X"
+- [ ] Transaction rows have aria-label with description and amount
+- [ ] Credit/debit color coding accompanied by +/- prefix and type label
+- [ ] "Add Money" button has descriptive aria-label
+- [ ] Filter controls are keyboard accessible
+- [ ] Transaction detail panel traps focus and has close button
 
-- [ ] Desktop (md+): Table layout with 5 columns
-- [ ] Mobile (below md): Grouped card layout with date headers
-- [ ] Stats cards: 2-column on mobile, 4-column on large screens
-- [ ] Balance card spans 2 columns
-- [ ] All interactive elements have min-h-11 for touch targets
-- [ ] Add Money modal is centered and responsive
+## Sample Test Data
 
-### 13. Accessibility
-
-- [ ] All interactive elements have visible focus indicators
-- [ ] Modals can be dismissed via backdrop click
-- [ ] Amount input supports keyboard entry
-- [ ] Category and status information uses text labels (not color alone)
+```json
+{
+  "balance": {
+    "amount": 12500,
+    "lastRecharge": "2026-04-25T14:30:00Z",
+    "currency": "INR"
+  },
+  "transactions": [
+    {
+      "id": "txn-001",
+      "type": "credit",
+      "amount": 5000,
+      "description": "Wallet recharge via Razorpay",
+      "date": "2026-04-25T14:30:00Z",
+      "referenceId": "pay_ABC123",
+      "status": "success"
+    },
+    {
+      "id": "txn-002",
+      "type": "debit",
+      "amount": 250,
+      "description": "API credits - Vahan Lookup x50",
+      "date": "2026-04-26T09:15:00Z",
+      "referenceId": "api_credit_456",
+      "status": "success"
+    },
+    {
+      "id": "txn-003",
+      "type": "refund",
+      "amount": 1000,
+      "description": "Challan SLA refund - CH-2026-00389",
+      "date": "2026-04-27T11:00:00Z",
+      "referenceId": "ref_789",
+      "linkedEntity": "ch-002",
+      "status": "success"
+    }
+  ]
+}
+```

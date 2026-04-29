@@ -1,0 +1,252 @@
+{
+  "_meta": {
+    "models": {
+      "vehicles": "Each vehicle is a registered vehicle in the subscriber's account, tracking its RC details, ownership category, compliance score, and document expiry status.",
+      "drivers": "Drivers are people who operate the subscriber's vehicles. Each driver has license details and can be assigned to one or more vehicles.",
+      "documents": "Compliance documents like insurance policies, PUC certificates, and fitness certificates linked to a vehicle or driver."
+    },
+    "relationships": [
+      "Each Vehicle can have one or more Drivers assigned to it",
+      "Each Vehicle has multiple Documents (insurance, PUC, fitness certificate)",
+      "Each Driver has Documents (driving license, medical certificate)",
+      "Drivers can be assigned to multiple Vehicles"
+    ]
+  },
+  "vehicles": [
+    {
+      "id": "veh-001",
+      "rcNumber": "UP32MM1113",
+      "vehicleType": "Truck",
+      "make": "Tata",
+      "model": "Prima 4028.S",
+      "year": 2022,
+      "category": "owned",
+      "complianceScore": 92,
+      "insuranceExpiry": "2026-08-15",
+      "pucExpiry": "2026-06-20",
+      "fitnessExpiry": "2027-01-10",
+      "status": "active",
+      "subscriptionStatus": "active",
+      "assignedDriverId": "drv-001",
+      "documents": [
+        { "id": "doc-001", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2026-08-15", "status": "valid" },
+        { "id": "doc-002", "type": "puc", "name": "PUC Certificate", "expiry": "2026-06-20", "status": "valid" },
+        { "id": "doc-003", "type": "fitness", "name": "Fitness Certificate", "expiry": "2027-01-10", "status": "valid" },
+        { "id": "doc-004", "type": "rc", "name": "Registration Certificate", "expiry": "2037-03-22", "status": "valid" }
+      ]
+    },
+    {
+      "id": "veh-002",
+      "rcNumber": "UP32NN2224",
+      "vehicleType": "Truck",
+      "make": "Ashok Leyland",
+      "model": "BOSS 1920HB",
+      "year": 2021,
+      "category": "owned",
+      "detailsFetched": false,
+      "complianceScore": 45,
+      "insuranceExpiry": "2026-02-28",
+      "pucExpiry": "2026-01-10",
+      "fitnessExpiry": "2026-07-15",
+      "status": "active",
+      "subscriptionStatus": "active",
+      "assignedDriverId": "drv-002",
+      "documents": [
+        { "id": "doc-005", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2026-02-28", "status": "expiring-soon" },
+        { "id": "doc-006", "type": "puc", "name": "PUC Certificate", "expiry": "2026-01-10", "status": "expired" },
+        { "id": "doc-007", "type": "fitness", "name": "Fitness Certificate", "expiry": "2026-07-15", "status": "valid" },
+        { "id": "doc-008", "type": "rc", "name": "Registration Certificate", "expiry": "2036-09-05", "status": "valid" }
+      ]
+    },
+    {
+      "id": "veh-003",
+      "rcNumber": "UP32PP3335",
+      "vehicleType": "Trailer",
+      "make": "BharatBenz",
+      "model": "3523R",
+      "year": 2023,
+      "category": "leased",
+      "complianceScore": 100,
+      "insuranceExpiry": "2027-01-20",
+      "pucExpiry": "2026-11-30",
+      "fitnessExpiry": "2027-06-18",
+      "status": "active",
+      "subscriptionStatus": "active",
+      "assignedDriverId": "drv-003",
+      "documents": [
+        { "id": "doc-009", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2027-01-20", "status": "valid" },
+        { "id": "doc-010", "type": "puc", "name": "PUC Certificate", "expiry": "2026-11-30", "status": "valid" },
+        { "id": "doc-011", "type": "fitness", "name": "Fitness Certificate", "expiry": "2027-06-18", "status": "valid" },
+        { "id": "doc-012", "type": "rc", "name": "Registration Certificate", "expiry": "2038-04-12", "status": "valid" }
+      ]
+    },
+    {
+      "id": "veh-004",
+      "rcNumber": "UP32QQ4446",
+      "vehicleType": "Truck",
+      "make": "Eicher",
+      "model": "Pro 6049",
+      "year": 2020,
+      "category": "rented",
+      "complianceScore": 28,
+      "insuranceExpiry": "2025-12-01",
+      "pucExpiry": "2025-11-15",
+      "fitnessExpiry": "2026-03-10",
+      "status": "active",
+      "subscriptionStatus": "inactive",
+      "assignedDriverId": "drv-004",
+      "documents": [
+        { "id": "doc-013", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2025-12-01", "status": "expired" },
+        { "id": "doc-014", "type": "puc", "name": "PUC Certificate", "expiry": "2025-11-15", "status": "expired" },
+        { "id": "doc-015", "type": "fitness", "name": "Fitness Certificate", "expiry": "2026-03-10", "status": "expiring-soon" },
+        { "id": "doc-016", "type": "rc", "name": "Registration Certificate", "expiry": "2035-07-28", "status": "valid" }
+      ]
+    },
+    {
+      "id": "veh-005",
+      "rcNumber": "UP32RR5557",
+      "vehicleType": "Mini Truck",
+      "make": "Tata",
+      "model": "Ace Gold",
+      "year": 2024,
+      "category": "owned",
+      "detailsFetched": false,
+      "complianceScore": 88,
+      "insuranceExpiry": "2027-03-05",
+      "pucExpiry": "2026-09-12",
+      "fitnessExpiry": "2027-08-22",
+      "status": "active",
+      "subscriptionStatus": "active",
+      "assignedDriverId": null,
+      "documents": [
+        { "id": "doc-017", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2027-03-05", "status": "valid" },
+        { "id": "doc-018", "type": "puc", "name": "PUC Certificate", "expiry": "2026-09-12", "status": "valid" },
+        { "id": "doc-019", "type": "fitness", "name": "Fitness Certificate", "expiry": "2027-08-22", "status": "valid" },
+        { "id": "doc-020", "type": "rc", "name": "Registration Certificate", "expiry": "2039-01-14", "status": "valid" }
+      ]
+    },
+    {
+      "id": "veh-006",
+      "rcNumber": "UP32SS6668",
+      "vehicleType": "Truck",
+      "make": "Mahindra",
+      "model": "Blazo X 46",
+      "year": 2021,
+      "category": "leased",
+      "detailsFetched": false,
+      "complianceScore": 72,
+      "insuranceExpiry": "2026-04-18",
+      "pucExpiry": "2026-03-01",
+      "fitnessExpiry": "2026-10-05",
+      "status": "active",
+      "subscriptionStatus": "active",
+      "assignedDriverId": "drv-005",
+      "documents": [
+        { "id": "doc-021", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2026-04-18", "status": "expiring-soon" },
+        { "id": "doc-022", "type": "puc", "name": "PUC Certificate", "expiry": "2026-03-01", "status": "expiring-soon" },
+        { "id": "doc-023", "type": "fitness", "name": "Fitness Certificate", "expiry": "2026-10-05", "status": "valid" },
+        { "id": "doc-024", "type": "rc", "name": "Registration Certificate", "expiry": "2036-11-20", "status": "valid" }
+      ]
+    },
+    {
+      "id": "veh-007",
+      "rcNumber": "UP32TT7779",
+      "vehicleType": "Truck",
+      "make": "Tata",
+      "model": "Signa 4825.TK",
+      "year": 2019,
+      "category": "owned",
+      "complianceScore": 15,
+      "insuranceExpiry": "2025-09-30",
+      "pucExpiry": "2025-08-22",
+      "fitnessExpiry": "2025-10-15",
+      "status": "inactive",
+      "subscriptionStatus": "inactive",
+      "assignedDriverId": null,
+      "documents": [
+        { "id": "doc-025", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2025-09-30", "status": "expired" },
+        { "id": "doc-026", "type": "puc", "name": "PUC Certificate", "expiry": "2025-08-22", "status": "expired" },
+        { "id": "doc-027", "type": "fitness", "name": "Fitness Certificate", "expiry": "2025-10-15", "status": "expired" },
+        { "id": "doc-028", "type": "rc", "name": "Registration Certificate", "expiry": "2034-06-08", "status": "valid" }
+      ]
+    },
+    {
+      "id": "veh-008",
+      "rcNumber": "UP32UU8880",
+      "vehicleType": "Tanker",
+      "make": "Ashok Leyland",
+      "model": "Captain 2523",
+      "year": 2023,
+      "category": "rented",
+      "complianceScore": 95,
+      "insuranceExpiry": "2027-02-10",
+      "pucExpiry": "2026-10-25",
+      "fitnessExpiry": "2027-04-30",
+      "status": "active",
+      "subscriptionStatus": "active",
+      "assignedDriverId": "drv-006",
+      "documents": [
+        { "id": "doc-029", "type": "insurance", "name": "Motor Insurance Policy", "expiry": "2027-02-10", "status": "valid" },
+        { "id": "doc-030", "type": "puc", "name": "PUC Certificate", "expiry": "2026-10-25", "status": "valid" },
+        { "id": "doc-031", "type": "fitness", "name": "Fitness Certificate", "expiry": "2027-04-30", "status": "valid" },
+        { "id": "doc-032", "type": "rc", "name": "Registration Certificate", "expiry": "2038-08-19", "status": "valid" }
+      ]
+    }
+  ],
+  "drivers": [
+    {
+      "id": "drv-001",
+      "name": "Rajesh Kumar",
+      "phone": "918976543210",
+      "licenseNumber": "MH12190045678",
+      "licenseExpiry": "2028-05-14",
+      "licenseStatus": "valid",
+      "assignedVehicleIds": ["veh-001"]
+    },
+    {
+      "id": "drv-002",
+      "name": "Suresh Patel",
+      "phone": "918765432109",
+      "licenseNumber": "GJ05200034567",
+      "licenseExpiry": "2027-09-22",
+      "licenseStatus": "valid",
+      "assignedVehicleIds": ["veh-002"]
+    },
+    {
+      "id": "drv-003",
+      "name": "Mohammad Irfan",
+      "phone": "917654321098",
+      "licenseNumber": "RJ14210023456",
+      "licenseExpiry": "2029-01-08",
+      "licenseStatus": "valid",
+      "assignedVehicleIds": ["veh-003"]
+    },
+    {
+      "id": "drv-004",
+      "name": "Vikram Singh",
+      "phone": "916543210987",
+      "licenseNumber": "MP09180056789",
+      "licenseExpiry": "2026-03-30",
+      "licenseStatus": "expiring-soon",
+      "assignedVehicleIds": ["veh-004"]
+    },
+    {
+      "id": "drv-005",
+      "name": "Arjun Reddy",
+      "phone": "915432109876",
+      "licenseNumber": "TN07200012345",
+      "licenseExpiry": "2028-11-17",
+      "licenseStatus": "valid",
+      "assignedVehicleIds": ["veh-006"]
+    },
+    {
+      "id": "drv-006",
+      "name": "Deepak Yadav",
+      "phone": "914321098765",
+      "licenseNumber": "UP32220067890",
+      "licenseExpiry": "2030-07-25",
+      "licenseStatus": "valid",
+      "assignedVehicleIds": ["veh-008", "veh-005"]
+    }
+  ]
+}

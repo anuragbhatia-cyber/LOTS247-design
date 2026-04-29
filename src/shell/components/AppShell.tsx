@@ -374,6 +374,7 @@ export function AppShell({
   const [profileOpen, setProfileOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
+  const [mobileLangOpen, setMobileLangOpen] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [showAddVehicle, setShowAddVehicle] = useState(false)
   const [showAddDriver, setShowAddDriver] = useState(false)
@@ -389,6 +390,7 @@ export function AppShell({
   const profileRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
   const langRef = useRef<HTMLDivElement>(null)
+  const mobileLangRef = useRef<HTMLDivElement>(null)
 
   const unreadCount = DUMMY_NOTIFICATIONS.filter((n) => !n.read).length
 
@@ -405,6 +407,9 @@ export function AppShell({
       }
       if (langRef.current && !langRef.current.contains(e.target as Node)) {
         setLangOpen(false)
+      }
+      if (mobileLangRef.current && !mobileLangRef.current.contains(e.target as Node)) {
+        setMobileLangOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -461,18 +466,44 @@ export function AppShell({
           >
             <Menu className="w-5 h-5" />
           </button>
-          <div className="ml-3">
-            <img src="/lots247-logo-white.png" alt="LOTS247" className="h-10 w-auto object-contain" />
+          <div className="ml-1">
+            <img src="/lots247-logo-white.png" alt="LOTS247" className="h-7 w-auto object-contain" />
           </div>
         </div>
-        {/* Mobile Language Switcher */}
-        <button
-          onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-        >
-          <Languages className="w-4 h-4" />
-          <span>{language === 'en' ? 'हिन्दी' : 'EN'}</span>
-        </button>
+        {/* Mobile Language Dropdown */}
+        <div ref={mobileLangRef} className="relative">
+          <button
+            onClick={() => setMobileLangOpen(!mobileLangOpen)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+          >
+            <Languages className="w-4 h-4" />
+            <span>{language === 'en' ? 'EN' : 'हिन्दी'}</span>
+            <ChevronDown className={`w-3 h-3 transition-transform duration-150 ${mobileLangOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {mobileLangOpen && (
+            <div className="absolute right-0 top-full mt-2 w-36 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-50">
+              <div className="py-1">
+                {([['en', 'English'], ['hi', 'हिन्दी']] as const).map(([code, label]) => (
+                  <button
+                    key={code}
+                    onClick={() => {
+                      setLanguage(code)
+                      setMobileLangOpen(false)
+                    }}
+                    className={`w-full text-left px-3.5 py-2.5 text-sm flex items-center justify-between transition-colors ${
+                      language === code
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
+                        : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
+                    }`}
+                  >
+                    {label}
+                    {language === code && <Check className="w-4 h-4" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </header>
 
       {/* Mobile Overlay */}

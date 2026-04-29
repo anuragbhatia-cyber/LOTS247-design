@@ -1,169 +1,154 @@
-# Vehicle & Driver Management Section - Test Instructions
+# Vehicle & Driver Management — Test Specifications
 
-## VehicleList
+## Overview
 
-### Rendering
-- [ ] Shows page header "Vehicles & Drivers" with subtitle
-- [ ] Shows "Add Driver" and "Add Vehicle" buttons
-- [ ] Shows 4 summary stat cards: Total Vehicles, Avg Compliance, Expired Docs, Expiring Soon
-- [ ] Shows tab switcher: Vehicles / Drivers with count badges
-- [ ] Shows search input with context-appropriate placeholder
+Tests for vehicle listing, vehicle addition (single and bulk), vehicle detail view, driver management, and the shared modal components.
 
-### Vehicles Tab
-- [ ] Desktop: shows table with columns: Vehicle, Category, Compliance, Subscription, Insurance Upto, PUC Upto, Actions
-- [ ] Mobile: shows card layout with key vehicle info
-- [ ] Each row shows compliance score badge (color-coded)
-- [ ] Subscription status badge (Active/Inactive)
-- [ ] Insurance/PUC expiry dates with status indicators
-- [ ] Vehicles with `detailsFetched: false` show "Fetch Details" button
-- [ ] Clicking "Fetch Details" shows loading spinner, then reveals details after 1.5s
-- [ ] Action menu (3-dot) shows: View Details, Edit, Deactivate
+---
 
-### Drivers Tab
-- [ ] Desktop: shows table with columns: Driver, License Number, License Expiry, Assigned Vehicles, Actions
-- [ ] Mobile: shows card layout
-- [ ] License expiry status badge (Valid/Expiring/Expired)
-- [ ] Assigned vehicles shown as monospace chips
-- [ ] "No vehicles assigned" shown when driver has no vehicles
-- [ ] Action menu shows: View Details, Change Vehicle, Remove Driver
+## 1. Vehicle List
 
-### Search
-- [ ] Vehicles tab: search by RC number, make, model, driver name
-- [ ] Drivers tab: search by name, license number, phone
-- [ ] Case-insensitive search
-- [ ] Results update as user types
+### Success Path
+- [ ] Navigate to Vehicle & Driver Management
+- [ ] Verify vehicle list renders with cards showing: vehicle number, make/model, compliance badge, driver name
+- [ ] Search for "MH01" — verify list filters to matching vehicles
+- [ ] Sort by compliance score (lowest first) — verify order updates
+- [ ] Filter by status "Non-Compliant" — verify only non-compliant vehicles show
+- [ ] Verify total vehicle count label is accurate
 
-### Filters (Vehicles Tab)
-- [ ] Document Status: All, Valid, Expiring Soon, Expired
-- [ ] Vehicle Status: All, Active, Inactive
-- [ ] Active filter count shown on filter button
-- [ ] Filter pills shown below search with clear buttons
+### Failure Path
+- [ ] API failure — verify error state with retry
+- [ ] Search with no matches "ZZ99XX0000" — verify "No vehicles found" message
+- [ ] Network offline — verify cached vehicle list displays with "Offline" badge
 
-### Sorting
-- [ ] Compliance (High to Low / Low to High)
-- [ ] RC Number (A-Z / Z-A)
-- [ ] Expiry (Soonest / Latest)
+---
 
-### Pagination
-- [ ] 5 items per page
-- [ ] Shows "X of Y vehicles/drivers"
-- [ ] Page numbers with prev/next buttons
-- [ ] Resets to page 1 on search/filter change
+## 2. Add Vehicle (Single)
 
-### Change Vehicle Modal (from Drivers tab)
-- [ ] Step 1: Shows vehicle list with search
-- [ ] Currently assigned vehicles marked with badge
-- [ ] Cannot select currently assigned vehicle
-- [ ] Step 2: Shows confirmation with driver name and selected vehicle
-- [ ] Step 3: Shows success message
-- [ ] Close resets modal state
+### Success Path
+- [ ] Tap "Add Vehicle" button — verify AddVehicleModal opens
+- [ ] Enter RC number "MH01AB1234"
+- [ ] Verify loading shimmer while fetching from Vahan database
+- [ ] Verify auto-populated fields: Make "Tata", Model "Ace", Fuel "Diesel", Registration Date, Expiry Date
+- [ ] Edit model to "Ace Gold" — verify field is editable
+- [ ] Tap Confirm — verify onAddVehicle fires with complete data
+- [ ] Verify modal closes and new vehicle appears in list
 
-## VehicleDetail
+### Failure Path
+- [ ] Enter empty RC — verify "RC number is required" error
+- [ ] Enter invalid format "123ABC" — verify "Enter a valid RC number (e.g., MH01AB1234)"
+- [ ] RC fetch returns 404 — verify "Vehicle not found in Vahan. Enter details manually." with manual form
+- [ ] Duplicate RC (already in fleet) — verify "This vehicle is already in your fleet" warning
+- [ ] Server error on submit — verify "Failed to add vehicle" toast with retry
 
-### Rendering
-- [ ] Shows back button "Back to Vehicles"
-- [ ] Shows vehicle header: RC number, make/model, compliance ring, status badge
-- [ ] Shows alert banners for expired/expiring documents
-- [ ] Shows 6 tabs: Details, Documents, Compliance, Challans, Incidents, Assigned Driver
+---
 
-### Details Tab
-- [ ] Shows vehicle info: RC Number (read-only), Vehicle Type, Make, Model, Year, Category, Status
-- [ ] "Fetch Details" button for vehicles with detailsFetched: false
+## 3. Bulk Upload
 
-### Documents Tab
-- [ ] Shows document cards for each vehicle document
-- [ ] Each card shows: document type, status badge, expiry date, days remaining
-- [ ] Valid documents show action menu (View, Download)
-- [ ] "Upload Document" button opens upload modal
-- [ ] Upload modal: document type dropdown, drag-and-drop file zone
-- [ ] Supported files: PDF, JPG, PNG, WebP up to 10MB
+### Success Path
+- [ ] Tap "Bulk Upload" — verify BulkUploadModal opens
+- [ ] Upload CSV file with 5 RC numbers
+- [ ] Verify progress bar advances (1/5, 2/5, ... 5/5)
+- [ ] Verify summary: "4 added successfully, 1 failed"
+- [ ] Verify failed row shows reason (e.g., "Invalid RC format")
+- [ ] Tap "Done" — verify modal closes and list refreshes
 
-### Compliance Tab
-- [ ] Shows large compliance ring with score and label
-- [ ] Lists expired/expiring documents with counts
-- [ ] If all valid, shows "All documents are valid" message
+### Failure Path
+- [ ] Upload non-CSV file (.xlsx) — verify "Please upload a CSV file" error
+- [ ] Upload empty CSV — verify "File contains no data" error
+- [ ] Upload CSV with 1000+ rows — verify warning "Maximum 100 vehicles per upload"
+- [ ] Network drops mid-upload — verify "Upload interrupted. X of Y processed." with resume option
 
-### Challans Tab
-- [ ] Initial state: shows "Fetch Challans" prompt with vehicle number
-- [ ] Fetching state: shows loading animation
-- [ ] Results state: shows pending challans grouped by type (Court/Online)
-- [ ] Each challan shows: number, violation, amount, location, date
-- [ ] Status badges: Pending (amber), Submitted (blue), Resolved (green)
-- [ ] Summary shows total pending amount
-- [ ] "Submit for Resolution" / "Pay Now" actions
-- [ ] "Re-fetch" button to refresh challan data
+---
 
-### Incidents Tab
-- [ ] Shows list of cases/incidents related to this vehicle
-- [ ] Desktop: table layout; Mobile: card layout
-- [ ] Empty state: "No incidents reported" message
+## 4. Vehicle Detail
 
-### Assigned Driver Tab
-- [ ] Shows driver info: name, license number, expiry, status, assigned vehicles
-- [ ] Empty state: "No driver assigned" with prompt to assign
-- [ ] "Assign Driver" / "Change Driver" button opens AssignDriverModal
+### Success Path
+- [ ] Tap vehicle "MH01AB1234" — verify VehicleDetail opens
+- [ ] Verify header: vehicle number, make/model, compliance score gauge
+- [ ] Verify tabs: Overview, Documents, Challans, Driver
+- [ ] Overview tab shows: registration details, fuel type, chassis number, engine number
+- [ ] Documents tab shows: RC, Insurance, PUCC, Permit with status and expiry
+- [ ] Challans tab shows linked challans in receipt-style cards
+- [ ] Driver tab shows linked driver with DL details
+- [ ] Tap back — verify return to list
 
-### Edit Vehicle Modal
-- [ ] Shows RC Number (read-only), Make, Model, Vehicle Type dropdown, Status toggle
-- [ ] Cancel resets form to original values
-- [ ] Save calls onSave callback
+### Failure Path
+- [ ] Vehicle with no linked driver — Driver tab shows "No driver linked" with "Link Driver" CTA
+- [ ] Vehicle with no challans — Challans tab shows "No challans found"
 
-### Assign Driver Modal
-- [ ] Shows searchable driver list
-- [ ] Current driver marked with badge
-- [ ] License status shown for each driver
-- [ ] Cannot re-select current driver
-- [ ] Confirm calls onAssign with driver ID
+---
 
-## AddVehicleModal
+## Empty State Tests
 
-### Single Vehicle Tab
-- [ ] Shows vehicle number input field
-- [ ] Auto-formats to uppercase, strips non-alphanumeric, max 10 chars
-- [ ] Submit button disabled until length >= 6
-- [ ] Success state shows vehicle number and confirmation message
-- [ ] "Done" button closes modal
+- [ ] Empty fleet — "No vehicles yet. Add your first vehicle." with Add Vehicle CTA
+- [ ] No drivers — driver section shows "No drivers added" with Add Driver CTA
+- [ ] Vehicle detail with no documents — Documents tab shows placeholder for each document type
 
-### Bulk Upload Tab
-- [ ] Shows drag-and-drop zone for file upload
-- [ ] Shows "Download Sample" button
-- [ ] Accepts CSV, XLS, XLSX files only
-- [ ] Selected file shows name, size, and remove button
-- [ ] "Upload & Import" button disabled until file selected
-- [ ] Shows required columns info box
+## Component Interaction Tests
 
-## AddDriverModal
+- [ ] AddVehicleModal opened from QuickActions (home) works identically to opening from VehicleList
+- [ ] Adding a vehicle from modal immediately reflects in VehicleList without page refresh
+- [ ] Linking a driver from VehicleDetail updates both vehicle and driver records
+- [ ] Bulk upload results can be dismissed and re-viewed from a notification
 
-### Rendering
-- [ ] Shows form: Full Name, Phone Number, License Number, License Expiry
-- [ ] Submit button disabled until: name >= 2 chars, phone >= 10 digits, license >= 6 chars
-- [ ] Phone input accepts digits only
-- [ ] License input auto-formats to uppercase
+## Edge Cases
 
-### Interactions
-- [ ] Cancel clears form and closes modal
-- [ ] Submit calls onAdd and closes modal
+- [ ] Vehicle number with spaces "MH 01 AB 1234" auto-normalizes to "MH01AB1234"
+- [ ] RC with special state codes (e.g., "DL" for Delhi, "TS" for Telangana)
+- [ ] CSV with mixed valid/invalid rows processes all valid rows
+- [ ] Very long owner name truncates with ellipsis in list, full name in detail
+- [ ] Simultaneous AddVehicle from two devices — deduplication by RC number
 
-## BulkUploadModal
+## Accessibility Checks
 
-### Rendering
-- [ ] Shows "Download Sample" button in header
-- [ ] Shows drag-and-drop file zone
-- [ ] Shows required columns info
+- [ ] Vehicle cards have aria-label with vehicle number and compliance status
+- [ ] AddVehicleModal has aria-labelledby for title
+- [ ] Bulk upload progress bar has role="progressbar" with aria-valuenow
+- [ ] Search input has aria-label "Search vehicles"
+- [ ] Tab navigation in VehicleDetail works with keyboard
+- [ ] Modal traps focus and returns focus on close
 
-### File Handling
-- [ ] Drag-over highlights the drop zone
-- [ ] Valid files: CSV, XLS, XLSX
-- [ ] Selected file shows name, size, checkmark, and remove option
-- [ ] "Upload & Import" disabled until file selected
-- [ ] Cancel clears file and closes modal
+## Sample Test Data
 
-## Bilingual Support
-- [ ] All visible text translates between "en" and "hi"
-- [ ] Tab labels, headers, filter options, button labels, empty states all translate
-
-## Responsive Design
-- [ ] VehicleList: table on desktop (lg+), cards on mobile
-- [ ] Summary cards: 2 columns on mobile, 4 on desktop
-- [ ] VehicleDetail: responsive tabs
-- [ ] Modals: centered with padding, max-width constrained
+```json
+{
+  "vehicles": [
+    {
+      "id": "v-001",
+      "vehicleNumber": "MH01AB1234",
+      "make": "Tata",
+      "model": "Ace",
+      "fuelType": "Diesel",
+      "registrationDate": "2022-03-15",
+      "expiryDate": "2037-03-14",
+      "complianceScore": 85,
+      "driverId": "d-001",
+      "status": "active"
+    },
+    {
+      "id": "v-002",
+      "vehicleNumber": "MH04CD5678",
+      "make": "Mahindra",
+      "model": "Bolero Pickup",
+      "fuelType": "Diesel",
+      "registrationDate": "2021-08-20",
+      "expiryDate": "2036-08-19",
+      "complianceScore": 62,
+      "driverId": null,
+      "status": "active"
+    }
+  ],
+  "drivers": [
+    {
+      "id": "d-001",
+      "name": "Suresh Patil",
+      "phone": "9876543210",
+      "dlNumber": "MH0120220001234",
+      "dlExpiry": "2028-06-30",
+      "linkedVehicle": "v-001"
+    }
+  ],
+  "bulkUploadCSV": "RC Number\nMH01AB1234\nMH04CD5678\nINVALID123\nMH12EF9012\nMH20GH3456"
+}
+```

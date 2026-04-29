@@ -767,8 +767,8 @@ export function ChallanList({
                 className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 active:bg-stone-50 dark:active:bg-stone-800/40 transition-colors cursor-pointer"
               >
                 {/* Top: ID + Status */}
-                <div className="flex items-start justify-between mb-3">
-                  <div>
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
                       {challan.displayId}
                     </p>
@@ -776,8 +776,8 @@ export function ChallanList({
                       {formatDate(challan.issueDate, language)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-stone-500 dark:text-stone-400">
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <span className="text-xs text-stone-500 dark:text-stone-400 hidden sm:inline">
                       {challan.challanType === 'court' ? t.challanTypeCourt : t.challanTypeOnline}
                     </span>
                     <StatusBadge status={challan.status} t={t} />
@@ -821,28 +821,33 @@ export function ChallanList({
                     </p>
                   </div>
                   <div
-                    className="flex items-center gap-1"
+                    className="relative"
+                    ref={openDropdownId === challan.id ? dropdownRef : undefined}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {actions.slice(0, 2).map((action) => {
-                      const Icon = action.icon
-                      return (
-                        <button
-                          key={action.label}
-                          onClick={action.onClick}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 rounded-xl text-xs font-medium transition-colors ${
-                            action.variant === 'primary'
-                              ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                              : action.variant === 'danger'
-                              ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-950/60'
-                              : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
-                          }`}
-                        >
-                          <Icon className="w-3.5 h-3.5" />
-                          {action.label}
-                        </button>
-                      )
-                    })}
+                    <button
+                      onClick={() => setOpenDropdownId(openDropdownId === challan.id ? null : challan.id)}
+                      className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {openDropdownId === challan.id && (
+                      <div className="absolute right-0 bottom-full mb-1 z-50 w-44 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden py-1">
+                        {actions.map((action) => (
+                          <button
+                            key={action.label}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              action.onClick()
+                              setOpenDropdownId(null)
+                            }}
+                            className="w-full text-left px-3.5 py-2 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors"
+                          >
+                            {action.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

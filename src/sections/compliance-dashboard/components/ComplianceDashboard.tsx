@@ -264,9 +264,9 @@ function CategoryCard({
         hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-md dark:hover:shadow-stone-950/40
       `}
     >
-      <div className="flex items-start justify-between gap-2 mb-3 min-h-[40px]">
-        <p className="text-sm font-medium text-stone-500 dark:text-stone-400 leading-snug min-w-0">{category.fullLabel}</p>
-        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 transition-colors flex-shrink-0">
+      <div className="mb-3 min-h-[40px]">
+        <p className="text-sm font-medium text-stone-500 dark:text-stone-400 leading-snug">{category.fullLabel}</p>
+        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 transition-colors mt-1.5">
           <span className="text-xs font-medium">View</span>
           <ArrowUpRight className="w-3 h-3" />
         </div>
@@ -277,7 +277,7 @@ function CategoryCard({
       </div>
 
       {category.id !== 'challans' && category.id !== 'blacklisted' && category.id !== 'ntbt' && (
-        <div className="flex items-center gap-2 flex-wrap mt-auto">
+        <div className="hidden sm:flex items-center gap-2 flex-wrap mt-auto">
           <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
             {category.compliant} Valid
           </span>
@@ -835,8 +835,243 @@ function CategoryDrilldownView({
         )}
       </div>
 
-      {/* Table */}
-      <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+      {/* Mobile Cards */}
+      <div className="sm:hidden space-y-3">
+        {categoryId === 'rc' && (sortedRc.length === 0 ? (
+          <p className="text-center py-8 text-sm text-stone-400 dark:text-stone-500">No records match this filter</p>
+        ) : sortedRc.map(row => (
+          <div key={row.vehicleNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-sm font-bold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</span>
+              <StatusBadge status={row.status} />
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Issue Date</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.issueDate)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">RTO Office</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{row.rtoOffice}</p>
+              </div>
+            </div>
+          </div>
+        )))}
+
+        {categoryId === 'insurance' && (sortedInsurance.length === 0 ? (
+          <p className="text-center py-8 text-sm text-stone-400 dark:text-stone-500">No records match this filter</p>
+        ) : sortedInsurance.map(row => (
+          <div key={row.vehicleNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-sm font-bold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</span>
+              <StatusBadge status={row.status} />
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Provider</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{row.provider}</p>
+              </div>
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Policy No.</p>
+                <p className="font-mono text-xs font-medium text-stone-500 dark:text-stone-400">{row.policyNumber}</p>
+              </div>
+            </div>
+          </div>
+        )))}
+
+        {categoryId === 'pucc' && (sortedPucc.length === 0 ? (
+          <p className="text-center py-8 text-sm text-stone-400 dark:text-stone-500">No records match this filter</p>
+        ) : sortedPucc.map(row => (
+          <div key={row.vehicleNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-sm font-bold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</span>
+              <StatusBadge status={row.status} />
+            </div>
+            <div className="space-y-2 text-sm">
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Test Centre</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{row.testCenter}</p>
+              </div>
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
+              </div>
+            </div>
+          </div>
+        )))}
+
+        {categoryId === 'permits' && (sortedPermits.length === 0 ? (
+          <p className="text-center py-8 text-sm text-stone-400 dark:text-stone-500">No records match this filter</p>
+        ) : sortedPermits.map(row => (
+          <div key={row.vehicleNumber + row.permitNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-sm font-bold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</span>
+              <StatusBadge status={row.status} />
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Permit Type</p>
+                <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">{PERMIT_TYPE_LABEL[row.permitType]}</span>
+              </div>
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Permit No.</p>
+                <p className="font-mono text-xs font-medium text-stone-500 dark:text-stone-400">{row.permitNumber}</p>
+              </div>
+            </div>
+          </div>
+        )))}
+
+        {categoryId === 'dl' && (sortedDl.length === 0 ? (
+          <p className="text-center py-8 text-sm text-stone-400 dark:text-stone-500">No records match this filter</p>
+        ) : sortedDl.map(row => {
+          const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
+          const isValid = row.status === 'valid'
+          return (
+            <div key={row.licenseNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
+                    <User className="w-4 h-4 text-stone-400 dark:text-stone-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{row.driverName}</p>
+                    <p className="text-xs text-stone-400 dark:text-stone-500">{driver?.phone || '—'}</p>
+                  </div>
+                </div>
+                <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${isValid ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400'}`}>
+                  {isValid ? 'Valid' : 'Not Valid'}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">License No.</p>
+                  <p className="font-mono text-xs font-medium text-stone-600 dark:text-stone-400">{row.licenseNumber}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry</p>
+                  <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-xs text-stone-400 dark:text-stone-500 mb-1">Assigned Vehicles</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {row.vehiclesAssigned.map(v => (
+                      <span key={v} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-mono font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
+                        <Truck className="w-3 h-3 text-stone-400" />{v}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        }))}
+
+        {categoryId === 'challans' && (sortedChallans.length === 0 ? (
+          <p className="text-center py-8 text-sm text-stone-400 dark:text-stone-500">No records match this filter</p>
+        ) : sortedChallans.map(row => (
+          <div key={row.vehicleNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-sm font-bold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</span>
+              {row.outstandingCount > 0 ? (
+                <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">{row.outstandingCount} pending</span>
+              ) : (
+                <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">Clear</span>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-sm">
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Court</p>
+                <p className="font-semibold text-stone-700 dark:text-stone-300">{row.courtCount}</p>
+              </div>
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Online</p>
+                <p className="font-semibold text-stone-700 dark:text-stone-300">{row.onlineCount}</p>
+              </div>
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Amount</p>
+                <p className="font-semibold text-stone-900 dark:text-stone-100">{row.totalAmount > 0 ? formatCurrency(row.totalAmount) : '—'}</p>
+              </div>
+            </div>
+          </div>
+        )))}
+
+        {categoryId === 'blacklisted' && (sortedBlacklisted.length === 0 ? (
+          <p className="text-center py-8 text-sm text-stone-400 dark:text-stone-500">No records match this filter</p>
+        ) : sortedBlacklisted.map(row => (
+          <div key={row.vehicleNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-sm font-bold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</span>
+              <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${row.status === 'active' ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'}`}>
+                {row.status === 'active' ? 'Active' : 'Resolved'}
+              </span>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Flag Reason</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{row.flagReason}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Authority</p>
+                  <p className="font-medium text-stone-700 dark:text-stone-300">{row.flaggingAuthority}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Flag Date</p>
+                  <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.flagDate)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )))}
+
+        {categoryId === 'ntbt' && (sortedNtbt.length === 0 ? (
+          <p className="text-center py-8 text-sm text-stone-400 dark:text-stone-500">No records match this filter</p>
+        ) : sortedNtbt.map(row => (
+          <div key={row.vehicleNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-sm font-bold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</span>
+              <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${row.status === 'active' ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'}`}>
+                {row.status === 'active' ? 'Active' : 'Resolved'}
+              </span>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Hold Reason</p>
+                <p className="font-medium text-stone-700 dark:text-stone-300">{row.holdReason}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Authority</p>
+                  <p className="font-medium text-stone-700 dark:text-stone-300">{row.issuingAuthority}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Hold Date</p>
+                  <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.holdDate)}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Case Reference</p>
+                <p className="font-mono text-xs font-medium text-stone-500 dark:text-stone-400">{row.caseReference}</p>
+              </div>
+            </div>
+          </div>
+        )))}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden sm:block rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
         {categoryId === 'rc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Issue Date', 'Expiry Date', 'RTO Office']}>
             {sortedRc.length === 0 ? emptyRow(5) : sortedRc.map(row => (
@@ -2309,6 +2544,7 @@ export function ComplianceDashboard({
   const [urgencySortDir, setUrgencySortDir] = useState<'asc' | 'desc'>('asc')
   const [checkVehicleOpen, setCheckVehicleOpen] = useState(false)
   const [checkVehicleNumber, setCheckVehicleNumber] = useState('')
+  const [checkVehicleError, setCheckVehicleError] = useState('')
   const [activeCardView, setActiveCardView] = useState<'dl' | 'rc' | 'challan' | null>(
     initialView === 'dl' || initialView === 'rc' || initialView === 'challan' ? initialView : null
   )
@@ -2438,24 +2674,26 @@ export function ComplianceDashboard({
             <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Fleet Overview</h1>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-          {/* Refresh */}
-            <button
-              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
-            >
-              <RefreshCw className="w-4 h-4 text-stone-400" />
-              <span className="hidden sm:inline">Refresh</span>
-            </button>
+          <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              {/* Refresh */}
+              <button
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+              >
+                <RefreshCw className="w-4 h-4 text-stone-400" />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
 
-          {/* Download PDF */}
-            <button
-              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
-            >
-              <Download className="w-4 h-4 text-stone-400" />
-              <span className="hidden sm:inline">Download PDF</span>
-            </button>
+              {/* Download PDF */}
+              <button
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+              >
+                <Download className="w-4 h-4 text-stone-400" />
+                <span className="hidden sm:inline">Download PDF</span>
+              </button>
+            </div>
 
-          {/* Date Range Filter */}
+            {/* Date Range Filter */}
             <div className="relative">
               <button
                 onClick={() => { setDateDropdownOpen(!dateDropdownOpen); setScopeDropdownOpen(false) }}
@@ -2517,7 +2755,54 @@ export function ComplianceDashboard({
             <FleetDlView dlRows={categoryDrilldowns.dl} drivers={drivers} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={false} />
           )
         ) : scope === 'driver' ? (
-          <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+          <>
+          {/* Mobile Cards */}
+          <div className="sm:hidden space-y-3">
+            {categoryDrilldowns.dl.map(row => {
+              const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
+              const isValid = row.status === 'valid'
+              return (
+                <div key={row.licenseNumber} className="p-4 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-stone-400 dark:text-stone-500" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{row.driverName}</p>
+                        <p className="text-xs text-stone-400 dark:text-stone-500">{driver?.phone || '—'}</p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${isValid ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400' : 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400'}`}>
+                      {isValid ? 'Valid' : 'Not Valid'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+                    <div>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">License No.</p>
+                      <p className="font-mono text-xs font-medium text-stone-600 dark:text-stone-400">{row.licenseNumber}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry</p>
+                      <p className="font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-stone-400 dark:text-stone-500 mb-1">Assigned Vehicles</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {row.vehiclesAssigned.map(v => (
+                        <span key={v} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-mono font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
+                          <Truck className="w-3 h-3 text-stone-400" />{v}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {/* Desktop Table */}
+          <div className="hidden sm:block rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
             <DrilldownTable headers={['Driver', 'License Number', 'License Expiry', 'Assigned Vehicles', 'Status']}>
               {categoryDrilldowns.dl.map(row => {
                 const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
@@ -2562,6 +2847,7 @@ export function ComplianceDashboard({
               })}
             </DrilldownTable>
           </div>
+          </>
         ) : selectedCategory && activeCategory ? (
           <CategoryDrilldownView
             categoryId={selectedCategory}
@@ -2581,7 +2867,7 @@ export function ComplianceDashboard({
                 {/* Compliance Health Card */}
                 <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40">
                   {/* Header */}
-                  <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex items-center justify-between">
+                  <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
                         Fleet Compliance Score
@@ -2657,7 +2943,7 @@ export function ComplianceDashboard({
                   if (!v) return null
                   const assignedDriver = categoryDrilldowns.dl.find(d => d.vehiclesAssigned.includes(v.vehicleNumber))
                   return (
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
                           <Truck className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
@@ -2668,7 +2954,7 @@ export function ComplianceDashboard({
                         </div>
                       </div>
                       {assignedDriver && (
-                        <div className="text-right">
+                        <div className="text-left sm:text-right">
                           <p className="text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wider">Assigned Driver</p>
                           <p className="text-sm font-semibold text-stone-800 dark:text-stone-200">{assignedDriver.driverName}</p>
                         </div>
@@ -2936,9 +3222,9 @@ export function ComplianceDashboard({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
               {/* Challans Trend Chart — takes 2 cols */}
               <div className="lg:col-span-2 p-5 sm:p-6 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                   <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider">Monthly Challans Trend</h3>
-                  <div className="flex items-center gap-5">
+                  <div className="flex items-center gap-4 sm:gap-5">
                     <div className="flex items-center gap-2">
                       <span className="w-3 h-0.5 rounded-full bg-teal-500 dark:bg-teal-400 inline-block" />
                       <span className="text-xs text-stone-500 dark:text-stone-400">Challan Count</span>
@@ -3001,7 +3287,49 @@ export function ComplianceDashboard({
                 <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider">Documents Expiry</h3>
                 <span className="text-xs text-stone-400 dark:text-stone-500">{expiryUrgencyItems.length} items</span>
               </div>
-              <div className="overflow-x-auto">
+              {/* Mobile Cards */}
+              <div className="sm:hidden divide-y divide-stone-100 dark:divide-stone-800/60">
+                {paginatedUrgencyItems.map(item => {
+                  const badge = URGENCY_BADGE[item.urgency]
+                  return (
+                    <div key={item.id} className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-mono text-sm font-bold text-stone-900 dark:text-stone-100">{item.vehicleNumber}</span>
+                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>{badge.label}</span>
+                      </div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-4">
+                          <div>
+                            <p className="text-xs text-stone-400 dark:text-stone-500">Document</p>
+                            <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{item.documentType}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-stone-400 dark:text-stone-500">Expiry</p>
+                            <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{formatDate(item.expiryDate)}</p>
+                          </div>
+                        </div>
+                        <span className="text-sm font-semibold text-stone-900 dark:text-stone-100 tabular-nums">
+                          {Math.abs(item.daysRemaining)}d
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (window.parent !== window) {
+                            window.parent.postMessage({ type: 'navigate', href: '/incidents', params: { vehicle: item.vehicleNumber, document: item.documentType } }, '*')
+                          }
+                        }}
+                        className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
+                      >
+                        Create Request
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Desktop Table */}
+              <div className="hidden sm:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">

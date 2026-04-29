@@ -1,160 +1,112 @@
 # Milestone 4: Compliance Dashboard
 
 > **Provide alongside:** `product-overview.md`
-> **Prerequisites:** Milestone 1 (Foundation) complete, Milestone 6 (Vehicle & Driver Management) recommended
-
----
-
-## About These Instructions
-
-**What you're receiving:**
-- Finished UI designs (React components with full styling)
-- Data model definitions (TypeScript types and sample data)
-- UI/UX specifications (user flows, requirements, screenshots)
-- Design system tokens (colors, typography, spacing)
-- Test-writing instructions for each section (for TDD approach)
-
-**What you need to build:**
-- Backend API endpoints and database schema
-- Authentication and authorization
-- Data fetching and state management
-- Business logic and validation
-- Integration of the provided UI components with real data
-
-**Important guidelines:**
-- **DO NOT** redesign or restyle the provided components — use them as-is
-- **DO** wire up the callback props to your routing and API calls
-- **DO** replace sample data with real data from your backend
-- **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist (first-time users, after deletions)
-- **DO** use test-driven development — write tests first using `tests.md` instructions
-- The components are props-based and ready to integrate — focus on the backend and data layer
-
----
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Compliance Dashboard — a fleet-level, view-only analytics dashboard that gives fleet managers real-time visibility into document validity, government flags, and compliance health across all vehicles and drivers.
+Implement the Compliance Dashboard — a fleet-level compliance monitoring view with real-time scores, category breakdowns, and drill-down capability.
 
 ## Overview
 
-The Compliance Dashboard is designed for fleet managers overseeing 50-500+ vehicles who need aggregate insights with drill-down capability. It is strictly a view-only analytics surface — all actions (document uploads, renewals, etc.) happen in their respective sections. The dashboard answers: "What is the compliance health of my fleet, what needs attention, and what are the trends?"
+A view-only analytics dashboard providing real-time visibility into document validity, government flags, and compliance health across all vehicles and drivers. Designed for fleet managers overseeing 50-500+ vehicles who need aggregate insights with drill-down capability. All actions (document uploads, renewals) happen in their respective sections.
 
 **Key Functionality:**
-- Overall fleet compliance ring score (0-100) with month-over-month change
-- 8 clickable category cards: RC, Insurance, PUCC, Permits, DL, Challans, Blacklisted, NTBT
-- Auto-generated insights panel (3-4 data-driven insights)
-- Monthly compliance trend line chart
+- Overall fleet compliance score (0-100) with ring visualization
+- 8 category cards: RC, Insurance, PUCC, Permits, DL, Challans, Blacklisted, NTBT
+- Date range filtering and scope toggle (Fleet/Vehicle/Driver)
+- Category drill-down with vehicle-level breakdown
+- Auto-generated insights panel and monthly trend chart
 - Expiry urgency table sorted by soonest expiry
-- Category drill-down views with vehicle-level breakdown tables
-- Filters: date range presets and scope toggle (Fleet / Vehicle / Driver)
-- Permits drill-down with sub-breakdown by type (All India / Nationwide / State)
-- Blacklisted drill-down with flag details (reason, authority, date)
-- NTBT drill-down with hold details (reason, authority, case reference)
-- Historical stats summary
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/compliance-dashboard/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/compliance-dashboard/components/`:
-- `ComplianceDashboard.tsx` — Full dashboard component handling fleet overview, category cards, insights, trends, expiry table, drill-down views, and all filtering
+
+- `ComplianceDashboard.tsx` — Main dashboard with score, categories, insights, trends, and urgency table
 
 ### Data Layer
 
-Key types from `types.ts`: ComplianceScore, ComplianceCategory, CategoryId, Insight, MonthlyTrendPoint, MonthlyChallanTrendPoint, ExpiryUrgencyItem, CategoryDrilldowns (with per-category row types: RcDrilldownRow, InsuranceDrilldownRow, PuccDrilldownRow, PermitDrilldownRow, DlDrilldownRow, ChallanDrilldownRow, BlacklistedDrilldownRow, NtbtDrilldownRow), HistoricalStats, Vehicle, Driver
-
-You'll need to:
-- Build a compliance scoring engine that calculates overall and per-category scores
-- Create API endpoints to aggregate compliance data across the fleet
-- Implement date range filtering (This Month, Last 3 Months, Last 6 Months, Last Year, Custom)
-- Implement scope filtering (Fleet, Vehicle-specific, Driver-specific)
-- Generate auto-insights from compliance data (e.g., "12 PUC certificates expiring in next 15 days")
-- Compute monthly trend data points for the line chart
-- Compute challan trend data (count, online vs court, amounts)
-- Query expiry dates across all documents and sort by urgency
-- Build drill-down queries for each of the 8 categories
-- Integrate with government databases for Blacklisted and NTBT flags
-- Track vehicle history events for per-vehicle timelines
+- Overall compliance score calculation (weighted across categories)
+- Per-category compliance counts (compliant/total)
+- Monthly trend data points
+- Expiry urgency data with days-remaining calculations
+- Auto-generated insights from data analysis
+- Scope filtering (fleet-wide, per-vehicle, per-driver)
 
 ### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onCategorySelect` | Open drill-down view for a specific compliance category |
-| `onBackToOverview` | Return from drill-down to the Fleet Overview |
-| `onDateRangeChange` | Apply a date range filter (preset or custom range) |
-| `onScopeChange` | Switch scope between Fleet, Vehicle, or Driver (with optional selected ID) |
+| `onCategoryClick` | Opens category drill-down view |
+| `onDateRangeChange` | Updates date filter for all data |
+| `onScopeChange` | Switches between Fleet/Vehicle/Driver scope |
+| `onVehicleSelect` | Selects specific vehicle in Vehicle scope |
+| `onDriverSelect` | Selects specific driver in Driver scope |
+| `onBackFromDrilldown` | Returns to Fleet Overview |
 
 ### Empty States
 
-- No vehicles in fleet: Show "Add your first vehicle to see compliance data" with CTA to Fleet section
-- No data for selected date range: Show "No compliance data available for this period"
-- No expiring documents: Show "All documents are up to date" in the expiry urgency table
-- No insights available: Show "Not enough data to generate insights yet"
-- Empty drill-down: Show "No vehicles found for this category"
+- **New account with no vehicles:** Show zero compliance state with prompt to add vehicles
+- **No expiring documents:** Show "All documents current" in urgency table
+- **Category with zero vehicles:** Show 0/0 with appropriate messaging
 
 ## Expected User Flows
 
-### Flow 1: View Fleet Compliance Overview
+### Flow 1: View Fleet Compliance
 1. User navigates to Compliance Dashboard
-2. User sees the overall compliance ring score (e.g., 87/100, "Healthy")
-3. User views 8 category cards with compliant/total counts and status colors
-4. User scrolls to see insights, monthly trend chart, and expiry urgency table
-5. **Outcome:** User has a full picture of fleet compliance health
+2. User sees overall score ring, 8 category cards, insights, trends, urgency table
+3. **Outcome:** Complete fleet compliance picture at a glance
 
-### Flow 2: Drill Down into a Category
+### Flow 2: Category Drill-Down
 1. User clicks the "Insurance" category card
-2. Dashboard transitions to the Insurance drill-down view
-3. User sees insurance-specific compliance score with trend
-4. User sees a table of all vehicles with insurance status, provider, policy number, and expiry date
-5. User clicks "Back" to return to Fleet Overview
-6. **Outcome:** User has identified which vehicles need insurance renewal
+2. Category drill-down view opens with insurance-specific compliance score
+3. User sees vehicle-level breakdown table
+4. User clicks back button
+5. **Outcome:** Returns to Fleet Overview
 
-### Flow 3: Filter by Scope — Specific Vehicle
-1. User changes scope toggle from "Fleet" to "Vehicle"
-2. A search/select dropdown appears
-3. User selects a specific vehicle (e.g., "MH04AB1234")
-4. Dashboard updates to show compliance data for that vehicle only
-5. **Outcome:** User sees single-vehicle compliance across all 8 categories
+### Flow 3: Scope Filtering
+1. User switches scope toggle to "Vehicle"
+2. Vehicle search/select dropdown appears
+3. User selects a specific vehicle
+4. **Outcome:** All data updates to show that vehicle's compliance across all 8 categories
 
-### Flow 4: Review Expiry Urgency
-1. User scrolls to the Expiry Urgency table
-2. User sees documents sorted by soonest expiry with urgency badges (Expired, 7 days, 15 days, 30 days)
-3. User identifies 3 vehicles with expired PUC certificates
-4. **Outcome:** User knows exactly which documents need immediate attention
+### Flow 4: Date Range Adjustment
+1. User changes date range to "Last 6 Months"
+2. **Outcome:** Trend chart and insights update to reflect the selected range
 
 ## Files to Reference
 
-- `product-plan/sections/compliance-dashboard/README.md`
-- `product-plan/sections/compliance-dashboard/tests.md`
-- `product-plan/sections/compliance-dashboard/components/`
-- `product-plan/sections/compliance-dashboard/types.ts`
-- `product-plan/sections/compliance-dashboard/sample-data.json`
+- `product-plan/sections/compliance-dashboard/README.md` — Feature overview
+- `product-plan/sections/compliance-dashboard/tests.md` — Test instructions
+- `product-plan/sections/compliance-dashboard/components/` — React components
+- `product-plan/sections/compliance-dashboard/types.ts` — TypeScript interfaces
+- `product-plan/sections/compliance-dashboard/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Overall compliance ring score displays with month-over-month change
-- [ ] Score color-codes correctly: emerald (75+), amber (50-74), red (below 50)
-- [ ] All 8 category cards render with compliant/total counts and percentage
-- [ ] Category cards are clickable and open drill-down views
-- [ ] Drill-down views show category-specific score, trend, and vehicle-level table
-- [ ] Permits drill-down shows sub-breakdown by type (All India / Nationwide / State)
-- [ ] Blacklisted drill-down shows flag reason, authority, and date
-- [ ] NTBT drill-down shows hold reason, authority, and case reference
-- [ ] Insights panel shows 3-4 auto-generated insights
-- [ ] Monthly trend chart renders with data points adapting to date range
-- [ ] Expiry urgency table shows documents sorted by soonest expiry
-- [ ] Urgency badges display correctly (Expired, 7 days, 15 days, 30 days)
-- [ ] Date range filter works with all presets and custom range
-- [ ] Scope toggle works for Fleet, Vehicle, and Driver
-- [ ] Vehicle/Driver selector appears when scope is changed
-- [ ] Back button in drill-down returns to Fleet Overview
-- [ ] Empty states display when no data exists
-- [ ] Responsive on mobile (cards stack to 2 columns)
+- [ ] Overall compliance score ring renders with correct percentage
+- [ ] 8 category cards show compliant/total with status colors
+- [ ] Date range filter updates all dashboard data
+- [ ] Scope toggle switches between Fleet/Vehicle/Driver views
+- [ ] Category drill-down shows vehicle-level breakdown
+- [ ] Permits drill-down shows sub-breakdown by permit type
+- [ ] Blacklisted and NTBT drill-downs show flag/hold details
+- [ ] Insights panel shows auto-generated data-driven insights
+- [ ] Monthly trend chart adapts to selected date range
+- [ ] Expiry urgency table sorted by soonest expiry with badges
+- [ ] Empty states display properly
+- [ ] Responsive on mobile

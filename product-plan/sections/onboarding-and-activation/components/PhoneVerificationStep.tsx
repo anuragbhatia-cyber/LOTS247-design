@@ -167,7 +167,7 @@ export function PhoneVerificationStep({
                     type="tel"
                     value={formatPhone(phoneNumber)}
                     onChange={handlePhoneChange}
-                    placeholder="98765 43210"
+                    placeholder="Enter phone number"
                     className={`
                       flex-1 px-4 py-3.5 rounded-r-xl border text-base
                       bg-white dark:bg-stone-900

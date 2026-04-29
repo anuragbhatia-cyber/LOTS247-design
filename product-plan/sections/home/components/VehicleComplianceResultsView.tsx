@@ -62,9 +62,9 @@ const SAMPLE_COMPLIANCE: ComplianceDoc[] = [
   },
   {
     id: 'challans',
-    label: 'Pending Challans',
-    status: 'expired',
-    statusLabel: 'Expired',
+    label: 'Challans',
+    status: 'expiring-soon',
+    statusLabel: 'Pending',
     details: [
       { label: 'Pending', value: '3 Challans' },
       { label: 'Total Amount', value: '₹15,500' },
@@ -158,11 +158,11 @@ export function VehicleComplianceResultsView({ vehicleNumber, onBack }: VehicleC
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
         {/* Vehicle Info Header */}
-        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-4 sm:p-5 mb-6">
+        <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6 mb-6">
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
-              className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex-shrink-0"
+              className="p-1.5 rounded-xl text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors flex-shrink-0"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
@@ -174,7 +174,7 @@ export function VehicleComplianceResultsView({ vehicleNumber, onBack }: VehicleC
                 <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-wider">
                   {vehicleNumber}
                 </h1>
-                <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
+                <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
                   {vehicle.status}
                 </span>
               </div>
@@ -191,11 +191,37 @@ export function VehicleComplianceResultsView({ vehicleNumber, onBack }: VehicleC
 
         {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          {/* Compliance Status — left */}
-          <div className="lg:col-span-3 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
-            <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
-              Compliance Status
-            </h3>
+          {/* Left column — Vehicle Summary + Compliance Status */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* Vehicle Summary */}
+            <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+              <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
+                Vehicle Summary
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                  <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Incidents</p>
+                  <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">5</p>
+                  <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹48,500</p>
+                </div>
+                <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                  <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Cases</p>
+                  <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">3</p>
+                  <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹32,000</p>
+                </div>
+                <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4">
+                  <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mb-2">Total Renewals</p>
+                  <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">7</p>
+                  <p className="text-base font-semibold text-stone-700 dark:text-stone-300 mt-1 tabular-nums">Amount: ₹18,200</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Compliance Status */}
+            <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+              <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">
+                Compliance Status
+              </h3>
             <div className="space-y-1">
               {SAMPLE_COMPLIANCE.map((doc) => {
                 const isExpanded = expanded.has(doc.id)
@@ -212,7 +238,7 @@ export function VehicleComplianceResultsView({ vehicleNumber, onBack }: VehicleC
                         <ChevronDown className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : '-rotate-90'}`} />
                         <p className="text-sm font-medium text-stone-800 dark:text-stone-200">{doc.label}</p>
                       </div>
-                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${statusBadge(doc.status)}`}>{doc.statusLabel}</span>
+                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${statusBadge(doc.status)}`}>{doc.statusLabel}</span>
                     </button>
                     {isExpanded && (
                       <div className="px-4 pb-4 pt-0.5 ml-7">
@@ -231,6 +257,7 @@ export function VehicleComplianceResultsView({ vehicleNumber, onBack }: VehicleC
               })}
             </div>
           </div>
+          </div>
 
           {/* Vehicle History — right */}
           <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
@@ -248,7 +275,7 @@ export function VehicleComplianceResultsView({ vehicleNumber, onBack }: VehicleC
                   {SAMPLE_HISTORY.map((item, i) => (
                     <div key={i} className="relative flex gap-3 pl-0">
                       {/* Dot */}
-                      <div className={`w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 ${historyDotColor()}`} />
+                      <div className={`w-[10px] h-[10px] rounded-full flex-shrink-0 z-10 mt-1.5 ${historyDotColor(item.event)}`} />
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-stone-800 dark:text-stone-200 truncate">{item.event}</p>

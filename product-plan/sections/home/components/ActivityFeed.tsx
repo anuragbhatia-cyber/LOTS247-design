@@ -1,9 +1,7 @@
-import { FileWarning, Clock, Shield, ArrowRight } from 'lucide-react'
+import { useState } from 'react'
+import { FileWarning, Clock, Shield, ArrowRight, RefreshCw } from 'lucide-react'
 import type { AlertItem, AlertCategory, AlertUrgency } from '../types'
-// TODO: Replace with your app's language/i18n context
-// import { useLanguage, type Language } from '@/shell/components/LanguageContext'
-type Language = 'en' | 'hi'
-const useLanguage = () => ({ language: 'en' as Language })
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 interface AlertsFeedProps {
   items: AlertItem[]
@@ -11,20 +9,18 @@ interface AlertsFeedProps {
   onAlertClick?: (alert: AlertItem) => void
 }
 
+type FilterTab = 'all' | AlertCategory
+
 const categoryLabels: Record<Language, Record<AlertCategory, string>> = {
-  en: { puc: 'PUC', insurance: 'Insurance', challan: 'Challan' },
-  hi: { puc: 'पीयूसी', insurance: 'बीमा', challan: 'चालान' },
+  en: { puc: 'PUC', insurance: 'Insurance', challan: 'Challan', renewal: 'Renewal' },
+  hi: { puc: 'पीयूसी', insurance: 'बीमा', challan: 'चालान', renewal: 'नवीनीकरण' },
 }
 
 const categoryIcons: Record<AlertCategory, typeof FileWarning> = {
   puc: Clock,
   insurance: Shield,
   challan: FileWarning,
-}
-
-const urgencyBadgeLabels: Record<Language, Record<AlertUrgency, string>> = {
-  en: { critical: 'Urgent', warning: 'Expiring soon', notice: 'Upcoming' },
-  hi: { critical: 'तत्काल', warning: 'जल्द समाप्त', notice: 'आगामी' },
+  renewal: RefreshCw,
 }
 
 const urgencyStyles: Record<AlertUrgency, {
@@ -54,42 +50,79 @@ const feedTranslations: Record<Language, Record<string, string>> = {
     alerts: 'Alerts',
     alert: 'alert',
     alertsPlural: 'alerts',
+    pendingAlerts: 'Pending Alerts',
+    view: 'View',
     vehicle: 'Vehicle',
     payNow: 'Pay Now',
-    raiseProposal: 'Raise Proposal',
+    raiseProposal: 'Create Request',
     seeAllAlerts: 'See all alerts',
+    all: 'All',
   },
   hi: {
     alerts: 'अलर्ट',
     alert: 'अलर्ट',
     alertsPlural: 'अलर्ट',
+    pendingAlerts: 'लंबित अलर्ट',
+    view: 'देखें',
     vehicle: 'वाहन',
     payNow: 'अभी भुगतान करें',
-    raiseProposal: 'प्रस्ताव उठाएं',
+    raiseProposal: 'अनुरोध बनाएं',
     seeAllAlerts: 'सभी अलर्ट देखें',
+    all: 'सभी',
   },
 }
+
+const filterTabs: FilterTab[] = ['all', 'challan', 'puc', 'insurance', 'renewal']
 
 export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) {
   const { language } = useLanguage()
   const t = feedTranslations[language]
+  const catLabels = categoryLabels[language]
+
+  const [activeFilter, setActiveFilter] = useState<FilterTab>('challan')
+
+  const filtered = activeFilter === 'all' ? items : items.filter(i => i.category === activeFilter)
+
   return (
     <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
-        <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
-          {t.alerts}
-        </h2>
-        {items.length > 0 && (
-          <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
-            {items.length} {items.length === 1 ? t.alert : t.alertsPlural}
-          </span>
-        )}
+      <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-3 border-b border-stone-200 dark:border-stone-800">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
+            {t.alerts}
+          </h2>
+          {items.length > 0 && (
+            <span className="text-xs font-semibold text-red-600 dark:text-red-400">
+              {items.length} {t.pendingAlerts}
+            </span>
+          )}
+        </div>
+
+        {/* Filter chips */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {filterTabs.map((tab) => {
+            const isActive = activeFilter === tab
+            const label = tab === 'all' ? t.all : catLabels[tab as AlertCategory]
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveFilter(tab)}
+                className={`text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${
+                  isActive
+                    ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900'
+                    : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700'
+                }`}
+              >
+                {label}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      {/* Alerts — first 4 */}
-      <div className="divide-y divide-stone-100 dark:divide-stone-800">
-        {items.slice(0, 3).map((item) => {
+      {/* Alerts — first 3 filtered items */}
+      <div className="divide-y divide-stone-200 dark:divide-stone-800">
+        {filtered.slice(0, 3).map((item) => {
           const Icon = categoryIcons[item.category]
           const style = urgencyStyles[item.urgency]
           return (
@@ -113,7 +146,7 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
                   e.stopPropagation()
                   onAlertClick?.(item)
                 }}
-                className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
+                className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
               >
                 {item.category === 'challan' ? t.payNow : t.raiseProposal}
                 <ArrowRight className="w-3 h-3" />
@@ -121,13 +154,18 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
             </div>
           )
         })}
+        {filtered.length === 0 && (
+          <div className="px-5 sm:px-6 py-8 text-center text-sm text-stone-400 dark:text-stone-600">
+            No alerts in this category
+          </div>
+        )}
       </div>
 
       {/* See all */}
-      {items.length > 3 && (
+      {items.length > 0 && (
         <button
           onClick={onViewAll}
-          className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-100 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+          className="w-full px-5 sm:px-6 py-2.5 border-t border-stone-200 dark:border-stone-800 text-left text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
         >
           {t.seeAllAlerts} &rarr;
         </button>

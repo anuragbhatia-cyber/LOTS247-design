@@ -4,16 +4,7 @@
 
 A mission-critical legal-tech platform that eliminates roadside legal issues for vehicle owners and fleets in real-time. From compliance tracking to challan resolution, accident support, and 24/7 lawyer access across 98% of India's pin codes — LOTS247 is the indispensable legal safety net for every vehicle on Indian roads.
 
-## Key Problems Solved
-
-1. **Legal complexity on the road** — Instant 24/7 on-call lawyer access resolves 85% of issues over a single call, with on-site deployment in 2 hours when needed.
-2. **Scattered compliance tracking** — Centralized dashboard showing real-time compliance scores, document expiries, and vehicle status across your entire fleet.
-3. **Challan chaos** — Live challan dashboard with automated tracking, Lok Adalat representation, and bulk resolution services.
-4. **Incident panic** — Guided resolution for accidents, seizures, and legal entanglements with full-service handling by a nationwide network of 75K+ lawyers.
-5. **RTO bureaucracy** — RTO-as-a-Service handling fitness, hypothecation, ownership transfers, and regulatory compliance.
-
 ## Key Features
-
 - 24/7 on-call legal resolution
 - 2-hour on-site lawyer deployment (98% pin code coverage)
 - Real-time compliance engine with proactive alerts
@@ -28,29 +19,33 @@ A mission-critical legal-tech platform that eliminates roadside legal issues for
 1. **Home** — Quick Actions Hub — the default landing view with compliance score overview, active incidents, pending challans, and quick action shortcuts.
 2. **Onboarding & Activation** — Account creation, vehicle registration, compliance score generation, and subscription activation in under 3 minutes.
 3. **Compliance Dashboard** — Real-time compliance scores, document expiry tracking, and proactive alerts across all vehicles and drivers.
-4. **Incident Management** — 24/7 legal support requests, guided resolution workflows, lawyer assignment, and case tracking. Includes Challans (traffic violations) and Cases (legal matters).
+4. **Incident Management** — 24/7 legal support requests, guided resolution workflows, lawyer assignment, and case tracking.
 5. **Vehicle & Driver Management** — Vehicle overview, driver profiles, document storage, and audit-ready reporting.
 6. **Reports** — Fleet analytics, compliance trends, incident summaries, and challan reports with exportable data views.
-7. **API Catalogue** — Browse available APIs, explore endpoints, and submit requests to the team for new APIs needed in the system.
+7. **API Catalogue** — Browse available APIs, explore endpoints, and submit requests for new APIs.
 8. **Wallet** — Credit and debit payment ledger used for challan settlements, subscription payments, and transaction history.
-9. **Proposals** — Create, manage, and track service proposals for fleet owners — including pricing breakdowns, coverage details, and approval workflows.
+9. **Proposals** — Create, manage, and track service proposals for fleet owners.
+10. **Knowledge Base** — Centralized repository of legal guides, compliance documentation, FAQs, and how-to articles.
+11. **My Profile** — Personal account hub — view and edit personal details, organization/business information, and KYC verification status.
+12. **Settings** — Notification preferences, app behavior configuration, subscription plan management, and billing history.
 
 ## Data Model
 
 Core entities: Subscriber, Vehicle, Driver, Subscription, Payment, Incident, Challan, Lawyer, Document, Notification
 
 Key relationships:
-- Subscriber owns Vehicles, Drivers, Incidents, Challans, Documents
-- Subscriber has one active Subscription and many Payments
-- Vehicle has Documents and Challans; many-to-many with Drivers
-- Incident may involve a Vehicle and be assigned to a Lawyer
-- Challan belongs to Vehicle, may link to Payment
+- Subscriber has many Vehicles, Drivers, Incidents, Documents, Challans, Payments, Notifications
+- Subscriber has one active Subscription
+- Vehicle belongs to Subscriber, has many Documents, Challans, and Drivers (many-to-many)
+- Driver belongs to Subscriber, has many Vehicles (many-to-many) and Documents
+- Incident belongs to Subscriber, may involve a Vehicle, may be assigned to a Lawyer
+- Challan belongs to Subscriber (via Vehicle), may link to a Payment
 
 ## Design System
 
 **Colors:**
 - Primary: `emerald` — Used for buttons, links, key accents
-- Secondary: `amber` — Used for warnings, alerts, secondary elements
+- Secondary: `amber` — Used for tags, highlights, alerts/warnings
 - Neutral: `stone` — Used for backgrounds, text, borders
 
 **Typography:**
@@ -62,15 +57,18 @@ Key relationships:
 
 Build this product in milestones:
 
-1. **Foundation** — Set up design tokens, data model types, routing structure, and application shell
-2. **Home** — Quick Actions Hub with compliance overview and quick action shortcuts
-3. **Onboarding & Activation** — Multi-step registration, vehicle addition, and subscription selection
-4. **Compliance Dashboard** — Fleet-wide compliance monitoring with drill-down capability
-5. **Incident Management** — Challan tracking and case management with comment threads
-6. **Vehicle & Driver Management** — Vehicle list, detail views, driver assignment
-7. **Reports** — Report browsing, PDF preview, download and sharing
-8. **API Catalogue** — API browsing with detail pages and contact forms
-9. **Wallet** — Prepaid wallet with transaction ledger and Razorpay integration
-10. **Proposals** — Proposal tracking with status management and follow-up threads
+1. **Foundation** — Set up design tokens, data model types, routing, and application shell
+2. **Home** — Quick Actions Hub with compliance overview and shortcuts
+3. **Onboarding & Activation** — Account creation and subscription activation flow
+4. **Compliance Dashboard** — Fleet-level compliance monitoring
+5. **Incident Management** — Challans and legal cases
+6. **Vehicle & Driver Management** — Vehicle/driver repository
+7. **Reports** — Fleet analytics and report browsing
+8. **API Catalogue** — API browsing and pricing enquiries
+9. **Wallet** — Prepaid wallet and transaction ledger
+10. **Proposals** — Service proposal tracking
+11. **Knowledge Base** — Legal knowledge repository
+12. **My Profile** — Personal account and KYC management
+13. **Settings** — Preferences and subscription management
 
-Each milestone has a dedicated instruction document in `product-plan/instructions/`.
+Each milestone has a dedicated instruction document in `instructions/incremental/`.

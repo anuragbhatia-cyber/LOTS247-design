@@ -67,93 +67,95 @@ export default function IncidentManagementPreview() {
               Manage challans and legal cases across your fleet
             </p>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {/* Date Range Filter */}
-            <div ref={dateRangeRef} className="relative">
-              <button
-                onClick={() => setDateRangeOpen(!dateRangeOpen)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 transition-colors"
-              >
-                <Calendar className="w-3.5 h-3.5 text-stone-400" />
-                <span className="hidden sm:inline">
-                  {selectedRange === 'custom' && customFrom && customTo
-                    ? `${new Date(customFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} – ${new Date(customTo).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`
-                    : DATE_PRESETS.find(p => p.id === selectedRange)?.label ?? 'Custom'
-                  }
-                </span>
-                <ChevronDown className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-150 ${dateRangeOpen ? 'rotate-180' : ''}`} />
-              </button>
+          <div className="flex items-center justify-between gap-2 sm:gap-3 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              {/* Date Range Filter */}
+              <div ref={dateRangeRef} className="relative">
+                <button
+                  onClick={() => setDateRangeOpen(!dateRangeOpen)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 transition-colors"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-stone-400" />
+                  <span className="hidden sm:inline">
+                    {selectedRange === 'custom' && customFrom && customTo
+                      ? `${new Date(customFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} – ${new Date(customTo).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`
+                      : DATE_PRESETS.find(p => p.id === selectedRange)?.label ?? 'Custom'
+                    }
+                  </span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-150 ${dateRangeOpen ? 'rotate-180' : ''}`} />
+                </button>
 
-              {dateRangeOpen && (
-                <div className="absolute right-0 top-full mt-2 w-44 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-30">
-                  <div className="p-1.5">
-                    {DATE_PRESETS.map((preset) => (
+                {dateRangeOpen && (
+                  <div className="absolute left-0 top-full mt-2 w-44 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-30">
+                    <div className="p-1.5">
+                      {DATE_PRESETS.map((preset) => (
+                        <button
+                          key={preset.id}
+                          onClick={() => {
+                            setSelectedRange(preset.id)
+                            setDateRangeOpen(false)
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
+                            selectedRange === preset.id
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
+                              : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      ))}
+
+                      <div className="mx-2 my-1 border-t border-stone-200 dark:border-stone-800" />
+
                       <button
-                        key={preset.id}
-                        onClick={() => {
-                          setSelectedRange(preset.id)
-                          setDateRangeOpen(false)
-                        }}
+                        onClick={() => setSelectedRange('custom')}
                         className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
-                          selectedRange === preset.id
+                          selectedRange === 'custom'
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
                             : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
                         }`}
                       >
-                        {preset.label}
+                        Custom
                       </button>
-                    ))}
 
-                    <div className="mx-2 my-1 border-t border-stone-200 dark:border-stone-800" />
-
-                    <button
-                      onClick={() => setSelectedRange('custom')}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
-                        selectedRange === 'custom'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
-                          : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
-                      }`}
-                    >
-                      Custom
-                    </button>
-
-                    {selectedRange === 'custom' && (
-                      <div className="px-3 pb-2 pt-1 flex flex-col gap-2">
-                        <input
-                          type="date"
-                          value={customFrom}
-                          onChange={(e) => setCustomFrom(e.target.value)}
-                          className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
-                        />
-                        <input
-                          type="date"
-                          value={customTo}
-                          onChange={(e) => setCustomTo(e.target.value)}
-                          className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
-                        />
-                        <button
-                          onClick={() => {
-                            if (customFrom && customTo) setDateRangeOpen(false)
-                          }}
-                          disabled={!customFrom || !customTo}
-                          className="w-full py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold transition-colors"
-                        >
-                          Apply
-                        </button>
-                      </div>
-                    )}
+                      {selectedRange === 'custom' && (
+                        <div className="px-3 pb-2 pt-1 flex flex-col gap-2">
+                          <input
+                            type="date"
+                            value={customFrom}
+                            onChange={(e) => setCustomFrom(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                          />
+                          <input
+                            type="date"
+                            value={customTo}
+                            onChange={(e) => setCustomTo(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+                          />
+                          <button
+                            onClick={() => {
+                              if (customFrom && customTo) setDateRangeOpen(false)
+                            }}
+                            disabled={!customFrom || !customTo}
+                            className="w-full py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold transition-colors"
+                          >
+                            Apply
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* Download PDF Button */}
-            <button
-              className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
-            >
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Download PDF</span>
-            </button>
+              {/* Download PDF Button */}
+              <button
+                className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Download PDF</span>
+              </button>
+            </div>
 
             {/* Add Incident Button */}
             <button
@@ -161,22 +163,22 @@ export default function IncidentManagementPreview() {
               className="flex items-center gap-2 px-4 py-2 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Incident</span>
+              Add Incident
             </button>
           </div>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-4">
+        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit max-w-full overflow-x-auto mb-4">
           <button
             onClick={() => setActiveTab('challans')}
-            className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'challans'
                 ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                 : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
             }`}
           >
-            <FileWarning className="w-4 h-4" />
+            <FileWarning className="w-4 h-4 flex-shrink-0" />
             Challans
             <span className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
               activeTab === 'challans'
@@ -188,13 +190,13 @@ export default function IncidentManagementPreview() {
           </button>
           <button
             onClick={() => setActiveTab('cases')}
-            className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'cases'
                 ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                 : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
             }`}
           >
-            <Briefcase className="w-4 h-4" />
+            <Briefcase className="w-4 h-4 flex-shrink-0" />
             Cases
             <span className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
               activeTab === 'cases'
@@ -206,13 +208,13 @@ export default function IncidentManagementPreview() {
           </button>
           <button
             onClick={() => setActiveTab('rto')}
-            className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'rto'
                 ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                 : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
             }`}
           >
-            <Building2 className="w-4 h-4" />
+            <Building2 className="w-4 h-4 flex-shrink-0" />
             RTO
             <span className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
               activeTab === 'rto'
@@ -224,13 +226,13 @@ export default function IncidentManagementPreview() {
           </button>
           <button
             onClick={() => setActiveTab('other')}
-            className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === 'other'
                 ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
                 : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
             }`}
           >
-            <MoreHorizontal className="w-4 h-4" />
+            <MoreHorizontal className="w-4 h-4 flex-shrink-0" />
             Other
             <span className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
               activeTab === 'other'
@@ -244,39 +246,39 @@ export default function IncidentManagementPreview() {
 
         {/* Overview Cards — Challans */}
         {activeTab === 'challans' && (
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-1">
+              <div className="p-3 sm:p-6">
+                <div className="flex items-start justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{totalChallans}</p>
-                  <div className="flex items-center gap-3">
+                  <div className="hidden sm:flex items-center gap-3">
                     <span className="text-xs text-stone-500 dark:text-stone-400">Online: <span className="font-semibold text-stone-700 dark:text-stone-300">5</span></span>
                     <span className="text-xs text-stone-500 dark:text-stone-400">Court: <span className="font-semibold text-stone-700 dark:text-stone-300">3</span></span>
                   </div>
                 </div>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Total Submitted Challans</p>
+                <p className="text-xs sm:text-sm font-medium text-stone-900 dark:text-stone-100">Total Submitted Challans</p>
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-1">
+              <div className="p-3 sm:p-6">
+                <div className="flex items-start justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{settledChallans}</p>
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50">
-                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
+                  <div className="p-1.5 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50">
+                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
                   </div>
                 </div>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Settled</p>
+                <p className="text-xs sm:text-sm font-medium text-stone-900 dark:text-stone-100">Settled</p>
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-1">
+              <div className="p-3 sm:p-6">
+                <div className="flex items-start justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{inProgressChallans}</p>
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50">
-                    <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
+                  <div className="p-1.5 sm:p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50">
+                    <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                 </div>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">In Progress</p>
+                <p className="text-xs sm:text-sm font-medium text-stone-900 dark:text-stone-100">In Progress</p>
               </div>
             </div>
           </div>
@@ -284,38 +286,38 @@ export default function IncidentManagementPreview() {
 
         {/* Overview Cards — Cases */}
         {activeTab === 'cases' && (
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-1">
+              <div className="p-3 sm:p-6">
+                <div className="flex items-start justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{submittedCases}</p>
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/50">
-                    <Send className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
+                  <div className="p-1.5 sm:p-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/50">
+                    <Send className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                 </div>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Submitted</p>
+                <p className="text-xs sm:text-sm font-medium text-stone-900 dark:text-stone-100">Submitted</p>
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-1">
+              <div className="p-3 sm:p-6">
+                <div className="flex items-start justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{inProgressCases}</p>
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50">
-                    <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
+                  <div className="p-1.5 sm:p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50">
+                    <Clock className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                 </div>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">In Progress</p>
+                <p className="text-xs sm:text-sm font-medium text-stone-900 dark:text-stone-100">In Progress</p>
               </div>
             </div>
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
-              <div className="p-5 sm:p-6">
-                <div className="flex items-center justify-between mb-1">
+              <div className="p-3 sm:p-6">
+                <div className="flex items-start justify-between mb-1">
                   <p className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-50 tabular-nums">{closedCases}</p>
-                  <div className="p-2 sm:p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800">
-                    <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-stone-500 dark:text-stone-400" />
+                  <div className="p-1.5 sm:p-2.5 rounded-lg bg-stone-100 dark:bg-stone-800">
+                    <XCircle className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-stone-500 dark:text-stone-400" />
                   </div>
                 </div>
-                <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Closed</p>
+                <p className="text-xs sm:text-sm font-medium text-stone-900 dark:text-stone-100">Closed</p>
               </div>
             </div>
           </div>

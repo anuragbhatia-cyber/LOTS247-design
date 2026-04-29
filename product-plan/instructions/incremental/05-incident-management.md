@@ -1,201 +1,123 @@
 # Milestone 5: Incident Management
 
 > **Provide alongside:** `product-overview.md`
-> **Prerequisites:** Milestone 1 (Foundation) complete, Milestone 6 (Vehicle & Driver Management) recommended
-
----
-
-## About These Instructions
-
-**What you're receiving:**
-- Finished UI designs (React components with full styling)
-- Data model definitions (TypeScript types and sample data)
-- UI/UX specifications (user flows, requirements, screenshots)
-- Design system tokens (colors, typography, spacing)
-- Test-writing instructions for each section (for TDD approach)
-
-**What you need to build:**
-- Backend API endpoints and database schema
-- Authentication and authorization
-- Data fetching and state management
-- Business logic and validation
-- Integration of the provided UI components with real data
-
-**Important guidelines:**
-- **DO NOT** redesign or restyle the provided components — use them as-is
-- **DO** wire up the callback props to your routing and API calls
-- **DO** replace sample data with real data from your backend
-- **DO** implement proper error handling and loading states
-- **DO** implement empty states when no records exist (first-time users, after deletions)
-- **DO** use test-driven development — write tests first using `tests.md` instructions
-- The components are props-based and ready to integrate — focus on the backend and data layer
-
----
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Incident Management section with its two sub-sections — Challans and Cases — including list views, detail views, creation flows, comment threads, and challan-to-case escalation.
+Implement Incident Management — handling both Challans (short-lifecycle traffic violations) and Cases (long-lifecycle legal matters) with sub-navigation, detail views, and unified comment threads.
 
 ## Overview
 
-Incident Management handles two distinct sub-sections accessible via a sub-nav under "Incidents" in the sidebar. Challans manage short-lifecycle traffic violation penalties with a 45-day resolution SLA. Cases handle structured long-lifecycle legal matters (accidents, detention, theft, disputes) with lawyer assignment and activity logging. Both sub-sections support a unified comment thread for follow-ups between the user and the LOTS247 team.
+The Incident Management section handles two distinct sub-sections accessible via sub-nav: **Challans** (traffic violation penalties with a 45-day resolution SLA) and **Cases** (structured legal matters like accidents, detention, theft with lawyer assignment). Both support unified comment threads for follow-ups between user and LOTS247 team.
 
 **Key Functionality:**
-- **Challans:** List with filters, detail with status/actions/comments, 45-day SLA tracking, refund requests on SLA breach
-- **Cases:** List with filters, multi-step creation modal, detail with tabs (Timeline/Documents/Comments)
-- Unified comment threads on both challans and cases
-- Challan-to-case escalation via pre-filled case creation modal
-- Subscription gating (free plan shows locked actions with upgrade prompts)
-
-**Challan Lifecycle (User View):** Submitted -> In Progress -> Resolved / On Hold / Not Settled
-**Case Lifecycle (User View):** Submitted -> In Progress -> Resolved / Document Requested / Extended
-
-**Case Types:** Theft, Detention, Bail, Accidents, FIRs, Superdari, Vehicle Impounding, E-Way Bill, Others
+- Challans list with filtering by vehicle, date, status, amount
+- Challan detail with status badge, key fields, actions (Pay Now, Dispute, Escalate to Case, Download Receipt)
+- Cases list with filtering by status, type, vehicle
+- Case creation via multi-step modal (type → vehicle → driver → description → documents)
+- Case detail with Timeline, Documents, and Comments tabs
+- Unified comment thread on both challans and cases
+- 45-day SLA tracking on challans with refund capability
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/incident-management/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/incident-management/components/`:
-- `ChallanList.tsx` — Challan table with columns for ID, vehicle, violation, amount, status, and actions; filterable by vehicle, date range, status, amount range
-- `ChallanDetail.tsx` — Challan detail view with status badge, key fields, action buttons (Pay Now, Dispute, Escalate to Case, Download Receipt), and comment thread
-- `CaseList.tsx` — Case table with columns for ID, type, vehicle, status, and actions; filterable by status, case type, vehicle
-- `CaseDetail.tsx` — Case detail with header summary, assigned lawyer info, and tabbed sections (Timeline, Documents, Comments)
 
-Additional top-level views:
-- `IncidentManagement.tsx` — Wrapper with sub-nav toggling between Challans and Cases
-- `ChallanList.tsx` (top-level) — Preview wrapper for challan list
-- `CaseList.tsx` (top-level) — Preview wrapper for case list
-- `ChallanDetail.tsx` (top-level) — Preview wrapper for challan detail
-- `CaseDetail.tsx` (top-level) — Preview wrapper for case detail
+- `IncidentManagement.tsx` — Main container with sub-nav (Challans | Cases)
+- Additional sub-components for challan list, case list, detail views
 
 ### Data Layer
 
-Key types from `types.ts`: Challan, ChallanStatus, ChallanType, ChallanActivity, ChallanActivityType, Case, CaseStatus, CaseType, CaseOrigin, CaseActivity, CaseDocument, CaseReport, Comment, Vehicle, Driver, Lawyer
+**Challan Lifecycle (User View):**
+- Submitted → In Progress → Resolved / On Hold / Not Settled
+- 45-day SLA from creation; if breached, user can request refund
 
-You'll need to:
-- Create CRUD API endpoints for challans and cases
-- Implement challan status transitions (Submitted -> In Progress -> Resolved/On Hold/Not Settled)
-- Implement case status transitions (Submitted -> In Progress -> Resolved/Document Requested/Extended)
-- Track the 45-day SLA deadline per challan and flag breaches
-- Implement comment threads (polymorphic: entityType = 'challan' | 'case')
-- Implement document upload and storage for cases
-- Build the multi-step case creation flow (type -> vehicle -> driver -> description -> documents -> submit)
-- Implement challan-to-case escalation with data pre-fill
-- Generate activity timeline events for status changes, assignments, and notes
-- Implement subscription gating (lock actions for free plan users)
+**Case Lifecycle (User View):**
+- Submitted → In Progress → Resolved / Document Requested / Extended
+- No fixed SLA; cases can originate from lawyer calls
 
-### Callbacks — Challan List
+### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onView` | Navigate to challan detail page |
-| `onAddFollowUp` | Open follow-up comment on a challan |
-| `onPay` | Initiate challan payment |
-| `onDispute` | Initiate challan dispute |
-| `onEscalateToCase` | Open case creation modal pre-filled with challan data |
-| `onDownloadReceipt` | Download payment receipt PDF |
-| `onRequestRefund` | Request refund for SLA-breached challan |
-
-### Callbacks — Challan Detail
-
-| Callback | Description |
-|----------|-------------|
-| `onPay` | Initiate challan payment |
-| `onDispute` | Initiate challan dispute |
-| `onEscalateToCase` | Open case creation modal pre-filled with challan data |
-| `onDownloadReceipt` | Download payment receipt PDF |
-| `onRequestRefund` | Request refund for SLA-breached challan |
-| `onAddComment` | Post a comment to the challan thread |
-| `onBack` | Navigate back to challan list |
-
-### Callbacks — Case List
-
-| Callback | Description |
-|----------|-------------|
-| `onView` | Navigate to case detail page |
-| `onCreate` | Open multi-step case creation modal |
-
-### Callbacks — Case Detail
-
-| Callback | Description |
-|----------|-------------|
-| `onUploadDocument` | Upload a document to the case |
-| `onAddComment` | Post a comment to the case thread |
-| `onBack` | Navigate back to case list |
+| `onViewChallan` | Opens challan detail view |
+| `onPayChallan` | Initiates challan payment |
+| `onDisputeChallan` | Starts dispute process |
+| `onEscalateToCase` | Opens case creation pre-filled with challan data |
+| `onDownloadReceipt` | Downloads challan receipt PDF |
+| `onRequestRefund` | Requests refund for SLA breach |
+| `onCreateCase` | Opens multi-step case creation modal |
+| `onViewCase` | Opens case detail page |
+| `onPostComment` | Adds comment to challan or case thread |
+| `onUploadDocument` | Uploads document to case |
 
 ### Empty States
 
-- No challans: Show "No challans found" with contextual message based on active filters
-- No cases: Show "No cases found" with option to create a new case
-- No comments on a challan/case: Show "No comments yet — add a follow-up below"
-- No documents on a case: Show "No documents attached yet"
-- No activity on a case timeline: Show "No activity recorded yet"
+- **No challans:** Show "No challans found" with helpful message
+- **No cases:** Show "No cases yet" with CTA to create first case
+- **No comments:** Show "No comments yet" in comment thread
+- **No documents:** Show upload prompt in case documents tab
 
 ## Expected User Flows
 
-### Flow 1: View and Filter Challans
-1. User navigates to Incidents -> Challans
-2. User sees the challan list table with all challans
-3. User filters by status "In Progress" and vehicle "MH04AB1234"
-4. Table updates to show only matching challans
-5. **Outcome:** User sees filtered challan list
+### Flow 1: View Challan Detail
+1. User navigates to Incidents → Challans tab
+2. User clicks a challan row in the table
+3. User sees status badge, key fields, action buttons, and comment thread
+4. **Outcome:** Full challan detail visible with available actions
 
-### Flow 2: View Challan Detail and Add Comment
-1. User clicks a challan row in the list
-2. Challan detail page opens with status badge, key fields, and action buttons
-3. User scrolls to the comment thread
-4. User types a follow-up message and submits
-5. **Outcome:** Comment appears in the thread with timestamp
-
-### Flow 3: Escalate Challan to Case
+### Flow 2: Escalate Challan to Case
 1. User views a challan detail
-2. User clicks "Escalate to Case" action button
-3. Multi-step case creation modal opens, pre-filled with challan's vehicle and description
-4. User selects case type, confirms details, optionally attaches documents
-5. User submits the case
-6. **Outcome:** New case is created linked to the original challan; challan shows escalation reference
+2. User clicks "Escalate to Case" button
+3. Multi-step case creation modal opens pre-filled with challan data (vehicle, description)
+4. User completes remaining steps and submits
+5. **Outcome:** New case created, linked to original challan
 
-### Flow 4: Create a New Case
-1. User navigates to Incidents -> Cases
+### Flow 3: Create a New Case
+1. User navigates to Incidents → Cases tab
 2. User clicks "Create Case" button
-3. Multi-step modal opens: Step 1 (case type) -> Step 2 (vehicle) -> Step 3 (driver) -> Step 4 (description) -> Step 5 (documents) -> Step 6 (submit)
-4. User fills in each step and submits
-5. **Outcome:** Case is created and appears in the case list with "Submitted" status
+3. Multi-step modal: case type → vehicle → driver → description → documents → submit
+4. **Outcome:** New case created with status "Submitted"
 
-### Flow 5: Request Refund on SLA-Breached Challan
-1. User views a challan that has exceeded the 45-day SLA
-2. System shows SLA breach indicator
-3. User clicks "Request Refund" action button
-4. **Outcome:** Refund request is submitted and tracked
+### Flow 4: Post Comment Follow-up
+1. User opens a case or challan detail
+2. User types a comment in the thread
+3. User submits the comment
+4. **Outcome:** Comment appears in chronological feed with timestamp
 
 ## Files to Reference
 
-- `product-plan/sections/incident-management/README.md`
-- `product-plan/sections/incident-management/tests.md`
-- `product-plan/sections/incident-management/components/`
-- `product-plan/sections/incident-management/types.ts`
-- `product-plan/sections/incident-management/sample-data.json`
+- `product-plan/sections/incident-management/README.md` — Feature overview
+- `product-plan/sections/incident-management/tests.md` — Test instructions
+- `product-plan/sections/incident-management/components/` — React components
+- `product-plan/sections/incident-management/types.ts` — TypeScript interfaces
+- `product-plan/sections/incident-management/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Challan list renders with filterable table (vehicle, date range, status, amount)
-- [ ] Challan detail shows status badge, key fields, action buttons, and comment thread
-- [ ] Pay Now, Dispute, Escalate to Case, Download Receipt actions work
-- [ ] 45-day SLA is tracked and refund request is available on breach
-- [ ] Case list renders with filterable table (status, case type, vehicle)
-- [ ] Case creation multi-step modal works with all steps
-- [ ] Case detail shows header, assigned lawyer, and 3 tabs (Timeline, Documents, Comments)
-- [ ] Document upload works on case detail
-- [ ] Comment threads work on both challans and cases
-- [ ] Challan-to-case escalation pre-fills case creation with challan data
-- [ ] Sub-nav correctly toggles between Challans and Cases pages
-- [ ] Empty states display when no data exists
-- [ ] Subscription gating shows locked actions for free plan users
+- [ ] Sub-nav switches between Challans and Cases views
+- [ ] Challans list with filtering (vehicle, date, status, amount)
+- [ ] Challan detail shows status badge, fields, actions, comments
+- [ ] Cases list with filtering (status, type, vehicle)
+- [ ] Case creation multi-step modal works end-to-end
+- [ ] Case detail with Timeline, Documents, Comments tabs
+- [ ] Escalate to Case pre-fills from challan data
+- [ ] Comment thread works for both challans and cases
+- [ ] 45-day SLA tracking with refund option when breached
+- [ ] Subscription gating on appropriate actions
+- [ ] Empty states for all views
 - [ ] Responsive on mobile

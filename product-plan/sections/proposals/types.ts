@@ -4,7 +4,9 @@
 
 export type ProposalType = 'Challan' | 'DL' | 'RC'
 
-export type ProposalStatus = 'sent' | 'received' | 'converted' | 'rejected'
+export type ProposalStatus = 'sent' | 'under_review' | 'received' | 'converted' | 'rejected'
+
+export type ServiceStatus = 'pending' | 'in_progress' | 'completed' | 'not_applicable'
 
 export interface Proposal {
   id: string
@@ -14,6 +16,7 @@ export interface Proposal {
   quantity: number
   amount: number
   status: ProposalStatus
+  serviceStatus?: ServiceStatus
   linkedIncidentId: string | null
   createdAt: string
   updatedAt: string
@@ -53,6 +56,8 @@ export interface ProposalListProps {
   onFollowUp?: (id: string) => void
   /** Called when user wants to cancel an active proposal */
   onCancel?: (id: string) => void
+  /** Called when user selects a request type from the Create Request modal */
+  onCreateRequest?: (type: 'challan' | 'rc' | 'dl') => void
 }
 
 export interface ProposalDetailProps {

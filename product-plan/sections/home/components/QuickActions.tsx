@@ -1,10 +1,7 @@
 import type { ElementType } from 'react'
 import { AlertTriangle, PlusCircle, Phone, UserPlus, LockKeyhole, ArrowRight } from 'lucide-react'
 import type { Subscription } from '../types'
-// TODO: Replace with your app's language/i18n context
-// import { useLanguage, type Language } from '@/shell/components/LanguageContext'
-type Language = 'en' | 'hi'
-const useLanguage = () => ({ language: 'en' as Language })
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 const qaTranslations: Record<Language, Record<string, string>> = {
   en: {

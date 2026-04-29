@@ -1,104 +1,140 @@
-# Reports Section -- Test Instructions
+# Reports — Test Specifications
 
-## Setup
+## Overview
 
-Render the `ReportsList` component with the sample data from `sample-data.json`. Provide mock callbacks for `onDownload`, `onShareEmail`, `onShareWhatsApp`, `onPreview`, `onTabChange`, and `onSearch`.
+Tests for report browsing, category tabs, PDF preview, download, and share functionality.
 
 ---
 
-## Test Cases
+## 1. Report List Load
 
-### 1. Viewing the Report List
+### Success Path
+- [ ] Navigate to Reports section
+- [ ] Verify tab bar renders with 5 tabs: All, MIS, ICR, ISR, MIS-CHALLAN
+- [ ] Verify "All" tab is active by default
+- [ ] Verify report cards render with: title, date, category badge, file size
+- [ ] Verify reports are sorted by date (newest first)
+- [ ] Verify total report count is displayed
 
-- [ ] Component renders without errors
-- [ ] Page title "Reports" and subtitle are visible
-- [ ] All 11 sample reports are displayed (across pages if paginated)
-- [ ] Each report row shows: period, report type badge, format, generated date/time
-- [ ] Reports are sorted by generated date in descending order (most recent first)
-- [ ] Desktop view shows a table layout; mobile view shows card layout
+### Failure Path
+- [ ] API failure — verify "Unable to load reports" error with retry button
+- [ ] Slow network — verify skeleton loaders for report cards
+- [ ] API returns empty list — verify "No reports available yet" empty state
 
-### 2. Tab Navigation
+---
 
-- [ ] All 5 tabs are visible: All, MIS, ICR, ISR, MIS-Challan
-- [ ] Each tab shows a count badge with the correct number of reports
-- [ ] "All" tab is selected by default and shows all 11 reports
-- [ ] Clicking "MIS" tab filters to show only MIS reports (3 reports)
-- [ ] Clicking "ICR" tab filters to show only ICR reports (3 reports)
-- [ ] Clicking "ISR" tab filters to show only ISR reports (3 reports)
-- [ ] Clicking "MIS-Challan" tab filters to show only MIS-CHALLAN reports (2 reports)
-- [ ] `onTabChange` callback is called with the selected tab value
-- [ ] Switching tabs resets pagination to page 1
+## 2. Category Tab Filtering
 
-### 3. Search and Filtering
+### Success Path
+- [ ] Tap "MIS" tab — verify only MIS reports show
+- [ ] Tap "ICR" tab — verify only ICR reports show
+- [ ] Tap "ISR" tab — verify only ISR reports show
+- [ ] Tap "MIS-CHALLAN" tab — verify only MIS-CHALLAN reports show
+- [ ] Tap "All" tab — verify all reports show again
+- [ ] Verify active tab has visual indicator (underline or background)
 
-- [ ] Search input is visible with placeholder text
-- [ ] Typing a period name (e.g., "Feb 2026") filters reports to matching results
-- [ ] Typing a vehicle registration (e.g., "UP32MM1113") filters to matching reports
-- [ ] Typing an incident ID (e.g., "INC-2026-0042") filters to matching reports
-- [ ] Clear button (X) appears when search has text; clicking it clears the search
-- [ ] `onSearch` callback is called with the current search query
-- [ ] Filters button toggles the filter panel
-- [ ] Format filter dropdown allows selecting "PDF" or "Excel"
-- [ ] When a format filter is active, the Filters button shows a count badge
-- [ ] "Clear filters" link resets the format filter
-- [ ] Search and tab filters work together (e.g., search within a specific tab)
+### Failure Path
+- [ ] Tab with zero reports — verify "No MIS reports found" message specific to category
+- [ ] Rapid tab switching — verify no race conditions, final tab's data shows
 
-### 4. Report Preview Modal
+---
 
-- [ ] Clicking a report row opens the preview modal
-- [ ] Preview modal shows: report type badge, format, title, generated date/time
-- [ ] Preview modal shows a PDF placeholder with the report icon and metadata
-- [ ] MIS reports show incident summary stats (total, resolved, pending)
-- [ ] MIS-CHALLAN reports show challan summary stats (total challans, resolved, fines)
-- [ ] ICR/ISR reports show incident ID, vehicle registration, and incident type
-- [ ] "Download PDF" button is visible and calls `onDownload` with the report ID
-- [ ] "WhatsApp" share button is visible and calls `onShareWhatsApp` with the report ID
-- [ ] Close button (X) dismisses the modal
-- [ ] Clicking the backdrop dismisses the modal
-- [ ] `onPreview` callback is called with the report ID when modal opens
+## 3. PDF Preview
 
-### 5. Download Action
+### Success Path
+- [ ] Tap a report card
+- [ ] Verify PDF preview opens in an overlay/modal
+- [ ] Verify PDF renders correctly with scroll
+- [ ] Verify close button returns to report list
+- [ ] Verify download and share buttons available within preview
 
-- [ ] Download button on desktop table row calls `onDownload` with the report ID
-- [ ] Download button on mobile card calls `onDownload` with the report ID
-- [ ] Download button in preview modal calls `onDownload` with the report ID
-- [ ] Click on the download action button does not trigger the row click (preview)
+### Failure Path
+- [ ] PDF file corrupted or missing — verify "Unable to load preview" with download fallback
+- [ ] Large PDF (10MB+) — verify loading indicator while PDF loads
 
-### 6. Share Actions
+---
 
-- [ ] WhatsApp button on desktop table row calls `onShareWhatsApp` with the report ID
-- [ ] WhatsApp button on mobile card calls `onShareWhatsApp` with the report ID
-- [ ] WhatsApp button in preview modal calls `onShareWhatsApp` with the report ID
-- [ ] Action buttons do not propagate click to the row (event stopPropagation)
+## 4. Download and Share
 
-### 7. Pagination
+### Success Path
+- [ ] Tap download icon on a report card — verify download initiates
+- [ ] Verify downloaded file name matches report title
+- [ ] Tap share icon — verify native share sheet opens (or link copied on desktop)
+- [ ] Verify share link is a valid URL
 
-- [ ] When more than 8 reports exist, pagination controls appear
-- [ ] Pagination shows "X-Y of Z reports" text
-- [ ] Page number buttons are displayed
-- [ ] Active page button is highlighted with emerald background
-- [ ] Previous button is disabled on the first page
-- [ ] Next button is disabled on the last page
-- [ ] Clicking a page number navigates to that page
-- [ ] Search/filter changes reset pagination to page 1
+### Failure Path
+- [ ] Download fails (network error) — verify "Download failed. Tap to retry." toast
+- [ ] Share on browser without Web Share API — verify fallback "Link copied to clipboard"
 
-### 8. Empty State
+---
 
-- [ ] When no reports match the current search/tab/filter, an empty state is shown
-- [ ] Empty state shows a search icon, "No reports found" message, and helper text
-- [ ] Empty state appears in both desktop (inside table) and mobile (card area) views
+## Empty State Tests
 
-### 9. Responsive Design
+- [ ] New account with no reports generated — "Reports will appear here once generated by the system"
+- [ ] Category tab with no reports — "No [category] reports available"
 
-- [ ] Desktop (md+): Table layout with columns for Period, Report Type, Format, Generated, Actions
-- [ ] Mobile (below md): Card layout with stacked report information
-- [ ] Mobile cards show Download and WhatsApp action buttons
-- [ ] Tab bar scrolls horizontally on small screens
-- [ ] All interactive elements have min-h-11 for touch targets
+## Component Interaction Tests
 
-### 10. Accessibility
+- [ ] Tab switch preserves scroll position when returning to "All"
+- [ ] Download icon shows spinner while download is in progress
+- [ ] Multiple downloads queue rather than fail
+- [ ] Report list auto-refreshes when a new report is generated (via polling or websocket)
 
-- [ ] Tab buttons have descriptive `title` attributes
-- [ ] Action buttons have `title` attributes for screen readers
-- [ ] Focus states are visible on all interactive elements
-- [ ] Modal traps focus and can be dismissed with keyboard
+## Edge Cases
+
+- [ ] Report title with 100+ characters — truncated with ellipsis, full title in preview
+- [ ] Report generated today shows "Today" instead of date
+- [ ] Report generated yesterday shows "Yesterday"
+- [ ] File size displays correctly: KB for small, MB for large
+- [ ] 100+ reports — verify virtual scroll or pagination
+- [ ] Same report opened twice does not create duplicate preview instances
+
+## Accessibility Checks
+
+- [ ] Tab bar is navigable with arrow keys and has role="tablist"
+- [ ] Active tab has aria-selected="true"
+- [ ] Report cards have aria-label with title and date
+- [ ] Download and share buttons have aria-label descriptions
+- [ ] PDF preview has accessible close button
+- [ ] Focus returns to triggering card when preview closes
+
+## Sample Test Data
+
+```json
+{
+  "reports": [
+    {
+      "id": "rpt-001",
+      "title": "Monthly MIS Report - April 2026",
+      "category": "MIS",
+      "date": "2026-04-28",
+      "fileSize": "2.4 MB",
+      "url": "/reports/mis-april-2026.pdf"
+    },
+    {
+      "id": "rpt-002",
+      "title": "Insurance Claim Report - Q1 2026",
+      "category": "ICR",
+      "date": "2026-04-01",
+      "fileSize": "1.8 MB",
+      "url": "/reports/icr-q1-2026.pdf"
+    },
+    {
+      "id": "rpt-003",
+      "title": "Incident Summary - March 2026",
+      "category": "ISR",
+      "date": "2026-03-31",
+      "fileSize": "956 KB",
+      "url": "/reports/isr-march-2026.pdf"
+    },
+    {
+      "id": "rpt-004",
+      "title": "Challan MIS Report - April 2026",
+      "category": "MIS-CHALLAN",
+      "date": "2026-04-28",
+      "fileSize": "1.2 MB",
+      "url": "/reports/mis-challan-april-2026.pdf"
+    }
+  ]
+}
+```

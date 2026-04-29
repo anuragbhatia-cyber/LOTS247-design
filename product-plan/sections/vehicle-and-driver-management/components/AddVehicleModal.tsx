@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   CheckCircle2,
@@ -8,7 +9,7 @@ import {
   FileSpreadsheet,
   AlertCircle,
 } from 'lucide-react'
-import { useLanguage, type Language } from './LanguageContext' // TODO: adjust path to your project's LanguageContext
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
@@ -17,7 +18,7 @@ const translations: Record<Language, Record<string, string>> = {
     singleVehicle: 'Single Vehicle',
     bulkUpload: 'Bulk Upload',
     vehicleNumber: 'Vehicle Number',
-    vehicleNumberPlaceholder: 'UP32MM1113',
+    vehicleNumberPlaceholder: 'Enter vehicle number',
     cancel: 'Cancel',
     vehicleAdded: 'Vehicle Added',
     vehicleAddedDesc: 'has been successfully added to your fleet.',
@@ -38,7 +39,7 @@ const translations: Record<Language, Record<string, string>> = {
     singleVehicle: 'एकल वाहन',
     bulkUpload: 'बल्क अपलोड',
     vehicleNumber: 'वाहन नंबर',
-    vehicleNumberPlaceholder: 'उदा. UP32MM1113',
+    vehicleNumberPlaceholder: 'वाहन नंबर दर्ज करें',
     cancel: 'रद्द करें',
     vehicleAdded: 'वाहन जोड़ा गया',
     vehicleAddedDesc: 'आपके बेड़े में सफलतापूर्वक जोड़ दिया गया है।',
@@ -141,8 +142,8 @@ export function AddVehicleModal({
 
   const isValid = vehicleNumber.length >= 6
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={handleClose} />
 
@@ -154,7 +155,7 @@ export function AddVehicleModal({
             <div className="relative px-6 py-10 flex flex-col items-center text-center">
               <button
                 onClick={handleClose}
-                className="absolute top-3 right-3 p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="absolute top-3 right-3 p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -169,10 +170,10 @@ export function AddVehicleModal({
                 {t.vehicleAddedDesc}
               </p>
             </div>
-            <div className="flex items-center justify-center px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-center px-6 py-4 border-t border-stone-200 dark:border-stone-800">
               <button
                 onClick={handleClose}
-                className="px-6 py-2 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
+                className="px-6 py-2 rounded-xl text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm"
               >
                 {t.done}
               </button>
@@ -182,7 +183,7 @@ export function AddVehicleModal({
           /* Form State */
           <>
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
               <div>
                 <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
                   {t.addVehicle}
@@ -193,7 +194,7 @@ export function AddVehicleModal({
               </div>
               <button
                 onClick={handleClose}
-                className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -241,23 +242,23 @@ export function AddVehicleModal({
                       onChange={(e) => handleVehicleNumberChange(e.target.value)}
                       placeholder={t.vehicleNumberPlaceholder}
                       maxLength={10}
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                     />
                   </div>
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+                <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
                   <button
                     onClick={handleClose}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+                    className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
                   >
                     {t.cancel}
                   </button>
                   <button
                     onClick={handleAdd}
                     disabled={!isValid}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
                       isValid
                         ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                         : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
@@ -273,7 +274,7 @@ export function AddVehicleModal({
                   {/* Download Sample */}
                   <div className="flex items-center justify-end mb-3">
                     <button
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
                     >
                       <Download className="w-3.5 h-3.5" />
                       {t.downloadSample}
@@ -352,17 +353,17 @@ export function AddVehicleModal({
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+                <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
                   <button
                     onClick={handleClose}
-                    className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+                    className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
                   >
                     {t.cancel}
                   </button>
                   <button
                     onClick={handleUpload}
                     disabled={!selectedFile}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
                       selectedFile
                         ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                         : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
@@ -377,6 +378,7 @@ export function AddVehicleModal({
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

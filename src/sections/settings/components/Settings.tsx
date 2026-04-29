@@ -97,7 +97,7 @@ const translations: Record<Language, Record<string, string>> = {
     downloadInvoice: 'Download',
     of: 'of',
     noLimit: 'No limit',
-    active: 'Active',
+    active: 'Current Plan',
     expiring_soon: 'Expiring Soon',
     expired: 'Expired',
     paid: 'Paid',
@@ -242,7 +242,7 @@ const translations: Record<Language, Record<string, string>> = {
     downloadInvoice: 'डाउनलोड',
     of: 'में से',
     noLimit: 'कोई सीमा नहीं',
-    active: 'सक्रिय',
+    active: 'वर्तमान प्लान',
     expiring_soon: 'जल्द समाप्त',
     expired: 'समाप्त',
     paid: 'भुगतान किया',
@@ -611,6 +611,7 @@ export function Settings({
 
   const [activeTab, setActiveTab] = useState<Tab>('general')
   const [showPlanModal, setShowPlanModal] = useState(false)
+  const [showCancelPlanModal, setShowCancelPlanModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false)
   // Track unchecked permissions per role (some start unchecked)
@@ -892,7 +893,7 @@ export function Settings({
           {activeTab === 'subscription' && (
             <div className="p-5 sm:p-6">
               {/* Current Plan Card */}
-              <div className={`rounded-xl border-2 p-5 mb-6 ${subStatusConfig.border} ${subStatusConfig.bg}`}>
+              <div className="rounded-xl bg-stone-50 dark:bg-stone-800/50 p-5 mb-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2.5 mb-1">
@@ -910,13 +911,21 @@ export function Settings({
                       <span>{t.nextRenewal}: {subscription.nextRenewalDate}</span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => { setShowPlanModal(true); sendOverlay(true) }}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shrink-0"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    {t.changePlan}
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => { setShowPlanModal(true); sendOverlay(true) }}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      {t.changePlan}
+                    </button>
+                    <button
+                      onClick={() => { setShowCancelPlanModal(true); sendOverlay(true) }}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    >
+                      Cancel Plan
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -966,56 +975,8 @@ export function Settings({
           {/* ----- Accounts & Billing Tab ----- */}
           {activeTab === 'billing' && (
             <div className="p-5 sm:p-6">
-              {/* Payment Methods */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-100">{t.paymentMethods}</h3>
-                  <button
-                    onClick={() => { setNewPaymentType('upi'); setShowAddPaymentModal(true); sendOverlay(true) }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    {t.addPaymentMethod}
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {paymentMethods.map((method) => {
-                    const MethodIcon = PAYMENT_METHOD_ICONS[method.type]
-                    return (
-                      <div
-                        key={method.id}
-                        className="flex items-center justify-between p-4 rounded-xl border border-stone-200 dark:border-stone-700 transition-all"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-stone-100 dark:bg-stone-800">
-                            <MethodIcon className="w-5 h-5 text-stone-500 dark:text-stone-400" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{method.label}</p>
-                              {method.isDefault && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/50">
-                                  <Star className="w-2.5 h-2.5" />
-                                  {t.defaultMethod}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 font-mono">{method.detail}</p>
-                          </div>
-                        </div>
-                        {!method.isDefault && (
-                          <button className="text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors">
-                            {t.setAsDefault}
-                          </button>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
               {/* Billing History */}
-              <div className="border-t border-stone-100 dark:border-stone-800 pt-6">
+              <div>
                 <h4 className="text-sm font-semibold text-stone-900 dark:text-stone-100 mb-4">{t.billingHistory}</h4>
 
                 {/* Desktop Table */}
@@ -1360,36 +1321,15 @@ export function Settings({
                         onChange={(e) => onUpdateGeneralSettings?.({ dataRetentionMonths: Number(e.target.value) })}
                         className="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                       >
+                        <option value={3}>3 {t.months}</option>
+                        <option value={6}>6 {t.months}</option>
+                        <option value={9}>9 {t.months}</option>
                         <option value={12}>12 {t.months}</option>
-                        <option value={24}>24 {t.months}</option>
-                        <option value={36}>36 {t.months}</option>
-                        <option value={60}>60 {t.months}</option>
                       </select>
                     </div>
                   </div>
                 </div>
 
-                {/* Auto Logout */}
-                <div className="py-5 last:pb-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{t.autoLogout}</p>
-                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{t.autoLogoutDesc}</p>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <select
-                        value={generalSettings.autoLogoutMinutes}
-                        onChange={(e) => onUpdateGeneralSettings?.({ autoLogoutMinutes: Number(e.target.value) })}
-                        className="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
-                      >
-                        <option value={15}>15 {t.minutes}</option>
-                        <option value={30}>30 {t.minutes}</option>
-                        <option value={60}>60 {t.minutes}</option>
-                        <option value={120}>120 {t.minutes}</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           )}
@@ -1408,6 +1348,37 @@ export function Settings({
           onClose={() => { setShowPlanModal(false); sendOverlay(false) }}
           t={t}
         />
+      )}
+
+      {/* Cancel Plan Confirmation Modal */}
+      {showCancelPlanModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => { setShowCancelPlanModal(false); sendOverlay(false) }} />
+          <div className="relative bg-white dark:bg-stone-900 rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div className="w-12 h-12 rounded-full bg-red-50 dark:bg-red-950/40 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 text-center mb-2">Cancel your plan?</h3>
+            <p className="text-sm text-stone-500 dark:text-stone-400 text-center leading-relaxed mb-6">
+              Are you sure you want to cancel? You will no longer have access to your account, vehicles, and all associated data once the cancellation takes effect.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => { setShowCancelPlanModal(false); sendOverlay(false) }}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
+              >
+                Keep Plan
+              </button>
+              <button
+                onClick={() => { setShowCancelPlanModal(false); sendOverlay(false) }}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 hover:bg-red-700 text-white transition-colors"
+              >
+                Yes, Cancel Plan
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Add Payment Method Modal */}

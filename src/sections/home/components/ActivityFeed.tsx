@@ -87,12 +87,12 @@ export function AlertsFeed({ items, onViewAll, onAlertClick }: AlertsFeedProps) 
     <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden flex flex-col">
       {/* Header */}
       <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-3 border-b border-stone-200 dark:border-stone-800">
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center justify-between mb-3">
           <h2 className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">
             {t.alerts}
           </h2>
           {items.length > 0 && (
-            <span className="text-xs font-medium text-stone-500 dark:text-stone-400">
+            <span className="text-xs font-semibold text-red-600 dark:text-red-400">
               {items.length} {t.pendingAlerts}
             </span>
           )}

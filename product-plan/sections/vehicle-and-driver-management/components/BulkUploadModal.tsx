@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import {
   X,
   Download,
@@ -7,7 +8,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from 'lucide-react'
-import { useLanguage, type Language } from './LanguageContext' // TODO: adjust path to your project's LanguageContext
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
@@ -100,8 +101,8 @@ export function BulkUploadModal({
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 dark:bg-black/70"
@@ -109,9 +110,9 @@ export function BulkUploadModal({
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg mx-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl">
+      <div className="relative w-full max-w-lg bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div>
             <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
               {t.bulkUploadVehicles}
@@ -123,14 +124,14 @@ export function BulkUploadModal({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onDownloadSample?.()}
-              className="flex items-center gap-1.5 px-3 py-1.5 min-h-11 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs font-medium text-stone-600 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
             >
               <Download className="w-3.5 h-3.5" />
               {t.downloadSample}
             </button>
             <button
               onClick={() => { setSelectedFile(null); onClose() }}
-              className="p-3 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              className="p-3 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -211,17 +212,17 @@ export function BulkUploadModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
           <button
             onClick={() => { setSelectedFile(null); onClose() }}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
           >
             {t.cancel}
           </button>
           <button
             onClick={handleUpload}
             disabled={!selectedFile}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
               selectedFile
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
                 : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400 cursor-not-allowed'
@@ -232,6 +233,7 @@ export function BulkUploadModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

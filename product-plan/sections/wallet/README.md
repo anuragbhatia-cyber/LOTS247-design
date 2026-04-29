@@ -1,71 +1,42 @@
-# Wallet Section
+# Wallet — Balance & Transactions
 
 ## Overview
 
-The Wallet section provides a prepaid wallet experience for LOTS247 subscribers. Users can view their current balance, add money via Razorpay, browse their transaction history with filters and search, and view detailed information about individual transactions.
+The Wallet section manages the user's financial account within LOTS247. It displays the current balance with a prominent card, provides an "Add Money" flow integrated with Razorpay, and maintains a filterable transaction ledger. Users can view transaction details, filter by type and date, and track all credits and debits.
 
-## Features
+## User Flows
 
-- **Balance card** showing current balance, last recharge info, and low balance warning
-- **Summary stats** -- Total In (credits), Total Out (debits) with transaction counts
-- **Add Money modal** with:
-  - Custom amount input with rupee symbol
-  - Quick-select preset amount buttons (configurable via props)
-  - Minimum (100) and maximum (1,00,000) validation
-  - "Pay via Razorpay" CTA
-  - Payment method info (UPI, Cards, Net Banking)
-- **Transaction ledger** with:
-  - Desktop table view (Reference ID, Date, Category, Amount, Balance)
-  - Mobile card view grouped by date with relative date labels
-  - Color-coded amounts (green for credits, default for debits, strikethrough for failed)
-  - Category badges (Recharge, Subscription, Challan, Legal Fee, Refund)
-  - Failed transaction indicator
-- **Search** by description or reference ID
-- **Filters** panel with Date Range, Type (Credit/Debit), and Category dropdowns
-- **Transaction detail modal** showing:
-  - Large amount display with category icon
-  - Date/time, category, type, reference ID, status, balance after
-  - Link to related entity (challan, subscription, incident, dispute)
-- **Pagination** with page numbers
-- **Empty states** -- wallet empty (no transactions) and no matching results
-- **Low balance warning** when balance is at or below threshold
-- **Date range selector** in the page header
+1. **Balance View** — User sees a balance card with current amount, last recharge date, and "Add Money" CTA.
+2. **Add Money** — Tapping "Add Money" opens a Razorpay payment flow. On success, balance updates immediately.
+3. **Transaction Ledger** — Below the balance card, a chronological list of all transactions (credits, debits, refunds).
+4. **Filter Transactions** — User can filter by type (Credit, Debit, Refund), date range, or amount range.
+5. **Transaction Detail** — Tapping a transaction row opens a detail panel showing full description, reference ID, timestamp, and linked entity.
 
-## Components
+## Design Decisions
+
+- Balance card uses a gradient background with the product accent color.
+- "Add Money" button is prominent with the Razorpay logo indicator.
+- Transaction rows use green for credits, red for debits, and amber for refunds.
+- Filters collapse into a single row of chips on mobile.
+- Transaction detail opens as a bottom sheet on mobile, side panel on desktop.
+- Amounts are formatted in INR with the rupee symbol.
+
+## Data Used
+
+- `product/sections/wallet/data.json` — Sample balance, transactions, payment data.
+- `product/sections/wallet/types.ts` — WalletBalance, Transaction, PaymentRequest.
+
+## Components Provided
 
 | Component | File | Description |
 |-----------|------|-------------|
-| `WalletView` | `components/WalletView.tsx` | Main component -- balance card, stats, transaction table, add money modal, detail modal |
+| WalletView | WalletView.tsx | Full wallet interface |
 
-## Data
+## Callback Props
 
-- **Types**: `types.ts` -- `WalletSummary`, `Transaction`, `TransactionFilters`, `WalletProps`, etc.
-- **Sample data**: `sample-data.json` -- wallet summary + 12 sample transactions across all categories
-
-## Props
-
-The `WalletView` component accepts:
-
-- `walletSummary` -- `WalletSummary` object with balance, currency, threshold, last recharge
-- `transactions` -- Array of `Transaction` objects in reverse chronological order
-- `quickAmounts` -- Array of numbers for quick-select buttons (e.g., [500, 1000, 2000, 5000])
-- `onAddMoney` -- Callback when user confirms a recharge amount
-- `onViewTransaction` -- Callback when user clicks a transaction row
-- `onNavigateToEntity` -- Callback when user clicks a related entity link in detail
-- `onFilterChange` -- Callback when filters change
-- `onSearch` -- Callback when search query changes
-
-## Usage
-
-```tsx
-import { WalletView } from './components'
-import sampleData from './sample-data.json'
-
-<WalletView
-  walletSummary={sampleData.walletSummary}
-  transactions={sampleData.transactions}
-  quickAmounts={sampleData.quickAmounts}
-  onAddMoney={(amount) => console.log('Add', amount)}
-  onViewTransaction={(id) => console.log('View', id)}
-/>
-```
+| Prop | Component | Signature | Purpose |
+|------|-----------|-----------|---------|
+| onAddMoney | WalletView | `(amount: number) => void` | Initiates Razorpay payment |
+| onTransactionSelect | WalletView | `(txnId: string) => void` | Opens transaction detail |
+| onFilterChange | WalletView | `(filters: TransactionFilter) => void` | Applies filters |
+| onLoadMore | WalletView | `() => void` | Loads next page of transactions |

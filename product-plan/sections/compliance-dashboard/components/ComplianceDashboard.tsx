@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import {
   ArrowLeft,
+  ArrowUpDown,
   ArrowUpRight,
   ArrowDownRight,
   TrendingUp,
@@ -34,6 +36,8 @@ import {
   MapPin,
   Copy,
   Info,
+  Check,
+  Minus,
 } from 'lucide-react'
 import type {
   ComplianceDashboardProps,
@@ -48,6 +52,8 @@ import type {
   PermitType,
   MonthlyChallanTrendPoint,
   VehicleHistoryEventType,
+  ChallanDrilldownRow,
+  Vehicle,
 } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -108,10 +114,10 @@ const DOC_STATUS_BADGE: Record<DocumentStatus, { bg: string; text: string; label
 }
 
 const URGENCY_BADGE: Record<UrgencyLevel, { bg: string; text: string; label: string }> = {
-  expired: { bg: 'bg-red-100 dark:bg-red-950/50', text: 'text-red-700 dark:text-red-400', label: 'Expired' },
-  critical: { bg: 'bg-red-100 dark:bg-red-950/50', text: 'text-red-700 dark:text-red-400', label: 'Expired' },
-  warning: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', label: 'Warning' },
-  notice: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', label: 'Warning' },
+  expired: { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-400', label: 'Expired' },
+  critical: { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-400', label: 'Expired' },
+  warning: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', label: 'Expiring Soon' },
+  notice: { bg: 'bg-amber-50 dark:bg-amber-950/30', text: 'text-amber-700 dark:text-amber-400', label: 'Expiring Soon' },
 }
 
 const INSIGHT_STYLE: Record<InsightType, { bg: string; border: string; icon: string }> = {
@@ -166,30 +172,31 @@ const SCOPE_OPTIONS: { value: ScopeFilter; label: string; icon: typeof Truck }[]
 // ---------------------------------------------------------------------------
 
 function ProposalToast({ show, onClose }: { show: boolean; onClose: () => void }) {
-  useEffect(() => {
-    if (show) {
-      const t = setTimeout(onClose, 3000)
-      return () => clearTimeout(t)
-    }
-  }, [show, onClose])
-
   if (!show) return null
 
-  return (
-    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in fade-in slide-in-from-top-2 duration-300">
-      <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl bg-stone-900 dark:bg-stone-100 shadow-xl shadow-stone-900/20 dark:shadow-stone-100/20">
-        <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-          <ShieldCheck className="w-4.5 h-4.5 text-white" />
+  const handleOk = () => {
+    onClose()
+    window.parent.postMessage({ type: 'navigate', href: '/proposals' }, '*')
+  }
+
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
+      <div className="relative z-[201] w-full max-w-sm bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl p-6 text-center">
+        <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center mx-auto mb-4">
+          <ShieldCheck className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
         </div>
-        <div>
-          <p className="text-sm font-semibold text-white dark:text-stone-900">Proposal Submitted</p>
-          <p className="text-xs text-stone-400 dark:text-stone-500">Your proposal request has been submitted successfully</p>
-        </div>
-        <button onClick={onClose} className="ml-2 p-1 rounded-lg text-stone-500 hover:text-stone-300 dark:hover:text-stone-700 transition-colors">
-          <X className="w-4 h-4" />
+        <h3 className="text-base font-bold text-stone-900 dark:text-stone-50 mb-1">Request Submitted</h3>
+        <p className="text-sm text-stone-500 dark:text-stone-400 mb-5">Your proposal request has been submitted successfully. You can track it in Request Proposals.</p>
+        <button
+          onClick={handleOk}
+          className="w-full px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
+        >
+          OK
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -269,21 +276,23 @@ function CategoryCard({
         <span className="text-2xl font-bold text-stone-900 dark:text-stone-100">{category.compliant}<span className="text-base font-semibold text-stone-400 dark:text-stone-500">/{category.total}</span></span>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap mt-auto">
-        <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
-          {category.compliant} Valid
-        </span>
-        {(category.expiring ?? 0) > 0 && (
-          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
-            {category.expiring} Expiring
+      {category.id !== 'challans' && category.id !== 'blacklisted' && category.id !== 'ntbt' && (
+        <div className="flex items-center gap-2 flex-wrap mt-auto">
+          <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400">
+            {category.compliant} Valid
           </span>
-        )}
-        {(category.total - category.compliant - (category.expiring ?? 0)) > 0 && (
-          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
-            {category.total - category.compliant - (category.expiring ?? 0)} Expired
-          </span>
-        )}
-      </div>
+          {(category.expiring ?? 0) > 0 && (
+            <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
+              {category.expiring} Expiring
+            </span>
+          )}
+          {(category.total - category.compliant - (category.expiring ?? 0)) > 0 && (
+            <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400">
+              {category.total - category.compliant - (category.expiring ?? 0)} Expired
+            </span>
+          )}
+        </div>
+      )}
 
 
     </button>
@@ -549,7 +558,7 @@ function DrilldownTable({ headers, children }: { headers: string[]; children: Re
     <div className="overflow-x-auto -mx-1">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-stone-200 dark:border-stone-800">
+          <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
             {headers.map(h => (
               <th key={h} className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
             ))}
@@ -563,7 +572,7 @@ function DrilldownTable({ headers, children }: { headers: string[]; children: Re
 
 function StatusBadge({ status }: { status: DocumentStatus }) {
   const s = DOC_STATUS_BADGE[status]
-  return <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${s.bg} ${s.text}`}>{s.label}</span>
+  return <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${s.bg} ${s.text}`}>{s.label}</span>
 }
 
 function CategoryDrilldownView({
@@ -582,6 +591,10 @@ function CategoryDrilldownView({
   const colors = STATUS_COLORS[category.status]
   const Icon = CATEGORY_ICONS[categoryId]
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState<string>('default')
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
+  const [showSortDropdown, setShowSortDropdown] = useState(false)
 
   // Filter options per category
   const filterOptions = useMemo(() => {
@@ -615,19 +628,43 @@ function CategoryDrilldownView({
     ]
   }, [categoryId])
 
-  // Filtered rows
-  const filteredRc = useMemo(() => statusFilter === 'all' ? drilldowns.rc : drilldowns.rc.filter(r => r.status === statusFilter), [drilldowns.rc, statusFilter])
-  const filteredInsurance = useMemo(() => statusFilter === 'all' ? drilldowns.insurance : drilldowns.insurance.filter(r => r.status === statusFilter), [drilldowns.insurance, statusFilter])
-  const filteredPucc = useMemo(() => statusFilter === 'all' ? drilldowns.pucc : drilldowns.pucc.filter(r => r.status === statusFilter), [drilldowns.pucc, statusFilter])
-  const filteredPermits = useMemo(() => statusFilter === 'all' ? drilldowns.permits : drilldowns.permits.filter(r => r.status === statusFilter), [drilldowns.permits, statusFilter])
-  const filteredDl = useMemo(() => statusFilter === 'all' ? drilldowns.dl : drilldowns.dl.filter(r => r.status === statusFilter), [drilldowns.dl, statusFilter])
+  // Search + status filtered rows
+  const sq = searchQuery.toLowerCase()
+  const matchesSearch = (vehicleNumber: string) => !sq || vehicleNumber.toLowerCase().includes(sq)
+  const matchesDriverSearch = (name: string, license: string) => !sq || name.toLowerCase().includes(sq) || license.toLowerCase().includes(sq)
+  const filteredRc = useMemo(() => drilldowns.rc.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.rc, statusFilter, sq])
+  const filteredInsurance = useMemo(() => drilldowns.insurance.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.insurance, statusFilter, sq])
+  const filteredPucc = useMemo(() => drilldowns.pucc.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.pucc, statusFilter, sq])
+  const filteredPermits = useMemo(() => drilldowns.permits.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.permits, statusFilter, sq])
+  const filteredDl = useMemo(() => drilldowns.dl.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesDriverSearch(r.driverName, r.licenseNumber)), [drilldowns.dl, statusFilter, sq])
   const filteredChallans = useMemo(() => {
-    if (statusFilter === 'all') return drilldowns.challans
-    if (statusFilter === 'pending') return drilldowns.challans.filter(r => r.outstandingCount > 0)
-    return drilldowns.challans.filter(r => r.outstandingCount === 0)
-  }, [drilldowns.challans, statusFilter])
-  const filteredBlacklisted = useMemo(() => statusFilter === 'all' ? drilldowns.blacklisted : drilldowns.blacklisted.filter(r => r.status === statusFilter), [drilldowns.blacklisted, statusFilter])
-  const filteredNtbt = useMemo(() => statusFilter === 'all' ? drilldowns.ntbt : drilldowns.ntbt.filter(r => r.status === statusFilter), [drilldowns.ntbt, statusFilter])
+    return drilldowns.challans.filter(r => {
+      const statusMatch = statusFilter === 'all' || (statusFilter === 'pending' ? r.outstandingCount > 0 : r.outstandingCount === 0)
+      return statusMatch && matchesSearch(r.vehicleNumber)
+    })
+  }, [drilldowns.challans, statusFilter, sq])
+  const filteredBlacklisted = useMemo(() => drilldowns.blacklisted.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.blacklisted, statusFilter, sq])
+  const filteredNtbt = useMemo(() => drilldowns.ntbt.filter(r => (statusFilter === 'all' || r.status === statusFilter) && matchesSearch(r.vehicleNumber)), [drilldowns.ntbt, statusFilter, sq])
+
+  // Sort helper
+  const applySort = <T extends { vehicleNumber?: string; expiryDate?: string; driverName?: string; licenseNumber?: string }>(rows: T[]) => {
+    if (sortBy === 'default') return rows
+    const sorted = [...rows]
+    if (sortBy === 'az') sorted.sort((a, b) => (a.vehicleNumber || a.driverName || '').localeCompare(b.vehicleNumber || b.driverName || ''))
+    if (sortBy === 'za') sorted.sort((a, b) => (b.vehicleNumber || b.driverName || '').localeCompare(a.vehicleNumber || a.driverName || ''))
+    if (sortBy === 'date-asc') sorted.sort((a, b) => new Date(a.expiryDate || '').getTime() - new Date(b.expiryDate || '').getTime())
+    if (sortBy === 'date-desc') sorted.sort((a, b) => new Date(b.expiryDate || '').getTime() - new Date(a.expiryDate || '').getTime())
+    return sorted
+  }
+
+  const sortedRc = useMemo(() => applySort(filteredRc), [filteredRc, sortBy])
+  const sortedInsurance = useMemo(() => applySort(filteredInsurance), [filteredInsurance, sortBy])
+  const sortedPucc = useMemo(() => applySort(filteredPucc), [filteredPucc, sortBy])
+  const sortedPermits = useMemo(() => applySort(filteredPermits), [filteredPermits, sortBy])
+  const sortedDl = useMemo(() => applySort(filteredDl), [filteredDl, sortBy])
+  const sortedChallans = useMemo(() => applySort(filteredChallans), [filteredChallans, sortBy])
+  const sortedBlacklisted = useMemo(() => applySort(filteredBlacklisted), [filteredBlacklisted, sortBy])
+  const sortedNtbt = useMemo(() => applySort(filteredNtbt), [filteredNtbt, sortBy])
 
   const getRows = () => {
     switch (categoryId) {
@@ -644,6 +681,16 @@ function CategoryDrilldownView({
   }
   const rowCounts = getRows()
 
+  const sortOptions = [
+    { value: 'default', label: 'Default' },
+    { value: 'az', label: categoryId === 'dl' ? 'Name (A-Z)' : 'Vehicle (A-Z)' },
+    { value: 'za', label: categoryId === 'dl' ? 'Name (Z-A)' : 'Vehicle (Z-A)' },
+    { value: 'date-asc', label: 'Expiry (Soonest)' },
+    { value: 'date-desc', label: 'Expiry (Latest)' },
+  ]
+
+  const activeFilterCount = (statusFilter !== 'all' ? 1 : 0)
+
   const emptyRow = (cols: number) => (
     <tr><td colSpan={cols} className="py-8 text-center text-sm text-stone-400 dark:text-stone-500">No records match this filter</td></tr>
   )
@@ -654,19 +701,11 @@ function CategoryDrilldownView({
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={onBack}
-          className="w-9 h-9 rounded-lg flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
         </button>
-        <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${colors.bg}`}>
-          <Icon className={`w-4.5 h-4.5 ${colors.text}`} />
-        </div>
-        <div>
-          <h2 className="text-lg font-bold text-stone-900 dark:text-stone-50">{category.fullLabel}</h2>
-          <p className="text-sm text-stone-500 dark:text-stone-400">
-            {category.compliant}/{category.total} compliant &middot; <span className={colors.text}>{category.percentage}%</span>
-          </p>
-        </div>
+        <h2 className="text-lg font-bold text-stone-900 dark:text-stone-50">{category.fullLabel}</h2>
       </div>
 
       {/* Permits sub-breakdown cards */}
@@ -687,36 +726,121 @@ function CategoryDrilldownView({
         </div>
       )}
 
-      {/* Filter Buttons */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-1 rounded-lg bg-stone-100 dark:bg-stone-800/60 p-1">
-          {filterOptions.map(opt => (
+      {/* Search + Filter + Sort */}
+      <div className="mb-4 space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
+            <input
+              type="text"
+              placeholder={categoryId === 'dl' ? 'Search driver or license...' : 'Search vehicle number...'}
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+            />
+          </div>
+
+          {/* Filter button */}
+          <div className="relative">
             <button
-              key={opt.value}
-              onClick={() => setStatusFilter(opt.value)}
-              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                statusFilter === opt.value
-                  ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-sm'
-                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+              onClick={() => { setShowFilterDropdown(!showFilterDropdown); setShowSortDropdown(false) }}
+              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+                activeFilterCount > 0
+                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
               }`}
             >
-              {opt.label}
+              <SlidersHorizontal className="w-4 h-4" />
+              <span className="hidden sm:inline">Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="ml-0.5 w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center">{activeFilterCount}</span>
+              )}
             </button>
-          ))}
+            {showFilterDropdown && (
+              <div className="absolute right-0 top-full mt-1.5 w-48 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/40 dark:shadow-stone-950/60 overflow-hidden z-20">
+                {filterOptions.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => { setStatusFilter(opt.value); setShowFilterDropdown(false) }}
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                      statusFilter === opt.value
+                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold'
+                        : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sort button */}
+          <div className="relative">
+            <button
+              onClick={() => { setShowSortDropdown(!showSortDropdown); setShowFilterDropdown(false) }}
+              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
+                sortBy !== 'default'
+                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+                  : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+              }`}
+            >
+              <ArrowUpDown className="w-4 h-4" />
+              <span className="hidden sm:inline">Sort</span>
+            </button>
+            {showSortDropdown && (
+              <div className="absolute right-0 top-full mt-1.5 w-48 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/40 dark:shadow-stone-950/60 overflow-hidden z-20">
+                {sortOptions.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => { setSortBy(opt.value); setShowSortDropdown(false) }}
+                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                      sortBy === opt.value
+                        ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-semibold'
+                        : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-        <span className="text-xs text-stone-400 dark:text-stone-500">
-          {statusFilter !== 'all'
-            ? `${rowCounts.filtered} of ${rowCounts.total}`
-            : `${rowCounts.total} total`}
-        </span>
+
+        {(statusFilter !== 'all' || sortBy !== 'default' || searchQuery) && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs text-stone-500 dark:text-stone-400">
+              Showing {rowCounts.filtered} of {rowCounts.total}
+            </span>
+            {statusFilter !== 'all' && (
+              <button
+                onClick={() => setStatusFilter('all')}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-colors"
+              >
+                {filterOptions.find(o => o.value === statusFilter)?.label}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {sortBy !== 'default' && (
+              <button
+                onClick={() => setSortBy('default')}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
+              >
+                {sortOptions.find(o => o.value === sortBy)?.label}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Table */}
       <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
         {categoryId === 'rc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Issue Date', 'Expiry Date', 'RTO Office']}>
-            {filteredRc.length === 0 ? emptyRow(5) : filteredRc.map(row => (
-              <tr key={row.vehicleNumber} className="transition-colors">
+            {sortedRc.length === 0 ? emptyRow(5) : sortedRc.map(row => (
+              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(row.issueDate)}</td>
@@ -729,8 +853,8 @@ function CategoryDrilldownView({
 
         {categoryId === 'insurance' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Provider', 'Policy No.', 'Expiry Date']}>
-            {filteredInsurance.length === 0 ? emptyRow(5) : filteredInsurance.map(row => (
-              <tr key={row.vehicleNumber} className="transition-colors">
+            {sortedInsurance.length === 0 ? emptyRow(5) : sortedInsurance.map(row => (
+              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.provider}</td>
@@ -743,8 +867,8 @@ function CategoryDrilldownView({
 
         {categoryId === 'pucc' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Test Centre', 'Expiry Date']}>
-            {filteredPucc.length === 0 ? emptyRow(4) : filteredPucc.map(row => (
-              <tr key={row.vehicleNumber} className="transition-colors">
+            {sortedPucc.length === 0 ? emptyRow(4) : sortedPucc.map(row => (
+              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.testCenter}</td>
@@ -756,8 +880,8 @@ function CategoryDrilldownView({
 
         {categoryId === 'permits' && (
           <DrilldownTable headers={['Vehicle', 'Status', 'Type', 'Permit No.', 'Expiry Date']}>
-            {filteredPermits.length === 0 ? emptyRow(5) : filteredPermits.map(row => (
-              <tr key={row.vehicleNumber + row.permitNumber} className="transition-colors">
+            {sortedPermits.length === 0 ? emptyRow(5) : sortedPermits.map(row => (
+              <tr key={row.vehicleNumber + row.permitNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3"><StatusBadge status={row.status} /></td>
                 <td className="py-3 px-3">
@@ -774,12 +898,12 @@ function CategoryDrilldownView({
 
         {categoryId === 'dl' && (
           <DrilldownTable headers={['Driver', 'License Number', 'License Expiry', 'Assigned Vehicles', 'Status']}>
-            {filteredDl.length === 0 ? emptyRow(5) : filteredDl.map(row => {
+            {sortedDl.length === 0 ? emptyRow(5) : sortedDl.map(row => {
               const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
               const isValid = row.status === 'valid'
 
               return (
-                <tr key={row.licenseNumber} className="transition-colors">
+                <tr key={row.licenseNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                   <td className="py-4 px-3">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
@@ -820,8 +944,8 @@ function CategoryDrilldownView({
 
         {categoryId === 'challans' && (
           <DrilldownTable headers={['Vehicle', 'Pending Challans', 'Amount']}>
-            {filteredChallans.length === 0 ? emptyRow(3) : filteredChallans.map(row => (
-              <tr key={row.vehicleNumber} className="transition-colors">
+            {sortedChallans.length === 0 ? emptyRow(3) : sortedChallans.map(row => (
+              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3">
                   <div className="flex items-center gap-3">
@@ -846,14 +970,14 @@ function CategoryDrilldownView({
 
         {categoryId === 'blacklisted' && (
           <DrilldownTable headers={['Vehicle', 'Flag Reason', 'Authority', 'Date', 'Status']}>
-            {filteredBlacklisted.length === 0 ? emptyRow(5) : filteredBlacklisted.map(row => (
-              <tr key={row.vehicleNumber} className="transition-colors">
+            {sortedBlacklisted.length === 0 ? emptyRow(5) : sortedBlacklisted.map(row => (
+              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400 max-w-[250px]">{row.flagReason}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.flaggingAuthority}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(row.flagDate)}</td>
                 <td className="py-3 px-3">
-                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
                     row.status === 'active' ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
                   }`}>{row.status === 'active' ? 'Active' : 'Resolved'}</span>
                 </td>
@@ -864,15 +988,15 @@ function CategoryDrilldownView({
 
         {categoryId === 'ntbt' && (
           <DrilldownTable headers={['Vehicle', 'Hold Reason', 'Authority', 'Date', 'Case Ref', 'Status']}>
-            {filteredNtbt.length === 0 ? emptyRow(6) : filteredNtbt.map(row => (
-              <tr key={row.vehicleNumber} className="transition-colors">
+            {sortedNtbt.length === 0 ? emptyRow(6) : sortedNtbt.map(row => (
+              <tr key={row.vehicleNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                 <td className="py-3 px-3 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{row.vehicleNumber}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400 max-w-[250px]">{row.holdReason}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{row.issuingAuthority}</td>
                 <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(row.holdDate)}</td>
                 <td className="py-3 px-3 font-mono text-xs text-stone-500 dark:text-stone-400">{row.caseReference}</td>
                 <td className="py-3 px-3">
-                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
                     row.status === 'active' ? 'bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
                   }`}>{row.status === 'active' ? 'Active' : 'Resolved'}</span>
                 </td>
@@ -900,6 +1024,8 @@ const CHALLAN_VIOLATIONS: { violation: string; location: string }[] = [
   { violation: 'Using Phone While Driving', location: 'Eastern Express Highway, Mumbai' },
 ]
 
+type SubmissionStatus = 'not_submitted' | 'submitted' | 'paid'
+
 type IndividualChallan = {
   id: string
   vehicleNumber: string
@@ -910,22 +1036,277 @@ type IndividualChallan = {
   location: string
   challanType: 'court' | 'online'
   status: 'pending' | 'paid'
+  submissionStatus: SubmissionStatus
+}
+
+function FleetChallanLanding({
+  challanRows,
+  vehicles,
+  onBack,
+  hideTitle,
+}: {
+  challanRows: ChallanDrilldownRow[]
+  vehicles: Vehicle[]
+  onBack: () => void
+  hideTitle?: boolean
+}) {
+  const [drillFilter, setDrillFilter] = useState<{ filter: 'pending' | 'paid'; submission: SubmissionStatus } | null>(null)
+
+  // Compute summary numbers from the drilldown rows
+  const notSubmittedCount = challanRows.reduce((s, r) => s + (r.notSubmittedCount || 0), 0)
+  const notSubmittedAmount = useMemo(() => {
+    let total = 0
+    for (const r of challanRows) {
+      if (r.outstandingCount > 0 && (r.notSubmittedCount || 0) > 0) {
+        const perChallan = r.totalAmount / r.outstandingCount
+        total += perChallan * (r.notSubmittedCount || 0)
+      }
+    }
+    return Math.round(total)
+  }, [challanRows])
+
+  const submittedCount = challanRows.reduce((s, r) => s + (r.submittedCount || 0), 0)
+  const submittedAmount = useMemo(() => {
+    let total = 0
+    for (const r of challanRows) {
+      if (r.outstandingCount > 0 && (r.submittedCount || 0) > 0) {
+        const perChallan = r.totalAmount / r.outstandingCount
+        total += perChallan * (r.submittedCount || 0)
+      }
+    }
+    return Math.round(total)
+  }, [challanRows])
+
+  const paidCount = challanRows.reduce((s, r) => s + (r.paidCount || 0), 0)
+  const paidAmount = challanRows.reduce((s, r) => s + (r.paidAmount || 0), 0)
+
+  const totalOutstanding = challanRows.reduce((s, r) => s + r.totalAmount, 0)
+
+  if (drillFilter) {
+    return (
+      <FleetChallanView
+        challanRows={challanRows}
+        vehicles={vehicles}
+        onBack={() => setDrillFilter(null)}
+        hideTitle={false}
+        initialFilter={drillFilter.filter}
+        initialSubmissionFilter={drillFilter.submission}
+      />
+    )
+  }
+
+  const notSubmittedRows = challanRows
+    .filter(r => (r.notSubmittedCount || 0) > 0)
+    .map(r => ({ vehicleNumber: r.vehicleNumber, count: r.notSubmittedCount || 0, amount: r.outstandingCount > 0 ? Math.round((r.totalAmount / r.outstandingCount) * (r.notSubmittedCount || 0)) : 0 }))
+    .sort((a, b) => b.amount - a.amount)
+
+  const submittedRows = challanRows
+    .filter(r => (r.submittedCount || 0) > 0)
+    .map(r => ({ vehicleNumber: r.vehicleNumber, count: r.submittedCount || 0, amount: r.outstandingCount > 0 ? Math.round((r.totalAmount / r.outstandingCount) * (r.submittedCount || 0)) : 0 }))
+    .sort((a, b) => b.amount - a.amount)
+
+  const paidRows = challanRows
+    .filter(r => (r.paidCount || 0) > 0)
+    .map(r => ({ vehicleNumber: r.vehicleNumber, count: r.paidCount || 0, amount: r.paidAmount || 0 }))
+    .sort((a, b) => b.amount - a.amount)
+
+  const cards: {
+    key: string
+    label: string
+    badge: string
+    badgeColor: string
+    count: number
+    amount: number
+    iconBg: string
+    iconColor: string
+    amountColor: string
+    rowTextColor: string
+    rows: { vehicleNumber: string; count: number; amount: number }[]
+    onClick: () => void
+  }[] = [
+    {
+      key: 'not_submitted',
+      label: 'Not Submitted',
+      badge: 'ACTION REQUIRED',
+      badgeColor: 'bg-red-100 dark:bg-red-950/50 text-red-700 dark:text-red-400',
+      count: notSubmittedCount,
+      amount: notSubmittedAmount,
+      iconBg: 'bg-red-100 dark:bg-red-950/40',
+      iconColor: 'text-red-600 dark:text-red-400',
+      amountColor: 'text-red-700 dark:text-red-400',
+      rowTextColor: 'text-red-600 dark:text-red-400',
+      rows: notSubmittedRows,
+      onClick: () => setDrillFilter({ filter: 'pending', submission: 'not_submitted' }),
+    },
+    {
+      key: 'submitted',
+      label: 'Submitted',
+      badge: 'PROCESSING',
+      badgeColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400',
+      count: submittedCount,
+      amount: submittedAmount,
+      iconBg: 'bg-amber-100 dark:bg-amber-950/40',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+      amountColor: 'text-amber-700 dark:text-amber-400',
+      rowTextColor: 'text-amber-600 dark:text-amber-400',
+      rows: submittedRows,
+      onClick: () => setDrillFilter({ filter: 'pending', submission: 'submitted' }),
+    },
+    {
+      key: 'paid',
+      label: 'Paid',
+      badge: 'PAID',
+      badgeColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400',
+      count: paidCount,
+      amount: paidAmount,
+      iconBg: 'bg-emerald-100 dark:bg-emerald-950/40',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      amountColor: 'text-emerald-700 dark:text-emerald-400',
+      rowTextColor: 'text-emerald-600 dark:text-emerald-400',
+      rows: paidRows,
+      onClick: () => setDrillFilter({ filter: 'paid', submission: 'paid' }),
+    },
+  ]
+
+  return (
+    <div>
+      <div className="mb-6">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
+          </button>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Fleet Challans</h2>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {cards.map(card => (
+          <div key={card.key} className="group flex flex-col transition-all duration-200 hover:drop-shadow-lg">
+            {/* Zigzag top edge */}
+            <svg className="block w-full shrink-0" height="14" viewBox="0 0 300 14" preserveAspectRatio="none">
+              <path
+                d="M0,14 L0,9 L10,0 L20,9 L30,0 L40,9 L50,0 L60,9 L70,0 L80,9 L90,0 L100,9 L110,0 L120,9 L130,0 L140,9 L150,0 L160,9 L170,0 L180,9 L190,0 L200,9 L210,0 L220,9 L230,0 L240,9 L250,0 L260,9 L270,0 L280,9 L290,0 L300,9 L300,14 Z"
+                className="fill-white dark:fill-stone-900"
+              />
+              <path
+                d="M0,9 L10,0 L20,9 L30,0 L40,9 L50,0 L60,9 L70,0 L80,9 L90,0 L100,9 L110,0 L120,9 L130,0 L140,9 L150,0 L160,9 L170,0 L180,9 L190,0 L200,9 L210,0 L220,9 L230,0 L240,9 L250,0 L260,9 L270,0 L280,9 L290,0 L300,9"
+                className="stroke-stone-200 dark:stroke-stone-800"
+                fill="none"
+                strokeWidth="1"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+            {/* Card body */}
+            <div className="flex-1 border-x border-b border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 rounded-b-xl p-5 text-left">
+            <div className="flex items-center justify-between mb-4">
+              <span className={`inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider ${card.badgeColor}`}>
+                {card.badge}
+              </span>
+              <div className={`w-8 h-8 rounded-lg ${card.iconBg} flex items-center justify-center`}>
+                {card.key === 'not_submitted' && <AlertTriangle className={`w-4 h-4 ${card.iconColor}`} />}
+                {card.key === 'submitted' && <Clock className={`w-4 h-4 ${card.iconColor}`} />}
+                {card.key === 'paid' && <ShieldCheck className={`w-4 h-4 ${card.iconColor}`} />}
+              </div>
+            </div>
+
+            <p className="text-sm font-medium text-stone-500 dark:text-stone-400">{card.label}</p>
+            <p className={`text-2xl font-bold mt-1 ${card.amountColor}`}>{formatCurrency(card.amount)}</p>
+            <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">{card.count} challans</p>
+
+            {card.rows.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800 space-y-2">
+                {card.rows.slice(0, 3).map(row => (
+                  <div key={row.vehicleNumber} className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-semibold text-stone-700 dark:text-stone-200">{row.vehicleNumber}</span>
+                      <span className="text-xs text-stone-400 dark:text-stone-500 ml-1.5">{row.count} challan{row.count !== 1 ? 's' : ''}</span>
+                    </div>
+                    <span className={`text-xs font-semibold ${card.rowTextColor}`}>{formatCurrency(row.amount)}</span>
+                  </div>
+                ))}
+                {card.rows.length > 3 && (
+                  <p className="text-xs text-stone-400 dark:text-stone-500">+{card.rows.length - 3} more vehicles</p>
+                )}
+              </div>
+            )}
+
+            {card.key === 'not_submitted' && (
+              <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800">
+                <div className="flex items-start gap-2 mb-4">
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-500 dark:text-red-400 mt-0.5 shrink-0" />
+                  <p className="text-xs text-red-600 dark:text-red-400 font-medium leading-snug">Pay now to avoid vehicle blacklisting</p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={card.onClick}
+                    className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors text-center"
+                  >
+                    View & Request Proposal
+                  </button>
+                  <button
+                    onClick={card.onClick}
+                    className="w-full py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors text-center"
+                  >
+                    View Challans
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {card.key !== 'not_submitted' && (
+              <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800">
+                <button
+                  onClick={card.onClick}
+                  className="w-full py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 text-xs font-semibold hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors text-center"
+                >
+                  View Challans
+                </button>
+              </div>
+            )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function FleetChallanView({
   challanRows,
   vehicles,
   onBack,
+  hideTitle,
+  initialFilter,
+  initialSubmissionFilter,
 }: {
   challanRows: ChallanDrilldownRow[]
   vehicles: Vehicle[]
   onBack: () => void
+  hideTitle?: boolean
+  initialFilter?: 'pending' | 'paid'
+  initialSubmissionFilter?: SubmissionStatus
 }) {
-  const [filter, setFilter] = useState<'pending' | 'paid'>('pending')
+  const [filter, setFilter] = useState<'pending' | 'paid'>(initialFilter || 'pending')
   const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set())
   const [showProposalToast, setShowProposalToast] = useState(false)
   const [selectedVehiclesInit, setSelectedVehiclesInit] = useState(false)
   const [selectedVehicles, setSelectedVehicles] = useState<Set<string>>(new Set())
+  const [selectedChallans, setSelectedChallans] = useState<Set<string>>(new Set())
+  const [searchVehicle, setSearchVehicle] = useState('')
+  const [challanTypeFilter, setChallanTypeFilter] = useState<'all' | 'court' | 'online'>('all')
+  const [submissionStatusFilter, setSubmissionStatusFilter] = useState<SubmissionStatus | 'all'>(initialSubmissionFilter || 'all')
+
+  const toggleSelectChallan = (challanId: string) => {
+    setSelectedChallans(prev => {
+      const next = new Set(prev)
+      if (next.has(challanId)) next.delete(challanId)
+      else next.add(challanId)
+      return next
+    })
+  }
 
   const toggleSelectVehicle = (vehNum: string) => {
     setSelectedVehicles(prev => {
@@ -960,12 +1341,18 @@ function FleetChallanView({
     for (const row of challanRows) {
       if (row.outstandingCount > 0) {
         const baseAmt = Math.round(row.totalAmount / row.outstandingCount / 500) * 500 || 2000
+        let submittedAssigned = 0
         for (let i = 0; i < row.outstandingCount; i++) {
           const m = CHALLAN_VIOLATIONS[idx % CHALLAN_VIOLATIONS.length]
           const isLast = i === row.outstandingCount - 1
           const amount = isLast ? row.totalAmount - baseAmt * (row.outstandingCount - 1) : baseAmt
           const base = new Date(row.latestDate || '2026-02-15')
           base.setDate(base.getDate() - i * 12)
+          let submissionStatus: SubmissionStatus = 'not_submitted'
+          if (submittedAssigned < (row.submittedCount || 0)) {
+            submissionStatus = 'submitted'
+            submittedAssigned++
+          }
           result.push({
             id: `pend-${idx}`,
             vehicleNumber: row.vehicleNumber,
@@ -976,22 +1363,33 @@ function FleetChallanView({
             location: m.location,
             challanType: i < row.courtCount ? 'court' : 'online',
             status: 'pending',
+            submissionStatus,
           })
           idx++
         }
-        const paidCount = Math.max(1, Math.floor(row.outstandingCount * 0.4))
-        for (let i = 0; i < paidCount; i++) {
+      }
+      // Generate paid challans for vehicles that have paidCount
+      const vehiclePaidCount = row.paidCount || (row.outstandingCount > 0 ? Math.max(1, Math.floor(row.outstandingCount * 0.4)) : 0)
+      if (vehiclePaidCount > 0) {
+        const vehiclePaidAmount = row.paidAmount || 0
+        const paidBaseAmt = vehiclePaidAmount > 0 ? Math.round(vehiclePaidAmount / vehiclePaidCount / 500) * 500 || 2000 : 0
+        for (let i = 0; i < vehiclePaidCount; i++) {
           const m = CHALLAN_VIOLATIONS[(idx + 3) % CHALLAN_VIOLATIONS.length]
+          const isLast = i === vehiclePaidCount - 1
+          const amount = vehiclePaidAmount > 0
+            ? (isLast ? vehiclePaidAmount - paidBaseAmt * (vehiclePaidCount - 1) : paidBaseAmt)
+            : paidAmounts[idx % paidAmounts.length]
           result.push({
             id: `paid-${idx}`,
             vehicleNumber: row.vehicleNumber,
             violation: m.violation,
             challanNumber: `CH${row.vehicleNumber.replace(/[^0-9]/g, '').slice(0, 8)}${String(idx + 200)}`,
-            amount: paidAmounts[idx % paidAmounts.length],
+            amount: Math.max(500, amount),
             date: `2025-${String(7 + (i % 5)).padStart(2, '0')}-${String(5 + ((idx * 3) % 23)).padStart(2, '0')}`,
             location: m.location,
             challanType: i % 2 === 0 ? 'court' : 'online',
             status: 'paid',
+            submissionStatus: 'paid',
           })
           idx++
         }
@@ -1000,7 +1398,16 @@ function FleetChallanView({
     return result
   }, [challanRows])
 
-  const filtered = useMemo(() => allChallans.filter(c => c.status === filter), [allChallans, filter])
+  const filtered = useMemo(() => {
+    let result = allChallans.filter(c => c.status === filter)
+    if (challanTypeFilter !== 'all') {
+      result = result.filter(c => c.challanType === challanTypeFilter)
+    }
+    if (submissionStatusFilter !== 'all') {
+      result = result.filter(c => c.submissionStatus === submissionStatusFilter)
+    }
+    return result
+  }, [allChallans, filter, challanTypeFilter, submissionStatusFilter])
 
   const grouped = useMemo(() => {
     const map = new Map<string, IndividualChallan[]>()
@@ -1009,8 +1416,13 @@ function FleetChallanView({
       arr.push(c)
       map.set(c.vehicleNumber, arr)
     }
-    return Array.from(map.entries())
-  }, [filtered])
+    let entries = Array.from(map.entries())
+    if (searchVehicle.trim()) {
+      const q = searchVehicle.toLowerCase()
+      entries = entries.filter(([vehNum]) => vehNum.toLowerCase().includes(q))
+    }
+    return entries
+  }, [filtered, searchVehicle])
 
   // Select all vehicles by default on first render
   useEffect(() => {
@@ -1022,6 +1434,9 @@ function FleetChallanView({
 
   const pendingCount = allChallans.filter(c => c.status === 'pending').length
   const paidCount = allChallans.filter(c => c.status === 'paid').length
+  const notSubmittedCount = allChallans.filter(c => c.submissionStatus === 'not_submitted').length
+  const submittedCount = allChallans.filter(c => c.submissionStatus === 'submitted').length
+  const paidSubmissionCount = allChallans.filter(c => c.submissionStatus === 'paid').length
 
   const selectedAmount = useMemo(() => {
     if (selectedVehicles.size === 0) return 0
@@ -1030,13 +1445,27 @@ function FleetChallanView({
       .reduce((s, c) => s + c.amount, 0)
   }, [filtered, selectedVehicles])
 
-  const showBottomBar = filter === 'pending' && selectedVehicles.size > 0
+  const showBottomBar = filter === 'pending' && submissionStatusFilter !== 'submitted' && selectedVehicles.size > 0
 
   return (
     <div className={`${showBottomBar ? 'pb-20' : ''}`}>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">All Vehicle Challans</h2>
+      {!hideTitle && (
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
+          </button>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">All Vehicle Challans</h2>
+        </div>
+        <button className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800 hover:border-stone-300 dark:hover:border-stone-600 transition-colors">
+          <Download className="w-4 h-4" />
+          Export
+        </button>
       </div>
+      )}
 
       {/* Mobile filter tabs */}
       <div className="flex md:hidden gap-2 mb-5">
@@ -1058,7 +1487,7 @@ function FleetChallanView({
       <div className="flex gap-6">
         {/* Sidebar */}
         <div className="w-56 shrink-0 hidden md:block">
-          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
               { key: 'pending' as const, label: 'Pending', count: pendingCount, icon: FileText, countColor: 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400' },
               { key: 'paid' as const, label: 'Paid', count: paidCount, icon: ShieldCheck, countColor: 'bg-stone-100 dark:bg-stone-800 text-stone-500' },
@@ -1080,7 +1509,7 @@ function FleetChallanView({
                     <span>{item.label}</span>
                   </div>
                   <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
-                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                    'bg-stone-100 dark:bg-stone-800 text-stone-500'
                   }`}>{item.count}</span>
                 </button>
               )
@@ -1089,7 +1518,76 @@ function FleetChallanView({
         </div>
 
         {/* Content */}
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 min-w-0">
+          {/* Search + Type filter */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-5">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search by vehicle number..."
+                value={searchVehicle}
+                onChange={(e) => setSearchVehicle(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
+              />
+              {searchVehicle && (
+                <button
+                  onClick={() => setSearchVehicle('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-lg p-1 self-start sm:self-auto shrink-0">
+              {(['all', 'court', 'online'] as const).map(type => (
+                <button
+                  key={type}
+                  onClick={() => setChallanTypeFilter(type)}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                    challanTypeFilter === type
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-stone-50 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  {type === 'all' ? 'All Types' : type === 'court' ? 'Court' : 'Online'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Submission status filter pills — only on pending tab */}
+          {filter === 'pending' && (
+            <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
+              {([
+                { key: 'all' as const, label: 'All', count: pendingCount },
+                { key: 'not_submitted' as const, label: 'Not Submitted', count: notSubmittedCount },
+                { key: 'submitted' as const, label: 'Submitted', count: submittedCount },
+              ] as const).map(pill => {
+                const isActive = submissionStatusFilter === pill.key
+                return (
+                  <button
+                    key={pill.key}
+                    onClick={() => setSubmissionStatusFilter(pill.key)}
+                    className={`shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                      isActive
+                        ? 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900'
+                        : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 border border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600'
+                    }`}
+                  >
+                    {pill.label}
+                    <span className={`ml-0.5 text-[10px] px-1.5 py-0.5 rounded-full ${
+                      isActive ? 'bg-white/20 text-inherit' : 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400'
+                    }`}>
+                      {pill.count}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          <div className="space-y-4">
           {/* Select All — only on pending tab */}
           {filter === 'pending' && grouped.length > 0 && (
             <div className="flex items-center gap-3 px-1">
@@ -1127,7 +1625,7 @@ function FleetChallanView({
             const isSelected = selectedVehicles.has(vehNum)
             return (
               <div key={vehNum} className={`rounded-2xl bg-white dark:bg-stone-900 shadow-sm border overflow-hidden transition-colors ${
-                isSelected ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-100 dark:border-stone-800'
+                isSelected && filter === 'pending' ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-200 dark:border-stone-800'
               }`}>
                 <div className="flex items-center p-4 hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors">
                   {/* Checkbox — only on pending tab */}
@@ -1174,26 +1672,46 @@ function FleetChallanView({
                   </button>
                 </div>
                 {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-stone-100 dark:border-stone-800">
+                  <div className="px-4 pb-4 border-t border-stone-200 dark:border-stone-800">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-4">
                       {challans.map(c => (
-                        <div key={c.id} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/40 p-4">
-                          <div className="flex items-start justify-between mb-1">
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-sm font-mono font-medium text-stone-900 dark:text-stone-100">{c.challanNumber}</p>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(c.challanNumber) }}
-                                className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                              >
-                                <Copy className="w-3.5 h-3.5" />
-                              </button>
+                        <div key={c.id} className={`rounded-xl border bg-white dark:bg-stone-900 p-5 transition-colors ${
+                          selectedChallans.has(c.id) && filter === 'pending' ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-200 dark:border-stone-800'
+                        }`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-2.5">
+                              {filter === 'pending' && (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); toggleSelectChallan(c.id) }}
+                                  className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                                    selectedChallans.has(c.id)
+                                      ? 'bg-emerald-600 border-emerald-600'
+                                      : 'border-stone-300 dark:border-stone-600 hover:border-stone-400 dark:hover:border-stone-500'
+                                  }`}
+                                >
+                                  {selectedChallans.has(c.id) && (
+                                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </button>
+                              )}
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{c.challanNumber}</p>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(c.challanNumber) }}
+                                  className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                                >
+                                  <Copy className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
-                            <span className={`text-lg font-bold tabular-nums ${filter === 'pending' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            <span className="text-lg font-bold tabular-nums text-red-600 dark:text-red-400">
                               {formatCurrency(c.amount)}
                             </span>
                           </div>
-                          <p className="text-xs font-medium text-stone-500 dark:text-stone-400 mt-2">{c.violation}</p>
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-stone-500 dark:text-stone-400 mt-2 mb-4">
+                          <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{c.violation}</p>
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
                             <span className="flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5" />
                               {formatDate(c.date)}
@@ -1207,12 +1725,12 @@ function FleetChallanView({
                             <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
                               c.challanType === 'court'
                                 ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400'
-                                : 'bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
+                                : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
                             }`}>
                               {c.challanType === 'court' ? 'Court Challans' : 'Online Challans'}
                             </span>
                             {filter === 'pending' && (
-                              <button className="px-4 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
+                              <button className="px-5 py-2 rounded-full text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
                                 Pay Now
                               </button>
                             )}
@@ -1227,9 +1745,14 @@ function FleetChallanView({
           })}
           {grouped.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} challans found</p>
+              <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
+                <CreditCard className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+              </div>
+              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">No {filter} challans</p>
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">No {filter} challans found for any vehicle</p>
             </div>
           )}
+          </div>
         </div>
       </div>
 
@@ -1244,7 +1767,7 @@ function FleetChallanView({
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
             >
               Request Proposal
             </button>
@@ -1261,10 +1784,12 @@ function FleetRcView({
   rcRows,
   vehicles,
   onBack,
+  hideTitle,
 }: {
   rcRows: RcDrilldownRow[]
   vehicles: Vehicle[]
   onBack: () => void
+  hideTitle?: boolean
 }) {
   const [filter, setFilter] = useState<'valid' | 'expiring' | 'invalid'>('expiring')
   const [showProposalToast, setShowProposalToast] = useState(false)
@@ -1272,13 +1797,54 @@ function FleetRcView({
   const validItems = rcRows.filter(r => r.status === 'valid')
   const expiringItems = rcRows.filter(r => r.status === 'expiring')
   const invalidItems = rcRows.filter(r => r.status === 'expired')
+
+  const [selectedRcs, setSelectedRcs] = useState<Set<string>>(() => new Set([...expiringItems, ...invalidItems].map(r => r.vehicleNumber)))
   const filtered = filter === 'valid' ? validItems : filter === 'expiring' ? expiringItems : invalidItems
+
+  const showSelection = filter === 'expiring' || filter === 'invalid'
+  const allFilteredSelected = showSelection && filtered.length > 0 && filtered.every(r => selectedRcs.has(r.vehicleNumber))
+  const selectedCount = filtered.filter(r => selectedRcs.has(r.vehicleNumber)).length
+
+  function toggleRc(vehicleNumber: string) {
+    setSelectedRcs(prev => {
+      const next = new Set(prev)
+      if (next.has(vehicleNumber)) next.delete(vehicleNumber)
+      else next.add(vehicleNumber)
+      return next
+    })
+  }
+
+  function toggleAllFiltered() {
+    if (allFilteredSelected) {
+      setSelectedRcs(prev => {
+        const next = new Set(prev)
+        filtered.forEach(r => next.delete(r.vehicleNumber))
+        return next
+      })
+    } else {
+      setSelectedRcs(prev => {
+        const next = new Set(prev)
+        filtered.forEach(r => next.add(r.vehicleNumber))
+        return next
+      })
+    }
+  }
 
   return (
     <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
+      {!hideTitle && (
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Registration Certificates</h2>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
+          </button>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Registration Certificates</h2>
+        </div>
       </div>
+      )}
 
       {/* Mobile tabs */}
       <div className="flex md:hidden gap-2 mb-5">
@@ -1300,7 +1866,7 @@ function FleetRcView({
       <div className="flex gap-6">
         {/* Sidebar */}
         <div className="w-56 shrink-0 hidden md:block">
-          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
               { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
               { key: 'valid' as const, label: 'Valid', count: validItems.length, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
@@ -1319,7 +1885,7 @@ function FleetRcView({
                 >
                   <span>{item.label}</span>
                   <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
-                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                    'bg-stone-100 dark:bg-stone-800 text-stone-500'
                   }`}>{item.count}</span>
                 </button>
               )
@@ -1329,14 +1895,51 @@ function FleetRcView({
 
         {/* Content */}
         <div className="flex-1">
+          {showSelection && filtered.length > 0 && (
+            <div className="flex items-center gap-3 mb-4">
+              <button onClick={toggleAllFiltered} className="flex items-center gap-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
+                  allFilteredSelected
+                    ? 'bg-emerald-600 border-emerald-600'
+                    : selectedCount > 0
+                      ? 'bg-emerald-600/20 border-emerald-600'
+                      : 'border-stone-300 dark:border-stone-600'
+                }`}>
+                  {allFilteredSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                  {!allFilteredSelected && selectedCount > 0 && <Minus className="w-3.5 h-3.5 text-emerald-600" />}
+                </div>
+                {selectedCount > 0 ? `${selectedCount} selected` : 'Select all'}
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filtered.map(row => {
               const vehicle = vehicles.find(v => v.vehicleNumber === row.vehicleNumber)
               const badge = DOC_STATUS_BADGE[row.status]
+              const isChecked = selectedRcs.has(row.vehicleNumber)
               return (
-                <div key={row.vehicleNumber} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+                <div
+                  key={row.vehicleNumber}
+                  onClick={showSelection ? () => toggleRc(row.vehicleNumber) : undefined}
+                  className={`rounded-xl border bg-white dark:bg-stone-900 p-4 transition-colors ${
+                    showSelection ? 'cursor-pointer' : ''
+                  } ${
+                    isChecked && showSelection
+                      ? 'border-emerald-500 dark:border-emerald-600 ring-1 ring-emerald-500/20'
+                      : 'border-stone-200 dark:border-stone-800'
+                  }`}
+                >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
+                      {showSelection && (
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                          isChecked
+                            ? 'bg-emerald-600 border-emerald-600'
+                            : 'border-stone-300 dark:border-stone-600'
+                        }`}>
+                          {isChecked && <Check className="w-3.5 h-3.5 text-white" />}
+                        </div>
+                      )}
                       <div className="w-9 h-9 rounded-lg bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                         <Truck className="w-4 h-4 text-stone-400" />
                       </div>
@@ -1369,7 +1972,11 @@ function FleetRcView({
           </div>
           {filtered.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} registration certificates found</p>
+              <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
+                <FileText className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+              </div>
+              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">No {filter} certificates</p>
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">No {filter} registration certificates found</p>
             </div>
           )}
         </div>
@@ -1380,13 +1987,18 @@ function FleetRcView({
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div>
               <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Expiring Registration Certificates</p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{expiringItems.length} vehicles</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{selectedCount > 0 ? `${selectedCount} of ${expiringItems.length}` : expiringItems.length} vehicles</p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              disabled={selectedCount === 0}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors shadow-sm ${
+                selectedCount > 0
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
+                  : 'bg-stone-300 dark:bg-stone-700 cursor-not-allowed'
+              }`}
             >
-              Request Proposal
+              Request Proposal{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </button>
           </div>
         </div>
@@ -1396,13 +2008,18 @@ function FleetRcView({
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div>
               <p className="text-xs font-medium text-red-600 dark:text-red-400">Invalid Registration Certificates</p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{invalidItems.length} vehicles</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{selectedCount > 0 ? `${selectedCount} of ${invalidItems.length}` : invalidItems.length} vehicles</p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              disabled={selectedCount === 0}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors shadow-sm ${
+                selectedCount > 0
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
+                  : 'bg-stone-300 dark:bg-stone-700 cursor-not-allowed'
+              }`}
             >
-              Request Proposal
+              Request Proposal{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </button>
           </div>
         </div>
@@ -1416,10 +2033,12 @@ function FleetDlView({
   dlRows,
   drivers,
   onBack,
+  hideTitle,
 }: {
   dlRows: DlDrilldownRow[]
   drivers: Driver[]
   onBack: () => void
+  hideTitle?: boolean
 }) {
   const [filter, setFilter] = useState<'valid' | 'invalid' | 'expiring'>('expiring')
   const [showProposalToast, setShowProposalToast] = useState(false)
@@ -1427,13 +2046,54 @@ function FleetDlView({
   const validItems = dlRows.filter(r => r.status === 'valid')
   const expiringItems = dlRows.filter(r => r.status === 'expiring')
   const invalidItems = dlRows.filter(r => r.status === 'expired')
+
+  const [selectedDls, setSelectedDls] = useState<Set<string>>(() => new Set([...expiringItems, ...invalidItems].map(r => r.licenseNumber)))
   const filtered = filter === 'valid' ? validItems : filter === 'invalid' ? invalidItems : expiringItems
+
+  const showSelection = filter === 'expiring' || filter === 'invalid'
+  const allFilteredSelected = showSelection && filtered.length > 0 && filtered.every(r => selectedDls.has(r.licenseNumber))
+  const selectedCount = filtered.filter(r => selectedDls.has(r.licenseNumber)).length
+
+  function toggleDl(licenseNumber: string) {
+    setSelectedDls(prev => {
+      const next = new Set(prev)
+      if (next.has(licenseNumber)) next.delete(licenseNumber)
+      else next.add(licenseNumber)
+      return next
+    })
+  }
+
+  function toggleAllFiltered() {
+    if (allFilteredSelected) {
+      setSelectedDls(prev => {
+        const next = new Set(prev)
+        filtered.forEach(r => next.delete(r.licenseNumber))
+        return next
+      })
+    } else {
+      setSelectedDls(prev => {
+        const next = new Set(prev)
+        filtered.forEach(r => next.add(r.licenseNumber))
+        return next
+      })
+    }
+  }
 
   return (
     <div className={`${(filter === 'expiring' && expiringItems.length > 0) || (filter === 'invalid' && invalidItems.length > 0) ? 'pb-20' : ''}`}>
+      {!hideTitle && (
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Driving Licenses</h2>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-9 h-9 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
+          </button>
+          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50">Driving Licenses</h2>
+        </div>
       </div>
+      )}
 
       {/* Mobile tabs */}
       <div className="flex md:hidden gap-2 mb-5">
@@ -1455,7 +2115,7 @@ function FleetDlView({
       <div className="flex gap-6">
         {/* Sidebar */}
         <div className="w-56 shrink-0 hidden md:block">
-          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-100 dark:border-stone-800 p-2 space-y-1 sticky top-6">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {([
               { key: 'expiring' as const, label: 'Expiring', count: expiringItems.length, countColor: 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
               { key: 'valid' as const, label: 'Valid', count: validItems.length, countColor: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
@@ -1474,7 +2134,7 @@ function FleetDlView({
                 >
                   <span>{item.label}</span>
                   <span className={`inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full text-xs font-bold ${
-                    active ? item.countColor : 'bg-stone-100 dark:bg-stone-800 text-stone-500'
+                    'bg-stone-100 dark:bg-stone-800 text-stone-500'
                   }`}>{item.count}</span>
                 </button>
               )
@@ -1484,14 +2144,51 @@ function FleetDlView({
 
         {/* Content */}
         <div className="flex-1">
+          {showSelection && filtered.length > 0 && (
+            <div className="flex items-center gap-3 mb-4">
+              <button onClick={toggleAllFiltered} className="flex items-center gap-2 text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 transition-colors">
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors ${
+                  allFilteredSelected
+                    ? 'bg-emerald-600 border-emerald-600'
+                    : selectedCount > 0
+                      ? 'bg-emerald-600/20 border-emerald-600'
+                      : 'border-stone-300 dark:border-stone-600'
+                }`}>
+                  {allFilteredSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                  {!allFilteredSelected && selectedCount > 0 && <Minus className="w-3.5 h-3.5 text-emerald-600" />}
+                </div>
+                {selectedCount > 0 ? `${selectedCount} selected` : 'Select all'}
+              </button>
+            </div>
+          )}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filtered.map(row => {
               const driver = drivers.find(d => d.licenseNumber === row.licenseNumber)
               const badge = DOC_STATUS_BADGE[row.status]
+              const isChecked = selectedDls.has(row.licenseNumber)
               return (
-                <div key={row.licenseNumber} className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+                <div
+                  key={row.licenseNumber}
+                  onClick={showSelection ? () => toggleDl(row.licenseNumber) : undefined}
+                  className={`rounded-xl border bg-white dark:bg-stone-900 p-4 transition-colors ${
+                    showSelection ? 'cursor-pointer' : ''
+                  } ${
+                    isChecked && showSelection
+                      ? 'border-emerald-500 dark:border-emerald-600 ring-1 ring-emerald-500/20'
+                      : 'border-stone-200 dark:border-stone-800'
+                  }`}
+                >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
+                      {showSelection && (
+                        <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                          isChecked
+                            ? 'bg-emerald-600 border-emerald-600'
+                            : 'border-stone-300 dark:border-stone-600'
+                        }`}>
+                          {isChecked && <Check className="w-3.5 h-3.5 text-white" />}
+                        </div>
+                      )}
                       <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                         <User className="w-4 h-4 text-stone-400 dark:text-stone-500" />
                       </div>
@@ -1513,17 +2210,6 @@ function FleetDlView({
                       <p className="text-xs text-stone-400 dark:text-stone-500 mb-0.5">Expiry Date</p>
                       <p className="text-sm font-medium text-stone-700 dark:text-stone-300">{formatDate(row.expiryDate)}</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-stone-400 dark:text-stone-500 mb-1">Assigned Vehicles</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {row.vehiclesAssigned.map(v => (
-                          <span key={v} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
-                            <Truck className="w-3 h-3 text-stone-400" />
-                            {v}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 </div>
               )
@@ -1531,7 +2217,11 @@ function FleetDlView({
           </div>
           {filtered.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-sm text-stone-400 dark:text-stone-500">No {filter} driving licenses found</p>
+              <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
+                <IdCard className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+              </div>
+              <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">No {filter} licenses</p>
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">No {filter} driving licenses found</p>
             </div>
           )}
         </div>
@@ -1542,13 +2232,18 @@ function FleetDlView({
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div>
               <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Expiring Driving Licenses</p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{expiringItems.length} drivers</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{selectedCount > 0 ? `${selectedCount} of ${expiringItems.length}` : expiringItems.length} drivers</p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              disabled={selectedCount === 0}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors shadow-sm ${
+                selectedCount > 0
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
+                  : 'bg-stone-300 dark:bg-stone-700 cursor-not-allowed'
+              }`}
             >
-              Request Proposal
+              Request Proposal{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </button>
           </div>
         </div>
@@ -1558,13 +2253,18 @@ function FleetDlView({
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <div>
               <p className="text-xs font-medium text-red-600 dark:text-red-400">Invalid Driving Licenses</p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{invalidItems.length} drivers</p>
+              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{selectedCount > 0 ? `${selectedCount} of ${invalidItems.length}` : invalidItems.length} drivers</p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              disabled={selectedCount === 0}
+              className={`px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-colors shadow-sm ${
+                selectedCount > 0
+                  ? 'bg-emerald-600 hover:bg-emerald-700'
+                  : 'bg-stone-300 dark:bg-stone-700 cursor-not-allowed'
+              }`}
             >
-              Request Proposal
+              Request Proposal{selectedCount > 0 ? ` (${selectedCount})` : ''}
             </button>
           </div>
         </div>
@@ -1605,6 +2305,8 @@ export function ComplianceDashboard({
   const [scopeApplied, setScopeApplied] = useState(initialView === 'vehicle')
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
   const [urgencyPage, setUrgencyPage] = useState(0)
+  const [urgencySortKey, setUrgencySortKey] = useState<'vehicleNumber' | 'documentType' | 'expiryDate' | null>(null)
+  const [urgencySortDir, setUrgencySortDir] = useState<'asc' | 'desc'>('asc')
   const [checkVehicleOpen, setCheckVehicleOpen] = useState(false)
   const [checkVehicleNumber, setCheckVehicleNumber] = useState('')
   const [activeCardView, setActiveCardView] = useState<'dl' | 'rc' | 'challan' | null>(
@@ -1628,11 +2330,33 @@ export function ComplianceDashboard({
     return []
   }, [scope, scopeSearch, vehicles, drivers])
 
-  const urgencyTotalPages = Math.ceil(expiryUrgencyItems.length / URGENCY_PAGE_SIZE)
+  const sortedUrgencyItems = useMemo(() => {
+    if (!urgencySortKey) return expiryUrgencyItems
+    const sorted = [...expiryUrgencyItems].sort((a, b) => {
+      let cmp = 0
+      if (urgencySortKey === 'vehicleNumber') cmp = a.vehicleNumber.localeCompare(b.vehicleNumber)
+      else if (urgencySortKey === 'documentType') cmp = a.documentType.localeCompare(b.documentType)
+      else if (urgencySortKey === 'expiryDate') cmp = new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()
+      return urgencySortDir === 'asc' ? cmp : -cmp
+    })
+    return sorted
+  }, [expiryUrgencyItems, urgencySortKey, urgencySortDir])
+
+  const urgencyTotalPages = Math.ceil(sortedUrgencyItems.length / URGENCY_PAGE_SIZE)
   const paginatedUrgencyItems = useMemo(
-    () => expiryUrgencyItems.slice(urgencyPage * URGENCY_PAGE_SIZE, (urgencyPage + 1) * URGENCY_PAGE_SIZE),
-    [expiryUrgencyItems, urgencyPage]
+    () => sortedUrgencyItems.slice(urgencyPage * URGENCY_PAGE_SIZE, (urgencyPage + 1) * URGENCY_PAGE_SIZE),
+    [sortedUrgencyItems, urgencyPage]
   )
+
+  function handleUrgencySort(key: 'vehicleNumber' | 'documentType' | 'expiryDate') {
+    if (urgencySortKey === key) {
+      setUrgencySortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setUrgencySortKey(key)
+      setUrgencySortDir('asc')
+    }
+    setUrgencyPage(0)
+  }
 
   const handleCategoryClick = (id: CategoryId) => {
     setSelectedCategory(id)
@@ -1711,14 +2435,13 @@ export function ComplianceDashboard({
         {!activeCardView && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50">Fleet Compliance</h1>
-            <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Fleet compliance health at a glance</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Fleet Overview</h1>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
           {/* Refresh */}
             <button
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
             >
               <RefreshCw className="w-4 h-4 text-stone-400" />
               <span className="hidden sm:inline">Refresh</span>
@@ -1726,7 +2449,7 @@ export function ComplianceDashboard({
 
           {/* Download PDF */}
             <button
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm font-medium text-stone-700 dark:text-stone-300"
             >
               <Download className="w-4 h-4 text-stone-400" />
               <span className="hidden sm:inline">Download PDF</span>
@@ -1736,7 +2459,7 @@ export function ComplianceDashboard({
             <div className="relative">
               <button
                 onClick={() => { setDateDropdownOpen(!dateDropdownOpen); setScopeDropdownOpen(false) }}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-300 dark:hover:border-stone-600 transition-colors text-sm"
               >
                 <Calendar className="w-4 h-4 text-stone-400" />
                 <span className="font-medium text-stone-700 dark:text-stone-300">
@@ -1775,7 +2498,7 @@ export function ComplianceDashboard({
             setSelectedScopeId(null)
             setScopeApplied(false)
           }}
-          className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Fleet
@@ -1787,11 +2510,11 @@ export function ComplianceDashboard({
         {/* ---------------------------------------------------------------- */}
         {activeCardView ? (
           activeCardView === 'challan' ? (
-            <FleetChallanView challanRows={categoryDrilldowns.challans} vehicles={vehicles} onBack={() => setActiveCardView(null)} />
+            <FleetChallanLanding challanRows={categoryDrilldowns.challans} vehicles={vehicles} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={false} />
           ) : activeCardView === 'rc' ? (
-            <FleetRcView rcRows={categoryDrilldowns.rc} vehicles={vehicles} onBack={() => setActiveCardView(null)} />
+            <FleetRcView rcRows={categoryDrilldowns.rc} vehicles={vehicles} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={false} />
           ) : (
-            <FleetDlView dlRows={categoryDrilldowns.dl} drivers={drivers} onBack={() => setActiveCardView(null)} />
+            <FleetDlView dlRows={categoryDrilldowns.dl} drivers={drivers} onBack={() => { if (initialView) { onBackToOverview?.() } else { setActiveCardView(null) } }} hideTitle={false} />
           )
         ) : scope === 'driver' ? (
           <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
@@ -1801,7 +2524,7 @@ export function ComplianceDashboard({
                 const isValid = row.status === 'valid'
 
                 return (
-                  <tr key={row.licenseNumber} className="transition-colors">
+                  <tr key={row.licenseNumber} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                     <td className="py-4 px-3">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center flex-shrink-0">
@@ -1890,7 +2613,6 @@ export function ComplianceDashboard({
                           <div key={cat.id}>
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full flex-shrink-0 bg-emerald-500" />
                                 <span className="text-sm text-stone-700 dark:text-stone-300">{HEALTH_CARD_LABEL[cat.id]}</span>
                               </div>
                               <span className={`text-sm font-semibold tabular-nums ${cfg.color}`}>
@@ -2079,7 +2801,7 @@ export function ComplianceDashboard({
                               <ChevronDown className={`w-4 h-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : '-rotate-90'}`} />
                               <p className="text-sm font-medium text-stone-800 dark:text-stone-200">{cat.fullLabel}</p>
                             </div>
-                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+                            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
                               isCompliant
                                 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
                                 : cat.status === 'warning'
@@ -2183,7 +2905,7 @@ export function ComplianceDashboard({
                       <div key={d.label} className="rounded-xl bg-stone-50 dark:bg-stone-800/40 p-4">
                         <p className="text-[11px] uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-1.5">{d.label}</p>
                         {d.badge ? (
-                          <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${d.badgeColor}`}>{d.value}</span>
+                          <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${d.badgeColor}`}>{d.value}</span>
                         ) : (
                           <p className="text-sm font-bold text-stone-900 dark:text-stone-100">{d.value}</p>
                         )}
@@ -2268,22 +2990,6 @@ export function ComplianceDashboard({
                     <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{formatCurrency(historicalStats.totalChallanAmount)}</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
-                  <div className="text-center flex-1">
-                    <p className="text-[11px] text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Avg Score</p>
-                    <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">{historicalStats.avgComplianceScore}</p>
-                  </div>
-                  <div className="w-px h-8 bg-stone-200 dark:bg-stone-700" />
-                  <div className="text-center flex-1">
-                    <p className="text-[11px] text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Best</p>
-                    <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{historicalStats.bestMonth}</p>
-                  </div>
-                  <div className="w-px h-8 bg-stone-200 dark:bg-stone-700" />
-                  <div className="text-center flex-1">
-                    <p className="text-[11px] text-stone-400 dark:text-stone-500 uppercase tracking-wider mb-1">Worst</p>
-                    <p className="text-sm font-bold text-red-600 dark:text-red-400">{historicalStats.worstMonth}</p>
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -2291,17 +2997,35 @@ export function ComplianceDashboard({
             {/* Expiry Urgency Table                                            */}
             {/* -------------------------------------------------------------- */}
             <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
-              <div className="px-5 sm:px-6 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+              <div className="px-5 sm:px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider">Documents Expiry</h3>
                 <span className="text-xs text-stone-400 dark:text-stone-500">{expiryUrgencyItems.length} items</span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-stone-200 dark:border-stone-800">
-                      <th className="text-left py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[18%]">Vehicle</th>
-                      <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[14%]">Document</th>
-                      <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[16%]">Expiry Date</th>
+                    <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
+                      <th
+                        onClick={() => handleUrgencySort('vehicleNumber')}
+                        className="text-left py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[18%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+                      >
+                        Vehicle
+                        <span className="ml-1 text-[10px]">{urgencySortKey === 'vehicleNumber' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
+                      </th>
+                      <th
+                        onClick={() => handleUrgencySort('documentType')}
+                        className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[14%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+                      >
+                        Document
+                        <span className="ml-1 text-[10px]">{urgencySortKey === 'documentType' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
+                      </th>
+                      <th
+                        onClick={() => handleUrgencySort('expiryDate')}
+                        className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[16%] cursor-pointer select-none hover:text-stone-700 dark:hover:text-stone-200 transition-colors"
+                      >
+                        Expiry Date
+                        <span className="ml-1 text-[10px]">{urgencySortKey === 'expiryDate' ? (urgencySortDir === 'asc' ? '▲' : '▼') : '⇅'}</span>
+                      </th>
                       <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[10%]">Days</th>
                       <th className="text-left py-3 px-3 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider w-[12%]">Urgency</th>
                       <th className="text-right py-3 px-4 sm:px-6 text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">Action</th>
@@ -2311,17 +3035,17 @@ export function ComplianceDashboard({
                     {paginatedUrgencyItems.map(item => {
                       const badge = URGENCY_BADGE[item.urgency]
                       return (
-                        <tr key={item.id} className="transition-colors">
+                        <tr key={item.id} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
                           <td className="py-3 px-4 sm:px-6 font-mono text-xs font-semibold text-stone-900 dark:text-stone-100">{item.vehicleNumber}</td>
                           <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{item.documentType}</td>
                           <td className="py-3 px-3 text-stone-600 dark:text-stone-400">{formatDate(item.expiryDate)}</td>
                           <td className="py-3 px-3">
-                            <span className={`font-semibold ${item.daysRemaining < 0 ? 'text-red-600 dark:text-red-400' : item.daysRemaining <= 7 ? 'text-red-500 dark:text-red-400' : item.daysRemaining <= 15 ? 'text-amber-600 dark:text-amber-400' : 'text-stone-600 dark:text-stone-400'}`}>
+                            <span className="font-semibold text-stone-900 dark:text-stone-100">
                               {Math.abs(item.daysRemaining)} Days
                             </span>
                           </td>
                           <td className="py-3 px-3">
-                            <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>{badge.label}</span>
+                            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>{badge.label}</span>
                           </td>
                           <td className="py-3 px-4 sm:px-6 text-right">
                             <button
@@ -2330,9 +3054,9 @@ export function ComplianceDashboard({
                                   window.parent.postMessage({ type: 'navigate', href: '/incidents', params: { vehicle: item.vehicleNumber, document: item.documentType } }, '*')
                                 }
                               }}
-                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
+                              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors whitespace-nowrap"
                             >
-                              Raise Proposal
+                              Create Request
                               <ArrowUpRight className="w-3.5 h-3.5" />
                             </button>
                           </td>
@@ -2343,7 +3067,7 @@ export function ComplianceDashboard({
                 </table>
               </div>
               {urgencyTotalPages > 1 && (
-                <div className="px-5 sm:px-6 py-3 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between">
+                <div className="px-5 sm:px-6 py-3 border-t border-stone-200 dark:border-stone-800 flex items-center justify-between">
                   <span className="text-xs text-stone-500 dark:text-stone-400">
                     Showing {urgencyPage * URGENCY_PAGE_SIZE + 1}–{Math.min((urgencyPage + 1) * URGENCY_PAGE_SIZE, expiryUrgencyItems.length)} of {expiryUrgencyItems.length}
                   </span>
@@ -2351,7 +3075,7 @@ export function ComplianceDashboard({
                     <button
                       onClick={() => setUrgencyPage(p => Math.max(0, p - 1))}
                       disabled={urgencyPage === 0}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-8 h-8 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4 text-stone-600 dark:text-stone-400" />
                     </button>
@@ -2359,7 +3083,7 @@ export function ComplianceDashboard({
                       <button
                         key={i}
                         onClick={() => setUrgencyPage(i)}
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-semibold transition-colors ${
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-semibold transition-colors ${
                           urgencyPage === i
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
                             : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -2371,7 +3095,7 @@ export function ComplianceDashboard({
                     <button
                       onClick={() => setUrgencyPage(p => Math.min(urgencyTotalPages - 1, p + 1))}
                       disabled={urgencyPage === urgencyTotalPages - 1}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-8 h-8 rounded-xl flex items-center justify-center border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4 text-stone-600 dark:text-stone-400" />
                     </button>
@@ -2385,18 +3109,18 @@ export function ComplianceDashboard({
       </div>
 
       {/* Check Vehicle Modal */}
-      {checkVehicleOpen && (
+      {checkVehicleOpen && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4">
           <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }} />
           <div className="relative w-full max-w-md bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl shadow-2xl my-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
               <div>
                 <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">Check Vehicle</h2>
                 <p className="text-xs text-stone-500 dark:text-stone-400">Enter a vehicle number to view its compliance report</p>
               </div>
               <button
                 onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }}
-                className="p-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -2413,28 +3137,29 @@ export function ComplianceDashboard({
                   setCheckVehicleError('')
                 }}
                 onKeyDown={e => { if (e.key === 'Enter') handleCheckVehicle() }}
-                placeholder="e.g. UP32MM1113"
+                placeholder="Enter vehicle number"
                 maxLength={10}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-mono text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors tracking-wider"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 transition-colors"
                 autoFocus
               />
             </div>
-            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-100 dark:border-stone-800">
+            <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
               <button
                 onClick={() => { setCheckVehicleOpen(false); setCheckVehicleNumber(''); setCheckVehicleError('') }}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCheckVehicle}
-                className="px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="px-5 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm bg-emerald-600 hover:bg-emerald-700 text-white"
               >
                 Check
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

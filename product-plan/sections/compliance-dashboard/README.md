@@ -1,65 +1,44 @@
-# Compliance Dashboard Section
+# Compliance Dashboard — Fleet Compliance Monitoring
 
-The Compliance Dashboard provides a comprehensive view of fleet-wide compliance health across 8 document categories. It includes drill-down views, trend charts, vehicle-level compliance status, and expiry urgency tracking.
+## Overview
 
-## Components
+The Compliance Dashboard provides a centralized view of fleet-wide compliance health across 8 categories. Fleet managers can monitor expiring documents, identify non-compliant vehicles, drill down into specific categories, and track compliance trends over time.
 
-| Component | Description |
-|---|---|
-| `ComplianceDashboard` | Main dashboard with fleet compliance score, category cards, trend charts, drill-down views, and expiry urgency table. This is a large, feature-rich component (~2400 lines) containing multiple sub-components. |
+## User Flows
 
-### Sub-components (internal to ComplianceDashboard)
+1. **Dashboard Overview** — User sees 8 compliance category cards (RC, Insurance, PUCC, Permits, DL, Challans, Blacklisted, NTBT) with count badges for non-compliant items.
+2. **Category Drill-Down** — Tapping a category card opens a filtered vehicle list showing only vehicles with issues in that category.
+3. **Vehicle-Wise Report** — User selects a specific vehicle to see its full compliance breakdown across all 8 categories in VehicleWiseReport.
+4. **Filters** — User filters by status (Compliant, Expiring Soon, Expired, Not Available), date range, or vehicle group.
+5. **Insights & Trends** — A collapsible insights panel shows month-over-month compliance trend charts and actionable recommendations.
+6. **Export** — User exports compliance report as CSV or PDF.
 
-| Sub-component | Description |
-|---|---|
-| `ScoreRing` | SVG ring chart for overall compliance score |
-| `CategoryCard` | Individual category compliance card with progress bar |
-| `TrendChart` | SVG line/bar chart for monthly trend data |
-| `ChallanTrendChart` | Challan-specific trend visualization |
-| `DrilldownTable` | Reusable table wrapper for category drill-downs |
-| `StatusBadge` | Status indicator badge |
-| `CategoryDrilldownView` | Full drill-down with filter tabs for each of the 8 categories |
-| `FleetChallanView` | Fleet-wide challan view with vehicle grouping and select/proposal actions |
-| `FleetRcView` | RC validity view with valid/expiring/invalid tabs |
-| `FleetDlView` | Driving license view with validity filtering |
-| `ProposalToast` | Toast notification for proposal submission |
+## Design Decisions
 
-## Categories
+- Category cards are arranged in a 2x4 grid on mobile, 4x2 on desktop.
+- Color coding: green (compliant), amber (expiring within 30 days), red (expired), gray (not available).
+- Drill-down uses a slide-in panel on desktop, full-screen on mobile.
+- Trend charts use simple bar/line charts without heavy chart libraries.
+- NTBT = "No Tax Been Paid" — a flag for vehicles behind on road tax.
 
-The dashboard tracks 8 compliance categories:
-1. **RC** - Registration Certificate
-2. **Insurance** - Motor Insurance
-3. **PUCC** - Pollution Under Control Certificate
-4. **Permits** - Vehicle Permits (All India, Nationwide, State)
-5. **DL** - Driving License
-6. **Challans** - Pending Traffic Challans
-7. **Blacklisted** - Blacklisted vehicles
-8. **NTBT** - Not Be Transferred (vehicle holds)
+## Data Used
 
-## Data Requirements
+- `product/sections/compliance-dashboard/data.json` — Sample compliance stats, vehicle compliance records, trend data.
+- `product/sections/compliance-dashboard/types.ts` — ComplianceCategory, VehicleCompliance, ComplianceTrend, ComplianceFilter.
 
-- **ComplianceCategory[]**: 8 categories with compliance percentages and status
-- **Insight[]**: Auto-generated compliance insights (positive/warning/critical)
-- **MonthlyTrendPoint[]**: Monthly compliance score data for line chart
-- **MonthlyChallanTrendPoint[]**: Monthly challan count/amount data for bar chart
-- **HistoricalStats**: Fleet snapshot (vehicles, drivers, renewals, challans paid)
-- **ExpiryUrgencyItem[]**: Documents sorted by soonest expiry
-- **CategoryDrilldowns**: Per-category vehicle-level drill-down data (8 arrays)
-- **Vehicle[]**: Fleet vehicles for scope selector
-- **Driver[]**: Fleet drivers for scope selector
-- **VehicleHistory**: Per-vehicle timeline events
+## Components Provided
 
-## External Dependencies
+| Component | File | Description |
+|-----------|------|-------------|
+| ComplianceDashboard | ComplianceDashboard.tsx | Top-level dashboard with category grid |
+| VehicleWiseReport | VehicleWiseReport.tsx | Per-vehicle compliance breakdown |
 
-- `lucide-react` - Icon library
-- Tailwind CSS v4 with `dark:` variant support
+## Callback Props
 
-## Key Patterns
-
-- Supports 3 scope modes: Fleet (overview), Vehicle (single vehicle), Driver (single driver)
-- Category drill-downs show vehicle-level data with expandable details
-- Fleet Challan/RC/DL views support multi-select and bulk proposal actions
-- Date range filter with presets (This Month, Last 3 Months, Last 6 Months, Last Year)
-- Trend chart renders using pure SVG (no chart library dependency)
-- Vehicle scope shows compliance status expandable accordion + vehicle history timeline
-- Check Vehicle modal allows quick lookup by vehicle number
+| Prop | Component | Signature | Purpose |
+|------|-----------|-----------|---------|
+| onCategorySelect | ComplianceDashboard | `(category: string) => void` | Opens category drill-down |
+| onVehicleSelect | ComplianceDashboard | `(vehicleId: string) => void` | Opens vehicle-wise report |
+| onFilterChange | ComplianceDashboard | `(filters: ComplianceFilter) => void` | Applies filters |
+| onExport | ComplianceDashboard | `(format: "csv" \| "pdf") => void` | Triggers report export |
+| onBack | VehicleWiseReport | `() => void` | Returns to dashboard |

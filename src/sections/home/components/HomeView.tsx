@@ -280,19 +280,19 @@ export function HomeView({
       <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
 
         {/* Page header */}
-        <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
             <span className="text-stone-500 dark:text-stone-400 font-normal">{getGreeting(t)}, </span>
             {subscriber.name}
           </h1>
 
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto sm:flex-shrink-0">
             {alerts.length > 0 && (
               <button
                 onClick={() => setView('alerts')}
-                className="inline-flex items-center gap-0 rounded-full text-xs font-semibold overflow-hidden border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 transition-colors"
+                className="flex sm:inline-flex w-full sm:w-auto items-center gap-0 rounded-full text-xs font-semibold overflow-hidden border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 transition-colors"
               >
-                <span className="relative px-2.5 py-1 bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 overflow-hidden">
+                <span className="relative flex-1 sm:flex-initial px-2.5 py-1.5 sm:py-1 bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 overflow-hidden">
                   <span
                     className="absolute inset-0 pointer-events-none"
                     style={{
@@ -303,7 +303,7 @@ export function HomeView({
                   />
                   {alerts.length} Pending Alerts
                 </span>
-                <span className="px-2.5 py-1 bg-white dark:bg-stone-900 text-red-600 dark:text-red-400 border-l border-red-200 dark:border-red-800">
+                <span className="px-2.5 py-1.5 sm:py-1 bg-white dark:bg-stone-900 text-red-600 dark:text-red-400 border-l border-red-200 dark:border-red-800 flex-shrink-0">
                   View &rarr;
                 </span>
               </button>
@@ -317,12 +317,12 @@ export function HomeView({
               <button
                 key={action.id}
                 onClick={() => quickActionCallbacks[action.id]?.()}
-                className="group flex items-start gap-3 px-4 py-5 sm:py-6 rounded-2xl bg-white dark:bg-stone-900 border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 hover:shadow-md transition-all duration-200 text-left"
+                className="group flex flex-row items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-3 sm:py-6 rounded-2xl bg-white dark:bg-stone-900 border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 hover:shadow-md transition-all duration-200 text-left"
               >
-                <img src={action.image} alt="" className="w-20 h-20 flex-shrink-0 object-contain" />
+                <img src={action.image} alt="" className="w-11 h-11 sm:w-20 sm:h-20 flex-shrink-0 object-contain" />
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-stone-900 dark:text-stone-50 leading-snug">{qaTranslations[action.id]?.label ?? action.label}</p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 leading-snug mt-0.5">{qaTranslations[action.id]?.description ?? action.description}</p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-50 leading-snug">{qaTranslations[action.id]?.label ?? action.label}</p>
+                  <p className="text-[10px] sm:text-xs text-stone-500 dark:text-stone-400 leading-snug mt-0.5">{qaTranslations[action.id]?.description ?? action.description}</p>
                 </div>
               </button>
           ))}

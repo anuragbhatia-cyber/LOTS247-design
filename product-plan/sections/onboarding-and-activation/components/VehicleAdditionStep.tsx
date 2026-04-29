@@ -147,7 +147,7 @@ export function VehicleAdditionStep({
                   type="text"
                   value={rcNumber}
                   onChange={handleRcChange}
-                  placeholder="DL3CAF1234"
+                  placeholder="Enter vehicle number"
                   disabled={isFetching || fetchSuccess}
                   className={`
                     flex-1 px-4 py-3.5 rounded-xl border text-base tracking-wider font-mono uppercase
@@ -277,7 +277,7 @@ export function VehicleAdditionStep({
                     type="text"
                     value={manualData.vehicleName}
                     onChange={(e) => setManualData({ ...manualData, vehicleName: e.target.value })}
-                    placeholder="e.g., Maruti Suzuki Swift VXi"
+                    placeholder="Enter vehicle name"
                     className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                 </div>

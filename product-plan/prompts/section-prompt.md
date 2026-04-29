@@ -2,8 +2,8 @@
 
 ## Define Section Variables
 
-- **SECTION_NAME** = [Human-readable name, e.g., "Home" or "Incident Management"]
-- **SECTION_ID** = [Folder name in sections/, e.g., "home" or "incident-management"]
+- **SECTION_NAME** = [Human-readable name, e.g., "Incident Management" or "Compliance Dashboard"]
+- **SECTION_ID** = [Folder name in sections/, e.g., "incident-management" or "compliance-dashboard"]
 - **NN** = [Milestone number, e.g., "02" or "05" — sections start at 02 since 01 is Foundation]
 
 ---

@@ -1,9 +1,6 @@
 import { useState } from 'react'
-import { ArrowLeft, FileWarning, CheckCircle2, Calendar, MapPin, Truck } from 'lucide-react'
-// TODO: Replace with your app's language/i18n context
-// import { useLanguage, type Language } from '@/shell/components/LanguageContext'
-type Language = 'en' | 'hi'
-const useLanguage = () => ({ language: 'en' as Language })
+import { ArrowLeft, FileWarning, CheckCircle2, Calendar, MapPin, Truck, Copy } from 'lucide-react'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
@@ -152,7 +149,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={onBack}
-            className="p-2 -ml-2 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-white dark:hover:bg-stone-800 transition-colors"
+            className="p-2 -ml-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-white dark:hover:bg-stone-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -169,7 +166,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
           <div className="bg-white dark:bg-stone-900 rounded-xl p-3 flex flex-row lg:flex-col gap-3 lg:w-[240px] lg:flex-shrink-0 lg:self-start">
             <button
               onClick={() => setActiveTab('pending')}
-              className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full ${
+              className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-colors w-full ${
                 activeTab === 'pending'
                   ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300'
                   : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
@@ -187,7 +184,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
             </button>
             <button
               onClick={() => setActiveTab('paid')}
-              className={`flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full ${
+              className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-colors w-full ${
                 activeTab === 'paid'
                   ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300'
                   : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
@@ -209,7 +206,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
           <div className="flex-1 min-w-0 flex flex-col gap-4">
 
             {/* Vehicle Info Card */}
-            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 flex items-center gap-4">
+            <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6 flex items-center gap-4">
               <div className="p-3 rounded-lg bg-stone-100 dark:bg-stone-800 flex-shrink-0">
                 <Truck className="w-5 h-5 text-stone-500 dark:text-stone-400" />
               </div>
@@ -227,16 +224,22 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {pendingChallans.map((challan) => (
                         <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <p className="text-sm font-semibold text-stone-900 dark:text-stone-50">{challan.violationType}</p>
-                              <p className="text-xs text-stone-500 dark:text-stone-400 font-mono mt-0.5">{challan.challanNumber}</p>
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
+                              <button
+                                onClick={() => navigator.clipboard.writeText(challan.challanNumber)}
+                                className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                              >
+                                <Copy className="w-3.5 h-3.5" />
+                              </button>
                             </div>
-                            <span className="inline-flex items-center text-lg font-bold text-amber-700 dark:text-amber-300 tabular-nums">
+                            <span className="text-lg font-bold text-red-600 dark:text-red-400 tabular-nums">
                               {formatCurrency(challan.amount, language)}
                             </span>
                           </div>
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-stone-500 dark:text-stone-400 mb-4">
+                          <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
                             <span className="inline-flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5" />
                               {formatDate(challan.issueDate, language)}
@@ -246,17 +249,17 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                               {challan.location}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between pt-3 border-t border-stone-100 dark:border-stone-800">
+                          <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
                             {challan.category === 'court' ? (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400">
                                 {language === 'hi' ? 'कोर्ट चालान' : 'Court Challans'}
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400">
                                 {language === 'hi' ? 'ऑनलाइन चालान' : 'Online Challans'}
                               </span>
                             )}
-                            <button className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors shadow-sm">
+                            <button className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-sm">
                               {t.payNow}
                             </button>
                           </div>
@@ -267,7 +270,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                   </>
                 ) : (
                   <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl py-16 text-center">
-                    <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
+                    <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
                       <CheckCircle2 className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <p className="text-sm font-medium text-stone-900 dark:text-stone-50">{t.noPending}</p>
@@ -284,17 +287,23 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {paidChallans.map((challan) => (
                       <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5">
-                        <div className="flex items-start justify-between mb-3">
-                          <div>
-                            <p className="text-sm font-semibold text-stone-900 dark:text-stone-50">{challan.violationType}</p>
-                            <p className="text-xs text-stone-500 dark:text-stone-400 font-mono mt-0.5">{challan.challanNumber}</p>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
+                            <button
+                              onClick={() => navigator.clipboard.writeText(challan.challanNumber)}
+                              className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
                           </div>
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-sm font-bold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 tabular-nums">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span className="inline-flex items-center gap-1.5 text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                            <CheckCircle2 className="w-4 h-4" />
                             {formatCurrency(challan.amount, language)}
                           </span>
                         </div>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-stone-500 dark:text-stone-400 mb-4">
+                        <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
+                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
                           <span className="inline-flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5" />
                             {formatDate(challan.issueDate, language)}
@@ -305,7 +314,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                           </span>
                         </div>
                         {challan.paidDate && (
-                          <div className="pt-3 border-t border-stone-100 dark:border-stone-800">
+                          <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
                             <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                               {t.paidOn}: {formatDate(challan.paidDate, language)}
                             </span>
@@ -316,7 +325,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                   </div>
                 ) : (
                   <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl py-16 text-center">
-                    <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+                    <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                       <FileWarning className="w-7 h-7 text-stone-400 dark:text-stone-500" />
                     </div>
                     <p className="text-sm font-medium text-stone-900 dark:text-stone-50">{t.noPaid}</p>
@@ -342,10 +351,10 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="px-4 py-2 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm font-medium transition-colors">
+              <button className="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm font-medium transition-colors">
                 {language === 'hi' ? 'प्रस्ताव भेजें' : 'Send Proposal'}
               </button>
-              <button className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm">
+              <button className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm">
                 {t.payNow}
               </button>
             </div>

@@ -31,13 +31,19 @@
 
 ## Test-Driven Development
 
-Each section includes a `tests.md` file with detailed test-writing instructions. These are **framework-agnostic** — adapt them to your testing setup.
+Each section includes a `tests.md` file with detailed test-writing instructions. These are **framework-agnostic** — adapt them to your testing setup (Jest, Vitest, Playwright, Cypress, RSpec, Minitest, PHPUnit, etc.).
 
 **For each section:**
 1. Read `product-plan/sections/[section-id]/tests.md`
-2. Write failing tests for key user flows
+2. Write failing tests for key user flows (success and failure paths)
 3. Implement the feature to make tests pass
 4. Refactor while keeping tests green
+
+The test instructions include:
+- Specific UI elements, button labels, and interactions to verify
+- Expected success and failure behaviors
+- Empty state handling (when no records exist yet)
+- Data assertions and state validations
 
 ---
 
@@ -47,16 +53,7 @@ Each section includes a `tests.md` file with detailed test-writing instructions.
 
 A mission-critical legal-tech platform that eliminates roadside legal issues for vehicle owners and fleets in real-time. From compliance tracking to challan resolution, accident support, and 24/7 lawyer access across 98% of India's pin codes — LOTS247 is the indispensable legal safety net for every vehicle on Indian roads.
 
-## Key Problems Solved
-
-1. **Legal complexity on the road** — Instant 24/7 on-call lawyer access resolves 85% of issues over a single call, with on-site deployment in 2 hours when needed.
-2. **Scattered compliance tracking** — Centralized dashboard showing real-time compliance scores, document expiries, and vehicle status across your entire fleet.
-3. **Challan chaos** — Live challan dashboard with automated tracking, Lok Adalat representation, and bulk resolution services.
-4. **Incident panic** — Guided resolution for accidents, seizures, and legal entanglements with full-service handling by a nationwide network of 75K+ lawyers.
-5. **RTO bureaucracy** — RTO-as-a-Service handling fitness, hypothecation, ownership transfers, and regulatory compliance.
-
 ## Key Features
-
 - 24/7 on-call legal resolution
 - 2-hour on-site lawyer deployment (98% pin code coverage)
 - Real-time compliance engine with proactive alerts
@@ -71,29 +68,33 @@ A mission-critical legal-tech platform that eliminates roadside legal issues for
 1. **Home** — Quick Actions Hub — the default landing view with compliance score overview, active incidents, pending challans, and quick action shortcuts.
 2. **Onboarding & Activation** — Account creation, vehicle registration, compliance score generation, and subscription activation in under 3 minutes.
 3. **Compliance Dashboard** — Real-time compliance scores, document expiry tracking, and proactive alerts across all vehicles and drivers.
-4. **Incident Management** — 24/7 legal support requests, guided resolution workflows, lawyer assignment, and case tracking. Includes Challans (traffic violations) and Cases (legal matters).
+4. **Incident Management** — 24/7 legal support requests, guided resolution workflows, lawyer assignment, and case tracking.
 5. **Vehicle & Driver Management** — Vehicle overview, driver profiles, document storage, and audit-ready reporting.
 6. **Reports** — Fleet analytics, compliance trends, incident summaries, and challan reports with exportable data views.
-7. **API Catalogue** — Browse available APIs, explore endpoints, and submit requests to the team for new APIs needed in the system.
+7. **API Catalogue** — Browse available APIs, explore endpoints, and submit requests for new APIs.
 8. **Wallet** — Credit and debit payment ledger used for challan settlements, subscription payments, and transaction history.
-9. **Proposals** — Create, manage, and track service proposals for fleet owners — including pricing breakdowns, coverage details, and approval workflows.
+9. **Proposals** — Create, manage, and track service proposals for fleet owners.
+10. **Knowledge Base** — Centralized repository of legal guides, compliance documentation, FAQs, and how-to articles.
+11. **My Profile** — Personal account hub — view and edit personal details, organization/business information, and KYC verification status.
+12. **Settings** — Notification preferences, app behavior configuration, subscription plan management, and billing history.
 
 ## Data Model
 
 Core entities: Subscriber, Vehicle, Driver, Subscription, Payment, Incident, Challan, Lawyer, Document, Notification
 
 Key relationships:
-- Subscriber owns Vehicles, Drivers, Incidents, Challans, Documents
-- Subscriber has one active Subscription and many Payments
-- Vehicle has Documents and Challans; many-to-many with Drivers
-- Incident may involve a Vehicle and be assigned to a Lawyer
-- Challan belongs to Vehicle, may link to Payment
+- Subscriber has many Vehicles, Drivers, Incidents, Documents, Challans, Payments, Notifications
+- Subscriber has one active Subscription
+- Vehicle belongs to Subscriber, has many Documents, Challans, and Drivers (many-to-many)
+- Driver belongs to Subscriber, has many Vehicles (many-to-many) and Documents
+- Incident belongs to Subscriber, may involve a Vehicle, may be assigned to a Lawyer
+- Challan belongs to Subscriber (via Vehicle), may link to a Payment
 
 ## Design System
 
 **Colors:**
 - Primary: `emerald` — Used for buttons, links, key accents
-- Secondary: `amber` — Used for warnings, alerts, secondary elements
+- Secondary: `amber` — Used for tags, highlights, alerts/warnings
 - Neutral: `stone` — Used for backgrounds, text, borders
 
 **Typography:**
@@ -105,24 +106,60 @@ Key relationships:
 
 Build this product in milestones:
 
-1. **Foundation** — Set up design tokens, data model types, routing structure, and application shell
-2. **Home** — Quick Actions Hub with compliance overview and quick action shortcuts
-3. **Onboarding & Activation** — Multi-step registration, vehicle addition, and subscription selection
-4. **Compliance Dashboard** — Fleet-wide compliance monitoring with drill-down capability
-5. **Incident Management** — Challan tracking and case management with comment threads
-6. **Vehicle & Driver Management** — Vehicle list, detail views, driver assignment
-7. **Reports** — Report browsing, PDF preview, download and sharing
-8. **API Catalogue** — API browsing with detail pages and contact forms
-9. **Wallet** — Prepaid wallet with transaction ledger and Razorpay integration
-10. **Proposals** — Proposal tracking with status management and follow-up threads
+1. **Foundation** — Set up design tokens, data model types, routing, and application shell
+2. **Home** — Quick Actions Hub with compliance overview and shortcuts
+3. **Onboarding & Activation** — Account creation and subscription activation flow
+4. **Compliance Dashboard** — Fleet-level compliance monitoring
+5. **Incident Management** — Challans and legal cases
+6. **Vehicle & Driver Management** — Vehicle/driver repository
+7. **Reports** — Fleet analytics and report browsing
+8. **API Catalogue** — API browsing and pricing enquiries
+9. **Wallet** — Prepaid wallet and transaction ledger
+10. **Proposals** — Service proposal tracking
+11. **Knowledge Base** — Legal knowledge repository
+12. **My Profile** — Personal account and KYC management
+13. **Settings** — Preferences and subscription management
 
-Each milestone has a dedicated instruction document in `product-plan/instructions/`.
+Each milestone has a dedicated instruction document in `instructions/incremental/`.
+
+---
+
 
 ---
 
 # Milestone 1: Foundation
 
+> **Provide alongside:** `product-overview.md`
 > **Prerequisites:** None
+
+---
+
+## About These Instructions
+
+**What you're receiving:**
+- Finished UI designs (React components with full styling)
+- Data model definitions (TypeScript types and sample data)
+- UI/UX specifications (user flows, requirements, screenshots)
+- Design system tokens (colors, typography, spacing)
+- Test-writing instructions for each section (for TDD approach)
+
+**What you need to build:**
+- Backend API endpoints and database schema
+- Authentication and authorization
+- Data fetching and state management
+- Business logic and validation
+- Integration of the provided UI components with real data
+
+**Important guidelines:**
+- **DO NOT** redesign or restyle the provided components — use them as-is
+- **DO** wire up the callback props to your routing and API calls
+- **DO** replace sample data with real data from your backend
+- **DO** implement proper error handling and loading states
+- **DO** implement empty states when no records exist (first-time users, after deletions)
+- **DO** use test-driven development — write tests first using `tests.md` instructions
+- The components are props-based and ready to integrate — focus on the backend and data layer
+
+---
 
 ## Goal
 
@@ -138,8 +175,14 @@ Configure your styling system with these tokens:
 - See `product-plan/design-system/tailwind-colors.md` for Tailwind configuration
 - See `product-plan/design-system/fonts.md` for Google Fonts setup
 
-**Colors:** Primary = Emerald, Secondary = Amber, Neutral = Stone
-**Fonts:** DM Sans (headings + body), IBM Plex Mono (code/technical)
+**Color Palette:**
+- Primary: `emerald` — Used for buttons, links, key accents, active states
+- Secondary: `amber` — Used for alerts, warnings, tags, highlights
+- Neutral: `stone` — Used for backgrounds, text, borders
+
+**Typography:**
+- Heading & Body: DM Sans (variable weight 100-1000)
+- Code/Technical: IBM Plex Mono (for IDs, reference numbers, technical data)
 
 ### 2. Data Model Types
 
@@ -148,1339 +191,1514 @@ Create TypeScript interfaces for your core entities:
 - See `product-plan/data-model/types.ts` for interface definitions
 - See `product-plan/data-model/README.md` for entity relationships
 
-Key entities: Subscriber, Vehicle, Driver, Subscription, Payment, Incident, Challan, Lawyer, Document, Notification
+**Core Entities:**
+- Subscriber — User/account entity with KYC and business details
+- Vehicle — Registered vehicles with compliance tracking
+- Driver — Driver profiles with license details
+- Subscription — Plan management with tier-based limits
+- Payment — Financial transactions and ledger entries
+- Incident — Cases requiring legal support
+- Challan — Traffic violation penalties
+- Lawyer — Legal professionals assigned to cases
+- Document — File attachments for KYC, vehicles, cases
+- Notification — Alerts and system messages
 
 ### 3. Routing Structure
 
-Create routes for each section:
+Create placeholder routes for each section:
 
-- `/` — Home (Quick Actions Hub)
-- `/onboarding` — Onboarding & Activation (standalone, no shell)
-- `/compliance` — Compliance Dashboard
-- `/incidents/challans` — Challan Management
-- `/incidents/cases` — Case Management
-- `/fleet` — Vehicle & Driver Management
-- `/fleet/:id` — Vehicle Detail
-- `/reports` — Reports
-- `/api-catalogue` — API Catalogue
-- `/api-catalogue/:id` — API Detail
-- `/wallet` — Wallet
-- `/proposals` — Proposals
-- `/proposals/:id` — Proposal Detail
-- `/settings` — Settings
+| Route | Section |
+|-------|---------|
+| `/` | Home (Quick Actions Hub) |
+| `/onboarding` | Onboarding & Activation (standalone, no shell) |
+| `/compliance` | Compliance Dashboard |
+| `/incidents/challans` | Incident Management — Challans sub-section |
+| `/incidents/cases` | Incident Management — Cases sub-section |
+| `/fleet` | Vehicle & Driver Management |
+| `/reports` | Reports |
+| `/api-catalogue` | API Catalogue |
+| `/wallet` | Wallet |
+| `/proposals` | Proposals |
+| `/knowledge-base` | Knowledge Base |
+| `/profile` | My Profile |
+| `/settings` | Settings |
 
 ### 4. Application Shell
 
 Copy the shell components from `product-plan/shell/components/` to your project:
 
-- `AppShell.tsx` — Main layout wrapper with sidebar, top bar, and modals
-- `MainNav.tsx` — Navigation component with nested item support
-- `UserMenu.tsx` — User menu with avatar and plan badge
-- `LanguageContext.tsx` — Bilingual support (English/Hindi)
+- `AppShell.tsx` — Main layout wrapper with collapsible sidebar
+- `MainNav.tsx` — Navigation component with section links
+- `LanguageContext.tsx` — Language context provider for bilingual support (EN/HI)
 
 **Wire Up Navigation:**
 
-Connect navigation items to your routing:
+Connect navigation to your routing:
 
-Primary nav items:
-- Home (icon: Home) — `/`
-- Compliance (icon: ShieldCheck) — `/compliance`
-- Incidents (icon: AlertTriangle) — parent, with children:
-  - Challans — `/incidents/challans`
-  - Cases — `/incidents/cases`
-- Fleet (icon: Truck) — `/fleet`
-- Reports (icon: FileText) — `/reports`
-- API Catalogue (icon: Code) — `/api-catalogue`
-- Wallet (icon: Wallet) — `/wallet`
-- Proposals (icon: FileSignature) — `/proposals`
+- **Home** → `/` (default landing)
+- **Compliance** → `/compliance`
+- **Incidents** → `/incidents/challans` (with sub-nav: Challans | Cases)
+- **Fleet** → `/fleet`
+- **Reports** → `/reports`
+- **API Catalogue** → `/api-catalogue`
+- **Wallet** → `/wallet`
+- **Proposals** → `/proposals`
+- **Knowledge Base** → `/knowledge-base`
+- **Settings** → `/settings`
 
-Secondary nav items (below divider):
-- Settings (icon: Settings) — `/settings`
-- Help (icon: HelpCircle) — opens support ticket modal
+**Shell Layout:**
+- Full width sidebar: 240px with icons + labels
+- Collapsed width: 64px with icons only
+- Floating edge toggle button to expand/collapse
+- Content area fills remaining width
+
+**Responsive Behavior:**
+- Desktop (1024px+): Full sidebar, collapsible via toggle
+- Tablet (768px-1023px): Sidebar collapsed by default
+- Mobile (<768px): Sidebar hidden, hamburger menu overlay
 
 **User Menu:**
-The user menu expects: user name, optional avatar URL, subscription plan badge (Basic/Fleet/Enterprise), logout callback.
+- Located at bottom of sidebar
+- Shows: user avatar (initials fallback), subscriber name, subscription plan badge
+- Logout action
 
-**Quick Actions:**
-The shell includes quick action buttons: Add Incident, Add Vehicle, Call a Lawyer, Add Driver. Wire these to open the appropriate modals or trigger actions.
+**Special Notes:**
+- Onboarding section renders standalone (no shell) — it's a focused wizard flow
+- Settings is accessible from the sidebar
+- Dark mode support throughout
 
 ## Files to Reference
 
 - `product-plan/design-system/` — Design tokens
-- `product-plan/data-model/` — Type definitions
+- `product-plan/data-model/` — Type definitions and entity relationships
 - `product-plan/shell/README.md` — Shell design intent
 - `product-plan/shell/components/` — Shell React components
 
 ## Done When
 
-- [ ] Design tokens are configured (emerald, amber, stone + DM Sans, IBM Plex Mono)
-- [ ] Data model types are defined for all core entities
+- [ ] Design tokens are configured (emerald/amber/stone palette, DM Sans + IBM Plex Mono)
+- [ ] Data model types are defined for all 10 entities
 - [ ] Routes exist for all sections (can be placeholder pages)
-- [ ] Shell renders with sidebar navigation
+- [ ] Shell renders with collapsible sidebar navigation
 - [ ] Navigation links to correct routes
-- [ ] Nested navigation works (Incidents — Challans / Cases)
-- [ ] User menu shows user info and plan badge
-- [ ] Quick actions trigger appropriate modals/actions
-- [ ] Responsive on mobile (hamburger menu, overlay sidebar)
-- [ ] Language switcher toggles between English and Hindi
+- [ ] User menu shows user info and logout
+- [ ] Responsive on desktop, tablet, and mobile
+- [ ] Dark mode toggle works
+- [ ] Onboarding route renders without shell
 
 ---
 
 # Milestone 2: Home
 
+> **Provide alongside:** `product-overview.md`
 > **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Home screen — the daily entry point for fleet operators providing a real-time operational snapshot.
+Implement the Home section — the daily landing page and operational control center for fleet operators.
 
 ## Overview
 
-The Home screen is the primary control center of LOTS247, serving as the default landing view after login. It provides a real-time operational snapshot across five summary cards and four quick action shortcuts, answering: "What is the current health of my fleet and what needs attention right now?"
+The Home screen is the primary entry point after login, providing a real-time operational snapshot with five summary cards, quick action shortcuts, compliance health scoring, and proactive alerts. It answers: "What is the current health of my fleet and what needs attention right now?"
 
 **Key Functionality:**
-- View five overview cards: Active Vehicles, Active Drivers, Pending Challans, Active Incidents, Subscription Status
-- Quick action buttons: Add Incident, Add Vehicle, Call a Lawyer, Add Driver
-- Fleet-wide compliance health score with category breakdown
-- Proactive alerts for expiring documents and pending challans
-- Activity feed showing recent system events
-- Deep-linking from cards to respective modules
+- View five overview cards: Active Vehicles, Active Drivers, Pending Challans (count + amount), Active Tickets, Subscription Status
+- Execute quick actions: Add Incident, Add Vehicle, Call a Lawyer, Add Driver
+- View overall Compliance Health Score with category breakdown
+- See proactive alerts for expiring documents and pending challans
+- Deep-link from any card or alert to the relevant module
 
 ## Recommended Approach: Test-Driven Development
 
-See `product-plan/sections/home/tests.md` for detailed test-writing instructions.
+Before implementing this section, **write tests first** based on the test specifications provided.
+
+See `product-plan/sections/home/tests.md` for detailed test-writing instructions including:
+- Key user flows to test (success and failure paths)
+- Specific UI elements, button labels, and interactions to verify
+- Expected behaviors and assertions
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
-Copy from `product-plan/sections/home/components/`:
-- `HomeView.tsx` — Main home layout
-- `TopHeader.tsx` — Page header
-- `OverviewCard.tsx` — Stat card component
-- `QuickActions.tsx` — Quick action buttons
-- `ComplianceScore.tsx` — Compliance health score display
-- `VehicleComplianceCheck.tsx` — Vehicle compliance checker
-- `VehicleComplianceResultsView.tsx` — Compliance check results
-- `ActivityView.tsx` — Activity section
-- `ActivityFeed.tsx` — Activity feed list
-- `AddIncidentModal.tsx` — Modal for creating incidents
-- `CheckChallanModal.tsx` — Modal for checking challans
-- `ChallanResultsView.tsx` — Challan check results
+Copy the section components from `product-plan/sections/home/components/`:
+
+- `Home.tsx` — Main home layout with overview cards, quick actions, compliance score, and alerts
 
 ### Data Layer
 
-Key types from `types.ts`: HomeStats, ComplianceScore, AlertItem, Subscriber, Subscription, ActiveVehiclesStat, ActiveDriversStat, PendingChallansStat, ActiveIncidentsStat
+The components expect these data shapes (from `types.ts`):
+- `HomeData` — Combined home state with vehicle/driver counts, challans, incidents, subscription
+- `ComplianceScore` — Overall score and category breakdowns
+- `Alert` — Proactive alert items with urgency levels
 
 You'll need to:
-- Create API endpoints to aggregate fleet stats
-- Fetch compliance scores from the compliance engine
-- Aggregate alerts from document expiry tracking
-- Stream activity feed events
+- Create API endpoints aggregating data from vehicles, drivers, challans, incidents, and subscriptions
+- Calculate compliance health score from document validity across fleet
+- Generate alerts based on expiry thresholds (7, 15, 30 days)
 
 ### Callbacks
 
+Wire up these user actions:
+
 | Callback | Description |
 |----------|-------------|
-| `onViewVehicles` | Navigate to Vehicle & Driver Management |
-| `onViewDrivers` | Navigate to Driver list |
-| `onViewChallans` | Navigate to Challan Management with filters |
-| `onViewIncidents` | Navigate to Incident Management |
-| `onViewSubscription` | Navigate to Subscription settings |
-| `onAddIncident` | Open Add Incident modal |
-| `onAddVehicle` | Open Add Vehicle modal |
-| `onCallLawyer` | Trigger legal support call |
-| `onAddDriver` | Open Add Driver form |
-| `onViewProfile` | Navigate to user profile |
-| `onLogout` | Trigger logout flow |
+| `onAddIncident` | Opens incident creation workflow |
+| `onAddVehicle` | Opens add vehicle modal (plan limit check) |
+| `onCallLawyer` | Triggers legal support (call modal on web) |
+| `onAddDriver` | Opens add driver form |
+| `onCardClick` | Deep-links to respective module |
+| `onAlertClick` | Navigates to specific vehicle detail |
 
 ### Empty States
 
-- No vehicles yet: Show "Add your first vehicle" CTA
-- No challans: Show "No pending challans" message
-- No incidents: Show "No active incidents" message
-- No alerts: Show "All clear — your fleet is compliant"
+- **No vehicles yet:** Show zero-state on Active Vehicles card with prompt to add
+- **No challans:** Show "No Pending Challans" message
+- **No alerts:** Show "All clear" state in alerts section
+- **Subscription expired:** Show urgency state with renewal CTA
 
 ## Expected User Flows
 
-### Flow 1: View Fleet Overview
-1. User lands on Home after login
-2. User sees all five overview cards with live data
+### Flow 1: View Fleet Status
+1. User logs in and lands on Home
+2. User sees all five overview cards populated with live data
 3. User clicks "Pending Challans" card
-4. **Outcome:** Navigates to Challan Management with pending filter
+4. **Outcome:** Navigates to Challan Management with pending filter applied
 
 ### Flow 2: Quick Action — Add Incident
-1. User clicks "Add Incident" button
-2. Modal opens with incident creation form
-3. User fills in incident details and submits
-4. **Outcome:** Incident created, card updates
+1. User clicks "Add Incident" quick action button
+2. Incident creation workflow opens
+3. **Outcome:** User can create a new incident from Home
 
-### Flow 3: Check Compliance Alerts
-1. User views compliance health score
-2. User sees alerts for expiring PUC/insurance
-3. User clicks an alert
-4. **Outcome:** Deep-links to the vehicle's detail page
+### Flow 3: View Compliance Alert
+1. User sees an alert: "MH12AB1234 — PUC expires in 5 days"
+2. User clicks the alert
+3. **Outcome:** Navigates to that vehicle's detail page in Fleet Management
+
+### Flow 4: Plan Limit Reached
+1. User clicks "Add Vehicle" but has reached plan limit
+2. **Outcome:** Upgrade prompt is shown instead of add vehicle form
 
 ## Files to Reference
 
-- `product-plan/sections/home/README.md`
-- `product-plan/sections/home/tests.md`
-- `product-plan/sections/home/components/`
-- `product-plan/sections/home/types.ts`
-- `product-plan/sections/home/sample-data.json`
+- `product-plan/sections/home/README.md` — Feature overview and design intent
+- `product-plan/sections/home/tests.md` — Test-writing instructions (use for TDD)
+- `product-plan/sections/home/components/` — React components
+- `product-plan/sections/home/types.ts` — TypeScript interfaces
+- `product-plan/sections/home/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
 - [ ] Five overview cards render with real data
-- [ ] Quick actions trigger correct modals/actions
-- [ ] Compliance score displays with category breakdown
-- [ ] Alerts show for expiring documents
-- [ ] Activity feed shows recent events
-- [ ] Empty states display when no data exists
-- [ ] Deep-links work to respective modules
+- [ ] Quick action buttons trigger correct workflows
+- [ ] Compliance health score calculates from fleet data
+- [ ] Alerts generated from expiry thresholds
+- [ ] Deep-links navigate to correct modules
+- [ ] Plan limits enforced with upgrade prompts
+- [ ] Empty states display properly when no records exist
 - [ ] Responsive on mobile
 
 ---
 
 # Milestone 3: Onboarding & Activation
 
+> **Provide alongside:** `product-overview.md`
 > **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the multi-step onboarding wizard that guides new users from registration through phone verification, vehicle addition, optional driver addition, and subscription plan selection to full activation — all in under 3 minutes.
+Implement the Onboarding & Activation flow — guiding new users from registration to first vehicle and subscription activation in under 3 minutes.
 
 ## Overview
 
-The Onboarding & Activation module is a standalone flow (no application shell) that ensures every new user reaches the dashboard with at least one vehicle linked and an active subscription. The wizard is linear — users cannot go backwards — and the system resumes from the last completed step if the user exits mid-flow.
+The onboarding module is a standalone multi-step wizard (no app shell) that handles account creation, OTP verification, vehicle registration via RC number auto-fetch, optional driver assignment, and subscription plan selection. The primary goal is to ensure every user reaches the dashboard with at least one vehicle linked and an active subscription.
 
 **Key Functionality:**
-- Registration form with business details and T&C agreement
-- Phone verification via 6-digit OTP with auto-advance input boxes
+- Multi-step registration form with OTP verification
 - Vehicle addition via RC number with auto-fetch from government API
-- Optional driver addition with skip capability
-- Subscription plan selection (Free activates immediately, Paid redirects to Razorpay)
-- Session resume from last completed step on re-login
-- Login flow for returning users ("Already have an account? Login")
+- Optional driver assignment linked to the added vehicle
+- Subscription plan selection with 4 tiers (Free + 3 Paid)
+- Resume from last completed step if user exits mid-onboarding
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/onboarding-and-activation/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/onboarding-and-activation/components/`:
-- `OnboardingFlow.tsx` — Main wizard orchestrator managing step transitions
-- `RegistrationStep.tsx` — Registration form (name, mobile, business type, state, pincode, email, T&C checkbox)
-- `LoginStep.tsx` — Login form for returning users
-- `PhoneVerificationStep.tsx` — OTP entry with 6 separate input boxes, countdown timer, resend link
-- `VehicleAdditionStep.tsx` — RC number input, fetch details button, auto-populated confirmation, manual fallback
-- `DriverAdditionStep.tsx` — Optional driver form with name, ID, license number, vehicle assignment, skip link
-- `PlanSelectionStep.tsx` — 4 pricing cards (Free + 3 paid tiers) with feature comparison
-- `ProgressIndicator.tsx` — Visual step progress (note: spec says no step counter shown, but component exists for internal tracking)
+
+- `Onboarding.tsx` — Multi-step wizard with all onboarding screens
 
 ### Data Layer
 
-Key types from `types.ts`: OnboardingProgress, SubscriptionPlan, SubscriptionPlanFeatures, PhoneVerificationForm, VehicleDetailsForm, DriverDetailsForm, ValidationErrors, UIState
-
-You'll need to:
-- Create user registration API endpoint
-- Implement OTP generation, delivery (SMS), and verification
-- Integrate with government RC vehicle details API for auto-fetch
-- Create vehicle and driver records on the backend
-- Integrate Razorpay payment gateway for paid plans
-- Implement session persistence to resume from last completed step
-- Validate duplicate RC numbers, phone numbers, and email addresses
+- Registration data: name, mobile, business name, business type, state, pincode, email
+- OTP verification: 6-digit code sent to mobile
+- Vehicle: RC number input → API auto-fetch → confirmation
+- Driver: optional name, ID, license number, vehicle assignment
+- Subscription: plan selection from 4 tiers
 
 ### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onRequestOTP` | Send OTP to the user's phone number |
-| `onVerifyOTP` | Validate the 6-digit OTP |
-| `onResendOTP` | Resend OTP after countdown expires |
-| `onPhoneVerified` | Proceed after successful verification |
-| `onFetchVehicleDetails` | Call government API to auto-fetch vehicle details by RC number |
-| `onAddVehicle` | Save vehicle and link to user account |
-| `onManualEntry` | Switch to manual vehicle entry when API fails |
-| `onAddDriver` | Save driver and assign to vehicle |
-| `onSkipDriver` | Skip driver step and proceed to plan selection |
-| `onSelectPlan` | Select a subscription plan |
-| `onFreePlanActivated` | Activate free plan immediately |
-| `onInitiatePayment` | Redirect to Razorpay for paid plan |
-| `onPaymentComplete` | Handle successful payment and activate subscription |
-| `onPaymentFailed` | Show payment failure error with retry option |
+| `onRegister` | Submits registration form data |
+| `onVerifyOTP` | Validates 6-digit OTP code |
+| `onResendOTP` | Triggers OTP resend after countdown |
+| `onFetchVehicle` | Fetches vehicle details by RC number |
+| `onAddDriver` | Submits optional driver details |
+| `onSelectPlan` | Selects subscription plan |
+| `onComplete` | Redirects to dashboard on activation |
 
-### Empty States
+### Important Notes
 
-- N/A — the onboarding flow is always presented fresh to new users. There are no "empty" states; all steps require input or action.
+- **No shell/navigation chrome** — this is a standalone focused flow
+- **No back button** — users cannot go backwards in the flow
+- **No progress indicator** — no step counter or step labels shown
+- **Resume capability** — system resumes from last completed step on next login
+- **Free plan activates immediately** — paid plans redirect to payment gateway
 
-### Error States
+### Empty States & Error Handling
 
-- Invalid phone number: Inline error below the phone input
-- Invalid OTP: Inline error with "Resend OTP" link
-- Rate-limited OTP: Message indicating too many attempts
-- Duplicate RC number: Inline error below RC input
-- RC API failure: Auto-switch to manual entry mode with fallback message
-- Payment failure: Inline error on plan screen with retry option
-- Payment timeout: Error with retry option
-- Missing required fields: Inline validation errors per field
+- **API fetch failure:** Allow manual vehicle entry as fallback
+- **Duplicate RC number:** Show inline error below RC input
+- **Invalid OTP:** Show inline error with resend option and rate limiting
+- **Payment failure:** Keep user on plan screen with retry option
 
 ## Expected User Flows
 
-### Flow 1: Happy Path — Full Registration to Activation
-1. User fills out registration form (name, mobile, business type, state, pincode, email)
-2. User checks "I agree to T&C and Privacy Policy" and taps "Continue"
-3. User receives OTP on their mobile number
-4. User enters 6-digit OTP in the separate input boxes (auto-advance on each digit)
-5. System verifies OTP, creates user account, advances to vehicle step
-6. User enters RC number and taps "Fetch Details"
-7. Loading spinner shows "Fetching vehicle details..."
-8. Vehicle details auto-populate; user confirms
-9. User optionally fills in driver details or taps "I'll add drivers later"
-10. User sees 4 subscription plans, selects "Free" plan
-11. Free plan activates immediately
-12. **Outcome:** User is redirected to the Home dashboard with one vehicle linked
+### Flow 1: Complete Registration
+1. User fills registration form (name, mobile, business name, type, state, pincode, email)
+2. User agrees to Terms & Conditions checkbox
+3. User clicks "Continue"
+4. **Outcome:** OTP sent to mobile number, user advances to OTP screen
 
-### Flow 2: Returning User — Login
-1. User taps "Already have an account? Login" link on registration page
-2. User enters phone number and receives OTP
-3. User enters OTP and is authenticated
-4. **Outcome:** User is redirected to the Home dashboard
+### Flow 2: OTP Verification
+1. User enters 6-digit OTP in separate input boxes
+2. Digits auto-advance between boxes
+3. **Outcome:** Account created, user advances to vehicle addition
 
-### Flow 3: RC API Failure — Manual Entry
-1. User enters RC number and taps "Fetch Details"
-2. API call fails; system shows fallback message
-3. User is presented with manual entry form fields (vehicle name, type, etc.)
-4. User fills in vehicle details manually and confirms
-5. **Outcome:** Vehicle is saved, flow advances to driver step
+### Flow 3: Add Vehicle via RC
+1. User enters RC number and clicks "Fetch Details"
+2. Loading spinner shows "Fetching vehicle details..."
+3. Vehicle details auto-populate for confirmation
+4. **Outcome:** Vehicle linked to account, flow advances
 
-### Flow 4: Paid Plan — Razorpay Payment
-1. User reaches plan selection step
-2. User selects a paid plan (e.g., Bsafe, Vcare, or Enterprise)
-3. System redirects to Razorpay payment gateway
-4. User completes payment
-5. **Outcome:** Subscription activates, user is redirected to Home dashboard
-6. **On failure:** User remains on plan screen with inline error and retry option
+### Flow 4: Select Subscription Plan
+1. User sees 4 pricing cards displayed
+2. User clicks "Select Plan" on desired tier
+3. Free plan activates immediately; Paid triggers payment
+4. **Outcome:** User redirected to dashboard
 
 ## Files to Reference
 
-- `product-plan/sections/onboarding-and-activation/README.md`
-- `product-plan/sections/onboarding-and-activation/tests.md`
-- `product-plan/sections/onboarding-and-activation/components/`
-- `product-plan/sections/onboarding-and-activation/types.ts`
-- `product-plan/sections/onboarding-and-activation/sample-data.json`
+- `product-plan/sections/onboarding-and-activation/README.md` — Feature overview
+- `product-plan/sections/onboarding-and-activation/tests.md` — Test instructions
+- `product-plan/sections/onboarding-and-activation/components/` — React components
+- `product-plan/sections/onboarding-and-activation/types.ts` — TypeScript interfaces
+- `product-plan/sections/onboarding-and-activation/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Registration form validates all fields and submits correctly
-- [ ] T&C checkbox is required before continuing
-- [ ] OTP is sent, verified, and auto-advances between input boxes
-- [ ] Resend OTP works after countdown timer expires
-- [ ] Vehicle details auto-fetch via RC number API
-- [ ] Manual entry fallback works when API fails
-- [ ] Duplicate RC number shows inline error
-- [ ] Driver addition is optional with working skip link
-- [ ] All 4 subscription plans display with correct features
+- [ ] Registration form validates and submits correctly
+- [ ] OTP verification works with auto-advance between digits
+- [ ] Vehicle RC auto-fetch with loading state and manual fallback
+- [ ] Driver addition is optional with skip link
+- [ ] All 4 subscription plans display with correct details
 - [ ] Free plan activates immediately
-- [ ] Paid plans redirect to Razorpay and handle success/failure
-- [ ] Session resumes from last completed step on re-login
-- [ ] Standalone pages render without application shell
-- [ ] Responsive on mobile
-- [ ] "Already have an account? Login" flow works
+- [ ] Paid plan redirects to payment gateway
+- [ ] Onboarding renders without app shell
+- [ ] Resume from last step works on re-login
+- [ ] All error states handled inline
+- [ ] Mobile responsive
 
 ---
 
 # Milestone 4: Compliance Dashboard
 
-> **Prerequisites:** Milestone 1 (Foundation) complete, Milestone 6 (Vehicle & Driver Management) recommended
+> **Provide alongside:** `product-overview.md`
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Compliance Dashboard — a fleet-level, view-only analytics dashboard that gives fleet managers real-time visibility into document validity, government flags, and compliance health across all vehicles and drivers.
+Implement the Compliance Dashboard — a fleet-level compliance monitoring view with real-time scores, category breakdowns, and drill-down capability.
 
 ## Overview
 
-The Compliance Dashboard is designed for fleet managers overseeing 50-500+ vehicles who need aggregate insights with drill-down capability. It is strictly a view-only analytics surface — all actions (document uploads, renewals, etc.) happen in their respective sections. The dashboard answers: "What is the compliance health of my fleet, what needs attention, and what are the trends?"
+A view-only analytics dashboard providing real-time visibility into document validity, government flags, and compliance health across all vehicles and drivers. Designed for fleet managers overseeing 50-500+ vehicles who need aggregate insights with drill-down capability. All actions (document uploads, renewals) happen in their respective sections.
 
 **Key Functionality:**
-- Overall fleet compliance ring score (0-100) with month-over-month change
-- 8 clickable category cards: RC, Insurance, PUCC, Permits, DL, Challans, Blacklisted, NTBT
-- Auto-generated insights panel (3-4 data-driven insights)
-- Monthly compliance trend line chart
+- Overall fleet compliance score (0-100) with ring visualization
+- 8 category cards: RC, Insurance, PUCC, Permits, DL, Challans, Blacklisted, NTBT
+- Date range filtering and scope toggle (Fleet/Vehicle/Driver)
+- Category drill-down with vehicle-level breakdown
+- Auto-generated insights panel and monthly trend chart
 - Expiry urgency table sorted by soonest expiry
-- Category drill-down views with vehicle-level breakdown tables
-- Filters: date range presets and scope toggle (Fleet / Vehicle / Driver)
-- Permits drill-down with sub-breakdown by type (All India / Nationwide / State)
-- Blacklisted drill-down with flag details (reason, authority, date)
-- NTBT drill-down with hold details (reason, authority, case reference)
-- Historical stats summary
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/compliance-dashboard/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/compliance-dashboard/components/`:
-- `ComplianceDashboard.tsx` — Full dashboard component handling fleet overview, category cards, insights, trends, expiry table, drill-down views, and all filtering
+
+- `ComplianceDashboard.tsx` — Main dashboard with score, categories, insights, trends, and urgency table
 
 ### Data Layer
 
-Key types from `types.ts`: ComplianceScore, ComplianceCategory, CategoryId, Insight, MonthlyTrendPoint, MonthlyChallanTrendPoint, ExpiryUrgencyItem, CategoryDrilldowns (with per-category row types: RcDrilldownRow, InsuranceDrilldownRow, PuccDrilldownRow, PermitDrilldownRow, DlDrilldownRow, ChallanDrilldownRow, BlacklistedDrilldownRow, NtbtDrilldownRow), HistoricalStats, Vehicle, Driver
-
-You'll need to:
-- Build a compliance scoring engine that calculates overall and per-category scores
-- Create API endpoints to aggregate compliance data across the fleet
-- Implement date range filtering (This Month, Last 3 Months, Last 6 Months, Last Year, Custom)
-- Implement scope filtering (Fleet, Vehicle-specific, Driver-specific)
-- Generate auto-insights from compliance data (e.g., "12 PUC certificates expiring in next 15 days")
-- Compute monthly trend data points for the line chart
-- Compute challan trend data (count, online vs court, amounts)
-- Query expiry dates across all documents and sort by urgency
-- Build drill-down queries for each of the 8 categories
-- Integrate with government databases for Blacklisted and NTBT flags
-- Track vehicle history events for per-vehicle timelines
+- Overall compliance score calculation (weighted across categories)
+- Per-category compliance counts (compliant/total)
+- Monthly trend data points
+- Expiry urgency data with days-remaining calculations
+- Auto-generated insights from data analysis
+- Scope filtering (fleet-wide, per-vehicle, per-driver)
 
 ### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onCategorySelect` | Open drill-down view for a specific compliance category |
-| `onBackToOverview` | Return from drill-down to the Fleet Overview |
-| `onDateRangeChange` | Apply a date range filter (preset or custom range) |
-| `onScopeChange` | Switch scope between Fleet, Vehicle, or Driver (with optional selected ID) |
+| `onCategoryClick` | Opens category drill-down view |
+| `onDateRangeChange` | Updates date filter for all data |
+| `onScopeChange` | Switches between Fleet/Vehicle/Driver scope |
+| `onVehicleSelect` | Selects specific vehicle in Vehicle scope |
+| `onDriverSelect` | Selects specific driver in Driver scope |
+| `onBackFromDrilldown` | Returns to Fleet Overview |
 
 ### Empty States
 
-- No vehicles in fleet: Show "Add your first vehicle to see compliance data" with CTA to Fleet section
-- No data for selected date range: Show "No compliance data available for this period"
-- No expiring documents: Show "All documents are up to date" in the expiry urgency table
-- No insights available: Show "Not enough data to generate insights yet"
-- Empty drill-down: Show "No vehicles found for this category"
+- **New account with no vehicles:** Show zero compliance state with prompt to add vehicles
+- **No expiring documents:** Show "All documents current" in urgency table
+- **Category with zero vehicles:** Show 0/0 with appropriate messaging
 
 ## Expected User Flows
 
-### Flow 1: View Fleet Compliance Overview
+### Flow 1: View Fleet Compliance
 1. User navigates to Compliance Dashboard
-2. User sees the overall compliance ring score (e.g., 87/100, "Healthy")
-3. User views 8 category cards with compliant/total counts and status colors
-4. User scrolls to see insights, monthly trend chart, and expiry urgency table
-5. **Outcome:** User has a full picture of fleet compliance health
+2. User sees overall score ring, 8 category cards, insights, trends, urgency table
+3. **Outcome:** Complete fleet compliance picture at a glance
 
-### Flow 2: Drill Down into a Category
+### Flow 2: Category Drill-Down
 1. User clicks the "Insurance" category card
-2. Dashboard transitions to the Insurance drill-down view
-3. User sees insurance-specific compliance score with trend
-4. User sees a table of all vehicles with insurance status, provider, policy number, and expiry date
-5. User clicks "Back" to return to Fleet Overview
-6. **Outcome:** User has identified which vehicles need insurance renewal
+2. Category drill-down view opens with insurance-specific compliance score
+3. User sees vehicle-level breakdown table
+4. User clicks back button
+5. **Outcome:** Returns to Fleet Overview
 
-### Flow 3: Filter by Scope — Specific Vehicle
-1. User changes scope toggle from "Fleet" to "Vehicle"
-2. A search/select dropdown appears
-3. User selects a specific vehicle (e.g., "MH04AB1234")
-4. Dashboard updates to show compliance data for that vehicle only
-5. **Outcome:** User sees single-vehicle compliance across all 8 categories
+### Flow 3: Scope Filtering
+1. User switches scope toggle to "Vehicle"
+2. Vehicle search/select dropdown appears
+3. User selects a specific vehicle
+4. **Outcome:** All data updates to show that vehicle's compliance across all 8 categories
 
-### Flow 4: Review Expiry Urgency
-1. User scrolls to the Expiry Urgency table
-2. User sees documents sorted by soonest expiry with urgency badges (Expired, 7 days, 15 days, 30 days)
-3. User identifies 3 vehicles with expired PUC certificates
-4. **Outcome:** User knows exactly which documents need immediate attention
+### Flow 4: Date Range Adjustment
+1. User changes date range to "Last 6 Months"
+2. **Outcome:** Trend chart and insights update to reflect the selected range
 
 ## Files to Reference
 
-- `product-plan/sections/compliance-dashboard/README.md`
-- `product-plan/sections/compliance-dashboard/tests.md`
-- `product-plan/sections/compliance-dashboard/components/`
-- `product-plan/sections/compliance-dashboard/types.ts`
-- `product-plan/sections/compliance-dashboard/sample-data.json`
+- `product-plan/sections/compliance-dashboard/README.md` — Feature overview
+- `product-plan/sections/compliance-dashboard/tests.md` — Test instructions
+- `product-plan/sections/compliance-dashboard/components/` — React components
+- `product-plan/sections/compliance-dashboard/types.ts` — TypeScript interfaces
+- `product-plan/sections/compliance-dashboard/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Overall compliance ring score displays with month-over-month change
-- [ ] Score color-codes correctly: emerald (75+), amber (50-74), red (below 50)
-- [ ] All 8 category cards render with compliant/total counts and percentage
-- [ ] Category cards are clickable and open drill-down views
-- [ ] Drill-down views show category-specific score, trend, and vehicle-level table
-- [ ] Permits drill-down shows sub-breakdown by type (All India / Nationwide / State)
-- [ ] Blacklisted drill-down shows flag reason, authority, and date
-- [ ] NTBT drill-down shows hold reason, authority, and case reference
-- [ ] Insights panel shows 3-4 auto-generated insights
-- [ ] Monthly trend chart renders with data points adapting to date range
-- [ ] Expiry urgency table shows documents sorted by soonest expiry
-- [ ] Urgency badges display correctly (Expired, 7 days, 15 days, 30 days)
-- [ ] Date range filter works with all presets and custom range
-- [ ] Scope toggle works for Fleet, Vehicle, and Driver
-- [ ] Vehicle/Driver selector appears when scope is changed
-- [ ] Back button in drill-down returns to Fleet Overview
-- [ ] Empty states display when no data exists
-- [ ] Responsive on mobile (cards stack to 2 columns)
+- [ ] Overall compliance score ring renders with correct percentage
+- [ ] 8 category cards show compliant/total with status colors
+- [ ] Date range filter updates all dashboard data
+- [ ] Scope toggle switches between Fleet/Vehicle/Driver views
+- [ ] Category drill-down shows vehicle-level breakdown
+- [ ] Permits drill-down shows sub-breakdown by permit type
+- [ ] Blacklisted and NTBT drill-downs show flag/hold details
+- [ ] Insights panel shows auto-generated data-driven insights
+- [ ] Monthly trend chart adapts to selected date range
+- [ ] Expiry urgency table sorted by soonest expiry with badges
+- [ ] Empty states display properly
+- [ ] Responsive on mobile
 
 ---
 
 # Milestone 5: Incident Management
 
-> **Prerequisites:** Milestone 1 (Foundation) complete, Milestone 6 (Vehicle & Driver Management) recommended
+> **Provide alongside:** `product-overview.md`
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Incident Management section with its two sub-sections — Challans and Cases — including list views, detail views, creation flows, comment threads, and challan-to-case escalation.
+Implement Incident Management — handling both Challans (short-lifecycle traffic violations) and Cases (long-lifecycle legal matters) with sub-navigation, detail views, and unified comment threads.
 
 ## Overview
 
-Incident Management handles two distinct sub-sections accessible via a sub-nav under "Incidents" in the sidebar. Challans manage short-lifecycle traffic violation penalties with a 45-day resolution SLA. Cases handle structured long-lifecycle legal matters (accidents, detention, theft, disputes) with lawyer assignment and activity logging. Both sub-sections support a unified comment thread for follow-ups between the user and the LOTS247 team.
+The Incident Management section handles two distinct sub-sections accessible via sub-nav: **Challans** (traffic violation penalties with a 45-day resolution SLA) and **Cases** (structured legal matters like accidents, detention, theft with lawyer assignment). Both support unified comment threads for follow-ups between user and LOTS247 team.
 
 **Key Functionality:**
-- **Challans:** List with filters, detail with status/actions/comments, 45-day SLA tracking, refund requests on SLA breach
-- **Cases:** List with filters, multi-step creation modal, detail with tabs (Timeline/Documents/Comments)
-- Unified comment threads on both challans and cases
-- Challan-to-case escalation via pre-filled case creation modal
-- Subscription gating (free plan shows locked actions with upgrade prompts)
-
-**Challan Lifecycle (User View):** Submitted -> In Progress -> Resolved / On Hold / Not Settled
-**Case Lifecycle (User View):** Submitted -> In Progress -> Resolved / Document Requested / Extended
-
-**Case Types:** Theft, Detention, Bail, Accidents, FIRs, Superdari, Vehicle Impounding, E-Way Bill, Others
+- Challans list with filtering by vehicle, date, status, amount
+- Challan detail with status badge, key fields, actions (Pay Now, Dispute, Escalate to Case, Download Receipt)
+- Cases list with filtering by status, type, vehicle
+- Case creation via multi-step modal (type → vehicle → driver → description → documents)
+- Case detail with Timeline, Documents, and Comments tabs
+- Unified comment thread on both challans and cases
+- 45-day SLA tracking on challans with refund capability
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/incident-management/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/incident-management/components/`:
-- `ChallanList.tsx` — Challan table with columns for ID, vehicle, violation, amount, status, and actions; filterable by vehicle, date range, status, amount range
-- `ChallanDetail.tsx` — Challan detail view with status badge, key fields, action buttons (Pay Now, Dispute, Escalate to Case, Download Receipt), and comment thread
-- `CaseList.tsx` — Case table with columns for ID, type, vehicle, status, and actions; filterable by status, case type, vehicle
-- `CaseDetail.tsx` — Case detail with header summary, assigned lawyer info, and tabbed sections (Timeline, Documents, Comments)
 
-Additional top-level views:
-- `IncidentManagement.tsx` — Wrapper with sub-nav toggling between Challans and Cases
-- `ChallanList.tsx` (top-level) — Preview wrapper for challan list
-- `CaseList.tsx` (top-level) — Preview wrapper for case list
-- `ChallanDetail.tsx` (top-level) — Preview wrapper for challan detail
-- `CaseDetail.tsx` (top-level) — Preview wrapper for case detail
+- `IncidentManagement.tsx` — Main container with sub-nav (Challans | Cases)
+- Additional sub-components for challan list, case list, detail views
 
 ### Data Layer
 
-Key types from `types.ts`: Challan, ChallanStatus, ChallanType, ChallanActivity, ChallanActivityType, Case, CaseStatus, CaseType, CaseOrigin, CaseActivity, CaseDocument, CaseReport, Comment, Vehicle, Driver, Lawyer
+**Challan Lifecycle (User View):**
+- Submitted → In Progress → Resolved / On Hold / Not Settled
+- 45-day SLA from creation; if breached, user can request refund
 
-You'll need to:
-- Create CRUD API endpoints for challans and cases
-- Implement challan status transitions (Submitted -> In Progress -> Resolved/On Hold/Not Settled)
-- Implement case status transitions (Submitted -> In Progress -> Resolved/Document Requested/Extended)
-- Track the 45-day SLA deadline per challan and flag breaches
-- Implement comment threads (polymorphic: entityType = 'challan' | 'case')
-- Implement document upload and storage for cases
-- Build the multi-step case creation flow (type -> vehicle -> driver -> description -> documents -> submit)
-- Implement challan-to-case escalation with data pre-fill
-- Generate activity timeline events for status changes, assignments, and notes
-- Implement subscription gating (lock actions for free plan users)
+**Case Lifecycle (User View):**
+- Submitted → In Progress → Resolved / Document Requested / Extended
+- No fixed SLA; cases can originate from lawyer calls
 
-### Callbacks — Challan List
+### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onView` | Navigate to challan detail page |
-| `onAddFollowUp` | Open follow-up comment on a challan |
-| `onPay` | Initiate challan payment |
-| `onDispute` | Initiate challan dispute |
-| `onEscalateToCase` | Open case creation modal pre-filled with challan data |
-| `onDownloadReceipt` | Download payment receipt PDF |
-| `onRequestRefund` | Request refund for SLA-breached challan |
-
-### Callbacks — Challan Detail
-
-| Callback | Description |
-|----------|-------------|
-| `onPay` | Initiate challan payment |
-| `onDispute` | Initiate challan dispute |
-| `onEscalateToCase` | Open case creation modal pre-filled with challan data |
-| `onDownloadReceipt` | Download payment receipt PDF |
-| `onRequestRefund` | Request refund for SLA-breached challan |
-| `onAddComment` | Post a comment to the challan thread |
-| `onBack` | Navigate back to challan list |
-
-### Callbacks — Case List
-
-| Callback | Description |
-|----------|-------------|
-| `onView` | Navigate to case detail page |
-| `onCreate` | Open multi-step case creation modal |
-
-### Callbacks — Case Detail
-
-| Callback | Description |
-|----------|-------------|
-| `onUploadDocument` | Upload a document to the case |
-| `onAddComment` | Post a comment to the case thread |
-| `onBack` | Navigate back to case list |
+| `onViewChallan` | Opens challan detail view |
+| `onPayChallan` | Initiates challan payment |
+| `onDisputeChallan` | Starts dispute process |
+| `onEscalateToCase` | Opens case creation pre-filled with challan data |
+| `onDownloadReceipt` | Downloads challan receipt PDF |
+| `onRequestRefund` | Requests refund for SLA breach |
+| `onCreateCase` | Opens multi-step case creation modal |
+| `onViewCase` | Opens case detail page |
+| `onPostComment` | Adds comment to challan or case thread |
+| `onUploadDocument` | Uploads document to case |
 
 ### Empty States
 
-- No challans: Show "No challans found" with contextual message based on active filters
-- No cases: Show "No cases found" with option to create a new case
-- No comments on a challan/case: Show "No comments yet — add a follow-up below"
-- No documents on a case: Show "No documents attached yet"
-- No activity on a case timeline: Show "No activity recorded yet"
+- **No challans:** Show "No challans found" with helpful message
+- **No cases:** Show "No cases yet" with CTA to create first case
+- **No comments:** Show "No comments yet" in comment thread
+- **No documents:** Show upload prompt in case documents tab
 
 ## Expected User Flows
 
-### Flow 1: View and Filter Challans
-1. User navigates to Incidents -> Challans
-2. User sees the challan list table with all challans
-3. User filters by status "In Progress" and vehicle "MH04AB1234"
-4. Table updates to show only matching challans
-5. **Outcome:** User sees filtered challan list
+### Flow 1: View Challan Detail
+1. User navigates to Incidents → Challans tab
+2. User clicks a challan row in the table
+3. User sees status badge, key fields, action buttons, and comment thread
+4. **Outcome:** Full challan detail visible with available actions
 
-### Flow 2: View Challan Detail and Add Comment
-1. User clicks a challan row in the list
-2. Challan detail page opens with status badge, key fields, and action buttons
-3. User scrolls to the comment thread
-4. User types a follow-up message and submits
-5. **Outcome:** Comment appears in the thread with timestamp
-
-### Flow 3: Escalate Challan to Case
+### Flow 2: Escalate Challan to Case
 1. User views a challan detail
-2. User clicks "Escalate to Case" action button
-3. Multi-step case creation modal opens, pre-filled with challan's vehicle and description
-4. User selects case type, confirms details, optionally attaches documents
-5. User submits the case
-6. **Outcome:** New case is created linked to the original challan; challan shows escalation reference
+2. User clicks "Escalate to Case" button
+3. Multi-step case creation modal opens pre-filled with challan data (vehicle, description)
+4. User completes remaining steps and submits
+5. **Outcome:** New case created, linked to original challan
 
-### Flow 4: Create a New Case
-1. User navigates to Incidents -> Cases
+### Flow 3: Create a New Case
+1. User navigates to Incidents → Cases tab
 2. User clicks "Create Case" button
-3. Multi-step modal opens: Step 1 (case type) -> Step 2 (vehicle) -> Step 3 (driver) -> Step 4 (description) -> Step 5 (documents) -> Step 6 (submit)
-4. User fills in each step and submits
-5. **Outcome:** Case is created and appears in the case list with "Submitted" status
+3. Multi-step modal: case type → vehicle → driver → description → documents → submit
+4. **Outcome:** New case created with status "Submitted"
 
-### Flow 5: Request Refund on SLA-Breached Challan
-1. User views a challan that has exceeded the 45-day SLA
-2. System shows SLA breach indicator
-3. User clicks "Request Refund" action button
-4. **Outcome:** Refund request is submitted and tracked
+### Flow 4: Post Comment Follow-up
+1. User opens a case or challan detail
+2. User types a comment in the thread
+3. User submits the comment
+4. **Outcome:** Comment appears in chronological feed with timestamp
 
 ## Files to Reference
 
-- `product-plan/sections/incident-management/README.md`
-- `product-plan/sections/incident-management/tests.md`
-- `product-plan/sections/incident-management/components/`
-- `product-plan/sections/incident-management/types.ts`
-- `product-plan/sections/incident-management/sample-data.json`
+- `product-plan/sections/incident-management/README.md` — Feature overview
+- `product-plan/sections/incident-management/tests.md` — Test instructions
+- `product-plan/sections/incident-management/components/` — React components
+- `product-plan/sections/incident-management/types.ts` — TypeScript interfaces
+- `product-plan/sections/incident-management/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Challan list renders with filterable table (vehicle, date range, status, amount)
-- [ ] Challan detail shows status badge, key fields, action buttons, and comment thread
-- [ ] Pay Now, Dispute, Escalate to Case, Download Receipt actions work
-- [ ] 45-day SLA is tracked and refund request is available on breach
-- [ ] Case list renders with filterable table (status, case type, vehicle)
-- [ ] Case creation multi-step modal works with all steps
-- [ ] Case detail shows header, assigned lawyer, and 3 tabs (Timeline, Documents, Comments)
-- [ ] Document upload works on case detail
-- [ ] Comment threads work on both challans and cases
-- [ ] Challan-to-case escalation pre-fills case creation with challan data
-- [ ] Sub-nav correctly toggles between Challans and Cases pages
-- [ ] Empty states display when no data exists
-- [ ] Subscription gating shows locked actions for free plan users
+- [ ] Sub-nav switches between Challans and Cases views
+- [ ] Challans list with filtering (vehicle, date, status, amount)
+- [ ] Challan detail shows status badge, fields, actions, comments
+- [ ] Cases list with filtering (status, type, vehicle)
+- [ ] Case creation multi-step modal works end-to-end
+- [ ] Case detail with Timeline, Documents, Comments tabs
+- [ ] Escalate to Case pre-fills from challan data
+- [ ] Comment thread works for both challans and cases
+- [ ] 45-day SLA tracking with refund option when breached
+- [ ] Subscription gating on appropriate actions
+- [ ] Empty states for all views
 - [ ] Responsive on mobile
 
 ---
 
 # Milestone 6: Vehicle & Driver Management
 
+> **Provide alongside:** `product-overview.md`
 > **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Vehicle & Driver Management section — the central repository for all vehicles and drivers in the user's account, with individual vehicle addition via RC auto-fetch, bulk CSV upload, vehicle detail with compliance tracking, and a basic driver listing.
+Implement Vehicle & Driver Management — the central repository for all vehicles and drivers with compliance tracking, RC auto-fetch, and bulk upload capabilities.
 
 ## Overview
 
-Vehicle & Driver Management is the foundational fleet data section that many other sections depend on (Compliance Dashboard, Incidents, Home stats). Users can add vehicles individually via RC number (with auto-fetch from government API), bulk upload via CSV for fleet owners, and categorize vehicles by ownership type. Each vehicle tracks its insurance, PUC, and fitness expiry status along with an individual compliance score. A basic driver listing is linked to vehicles.
+The Vehicle & Driver Management section serves as the central repository for all vehicles in the user's account. Users can add vehicles individually via RC number (with auto-fetch from API), bulk upload via CSV, and categorize vehicles by ownership type. Each vehicle tracks insurance and PUC expiry with an individual compliance score. A basic driver listing is linked to vehicles.
 
 **Key Functionality:**
-- Vehicle list with search and filters (by category, compliance score, expiry status)
-- Add single vehicle by RC number with auto-fetch from government API
-- Bulk upload vehicles via CSV file with preview and validation
-- Categorize vehicles as owned, leased, or rented
-- Vehicle detail page with RC details, documents, compliance score, expiry dates, and assigned driver
-- Track insurance, PUC, and fitness expiry dates with proactive alerts
-- Basic driver listing with name, license number, license status, and assigned vehicles
-- Add driver modal and assign driver to vehicle
+- Searchable, filterable vehicle list with compliance indicators
+- Add single vehicle by RC number with API auto-fetch
+- Bulk upload vehicles via CSV file
+- Vehicle detail page with documents, insurance/PUC status, compliance score
+- Basic driver listing linked to vehicles
+- Proactive expiry alerts for insurance and PUC
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/vehicle-and-driver-management/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/vehicle-and-driver-management/components/`:
-- `VehicleList.tsx` — Searchable, filterable vehicle table with columns for RC number, vehicle type, category, compliance score, insurance expiry, PUC expiry, and status
-- `VehicleDetail.tsx` — Vehicle detail page with header summary, compliance score, document sections, expiry status, and assigned driver
-- `AddVehicleModal.tsx` — Modal with RC number input, fetch details button, auto-populated confirmation, manual fallback (shared component also used in AppShell)
-- `AddDriverModal.tsx` — Modal for adding a new driver
-- `BulkUploadModal.tsx` — CSV upload flow with file selection, preview, validation, and confirmation
 
-Additional top-level views:
-- `VehicleList.tsx` (top-level) — Preview wrapper for vehicle list
-- `VehicleDetail.tsx` (top-level) — Preview wrapper for vehicle detail
+- `VehicleManagement.tsx` — Main vehicle list and management interface
+- `AddVehicleModal.tsx` — Modal for adding vehicles (shared with AppShell)
 
 ### Data Layer
 
-Key types from `types.ts`: Vehicle, VehicleCategory, VehicleStatus, SubscriptionStatus, DocumentType, DocumentStatus, VehicleDocument, Driver, LicenseStatus, VehicleFilters
+- Vehicle list with search and filters (category, compliance score, expiry status)
+- RC number auto-fetch from government API
+- CSV bulk upload with validation and preview
+- Per-vehicle compliance score calculation
+- Insurance and PUC expiry tracking with thresholds
+- Driver list linked to vehicles
 
-You'll need to:
-- Create CRUD API endpoints for vehicles and drivers
-- Integrate with government RC vehicle details API for auto-fetch on add
-- Implement CSV parsing, validation, and bulk vehicle creation
-- Calculate per-vehicle compliance scores based on document validity
-- Track document expiry dates (insurance, PUC, fitness, RC)
-- Implement driver-vehicle assignment (one driver can be assigned to multiple vehicles)
-- Implement search across vehicle fields (RC number, make, model)
-- Implement filtering by category, compliance score range, and expiry status
-
-### Callbacks — Vehicle List
+### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onViewVehicle` | Navigate to vehicle detail page |
-| `onAddVehicle` | Open Add Vehicle modal |
-| `onBulkUpload` | Open Bulk Upload modal |
-| `onEditVehicle` | Open edit form for a vehicle |
-| `onDeleteVehicle` | Delete a vehicle (with confirmation) |
-| `onChangeCategory` | Change a vehicle's category (owned/leased/rented) |
-| `onAssignDriver` | Assign a driver to a vehicle |
-| `onSearch` | Search the vehicle list |
-| `onFilter` | Apply filters to the vehicle list |
-
-### Callbacks — Vehicle Detail
-
-| Callback | Description |
-|----------|-------------|
-| `onBack` | Navigate back to vehicle list |
-| `onEdit` | Open edit form for the vehicle |
-| `onDelete` | Delete the vehicle (with confirmation) |
-| `onChangeCategory` | Change the vehicle's category |
-| `onAssignDriver` | Assign or change the driver |
+| `onAddVehicle` | Opens add vehicle modal |
+| `onBulkUpload` | Opens CSV upload flow |
+| `onViewVehicle` | Opens vehicle detail page |
+| `onFetchRC` | Fetches vehicle details by RC number from API |
+| `onEditVehicle` | Edits vehicle details |
+| `onViewDriver` | Opens driver detail |
+| `onAssignDriver` | Assigns driver to vehicle |
+| `onFilter` | Applies filters to vehicle list |
 
 ### Empty States
 
-- No vehicles: Show "No vehicles in your fleet yet" with prominent "Add Vehicle" and "Bulk Upload" CTAs
-- No drivers: Show "No drivers added yet" with "Add Driver" CTA
-- No documents on a vehicle: Show "No documents tracked for this vehicle"
-- Search/filter with no results: Show "No vehicles match your search" with option to clear filters
-- Vehicle with no assigned driver: Show "No driver assigned" with "Assign Driver" button
+- **No vehicles:** Show "No vehicles yet" with prominent Add Vehicle CTA
+- **No drivers:** Show "No drivers yet" with prompt to add
+- **Filter returns nothing:** Show "No vehicles match your filters" with clear filters option
+- **API fetch failure:** Show manual entry fallback
 
 ## Expected User Flows
 
-### Flow 1: Add a Single Vehicle via RC Number
-1. User clicks "Add Vehicle" button on the vehicle list
-2. Add Vehicle modal opens with RC number input field
-3. User enters RC number (e.g., "MH04AB1234") and clicks "Fetch Details"
-4. Loading spinner shows while API fetches vehicle data
-5. Vehicle details auto-populate (name, type, registration date, owner, fuel type)
-6. User confirms details
-7. **Outcome:** Vehicle is added to the list with auto-fetched data
+### Flow 1: Add Vehicle via RC Number
+1. User clicks "Add Vehicle" button
+2. Modal opens with RC number input
+3. User enters RC number and clicks "Fetch Details"
+4. Loading spinner shown while API fetches
+5. Vehicle details auto-populate for confirmation
+6. **Outcome:** Vehicle added to list with compliance score calculated
 
-### Flow 2: Bulk Upload Vehicles via CSV
-1. User clicks "Bulk Upload" button on the vehicle list
-2. Bulk Upload modal opens with file input
-3. User selects a CSV file
-4. System parses CSV and shows a preview table with validation results
-5. User reviews the preview (valid rows, invalid rows with error messages)
-6. User clicks "Import" to confirm
-7. **Outcome:** Valid vehicles are added to the fleet; invalid rows are reported
+### Flow 2: Bulk Upload Vehicles
+1. User clicks "Bulk Upload" option
+2. CSV upload interface appears
+3. User uploads a CSV file
+4. Preview shows validated data with any errors highlighted
+5. User confirms upload
+6. **Outcome:** Multiple vehicles added to the account
 
-### Flow 3: View Vehicle Detail and Compliance
+### Flow 3: View Vehicle Detail
 1. User clicks a vehicle row in the list
-2. Vehicle detail page opens with header (RC number, make, model, year)
-3. User sees compliance score (color-coded), document sections with expiry dates
-4. User sees insurance, PUC, and fitness status with urgency badges
-5. User sees the assigned driver (or "No driver assigned" with assign button)
-6. **Outcome:** User has full visibility into the vehicle's compliance state
+2. Detail page opens showing RC details, compliance score, documents, insurance/PUC status
+3. User sees assigned driver and expiry alerts
+4. **Outcome:** Complete vehicle information visible
 
-### Flow 4: Assign Driver to Vehicle
-1. User is on a vehicle's detail page
-2. User clicks "Assign Driver" button
-3. A dropdown or modal shows available drivers
-4. User selects a driver
-5. **Outcome:** Driver is assigned to the vehicle; both vehicle detail and driver listing reflect the assignment
+### Flow 4: Filter by Expiry Status
+1. User selects "Expiring Soon" in the expiry status filter
+2. Vehicle list updates to show only vehicles with upcoming expirations
+3. **Outcome:** User can quickly identify vehicles needing attention
 
 ## Files to Reference
 
-- `product-plan/sections/vehicle-and-driver-management/README.md`
-- `product-plan/sections/vehicle-and-driver-management/tests.md`
-- `product-plan/sections/vehicle-and-driver-management/components/`
-- `product-plan/sections/vehicle-and-driver-management/types.ts`
-- `product-plan/sections/vehicle-and-driver-management/sample-data.json`
+- `product-plan/sections/vehicle-and-driver-management/README.md` — Feature overview
+- `product-plan/sections/vehicle-and-driver-management/tests.md` — Test instructions
+- `product-plan/sections/vehicle-and-driver-management/components/` — React components
+- `product-plan/sections/vehicle-and-driver-management/types.ts` — TypeScript interfaces
+- `product-plan/sections/vehicle-and-driver-management/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Vehicle list renders with searchable, filterable table
-- [ ] Filters work for category, compliance score range, and expiry status
-- [ ] Search works across RC number, make, model
-- [ ] Add Vehicle modal works with RC auto-fetch from API
-- [ ] Manual entry fallback works when API fails
-- [ ] Duplicate RC number shows inline error
-- [ ] Bulk Upload modal parses CSV, shows preview, validates, and imports
-- [ ] Vehicle detail page shows all fields, compliance score, and documents
-- [ ] Document expiry badges display correctly (valid, expiring soon, expired)
-- [ ] Driver listing shows all drivers with license status and assigned vehicles
-- [ ] Add Driver modal works
-- [ ] Driver-vehicle assignment works from both list and detail views
-- [ ] Delete vehicle works with confirmation dialog
-- [ ] Change vehicle category works (owned/leased/rented)
-- [ ] Empty states display when no data exists
+- [ ] Vehicle list renders with search and filter controls
+- [ ] Add Vehicle modal with RC auto-fetch works
+- [ ] CSV bulk upload with validation and preview
+- [ ] Vehicle detail page shows all data sections
+- [ ] Per-vehicle compliance score calculates correctly
+- [ ] Insurance/PUC expiry tracking with color-coded badges
+- [ ] Driver list displays with vehicle assignments
+- [ ] Category filters (owned/leased/rented) work
+- [ ] Empty states for all views
 - [ ] Responsive on mobile
 
 ---
 
 # Milestone 7: Reports
 
-> **Prerequisites:** Milestone 1 (Foundation) complete, Milestone 5 (Incident Management) recommended
+> **Provide alongside:** `product-overview.md`
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Reports section — a read-only report browsing interface where fleet owners can view, preview, download, and share system-generated reports organized by type via tabs.
+Implement the Reports section — a browsing interface for system-generated fleet analytics reports with filtering, PDF preview, download, and sharing capabilities.
 
 ## Overview
 
-Reports is a consumption-only section where fleet owners and admins browse system-generated reports. Reports are automatically generated by the system at specific triggers (monthly summaries, incident closures, 24-hour post-incident summaries) and cannot be manually created by users. The section provides tabbed browsing, PDF preview, download, and sharing via email/WhatsApp.
+A report browsing section where fleet owners/admins can view, download, and share system-generated reports. Reports are organized by type via tabs (MIS, ICR, ISR, MIS-CHALLAN) with a combined "All" view as the default landing. Reports are read-only and auto-generated by the system.
 
 **Key Functionality:**
-- Tabbed navigation: All | MIS | ICR | ISR | MIS-CHALLAN
-- Table view with columns: Period, Report Type, Format, Generated Date, Action
-- PDF preview on report click (modal or detail view)
-- Download report as PDF
-- Share report via email or WhatsApp
+- Browse reports with tabbed filtering by type (All, MIS, ICR, ISR, MIS-CHALLAN)
 - Search and filter by date, vehicle, or incident reference
-- Read-only — no manual report creation
-
-**Report Types:**
-- **MIS** — Monthly Incident Summary, auto-generated each month
-- **ICR** — Incident Closure Report, generated when an incident is closed
-- **ISR** — Incident Summary Report, generated 24 hours after an incident
-- **MIS-CHALLAN** — Monthly Challan Summary, auto-generated each month
+- PDF preview on report click
+- Download reports as PDF
+- Share reports via email or WhatsApp
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/reports/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/reports/components/`:
-- `ReportsList.tsx` — Full reports view with tabbed navigation, search/filter controls, report table, and action buttons (preview, download, share)
 
-Additional top-level view:
-- `ReportsList.tsx` (top-level) — Preview wrapper for the reports list
+- `ReportsList.tsx` — Main reports list with tabs, filters, and table
 
 ### Data Layer
 
-Key types from `types.ts`: Report, ReportType, ReportTab
-
-You'll need to:
-- Create a report generation pipeline that auto-generates reports at the correct triggers:
-  - MIS: Auto-generated at the end of each month
-  - ICR: Auto-generated when an incident (challan or case) is closed/resolved
-  - ISR: Auto-generated 24 hours after an incident is created
-  - MIS-CHALLAN: Auto-generated at the end of each month
-- Store generated PDF files (S3 or equivalent)
-- Create API endpoints to list, filter, and fetch reports
-- Implement PDF rendering/preview capability
-- Implement file download serving
-- Implement email sharing (generate a share link or attach PDF)
-- Implement WhatsApp sharing (generate a deep link with PDF URL)
-- Recipients are fleet owner/admin only
+**Report Types:**
+- **MIS** — Monthly Incident Summary (auto-generated monthly)
+- **ICR** — Incident Closure Report (generated when incident is closed)
+- **ISR** — Incident Summary Report (generated 24 hours after an incident)
+- **MIS-CHALLAN** — Monthly Challan Summary (auto-generated monthly)
 
 ### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onTabChange` | Switch between report type tabs (All, MIS, ICR, ISR, MIS-CHALLAN) |
-| `onPreview` | Open PDF preview for a report |
-| `onDownload` | Download report as PDF |
-| `onShareEmail` | Share report via email |
-| `onShareWhatsApp` | Share report via WhatsApp |
-| `onSearch` | Search/filter reports by keyword |
+| `onViewReport` | Opens PDF preview for selected report |
+| `onDownloadReport` | Downloads report as PDF file |
+| `onShareReport` | Shares report via email or WhatsApp |
+| `onFilterChange` | Applies date/vehicle/reference filters |
+| `onTabChange` | Switches between report type tabs |
 
 ### Empty States
 
-- No reports at all: Show "No reports generated yet. Reports will appear here as your fleet activity generates them."
-- No reports in a specific tab: Show "No [type] reports found"
-- Search/filter with no results: Show "No reports match your search" with option to clear filters
+- **No reports yet:** Show "No reports generated yet" with explanation
+- **Tab with no reports:** Show "No [type] reports available"
+- **Filter returns nothing:** Show "No reports match your filters"
 
 ## Expected User Flows
 
 ### Flow 1: Browse Reports by Type
 1. User navigates to Reports section
-2. User sees "All" tab active with all reports in a table
-3. User clicks the "MIS" tab
-4. Table filters to show only Monthly Incident Summary reports
-5. **Outcome:** User sees only MIS reports sorted by most recent
+2. User sees "All" tab with all reports in table
+3. User clicks "MIS" tab
+4. **Outcome:** Table filters to show only Monthly Incident Summary reports
 
-### Flow 2: Preview and Download a Report
+### Flow 2: Preview and Download Report
 1. User clicks a report row in the table
-2. PDF preview opens (in a modal or detail view)
-3. User reviews the report content
-4. User clicks "Download" button
-5. **Outcome:** PDF file downloads to user's device
+2. PDF preview opens (modal or detail view)
+3. User clicks "Download" button
+4. **Outcome:** Report PDF downloads to device
 
-### Flow 3: Share a Report via WhatsApp
-1. User clicks the share action on a report row
-2. Share options appear (Email, WhatsApp)
-3. User selects "WhatsApp"
-4. WhatsApp deep link opens with the report PDF URL
-5. **Outcome:** User can send the report to a WhatsApp contact
+### Flow 3: Share Report
+1. User clicks share action on a report
+2. Share options appear (email, WhatsApp)
+3. User selects sharing method
+4. **Outcome:** Report shared via selected channel
 
 ## Files to Reference
 
-- `product-plan/sections/reports/README.md`
-- `product-plan/sections/reports/tests.md`
-- `product-plan/sections/reports/components/`
-- `product-plan/sections/reports/types.ts`
-- `product-plan/sections/reports/sample-data.json`
+- `product-plan/sections/reports/README.md` — Feature overview
+- `product-plan/sections/reports/tests.md` — Test instructions
+- `product-plan/sections/reports/components/` — React components
+- `product-plan/sections/reports/types.ts` — TypeScript interfaces
+- `product-plan/sections/reports/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Tabbed navigation works for All, MIS, ICR, ISR, MIS-CHALLAN
-- [ ] Report table renders with correct columns (Period, Report Type, Format, Generated Date, Action)
-- [ ] Tab switching filters the report list correctly
+- [ ] Tabbed navigation works (All, MIS, ICR, ISR, MIS-CHALLAN)
+- [ ] Table displays with correct columns (Period, Report Type, Format, Generated Date, Action)
+- [ ] Search and filter controls work
 - [ ] PDF preview opens on report click
 - [ ] Download as PDF works
-- [ ] Share via email works
-- [ ] Share via WhatsApp works
-- [ ] Search and filter controls work (by date, vehicle, incident reference)
-- [ ] Report generation pipeline auto-creates reports at correct triggers
-- [ ] Reports are read-only (no manual creation UI)
-- [ ] Empty states display when no reports exist
+- [ ] Share via email/WhatsApp works
+- [ ] Empty states for all tabs and filter states
 - [ ] Responsive on mobile
 
 ---
 
 # Milestone 8: API Catalogue
 
+> **Provide alongside:** `product-overview.md`
 > **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the API Catalogue — a browsable catalogue of available APIs presented as cards in a grid layout, with a two-column detail page for each API and a contact modal for pricing enquiries.
+Implement the API Catalogue — a browsable catalogue of available APIs with detail pages, endpoint documentation, and pricing inquiry capability.
 
 ## Overview
 
-The API Catalogue is an informational section showcasing the APIs available through LOTS247. Users browse a card grid, click into detailed API pages, and submit pricing enquiries through a contact modal. The catalogue currently features three APIs (Challan API, Driving Licence API, RC API) but should be built to accommodate additional APIs in the future.
+A browsable catalogue of available APIs presented as cards in a grid layout. Users can browse APIs, click into a two-column detail page to explore features and endpoints, and submit pricing enquiries through a contact modal.
 
 **Key Functionality:**
-- Card grid browsing (3-column responsive grid, stacks on mobile)
-- Each card shows icon, API name, provider subtitle, short description, and category tag
-- Detail page with left sidebar (API info + contact CTA) and right content area with tabs
-- "Description" tab with feature highlight sections (heading + paragraph pairs)
-- "Endpoints" tab with method badges (GET/POST), paths, and descriptions
-- "Contact for Pricing" modal with message textarea and submit button
-- "View documentation" link on detail page sidebar
+- Browse API cards in a 3-column responsive grid
+- View API detail page with two-column layout (sidebar + tabbed content)
+- Explore API features via Description tab
+- View available endpoints via Endpoints tab
+- Submit pricing enquiries through contact modal
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/api-catalogue/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/api-catalogue/components/`:
-- `ApiCatalogue.tsx` — Card grid view with all API cards
-- `ApiDetail.tsx` — Two-column detail page with sidebar and tabbed content
-- `ContactModal.tsx` — Contact/pricing enquiry modal with message textarea
-- `TopUpModal.tsx` — API credit top-up modal
 
-Additional top-level views:
-- `ApiCatalogueView.tsx` — Preview wrapper for the catalogue grid
-- `ApiDetailView.tsx` — Preview wrapper for the detail page
+- `ApiCatalogue.tsx` — Grid of API cards
+- `ApiDetail.tsx` — Two-column detail page with sidebar and tabbed content
 
 ### Data Layer
 
-Key types from `types.ts`: Api, ApiEndpoint, ApiFeature
+**Available APIs:**
+- Challan API — Traffic challan lookup and management
+- Driving Licence API — DL verification and details
+- RC API — Vehicle registration certificate lookup
 
-You'll need to:
-- Create a data store for API catalogue entries (can be static/seeded data initially)
-- Store API definitions: name, provider, descriptions, documentation URL, category, icon, features, endpoints
-- Create API endpoints to list all APIs and fetch a single API by ID
-- Implement the contact/pricing enquiry submission (store message, notify internal team)
-- Store and manage pricing enquiries
+Each API includes: name, provider, description, category tag, features list, and endpoint definitions.
 
-### Callbacks — Catalogue
+### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onViewDetail` | Navigate to the API detail page (by API ID) |
-
-### Callbacks — Detail
-
-| Callback | Description |
-|----------|-------------|
-| `onBack` | Navigate back to the catalogue grid |
-| `onContactSubmit` | Submit a pricing enquiry message for a specific API |
+| `onViewApi` | Opens API detail page |
+| `onBack` | Returns to catalogue grid from detail |
+| `onContactPricing` | Opens contact/pricing inquiry modal |
+| `onSubmitInquiry` | Submits pricing inquiry message |
+| `onTabChange` | Switches between Description and Endpoints tabs |
 
 ### Empty States
 
-- No APIs in catalogue: Show "No APIs available yet. Check back soon."
-- No endpoints listed for an API: Show "Endpoint documentation coming soon"
-- No features listed for an API: Show "Feature details coming soon"
+- **No APIs available:** Show "No APIs in catalogue yet"
+- **Contact form submitted:** Show success confirmation
 
 ## Expected User Flows
 
-### Flow 1: Browse API Catalogue
+### Flow 1: Browse APIs
 1. User navigates to API Catalogue
-2. User sees three API cards in a grid layout: Challan API, Driving Licence API, RC API
-3. Each card displays the API name, provider ("Built by LOTS247"), short description, and category badge
-4. **Outcome:** User has a quick overview of all available APIs
+2. User sees three API cards in a grid
+3. Each card shows icon, name, provider, description, category tag
+4. **Outcome:** User can browse all available APIs at a glance
 
 ### Flow 2: View API Detail
-1. User clicks the "Challan API" card
-2. Detail page opens with a two-column layout
-3. Left sidebar shows: API icon, name, full description, "View documentation" link, category label, and "Contact for Pricing" button
-4. Right content area shows "Description" tab active with feature highlights
-5. User clicks "Endpoints" tab
-6. Endpoints list shows method badges (GET/POST), paths, and descriptions
-7. **Outcome:** User understands the API's capabilities and available endpoints
+1. User clicks an API card (e.g., "Challan API")
+2. Detail page opens with left sidebar (API info + contact CTA) and right content area
+3. User reads the Description tab with feature highlights
+4. User switches to Endpoints tab to see available endpoints with method badges
+5. **Outcome:** User understands the API capabilities
 
-### Flow 3: Submit Pricing Enquiry
-1. User is on an API detail page
-2. User clicks "Contact for Pricing" button in the sidebar
-3. Contact modal opens with a message textarea
-4. User types their enquiry and clicks "Submit"
-5. **Outcome:** Enquiry is submitted; user sees confirmation; internal team is notified
+### Flow 3: Contact for Pricing
+1. User clicks "Contact for Pricing" button on detail page
+2. Modal opens with message textarea
+3. User enters inquiry message and clicks submit
+4. **Outcome:** Inquiry submitted, confirmation shown
 
 ## Files to Reference
 
-- `product-plan/sections/api-catalogue/README.md`
-- `product-plan/sections/api-catalogue/tests.md`
-- `product-plan/sections/api-catalogue/components/`
-- `product-plan/sections/api-catalogue/types.ts`
-- `product-plan/sections/api-catalogue/sample-data.json`
+- `product-plan/sections/api-catalogue/README.md` — Feature overview
+- `product-plan/sections/api-catalogue/tests.md` — Test instructions
+- `product-plan/sections/api-catalogue/components/` — React components
+- `product-plan/sections/api-catalogue/types.ts` — TypeScript interfaces
+- `product-plan/sections/api-catalogue/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Card grid renders with all APIs (3-column on desktop, stacked on mobile)
-- [ ] Each card shows icon, name, provider, description, and category badge
-- [ ] Clicking a card navigates to the detail page
-- [ ] Detail page renders with two-column layout (sidebar + content)
-- [ ] Sidebar shows API info, documentation link, and "Contact for Pricing" button
-- [ ] "Description" tab shows feature highlights as heading + paragraph pairs
-- [ ] "Endpoints" tab shows method badge (GET/POST), path, and description for each endpoint
-- [ ] Tab switching works between Description and Endpoints
-- [ ] "Contact for Pricing" modal opens with message textarea
-- [ ] Enquiry submission works and provides confirmation
-- [ ] Back button navigates from detail to catalogue grid
-- [ ] "View documentation" link works
-- [ ] Empty states display when no data exists
-- [ ] Responsive on mobile
+- [ ] API cards render in 3-column grid (responsive)
+- [ ] Clicking card navigates to detail page
+- [ ] Detail page shows two-column layout
+- [ ] Description tab shows feature highlights
+- [ ] Endpoints tab shows method badges (GET/POST), paths, descriptions
+- [ ] Contact for Pricing modal works
+- [ ] Back navigation returns to grid
+- [ ] Empty states handled
+- [ ] Responsive on mobile (cards stack)
 
 ---
 
 # Milestone 9: Wallet
 
+> **Provide alongside:** `product-overview.md`
 > **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Wallet — the central financial hub functioning as a prepaid wallet with Razorpay integration, providing a unified credit/debit ledger for all system transactions.
+Implement the Wallet — a prepaid wallet with Razorpay integration, unified credit/debit ledger, and transaction history.
 
 ## Overview
 
-The Wallet is LOTS247's financial backbone. Every system transaction — subscription payments, challan settlements, legal service fees, and manual top-ups — flows through the wallet as a unified credit/debit ledger. Users add money via Razorpay, and the system automatically debits for services. The wallet gives fleet operators a single place to track all financial activity.
+The Wallet is the central financial hub of LOTS247, functioning as a prepaid wallet with Razorpay integration. Every system transaction — subscription payments, challan settlements, legal service fees, and manual top-ups — flows through the wallet as a unified credit/debit ledger. Users add money via Razorpay, and the system automatically debits for services.
 
 **Key Functionality:**
-- Balance card with current balance, last recharge info, and "Add Money" CTA
-- Low balance visual treatment when below threshold
-- Add Money modal with preset quick-select amounts (500, 1000, 2000, 5000) and custom amount entry
-- Razorpay payment gateway integration
-- Transaction ledger in reverse chronological order with running balance
-- Filters: date range (Today, This Week, This Month, Custom), type (Credit/Debit), category (Recharge, Subscription, Challan, Legal Fee, Refund)
-- Search by description or reference ID
-- Active filters shown as dismissible chips
-- Transaction detail panel with full metadata (amount, date/time, category, reference ID, status, description)
-- Related entity links in transaction detail (e.g., link to challan ID, subscription plan)
+- View current balance with prominent display and last recharged date
+- Add money via Razorpay payment gateway
+- Browse full transaction history (credits and debits)
+- Filter transactions by date range, type (credit/debit), and category
+- View expanded transaction detail with full metadata
+- Low balance visual warning
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/wallet/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/wallet/components/`:
-- `WalletView.tsx` — Full wallet interface including balance card, Add Money modal, transaction ledger, filters, search, and transaction detail panel
 
-Additional top-level view:
-- `WalletView.tsx` (top-level) — Preview wrapper for the wallet
+- `Wallet.tsx` — Main wallet view with balance card, add money, and transaction ledger
 
 ### Data Layer
 
-Key types from `types.ts`: WalletSummary, LastRecharge, Transaction, TransactionType, TransactionCategory, TransactionStatus, RelatedEntityType, TransactionFilters
-
-You'll need to:
-- Create a wallet record per user with current balance and low balance threshold
-- Implement credit operations (recharge via Razorpay, refunds)
-- Implement debit operations (subscription payments, challan settlements, legal fees)
-- Maintain a transaction ledger with running balance calculation
-- Integrate Razorpay payment gateway for the Add Money flow
-- Handle payment success/failure callbacks from Razorpay
-- Implement transaction filtering (date range, type, category)
-- Implement transaction search (by description, reference ID)
-- Link transactions to related entities (challans, subscriptions, incidents, disputes)
-- Set and enforce minimum/maximum recharge limits
-- Implement low balance detection and visual threshold
+- Current balance tracking
+- Transaction ledger: reverse chronological, with credits (green) and debits (red)
+- Transaction categories: Recharge, Subscription, Challan, Legal Fee, Refund
+- Transaction detail: amount, date/time, category, reference ID, status, description
+- Razorpay payment gateway integration
 
 ### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onAddMoney` | Open Add Money modal and initiate Razorpay payment with chosen amount |
-| `onViewTransaction` | Expand transaction detail panel for a specific transaction |
-| `onNavigateToEntity` | Navigate to related entity (challan, subscription, incident) from transaction detail |
-| `onFilterChange` | Apply filters to the transaction ledger |
-| `onSearch` | Search transactions by description or reference ID |
+| `onAddMoney` | Opens add money modal |
+| `onSubmitPayment` | Initiates Razorpay payment with amount |
+| `onViewTransaction` | Expands transaction detail panel |
+| `onFilterChange` | Applies date/type/category filters |
+| `onSearch` | Searches transactions by description or reference ID |
 
 ### Empty States
 
-- No transactions (new wallet): Show "Your wallet is empty. Add money to get started." with prominent "Add Money" CTA and a friendly icon/illustration
-- No transactions matching filters: Show "No transactions match your filters" with option to clear filters
-- No transactions matching search: Show "No transactions found for your search"
+- **No transactions:** Show "Your wallet is empty. Add money to get started." with Add Money CTA
+- **Filter returns nothing:** Show "No transactions match your filters"
+- **Low balance:** Visual treatment changes when balance below threshold
 
 ## Expected User Flows
 
-### Flow 1: Add Money via Razorpay
-1. User navigates to Wallet and sees current balance (e.g., "Rs. 2,500")
-2. User clicks "Add Money" button
-3. Add Money modal opens with preset amounts (500, 1000, 2000, 5000) and a custom amount field
-4. User selects Rs. 2,000 (or enters a custom amount)
-5. User clicks "Proceed to Pay"
-6. Razorpay payment gateway opens
-7. User completes payment
-8. **Outcome:** Balance updates to Rs. 4,500; a credit entry appears at the top of the transaction ledger
+### Flow 1: Add Money to Wallet
+1. User clicks "Add Money" button on balance card
+2. Recharge modal opens with preset amounts (500, 1000, 2000, 5000) and custom entry
+3. User selects or enters amount
+4. Razorpay payment gateway opens
+5. On success: balance updates immediately, credit entry appears in ledger
+6. **Outcome:** Wallet balance increased, transaction recorded
 
-### Flow 2: Browse and Filter Transaction History
-1. User scrolls through the transaction ledger
-2. User sees credits (green) and debits (red) with descriptions and running balance
-3. User clicks "This Month" date filter and "Debit" type filter
-4. Active filters appear as dismissible chips
-5. Ledger updates to show only debits from this month
-6. **Outcome:** User sees a filtered view of their spending
+### Flow 2: Browse Transaction History
+1. User scrolls through transaction ledger
+2. Each row shows date, description, category badge, amount (green/red), running balance
+3. **Outcome:** Complete financial history visible
 
-### Flow 3: View Transaction Detail
-1. User taps a transaction row (e.g., "Challan Settlement - MH04AB1234")
-2. Transaction detail panel expands showing: amount, date/time, category (Challan), reference ID, status (Success), description
-3. User sees a link to the related challan entity
-4. User taps the challan link
-5. **Outcome:** User navigates to the challan detail page
+### Flow 3: Filter Transactions
+1. User applies filters: date range (This Month), type (Debit), category (Challan)
+2. Transaction list updates to show only matching entries
+3. **Outcome:** User can quickly find specific transactions
 
-### Flow 4: Empty Wallet — First-Time User
-1. New user navigates to Wallet for the first time
-2. Balance shows Rs. 0
-3. Empty state illustration with message: "Your wallet is empty. Add money to get started."
-4. Prominent "Add Money" CTA button
-5. **Outcome:** User is guided to add their first recharge
+### Flow 4: View Transaction Detail
+1. User taps a transaction row
+2. Detail panel expands/slides showing full metadata
+3. For debits, links to related entity (challan ID, subscription plan)
+4. **Outcome:** Complete transaction information visible
 
 ## Files to Reference
 
-- `product-plan/sections/wallet/README.md`
-- `product-plan/sections/wallet/tests.md`
-- `product-plan/sections/wallet/components/`
-- `product-plan/sections/wallet/types.ts`
-- `product-plan/sections/wallet/sample-data.json`
+- `product-plan/sections/wallet/README.md` — Feature overview
+- `product-plan/sections/wallet/tests.md` — Test instructions
+- `product-plan/sections/wallet/components/` — React components
+- `product-plan/sections/wallet/types.ts` — TypeScript interfaces
+- `product-plan/sections/wallet/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Balance card displays current balance prominently
-- [ ] Last recharge date and amount shown as secondary info
-- [ ] Low balance visual treatment triggers below threshold
-- [ ] "Add Money" button opens the Add Money modal
-- [ ] Preset quick-select amounts work (500, 1000, 2000, 5000)
-- [ ] Custom amount entry works with min/max validation
-- [ ] Razorpay payment gateway integration works end-to-end
-- [ ] Balance updates immediately after successful payment
-- [ ] Credit entry appears in ledger after recharge
-- [ ] Transaction ledger renders in reverse chronological order
-- [ ] Each transaction row shows date, description, category badge, amount (colored), and running balance
-- [ ] Date range filter works (Today, This Week, This Month, Custom)
-- [ ] Type filter works (All, Credit, Debit)
-- [ ] Category filter works (Recharge, Subscription, Challan, Legal Fee, Refund)
-- [ ] Active filters display as dismissible chips
-- [ ] Search works for description and reference ID
-- [ ] Transaction detail panel expands with full metadata
-- [ ] Related entity links navigate to correct entities
-- [ ] Empty state displays for new wallets with "Add Money" CTA
+- [ ] Balance card shows current balance prominently
+- [ ] Add Money modal with preset and custom amounts
+- [ ] Razorpay integration triggers payment
+- [ ] Balance updates on successful payment
+- [ ] Transaction ledger shows all credits/debits chronologically
+- [ ] Filters work (date range, type, category)
+- [ ] Search by description or reference ID works
+- [ ] Transaction detail panel shows full metadata
+- [ ] Low balance visual warning
+- [ ] Empty state when no transactions
 - [ ] Responsive on mobile
 
 ---
 
 # Milestone 10: Proposals
 
-> **Prerequisites:** Milestone 1 (Foundation) complete, Milestone 4 (Compliance Dashboard) recommended, Milestone 5 (Incident Management) recommended
+> **Provide alongside:** `product-overview.md`
+> **Prerequisites:** Milestone 1 (Foundation) complete
 
 ## Goal
 
-Implement the Proposals section — a tracking hub for service requests originating from Compliance checks, with proposal listing, detail views with timeline and chat-style follow-up, and lifecycle management.
+Implement the Proposals section — a tracking hub for service requests originating from compliance checks, with follow-up capability and conversion tracking.
 
 ## Overview
 
-Proposals is a tracking hub for service requests that originate from Compliance checks (Challan, DL, RC). When a user runs a compliance check and finds issues, they can send a proposal to the LOTS247 team requesting resolution. Users can then track proposal status, follow up with the team, and see when proposals convert into incidents or get rejected. Converted proposals link to the created incidents.
+Proposals is a tracking hub for service requests originating from Compliance checks (Challan, DL, RC). Users can view all sent proposals, track their status, follow up with the LOTS team, and see when proposals convert into incidents or get rejected.
 
 **Key Functionality:**
-- Two-tab layout: Active Proposals / Past Proposals
-- Active proposals table with columns: Created Date, Proposal ID, Type (Challan/DL/RC), Quantity, Amount, Status, Actions
-- Proposal statuses: Sent, Received, Converted, Rejected
-- Proposal detail view with two tabs: Overview (status timeline + details) and Follow-up (chat-style thread)
-- Follow-up tab uses the same chat-style comment thread pattern as Incident Management
-- Cancel action available on active proposals
+- View proposals in two tabs: Active Proposals and Past Proposals
+- Track proposal status: Sent, Converted, Rejected
+- Follow up with LOTS team via chat-style thread (same pattern as Incident Management)
+- View proposal detail with Overview (timeline + details) and Follow-up tabs
 - Converted proposals link to created incidents
-- When a proposal is Converted or Rejected, it moves to Past Proposals
+- Cancel active proposals
 
 ## Recommended Approach: Test-Driven Development
 
 See `product-plan/sections/proposals/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
 
 ## What to Implement
 
 ### Components
 
 Copy from `product-plan/sections/proposals/components/`:
-- `ProposalList.tsx` — Two-tab proposal list (Active/Past) with table showing Created Date, Proposal ID, Type, Quantity, Amount, Status, and Actions (Follow-up, Cancel, View Detail)
-- `ProposalDetail.tsx` — Detail view with two tabs: Overview (status timeline + proposal details) and Follow-up (chat-style comment thread)
 
-Additional top-level views:
-- `ProposalManagement.tsx` — Preview wrapper for the proposal list
-- `ProposalDetail.tsx` (top-level) — Preview wrapper for the proposal detail
+- `Proposals.tsx` — Main proposals interface with tabs and list
 
 ### Data Layer
 
-Key types from `types.ts`: Proposal, ProposalType, ProposalStatus, ProposalActivity, ProposalActivityType, Comment
+- Proposals list with Active/Past tabs
+- Proposal detail: ID, type (Challan/DL/RC), quantity, amount, status, timeline
+- Follow-up thread (chat-style, matching Incident Management pattern)
+- Status transitions: Sent → Converted / Rejected (moves to Past)
+- Links between converted proposals and created incidents
 
-You'll need to:
-- Create CRUD API endpoints for proposals
-- Implement proposal creation from Compliance checks (Challan check, DL check, RC check)
-- Implement proposal status transitions: Sent -> Received -> Converted / Rejected
-- When a proposal is Converted, create a linked incident and store the `linkedIncidentId`
-- When a proposal is Converted or Rejected, move it to Past Proposals
-- Implement the comment/follow-up thread (same pattern as Incident Management comments)
-- Track proposal activities (status changes, notes) with timestamps
-- Implement proposal cancellation for active proposals
-- Link proposals to their originating compliance check data
-
-### Callbacks — Proposal List
+### Callbacks
 
 | Callback | Description |
 |----------|-------------|
-| `onView` | Navigate to proposal detail page |
-| `onFollowUp` | Open follow-up thread for a proposal |
-| `onCancel` | Cancel an active proposal (with confirmation) |
-
-### Callbacks — Proposal Detail
-
-| Callback | Description |
-|----------|-------------|
-| `onAddComment` | Post a follow-up message to the proposal thread |
-| `onCancel` | Cancel the proposal (with confirmation) |
-| `onBack` | Navigate back to the proposal list |
+| `onViewProposal` | Opens proposal detail view |
+| `onFollowUp` | Posts follow-up message in thread |
+| `onCancelProposal` | Cancels an active proposal |
+| `onTabChange` | Switches between Active and Past tabs |
+| `onViewLinkedIncident` | Navigates to linked incident for converted proposals |
 
 ### Empty States
 
-- No active proposals: Show "No active proposals. Proposals are created from Compliance checks."
-- No past proposals: Show "No past proposals yet"
-- No comments on a proposal: Show "No follow-ups yet — send a message below"
-- No activity on a proposal timeline: Show "No activity recorded yet"
+- **No active proposals:** Show "No active proposals" with context about how proposals originate
+- **No past proposals:** Show "No past proposals yet"
+- **No follow-up messages:** Show empty state in follow-up tab
 
 ## Expected User Flows
 
-### Flow 1: View Active and Past Proposals
+### Flow 1: View Active Proposals
 1. User navigates to Proposals section
-2. User sees "Active Proposals" tab selected by default
-3. User views the table of active proposals with status badges (Sent, Received)
-4. User clicks "Past Proposals" tab
-5. Table switches to show Converted and Rejected proposals
-6. **Outcome:** User can see all proposals organized by lifecycle state
+2. Active Proposals tab shows table with Created Date, ID, Type, Quantity, Amount, Status, Actions
+3. **Outcome:** User sees all pending proposals at a glance
 
-### Flow 2: View Proposal Detail and Timeline
-1. User clicks a proposal row in the Active list
-2. Proposal detail page opens with "Overview" tab active
-3. User sees the status timeline showing progression (Sent -> Received)
-4. User sees proposal details: type, quantity, amount, creation date
-5. **Outcome:** User understands the current state and history of the proposal
+### Flow 2: View Proposal Detail
+1. User clicks a proposal row
+2. Detail view opens with Overview tab (timeline + details) and Follow-up tab
+3. **Outcome:** User sees complete proposal information
 
-### Flow 3: Follow Up on a Proposal
-1. User is on a proposal detail page
-2. User clicks the "Follow-up" tab
-3. User sees the chat-style thread with previous messages from user and LOTS247 team
-4. User types a follow-up message and submits
-5. **Outcome:** Message appears in the thread; LOTS247 team is notified
+### Flow 3: Follow Up on Proposal
+1. User opens a proposal detail
+2. User switches to Follow-up tab
+3. User types and sends a follow-up message
+4. **Outcome:** Message appears in chat-style thread
 
-### Flow 4: Cancel an Active Proposal
-1. User is viewing an active proposal
-2. User clicks "Cancel" action
-3. Confirmation dialog appears
-4. User confirms cancellation
-5. **Outcome:** Proposal is cancelled and moves to Past Proposals
-
-### Flow 5: Navigate from Converted Proposal to Incident
-1. User views a Converted proposal in Past Proposals
-2. User clicks the linked incident reference
-3. **Outcome:** User is navigated to the incident detail page in Incident Management
+### Flow 4: View Converted Proposal
+1. User switches to Past Proposals tab
+2. User clicks a "Converted" proposal
+3. User sees link to the created incident
+4. **Outcome:** User can navigate to the related incident
 
 ## Files to Reference
 
-- `product-plan/sections/proposals/README.md`
-- `product-plan/sections/proposals/tests.md`
-- `product-plan/sections/proposals/components/`
-- `product-plan/sections/proposals/types.ts`
-- `product-plan/sections/proposals/sample-data.json`
+- `product-plan/sections/proposals/README.md` — Feature overview
+- `product-plan/sections/proposals/tests.md` — Test instructions
+- `product-plan/sections/proposals/components/` — React components
+- `product-plan/sections/proposals/types.ts` — TypeScript interfaces
+- `product-plan/sections/proposals/sample-data.json` — Test data
 
 ## Done When
 
-- [ ] Tests written for key user flows
+- [ ] Tests written for key user flows (success and failure paths)
 - [ ] All tests pass
-- [ ] Two-tab layout works (Active Proposals / Past Proposals)
-- [ ] Active proposals table renders with correct columns and status badges
-- [ ] Past proposals table renders with Converted and Rejected proposals
-- [ ] Proposal detail page renders with Overview and Follow-up tabs
-- [ ] Overview tab shows status timeline and proposal details
-- [ ] Follow-up tab shows chat-style comment thread (matching Incident Management pattern)
-- [ ] Posting follow-up messages works
-- [ ] Cancel action works with confirmation dialog
-- [ ] Cancelled proposals move to Past Proposals
-- [ ] Converted proposals show linked incident reference
-- [ ] Clicking linked incident navigates to Incident Management detail
-- [ ] Proposals can be created from Compliance checks (Challan, DL, RC)
-- [ ] Status transitions work correctly (Sent -> Received -> Converted/Rejected)
-- [ ] Empty states display when no data exists
+- [ ] Two-tab layout works (Active / Past)
+- [ ] Proposals table shows all columns
+- [ ] Detail view with Overview and Follow-up tabs
+- [ ] Follow-up chat thread works (matches Incident Management pattern)
+- [ ] Cancel action works on active proposals
+- [ ] Converted proposals link to incidents
+- [ ] Status badges render correctly (Sent, Converted, Rejected)
+- [ ] Empty states for all views
 - [ ] Responsive on mobile
+
+---
+
+# Milestone 11: Knowledge Base
+
+> **Provide alongside:** `product-overview.md`
+> **Prerequisites:** Milestone 1 (Foundation) complete
+
+## Goal
+
+Implement the Knowledge Base — a centralized legal knowledge repository with browsing, searching, and bilingual support for vehicle owners and fleet managers.
+
+## Overview
+
+A centralized legal knowledge repository where vehicle owners and fleet managers can browse, search, and access legal templates, FAQs, step-by-step guides, compliance checklists, regulatory references, judgements, and circulars. Content is curated by the LOTS247 legal team with bilingual support (EN/HI).
+
+**Key Functionality:**
+- Browse articles by category tabs: All, Templates, FAQs, Guides, Checklists, Regulations, Judgements, Circulars
+- Search across all articles (title, body, tags)
+- Filter by tags (vehicle type, state, document type, topic)
+- View article detail with formatted content
+- Category-specific rendering: downloadable templates, accordion FAQs, interactive checklists
+- Related articles and helpfulness feedback
+- Bilingual support (English/Hindi)
+
+## Recommended Approach: Test-Driven Development
+
+See `product-plan/sections/knowledge-base/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
+
+## What to Implement
+
+### Components
+
+Copy from `product-plan/sections/knowledge-base/components/`:
+
+- `KnowledgeBase.tsx` — Browse view with search, tabs, filters, and article grid
+- `ArticleDetail.tsx` — Article detail view with formatted content
+
+### Data Layer
+
+**Content Categories:**
+- Legal Templates — Ready-to-use legal documents (affidavits, forms, applications)
+- FAQs — Questions organized by topic
+- Legal Guides — Step-by-step procedural guides
+- Compliance Checklists — Actionable checklists
+- Regulatory Reference — Motor Vehicles Act sections, penalty structures
+- Judgements — Landmark court rulings (Supreme Court, High Court, MACT)
+- Circulars — Government notifications from MoRTH, IRDAI, state departments
+
+### Callbacks
+
+| Callback | Description |
+|----------|-------------|
+| `onViewArticle` | Opens article detail view |
+| `onSearch` | Searches articles by free text |
+| `onCategoryChange` | Filters by category tab |
+| `onTagFilter` | Filters by tag chips |
+| `onDownloadTemplate` | Downloads template as PDF |
+| `onCopyText` | Copies template text to clipboard |
+| `onFeedback` | Submits "Was this helpful?" response |
+| `onBack` | Returns to browse view with preserved filters |
+
+### Empty States
+
+- **No articles:** Show "No articles available" (unlikely but handle)
+- **Search returns nothing:** Show "No results found" with suggestion to adjust search/filters
+- **No related articles:** Hide related section gracefully
+
+## Expected User Flows
+
+### Flow 1: Browse and Search
+1. User navigates to Knowledge Base
+2. User sees search bar, category tabs, tag filters, and article grid
+3. User types a search term (e.g., "challan dispute")
+4. Grid updates to show matching articles
+5. **Outcome:** User finds relevant legal content
+
+### Flow 2: Read an Article
+1. User clicks an article card from the grid
+2. Detail view opens with breadcrumb, header, formatted body content
+3. User reads through the article
+4. User clicks "Was this helpful?" (thumbs up/down)
+5. **Outcome:** User gets legal guidance, feedback captured
+
+### Flow 3: Download a Template
+1. User browses Templates category
+2. User clicks a template article
+3. User clicks "Download Template" or "Copy Text"
+4. **Outcome:** Template PDF downloaded or text copied to clipboard
+
+### Flow 4: Use a Checklist
+1. User opens a checklist article
+2. User sees interactive checkbox items grouped by section
+3. User checks items as completed
+4. **Outcome:** User can track progress through the checklist (state not persisted)
+
+## Files to Reference
+
+- `product-plan/sections/knowledge-base/README.md` — Feature overview
+- `product-plan/sections/knowledge-base/tests.md` — Test instructions
+- `product-plan/sections/knowledge-base/components/` — React components
+- `product-plan/sections/knowledge-base/types.ts` — TypeScript interfaces
+- `product-plan/sections/knowledge-base/sample-data.json` — Test data
+
+## Done When
+
+- [ ] Tests written for key user flows (success and failure paths)
+- [ ] All tests pass
+- [ ] Browse view with search, category tabs, tag filters
+- [ ] Article cards in responsive grid (3/2/1 columns)
+- [ ] Search works across title, body, tags
+- [ ] Category tabs filter correctly (All, Templates, FAQs, etc.)
+- [ ] Tag filter chips work
+- [ ] Article detail renders formatted content
+- [ ] Templates: Download and Copy actions work
+- [ ] FAQs: Accordion Q&A pairs expand/collapse
+- [ ] Checklists: Interactive checkboxes work
+- [ ] Related articles section shows at bottom
+- [ ] Feedback (thumbs up/down) captures response
+- [ ] Breadcrumb navigation works
+- [ ] Back preserves previous filters
+- [ ] Empty/no-results states handled
+- [ ] Responsive on mobile
+
+---
+
+# Milestone 12: My Profile
+
+> **Provide alongside:** `product-overview.md`
+> **Prerequisites:** Milestone 1 (Foundation) complete
+
+## Goal
+
+Implement My Profile — the subscriber's personal account hub with tabbed interface for personal details, organization info, and KYC verification.
+
+## Overview
+
+The My Profile section consolidates personal details, organization/business information, and KYC verification status into a clean tabbed interface. It serves both individual vehicle owners and fleet operators who need to manage organization-level data. Subscription management and billing are handled separately in Settings.
+
+**Key Functionality:**
+- Profile header with avatar, name, Subscriber ID, account type badge, KYC status
+- Personal Information tab: edit name, mobile (OTP re-verification), email, DOB, photo
+- Organization tab: business name, type, state, GST, CIN (conditional for fleet/business)
+- KYC & Verification tab: document upload, status tracking, rejection handling
+- Inline editing with validation
+
+## Recommended Approach: Test-Driven Development
+
+See `product-plan/sections/my-profile/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
+
+## What to Implement
+
+### Components
+
+Copy from `product-plan/sections/my-profile/components/`:
+
+- `MyProfile.tsx` — Profile page with header card and tabbed sections
+
+### Data Layer
+
+- Subscriber profile data: name, mobile, email, DOB, photo
+- Organization/business details: name, type, GST, CIN, address
+- KYC documents: Aadhaar, PAN, GST Certificate, Company Registration
+- Document statuses: Not Submitted, Pending Review, Verified, Rejected
+- Account types: Individual, Fleet, Business
+
+### Callbacks
+
+| Callback | Description |
+|----------|-------------|
+| `onEditPersonal` | Enables inline edit mode for personal fields |
+| `onSavePersonal` | Saves personal info changes |
+| `onChangeMobile` | Triggers OTP re-verification for mobile change |
+| `onUploadPhoto` | Uploads/changes profile photo |
+| `onEditOrganization` | Enables inline edit for org fields |
+| `onSaveOrganization` | Saves organization changes |
+| `onUploadDocument` | Uploads KYC document (JPG, PNG, PDF; max 5MB) |
+| `onReuploadDocument` | Re-uploads rejected document |
+
+### Empty States
+
+- **No photo:** Show initials fallback (emerald bg) in avatar
+- **No KYC documents:** Show "Not Submitted" status for all documents
+- **Individual account:** Hide GST/CIN fields in Organization tab
+
+## Expected User Flows
+
+### Flow 1: Edit Personal Information
+1. User navigates to My Profile → Personal Info tab
+2. User clicks "Edit" button
+3. Fields switch to inline edit mode
+4. User modifies name and email
+5. User clicks "Save"
+6. **Outcome:** Changes saved, confirmation shown
+
+### Flow 2: Change Mobile Number
+1. User clicks edit on mobile number field
+2. OTP re-verification flow triggers
+3. User enters new number and verifies OTP
+4. **Outcome:** Mobile number updated after verification
+
+### Flow 3: Upload KYC Document
+1. User navigates to KYC & Verification tab
+2. User clicks upload on Aadhaar document card
+3. Upload modal opens with drag-and-drop (JPG, PNG, PDF; max 5MB)
+4. User selects file and uploads
+5. **Outcome:** Document status changes to "Pending Review"
+
+### Flow 4: Re-upload Rejected Document
+1. User sees a document with "Rejected" status and rejection reason
+2. User clicks "Re-upload" action
+3. User uploads new document
+4. **Outcome:** Document re-submitted for review
+
+## Files to Reference
+
+- `product-plan/sections/my-profile/README.md` — Feature overview
+- `product-plan/sections/my-profile/tests.md` — Test instructions
+- `product-plan/sections/my-profile/components/` — React components
+- `product-plan/sections/my-profile/types.ts` — TypeScript interfaces
+- `product-plan/sections/my-profile/sample-data.json` — Test data
+
+## Done When
+
+- [ ] Tests written for key user flows (success and failure paths)
+- [ ] All tests pass
+- [ ] Profile header shows avatar, name, ID, account type badge, KYC badge
+- [ ] Tabs work: Personal Info, Organization, KYC & Verification
+- [ ] Personal info inline editing with save
+- [ ] Mobile change triggers OTP re-verification
+- [ ] Photo upload/change with preview
+- [ ] Organization tab shows conditional fields (GST/CIN for business types only)
+- [ ] GSTIN format validation (15-character pattern)
+- [ ] KYC document cards with status badges
+- [ ] Document upload with file type/size restrictions
+- [ ] Rejected documents show reason and re-upload action
+- [ ] Overall KYC badge: Unverified (red), Partial (amber), Verified (emerald)
+- [ ] Progress summary ("2 of 4 documents verified")
+- [ ] Empty states handled
+- [ ] Responsive on mobile
+
+---
+
+# Milestone 13: Settings
+
+> **Provide alongside:** `product-overview.md`
+> **Prerequisites:** Milestone 1 (Foundation) complete
+
+## Goal
+
+Implement the Settings section — notification preferences, app behavior configuration, subscription management, and billing history.
+
+## Overview
+
+Settings gives subscribers control over notification preferences, app behavior, and subscription management. It consolidates alert channel configuration, default app preferences, plan management, and billing history into a clean tabbed interface, separate from My Profile which handles identity and KYC.
+
+**Key Functionality:**
+- Configure notification channels per category (In-App, WhatsApp, Email, SMS)
+- Set Quiet Hours with critical alert exemptions
+- Choose default landing page after login
+- View current subscription plan with usage meters
+- Change plans via comparison modal
+- View billing history with PDF download
+
+## Recommended Approach: Test-Driven Development
+
+See `product-plan/sections/settings/tests.md` for detailed test-writing instructions.
+
+**TDD Workflow:**
+1. Read `tests.md` and write failing tests for the key user flows
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
+
+## What to Implement
+
+### Components
+
+Copy from `product-plan/sections/settings/components/`:
+
+- `Settings.tsx` — Settings page with tabbed interface
+
+### Data Layer
+
+**Notification Categories:**
+- Compliance: document expiry, score changes
+- Incidents: case updates, lawyer assignment
+- Challans: new challans, payment reminders
+- Billing: renewal, payment receipts, low wallet balance
+
+**Channels:** In-App, WhatsApp, Email, SMS (toggle per category)
+
+**Subscription Data:**
+- Current plan: name, status, renewal date, price
+- Usage: vehicles used/limit, users used/limit
+- Available plans for comparison
+- Billing history: date, description, amount, status, PDF download
+
+### Callbacks
+
+| Callback | Description |
+|----------|-------------|
+| `onToggleChannel` | Toggles notification channel for a category |
+| `onSetQuietHours` | Enables/configures quiet hours |
+| `onSetLandingPage` | Sets default landing page preference |
+| `onChangePlan` | Opens plan comparison modal |
+| `onSelectPlan` | Selects new plan from comparison |
+| `onDownloadInvoice` | Downloads billing PDF |
+
+### Empty States
+
+- **No billing history:** Show "No billing history yet" (new accounts)
+- **Free plan:** Show limited features with upgrade prompts
+
+## Expected User Flows
+
+### Flow 1: Configure Notifications
+1. User navigates to Settings → Notifications tab
+2. User sees category cards with channel toggles
+3. User toggles off "SMS" for Compliance notifications
+4. Change auto-saves with confirmation toast
+5. **Outcome:** Notification preference updated
+
+### Flow 2: Set Quiet Hours
+1. User enables Quiet Hours toggle
+2. Time pickers appear for start (10 PM) and end (7 AM)
+3. User sets times
+4. **Outcome:** Non-critical notifications suppressed during quiet hours
+
+### Flow 3: Change Subscription Plan
+1. User navigates to Subscription & Billing tab
+2. User sees current plan card with usage meters
+3. User clicks "Change Plan"
+4. Plan comparison modal opens with all available plans
+5. User selects a new plan
+6. **Outcome:** Plan change initiated (payment if upgrading)
+
+### Flow 4: Download Billing Invoice
+1. User scrolls to billing history table
+2. User clicks "Download" on a billing entry
+3. **Outcome:** PDF invoice downloads
+
+## Files to Reference
+
+- `product-plan/sections/settings/README.md` — Feature overview
+- `product-plan/sections/settings/tests.md` — Test instructions
+- `product-plan/sections/settings/components/` — React components
+- `product-plan/sections/settings/types.ts` — TypeScript interfaces
+- `product-plan/sections/settings/sample-data.json` — Test data
+
+## Done When
+
+- [ ] Tests written for key user flows (success and failure paths)
+- [ ] All tests pass
+- [ ] Tabs work: Notifications, Preferences, Subscription & Billing
+- [ ] Notification category cards with channel toggles
+- [ ] Toggle changes auto-save with confirmation toast
+- [ ] Quiet Hours toggle with time pickers
+- [ ] Critical alerts exempt from quiet hours (info text shown)
+- [ ] Fleet/Business: Daily Digest toggle visible
+- [ ] Default landing page radio selection
+- [ ] Fleet/Business: sidebar badge toggle visible
+- [ ] Current plan card with status color
+- [ ] Usage meters (vehicles, users) with progress bars
+- [ ] Change Plan modal with comparison cards
+- [ ] Billing history table with PDF download
+- [ ] Empty states handled
+- [ ] Responsive on mobile (table → cards)

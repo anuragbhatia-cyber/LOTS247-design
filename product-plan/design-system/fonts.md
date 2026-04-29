@@ -2,7 +2,7 @@
 
 ## Google Fonts Import
 
-Add to your HTML `<head>` or CSS:
+Add to your HTML `<head>`:
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,17 +12,13 @@ Add to your HTML `<head>` or CSS:
 
 ## Font Usage
 
-- **Headings:** DM Sans (bold/semibold weights)
+- **Headings:** DM Sans (semibold/bold weights)
 - **Body text:** DM Sans (regular/medium weights)
-- **Code/technical:** IBM Plex Mono (monospace for IDs, reference numbers, technical data)
+- **Code/technical:** IBM Plex Mono (monospaced, for IDs, reference numbers, code)
 
-## Tailwind Configuration
+## Tailwind Classes
 
-In your CSS (Tailwind v4):
-
-```css
-@theme {
-  --font-sans: 'DM Sans', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-}
+```
+font-sans  → DM Sans (set as default sans-serif)
+font-mono  → IBM Plex Mono
 ```

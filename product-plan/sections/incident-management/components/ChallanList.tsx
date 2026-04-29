@@ -23,7 +23,7 @@ import type {
   Vehicle,
   Driver,
 } from '../types'
-import { useLanguage, type Language } from './LanguageContext'
+import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 // ---------------------------------------------------------------------------
 // Translations
@@ -243,7 +243,7 @@ function formatDate(dateStr: string, language: Language): string {
 }
 
 function getSlaInfo(slaDeadline: string, status: ChallanStatus, t: Record<string, string>) {
-  if (status === 'resolved') return { label: t.slaCompleted, color: 'text-emerald-600 dark:text-emerald-400', breached: false }
+  if (status === 'resolved') return { label: t.slaCompleted, color: 'text-stone-600 dark:text-stone-400', breached: false }
 
   const now = new Date()
   const deadline = new Date(slaDeadline)
@@ -251,12 +251,12 @@ function getSlaInfo(slaDeadline: string, status: ChallanStatus, t: Record<string
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
 
   if (diffDays < 0) {
-    return { label: `${Math.abs(diffDays)}${t.slaDaysOverdue}`, color: 'text-red-600 dark:text-red-400', breached: true }
+    return { label: `${Math.abs(diffDays)}${t.slaDaysOverdue}`, color: 'text-stone-900 dark:text-stone-100', breached: true }
   }
   if (diffDays <= 7) {
-    return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-amber-600 dark:text-amber-400', breached: false }
+    return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-stone-900 dark:text-stone-100', breached: false }
   }
-  return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-stone-500 dark:text-stone-400', breached: false }
+  return { label: `${diffDays}${t.slaDaysRemaining}`, color: 'text-stone-900 dark:text-stone-100', breached: false }
 }
 
 function resolveVehicle(vehicleId: string, vehicles: Vehicle[]): Vehicle | undefined {
@@ -473,7 +473,7 @@ export function ChallanList({
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
+              className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-sm font-medium transition-colors ${
                 showFilters || activeFilterCount > 0
                   ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
                   : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600'
@@ -522,7 +522,7 @@ export function ChallanList({
                     onChange={(e) =>
                       setStatusFilter(e.target.value as ChallanStatus | 'all')
                     }
-                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                   >
                     <option value="all">{t.allStatuses}</option>
                     <option value="submitted">{t.statusSubmitted}</option>
@@ -544,7 +544,7 @@ export function ChallanList({
                   <select
                     value={vehicleFilter}
                     onChange={(e) => setVehicleFilter(e.target.value)}
-                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                    className="appearance-none pl-3 pr-8 py-2 rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                   >
                     <option value="all">{t.allVehicles}</option>
                     {vehicles.map((v) => (
@@ -612,7 +612,7 @@ export function ChallanList({
               <col className="w-[10%]" />
             </colgroup>
             <thead>
-              <tr className="border-b border-stone-100 dark:border-stone-800">
+              <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
                 <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                   {t.headerIncidentId}
                 </th>
@@ -636,7 +636,7 @@ export function ChallanList({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-100 dark:divide-stone-800/60">
+            <tbody className="divide-y divide-stone-200 dark:divide-stone-800/60">
               {paginatedItems.map((challan) => {
                 const vehicle = resolveVehicle(challan.vehicleId, vehicles)
                 const driver = resolveDriver(challan.driverId, drivers)
@@ -647,7 +647,7 @@ export function ChallanList({
                   <tr
                     key={challan.id}
                     onClick={() => onView?.(challan.id)}
-                    className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/40 transition-colors"
+                    className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
                   >
                     {/* Incident ID + Date */}
                     <td className="px-5 py-4">
@@ -740,10 +740,10 @@ export function ChallanList({
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                 <Search className="w-5 h-5 text-stone-400 dark:text-stone-500" />
               </div>
-              <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
+              <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">
                 {t.noChallansFound}
               </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
                 {t.tryAdjusting}
               </p>
             </div>
@@ -811,7 +811,7 @@ export function ChallanList({
                 </div>
 
                 {/* Bottom: Amount + SLA + Actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-stone-100 dark:border-stone-800">
+                <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
                   <div>
                     <p className="text-lg font-bold text-stone-900 dark:text-stone-50 tabular-nums">
                       {formatCurrency(challan.amount)}
@@ -830,7 +830,7 @@ export function ChallanList({
                         <button
                           key={action.label}
                           onClick={action.onClick}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 rounded-lg text-xs font-medium transition-colors ${
+                          className={`flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 rounded-xl text-xs font-medium transition-colors ${
                             action.variant === 'primary'
                               ? 'bg-emerald-600 text-white hover:bg-emerald-700'
                               : action.variant === 'danger'
@@ -855,10 +855,10 @@ export function ChallanList({
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
                 <Search className="w-5 h-5 text-stone-400 dark:text-stone-500" />
               </div>
-              <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
+              <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">
                 {t.noChallansFound}
               </p>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
                 {t.tryAdjusting}
               </p>
             </div>
@@ -875,7 +875,7 @@ export function ChallanList({
               <button
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -883,7 +883,7 @@ export function ChallanList({
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${
+                  className={`min-w-[32px] h-8 rounded-xl text-xs font-medium transition-colors ${
                     page === currentPage
                       ? 'bg-emerald-600 text-white shadow-sm'
                       : 'text-stone-600 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800'
@@ -895,7 +895,7 @@ export function ChallanList({
               <button
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-lg text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                className="p-2 rounded-xl text-stone-500 dark:text-stone-400 hover:bg-white dark:hover:bg-stone-800 hover:text-stone-700 dark:hover:text-stone-200 disabled:opacity-40 disabled:pointer-events-none transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

@@ -16,47 +16,12 @@
   },
   "subscriptionPlans": [
     {
-      "id": "plan-free",
-      "name": "Free",
-      "displayName": "Free Trial",
-      "description": "Get started with basic compliance tracking",
-      "price": 0,
-      "billingPeriod": "month",
-      "isRecommended": false,
-      "features": {
-        "vehicleLimit": 1,
-        "onCallResolution": false,
-        "onSiteResolution": false,
-        "challanResolution": {
-          "online": false,
-          "lokAdalat": false,
-          "court": false
-        },
-        "rtoService": false,
-        "dashboardAccess": true,
-        "numberOfUsers": 1,
-        "automatedReports": false,
-        "personalizedReports": false,
-        "whatsappUpdates": false,
-        "addOns": false,
-        "valueAddedServices": false,
-        "accountManager": false,
-        "bulkChallanResolution": false,
-        "apiIntegration": false
-      },
-      "limitations": [
-        "Limited to 1 vehicle only",
-        "No legal support services",
-        "No challan resolution assistance"
-      ]
-    },
-    {
       "id": "plan-udrive",
       "name": "U Drive",
       "displayName": "U Drive",
       "description": "Perfect for individual vehicle owners",
-      "price": 0,
-      "billingPeriod": "month",
+      "price": 1000,
+      "billingPeriod": "year",
       "isRecommended": false,
       "features": {
         "vehicleLimit": 1,
@@ -68,7 +33,7 @@
           "court": 2000
         },
         "rtoService": "payPerUse",
-        "dashboardAccess": true,
+        "dashboardAccess": false,
         "numberOfUsers": 1,
         "automatedReports": false,
         "personalizedReports": false,
@@ -86,12 +51,49 @@
       ]
     },
     {
+      "id": "plan-udrive-plus",
+      "name": "U Drive+",
+      "displayName": "U Drive+",
+      "description": "Complete protection for individual vehicle owners",
+      "price": 999,
+      "billingPeriod": "year",
+      "isRecommended": false,
+      "features": {
+        "vehicleLimit": 1,
+        "onCallResolution": true,
+        "onSiteResolution": true,
+        "challanResolution": {
+          "online": true,
+          "lokAdalat": true,
+          "court": true
+        },
+        "rtoService": "payPerUse",
+        "dashboardAccess": true,
+        "numberOfUsers": 1,
+        "automatedReports": true,
+        "personalizedReports": false,
+        "whatsappUpdates": true,
+        "addOns": "included",
+        "valueAddedServices": "payPerUse",
+        "accountManager": false,
+        "bulkChallanResolution": false,
+        "apiIntegration": false
+      },
+      "highlights": [
+        "Unlimited on-call & on-site legal support",
+        "1 challan resolution included",
+        "Unlimited RTO services",
+        "1500 credits included",
+        "WhatsApp incident updates"
+      ]
+    },
+    {
       "id": "plan-bsafe",
       "name": "B Safe",
       "displayName": "B Safe",
       "description": "Comprehensive protection for growing fleets",
-      "price": 0,
-      "billingPeriod": "month",
+      "price": 40000,
+      "billingPeriod": "year",
       "isRecommended": false,
       "features": {
         "vehicleLimit": null,
@@ -127,8 +129,8 @@
       "name": "V Care",
       "displayName": "V Care",
       "description": "Complete fleet management with premium support",
-      "price": 0,
-      "billingPeriod": "month",
+      "price": 100000,
+      "billingPeriod": "year",
       "isRecommended": true,
       "features": {
         "vehicleLimit": null,
