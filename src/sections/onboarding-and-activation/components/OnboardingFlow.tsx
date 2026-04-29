@@ -149,7 +149,7 @@ export function OnboardingFlow({
   // Success Screen (dashboard loading)
   if (showSuccess) {
     return (
-      <div className="min-h-screen bg-white dark:bg-stone-950 flex flex-col">
+      <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex flex-col">
         <header className="w-full bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-10 py-3">
           <img src="/lots247-logo.png" alt="LOTS247" className="h-10 w-auto" />
         </header>

@@ -470,39 +470,75 @@ export function AppShell({
             <img src="/lots247-logo-white.png" alt="LOTS247" className="h-7 w-auto object-contain" />
           </div>
         </div>
-        {/* Mobile Language Dropdown */}
-        <div ref={mobileLangRef} className="relative">
+        <div className="flex items-center gap-1">
+          {/* Mobile Notification Bell */}
           <button
-            onClick={() => setMobileLangOpen(!mobileLangOpen)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            onClick={() => {
+              setShowNotifications(true)
+            }}
+            aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+            className="relative p-3 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
           >
-            <Languages className="w-4 h-4" />
-            <span>{language === 'en' ? 'EN' : 'हिन्दी'}</span>
-            <ChevronDown className={`w-3 h-3 transition-transform duration-150 ${mobileLangOpen ? 'rotate-180' : ''}`} />
+            <Bell className="w-5 h-5" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-stone-900" />
+            )}
           </button>
-          {mobileLangOpen && (
-            <div className="absolute right-0 top-full mt-2 w-36 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-50">
-              <div className="py-1">
-                {([['en', 'English'], ['hi', 'हिन्दी']] as const).map(([code, label]) => (
-                  <button
-                    key={code}
-                    onClick={() => {
-                      setLanguage(code)
-                      setMobileLangOpen(false)
-                    }}
-                    className={`w-full text-left px-3.5 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      language === code
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
-                        : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
-                    }`}
-                  >
-                    {label}
-                    {language === code && <Check className="w-4 h-4" />}
-                  </button>
-                ))}
-              </div>
-            </div>
+
+          {/* Mobile User Profile */}
+          {user && (
+            <button
+              onClick={() => {
+                onNavigate?.('/profile')
+              }}
+              aria-label="My Profile"
+              className="p-1.5 rounded-lg hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            >
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-bold text-white">
+                    {user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}
+                  </span>
+                </div>
+              )}
+            </button>
           )}
+
+          {/* Mobile Language Dropdown */}
+          <div ref={mobileLangRef} className="relative">
+            <button
+              onClick={() => setMobileLangOpen(!mobileLangOpen)}
+              className="flex items-center gap-1 px-2 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            >
+              <Languages className="w-4 h-4" />
+              <span className="text-xs">{language === 'en' ? 'EN' : 'हिं'}</span>
+            </button>
+            {mobileLangOpen && (
+              <div className="absolute right-0 top-full mt-2 w-36 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-50">
+                <div className="py-1">
+                  {([['en', 'English'], ['hi', 'हिन्दी']] as const).map(([code, label]) => (
+                    <button
+                      key={code}
+                      onClick={() => {
+                        setLanguage(code)
+                        setMobileLangOpen(false)
+                      }}
+                      className={`w-full text-left px-3.5 py-2.5 text-sm flex items-center justify-between transition-colors ${
+                        language === code
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-semibold'
+                          : 'text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800'
+                      }`}
+                    >
+                      {label}
+                      {language === code && <Check className="w-4 h-4" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -590,8 +626,8 @@ export function AppShell({
             )}
           </div>
 
-          {/* Settings */}
-          <div className="px-3 py-3 border-t border-stone-800/50">
+          {/* Settings & Logout */}
+          <div className="px-3 py-3 border-t border-stone-800/50 space-y-1">
             <button
               onClick={() => {
                 onNavigate?.('/settings')
@@ -612,6 +648,23 @@ export function AppShell({
             >
               <Settings className="w-5 h-5 flex-shrink-0" />
               {!isCollapsed && <span>{t.settings}</span>}
+            </button>
+            <button
+              onClick={() => {
+                setIsMobileOpen(false)
+                onLogout?.()
+              }}
+              title={isCollapsed ? t.logout : undefined}
+              className={`
+                lg:hidden w-full flex items-center gap-3 px-3 py-2.5 min-h-11 rounded-lg text-[13px] font-medium
+                text-red-400 hover:text-red-300 hover:bg-red-950/40
+                transition-all duration-150
+                focus:outline-none focus:ring-2 focus:ring-red-500/40
+                ${isCollapsed ? 'justify-center px-2' : ''}
+              `}
+            >
+              <LogOut className="w-5 h-5 flex-shrink-0" />
+              {!isCollapsed && <span>{t.logout}</span>}
             </button>
           </div>
 
