@@ -329,7 +329,7 @@ export function MyProfile({
     <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
       <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7">
         {/* Page Title */}
-        <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-4">
+        <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-4">
           {t.pageTitle}
         </h1>
 
@@ -337,7 +337,7 @@ export function MyProfile({
         {/* Profile Header Card */}
         {/* ================================================================= */}
         <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 p-5 sm:p-6 mb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="flex flex-row items-center gap-4">
             {/* Avatar */}
             <div className="relative group shrink-0">
               {subscriberProfile.avatarUrl ? (
@@ -424,7 +424,7 @@ export function MyProfile({
           {activeTab === 'personal' && (
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl sm:text-2xl font-semibold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg sm:text-xl font-semibold text-stone-900 dark:text-stone-100">
                   {t.tabPersonal}
                 </h3>
                 {!isEditingPersonal ? (
@@ -576,7 +576,7 @@ export function MyProfile({
           {activeTab === 'organization' && (
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl sm:text-2xl font-semibold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg sm:text-xl font-semibold text-stone-900 dark:text-stone-100">
                   {t.tabOrganization}
                 </h3>
                 {!isEditingOrg ? (
@@ -744,7 +744,7 @@ export function MyProfile({
           {activeTab === 'kyc' && (
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl sm:text-2xl font-semibold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg sm:text-xl font-semibold text-stone-900 dark:text-stone-100">
                   {t.tabKyc}
                 </h3>
                 <span className="text-sm text-stone-500 dark:text-stone-400">

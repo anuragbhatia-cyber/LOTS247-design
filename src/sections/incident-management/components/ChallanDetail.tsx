@@ -1079,15 +1079,10 @@ export function ChallanDetail({
                     <ArrowLeft className="w-5 h-5" />
                   </button>
 
-                  {/* Challan Icon */}
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${statusStyle.bg}`}>
-                    <StatusIcon className={`w-4 h-4 ${statusStyle.text}`} />
-                  </div>
-
                   {/* ID + Badges */}
                   <div>
                     <div className="flex items-center gap-2.5 flex-wrap">
-                      <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
+                      <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
                         {challan.displayId}
                       </h1>
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-medium ${statusStyle.bg} ${statusStyle.text}`}>

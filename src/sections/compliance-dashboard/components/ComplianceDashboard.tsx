@@ -2671,7 +2671,7 @@ export function ComplianceDashboard({
         {!activeCardView && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Fleet Overview</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Fleet Overview</h1>
           </div>
 
           <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
@@ -3209,7 +3209,7 @@ export function ComplianceDashboard({
             {/* -------------------------------------------------------------- */}
             <div className="mb-6 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
               <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">Compliance Categories</h3>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {categories.map(cat => (
                   <CategoryCard key={cat.id} category={cat} onClick={() => handleCategoryClick(cat.id)} />
                 ))}

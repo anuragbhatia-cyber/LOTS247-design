@@ -203,6 +203,9 @@ function AddMoneyModal({
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
   const [customAmount, setCustomAmount] = useState('')
   const [error, setError] = useState('')
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
+  const [paidAmount, setPaidAmount] = useState(0)
+  const [txnId] = useState(() => `pay_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`)
 
   const effectiveAmount = selectedAmount ?? (customAmount ? parseInt(customAmount, 10) : 0)
 
@@ -229,89 +232,155 @@ function AddMoneyModal({
       return
     }
     onAddMoney?.(effectiveAmount)
-    onClose()
+    setPaidAmount(effectiveAmount)
+    setPaymentSuccess(true)
   }
+
+  const now = new Date()
+  const successDate = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+  const successTime = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
       <div className="relative w-full max-w-md bg-white dark:bg-stone-900 rounded-2xl shadow-2xl dark:shadow-stone-950/50 overflow-hidden">
-        {/* Header */}
-        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-200 dark:border-stone-800">
-          <div>
-            <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 tracking-tight">Add Money</h3>
-            <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Top up your LOTS247 wallet</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-lg text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
 
-        <div className="p-4 sm:p-6 space-y-4">
-          {/* Amount input */}
-          <div>
-            <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
-              Enter Amount
-            </label>
-            <div className="flex items-center gap-1.5 border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-900 focus-within:ring-2 focus-within:ring-emerald-500/30 focus-within:border-emerald-400 dark:focus-within:border-emerald-600 transition-colors px-3 py-2.5">
-              <span className="text-base font-semibold text-stone-400 dark:text-stone-500 select-none">₹</span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={selectedAmount ? selectedAmount.toLocaleString('en-IN') : customAmount ? parseInt(customAmount).toLocaleString('en-IN') : ''}
-                onChange={(e) => handleCustomChange(e.target.value.replace(/,/g, ''))}
-                placeholder="0"
-                className="flex-1 text-lg font-bold bg-transparent text-stone-900 dark:text-stone-100 placeholder:text-stone-300 dark:placeholder:text-stone-600 focus:outline-none"
-              />
+        {paymentSuccess ? (
+          /* ---- Payment Success State ---- */
+          <div className="p-6 sm:p-8">
+            {/* Close */}
+            <div className="flex justify-end -mt-2 -mr-2 mb-2">
+              <button
+                onClick={onClose}
+                className="p-2 rounded-lg text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            {error && (
-              <p className="mt-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3" />
-                {error}
+
+            {/* Checkmark */}
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mb-4">
+                <div className="w-11 h-11 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                  <CheckCircle2 className="w-6 h-6 text-white" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-stone-900 dark:text-white">Payment Successful</h3>
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
+                {formatCurrency(paidAmount)} added to your wallet
               </p>
-            )}
-          </div>
-
-          {/* Quick amounts */}
-          <div>
-            <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
-              Quick Select
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {quickAmounts.map((amount) => (
-                <button
-                  key={amount}
-                  onClick={() => handleQuickSelect(amount)}
-                  className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                    selectedAmount === amount
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
-                  }`}
-                >
-                  ₹{amount.toLocaleString('en-IN')}
-                </button>
-              ))}
             </div>
+
+            {/* Details */}
+            <div className="bg-stone-50 dark:bg-stone-800/50 rounded-xl p-4 space-y-3 mb-6">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-stone-500 dark:text-stone-400">Amount</span>
+                <span className="text-sm font-bold text-stone-900 dark:text-white">{formatCurrency(paidAmount)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-stone-500 dark:text-stone-400">Transaction ID</span>
+                <span className="text-xs font-mono text-stone-600 dark:text-stone-300 bg-stone-100 dark:bg-stone-700 px-2 py-1 rounded">
+                  {txnId}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-stone-500 dark:text-stone-400">Date</span>
+                <span className="text-sm text-stone-700 dark:text-stone-300">{successDate}, {successTime}</span>
+              </div>
+              <div className="border-t border-dashed border-stone-200 dark:border-stone-700 my-1" />
+              <p className="text-xs text-stone-400 dark:text-stone-500 text-center">
+                A receipt has been sent to your registered email
+              </p>
+            </div>
+
+            <button
+              onClick={onClose}
+              className="w-full py-3 rounded-xl font-semibold text-sm bg-stone-900 dark:bg-white hover:bg-stone-700 dark:hover:bg-stone-100 text-white dark:text-stone-900 transition-colors cursor-pointer"
+            >
+              Done
+            </button>
           </div>
+        ) : (
+          /* ---- Add Money Form ---- */
+          <>
+            {/* Header */}
+            <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-200 dark:border-stone-800">
+              <div>
+                <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 tracking-tight">Add Money</h3>
+                <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Top up your LOTS247 wallet</p>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-2 rounded-lg text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-          {/* Proceed button */}
-          <button
-            onClick={handleProceed}
-            disabled={!effectiveAmount}
-            className="w-full px-4 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-800 disabled:text-stone-400 dark:disabled:text-stone-500 text-white font-semibold text-sm transition-colors disabled:cursor-not-allowed"
-          >
-            {effectiveAmount
-              ? `Pay ${formatCurrency(effectiveAmount)} via Razorpay`
-              : 'Enter an amount to proceed'}
-          </button>
+            <div className="p-4 sm:p-6 space-y-4">
+              {/* Amount input */}
+              <div>
+                <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
+                  Enter Amount
+                </label>
+                <div className="flex items-center gap-1.5 border border-stone-200 dark:border-stone-700 rounded-lg bg-white dark:bg-stone-900 focus-within:ring-2 focus-within:ring-emerald-500/30 focus-within:border-emerald-400 dark:focus-within:border-emerald-600 transition-colors px-3 py-2.5">
+                  <span className="text-base font-semibold text-stone-400 dark:text-stone-500 select-none">₹</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={selectedAmount ? selectedAmount.toLocaleString('en-IN') : customAmount ? parseInt(customAmount).toLocaleString('en-IN') : ''}
+                    onChange={(e) => handleCustomChange(e.target.value.replace(/,/g, ''))}
+                    placeholder="0"
+                    className="flex-1 text-lg font-bold bg-transparent text-stone-900 dark:text-stone-100 placeholder:text-stone-300 dark:placeholder:text-stone-600 focus:outline-none"
+                  />
+                </div>
+                {error && (
+                  <p className="mt-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    {error}
+                  </p>
+                )}
+              </div>
 
-          <p className="text-center text-xs text-stone-400 dark:text-stone-500">
-            Secured by Razorpay &middot; UPI, Cards, Net Banking accepted
-          </p>
-        </div>
+              {/* Quick amounts */}
+              <div>
+                <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
+                  Quick Select
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickAmounts.map((amount) => (
+                    <button
+                      key={amount}
+                      onClick={() => handleQuickSelect(amount)}
+                      className={`py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                        selectedAmount === amount
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700'
+                      }`}
+                    >
+                      ₹{amount.toLocaleString('en-IN')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Proceed button */}
+              <button
+                onClick={handleProceed}
+                disabled={!effectiveAmount}
+                className="w-full px-4 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-200 dark:disabled:bg-stone-800 disabled:text-stone-400 dark:disabled:text-stone-500 text-white font-semibold text-sm transition-colors disabled:cursor-not-allowed"
+              >
+                {effectiveAmount
+                  ? `Pay ${formatCurrency(effectiveAmount)} via Razorpay`
+                  : 'Enter an amount to proceed'}
+              </button>
+
+              <p className="text-center text-xs text-stone-400 dark:text-stone-500">
+                Secured by Razorpay &middot; UPI, Cards, Net Banking accepted
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>,
     document.body
@@ -569,7 +638,7 @@ export function WalletView({
         <div className="pt-5 sm:pt-7 pb-5 sm:pb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Wallet</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Wallet</h1>
               <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">Manage your balance and transaction history</p>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">

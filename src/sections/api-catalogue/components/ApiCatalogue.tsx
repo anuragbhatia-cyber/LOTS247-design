@@ -60,7 +60,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       {/* Header — full width above sidebar */}
       <div className="px-5 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8 pb-4 sm:pb-5">
-        <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+        <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
           {activeTab === 'all' ? 'API Catalogue' : 'My APIs'}
         </h1>
         <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
@@ -230,34 +230,34 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                             <>
                               <button
                                 onClick={(e) => { e.stopPropagation(); setShowTopUp(true) }}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
                               >
-                                <Wallet className="w-3.5 h-3.5" />
-                                Top-up Balance
+                                <Wallet className="w-3.5 h-3.5 shrink-0" />
+                                Top-up
                               </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors whitespace-nowrap"
                               >
-                                Check Details
-                                <ArrowRight className="w-3.5 h-3.5" />
+                                Details
+                                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                               </button>
                             </>
                           ) : (
                             <>
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
                               >
-                                Check Details
-                                <ArrowRight className="w-3.5 h-3.5" />
+                                Details
+                                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                               </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); setContactApiId(api.id) }}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors whitespace-nowrap"
                               >
-                                <Mail className="w-3.5 h-3.5" />
-                                Contact for Pricing
+                                <Mail className="w-3.5 h-3.5 shrink-0" />
+                                Contact
                               </button>
                             </>
                           )}
@@ -287,17 +287,17 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                         <div className="flex items-center gap-2 pt-4 border-t border-stone-200 dark:border-stone-800">
                           <button
                             onClick={(e) => { e.stopPropagation(); setShowTopUp(true) }}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm"
+                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
                           >
-                            <Wallet className="w-3.5 h-3.5" />
-                            Top-up Balance
+                            <Wallet className="w-3.5 h-3.5 shrink-0" />
+                            Top-up
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleViewDetail(api.id) }}
-                            className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
+                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors whitespace-nowrap"
                           >
-                            Check Details
-                            <ArrowRight className="w-3.5 h-3.5" />
+                            Details
+                            <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                           </button>
                         </div>
                       </div>

@@ -190,7 +190,7 @@ export function ReportsList({
       <div className="px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8">
         {/* Page Header */}
         <div className="mb-5">
-          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+          <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
             Reports
           </h1>
           <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
@@ -198,31 +198,48 @@ export function ReportsList({
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-5 overflow-x-auto">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
-              title={tab.description}
-              className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
-                  : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
-              }`}
+        {/* Tabs — dropdown on mobile, pill bar on sm+ */}
+        <div className="mb-5">
+          {/* Mobile dropdown */}
+          <div className="sm:hidden">
+            <select
+              value={activeTab}
+              onChange={(e) => handleTabChange(e.target.value as ReportTab)}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
             >
-              {tab.label}
-              <span
-                className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
+              {TABS.map((tab) => (
+                <option key={tab.id} value={tab.id}>
+                  {tab.label} ({tabCounts[tab.id]})
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Desktop pill bar */}
+          <div className="hidden sm:flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                title={tab.description}
+                className={`flex items-center gap-1.5 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
-                    : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
+                    ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
+                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
                 }`}
               >
-                {tabCounts[tab.id]}
-              </span>
-            </button>
-          ))}
+                {tab.label}
+                <span
+                  className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
+                    activeTab === tab.id
+                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
+                  }`}
+                >
+                  {tabCounts[tab.id]}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Search + Filters */}

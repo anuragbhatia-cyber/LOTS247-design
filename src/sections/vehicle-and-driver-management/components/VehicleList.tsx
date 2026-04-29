@@ -838,7 +838,7 @@ export function VehicleList({
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
               {t.vehiclesAndDrivers}
             </h1>
             <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">

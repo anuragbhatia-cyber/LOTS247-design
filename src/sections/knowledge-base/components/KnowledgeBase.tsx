@@ -728,7 +728,7 @@ function DetailView({
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-100 truncate">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100 truncate">
               {article.title}
             </h1>
           </div>
@@ -1275,7 +1275,7 @@ export function KnowledgeBase({
       <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-1">
+          <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-1">
             {t.pageTitle}
           </h1>
           <p className="text-sm text-stone-500 dark:text-stone-400">

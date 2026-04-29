@@ -177,7 +177,7 @@ export function VehicleWiseReport({ vehicles, vehicleHistory }: VehicleWiseRepor
       <div className="min-h-screen bg-stone-100">
         <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
           <div className="mb-6">
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900">Vehicle-wise Compliance Report</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900">Vehicle-wise Compliance Report</h1>
             <p className="text-sm text-stone-500 mt-1">Select a vehicle to view its detailed compliance status</p>
           </div>
 

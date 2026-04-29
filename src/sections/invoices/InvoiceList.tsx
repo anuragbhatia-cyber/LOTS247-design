@@ -3,7 +3,7 @@ export function InvoiceList() {
     <div className="w-full h-full p-5 sm:p-6 bg-stone-50 dark:bg-stone-900">
       <div className="max-w-6xl mx-auto space-y-6">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Invoices</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Invoices</h1>
           <p className="text-sm text-stone-600 dark:text-stone-400 mt-1">Manage your customer invoices</p>
         </div>
 

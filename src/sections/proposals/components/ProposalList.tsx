@@ -350,7 +350,7 @@ function ProposalRow({
 
   return (
     <div onClick={onView} className="group/row flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 px-4 sm:px-5 py-4 border-b border-stone-200 dark:border-stone-800 last:border-b-0 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors cursor-pointer">
-      {/* Mobile: Top row with ID + Status */}
+      {/* Mobile: Top row with ID + Status + Actions */}
       <div className="flex items-center justify-between sm:hidden">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
@@ -360,9 +360,50 @@ function ProposalRow({
             {t[typeConfig.labelKey]}
           </span>
         </div>
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
-          {t[statusConfig.labelKey]}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
+            {t[statusConfig.labelKey]}
+          </span>
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
+                <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/40 dark:shadow-stone-950/60 overflow-hidden z-30">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onView?.() }}
+                    className="w-full text-left px-3.5 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                  >
+                    {t.viewDetail}
+                  </button>
+                  {isActive && (
+                    <>
+                      <div className="border-t border-stone-200 dark:border-stone-800" />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onFollowUp?.() }}
+                        className="w-full text-left px-3.5 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                      >
+                        {t.followUp}
+                      </button>
+                      <div className="border-t border-stone-200 dark:border-stone-800" />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onCancel?.() }}
+                        className="w-full text-left px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                      >
+                        {t.cancel}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Mobile: Details row */}
@@ -374,10 +415,6 @@ function ProposalRow({
         </div>
       </div>
 
-      {/* Mobile: Description */}
-      <p className="sm:hidden text-xs text-stone-500 dark:text-stone-400 line-clamp-1">
-        {proposal.description}
-      </p>
 
       {/* Mobile: Service Status (past tab only) */}
       {showIncidentColumn && proposal.serviceStatus && proposal.serviceStatus !== 'not_applicable' && (
@@ -389,54 +426,15 @@ function ProposalRow({
         </div>
       )}
 
-      {/* Mobile: Actions — three-dot menu */}
-      <div className="flex items-center justify-between sm:hidden">
-        {proposal.linkedIncidentId && (
+      {/* Mobile: Linked incident (if any) */}
+      {proposal.linkedIncidentId && (
+        <div className="flex items-center sm:hidden">
           <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
             <ArrowUpRight className="w-3 h-3" />
             {proposal.linkedIncidentId}
           </span>
-        )}
-        <div className="relative ml-auto" onClick={(e) => e.stopPropagation()}>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
-          {menuOpen && (
-            <>
-              <div className="fixed inset-0 z-20" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 bottom-full mb-1 w-44 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/40 dark:shadow-stone-950/60 overflow-hidden z-30">
-                <button
-                  onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onView?.() }}
-                  className="w-full text-left px-3.5 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
-                >
-                  {t.viewDetail}
-                </button>
-                {isActive && (
-                  <>
-                    <div className="border-t border-stone-200 dark:border-stone-800" />
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onFollowUp?.() }}
-                      className="w-full text-left px-3.5 py-2.5 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
-                    >
-                      {t.followUp}
-                    </button>
-                    <div className="border-t border-stone-200 dark:border-stone-800" />
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onCancel?.() }}
-                      className="w-full text-left px-3.5 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
-                    >
-                      {t.cancel}
-                    </button>
-                  </>
-                )}
-              </div>
-            </>
-          )}
         </div>
-      </div>
+      )}
 
       {/* Desktop: Table columns */}
       <div className="hidden sm:flex sm:items-center sm:flex-1">
@@ -1110,45 +1108,69 @@ export function ProposalList({
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
               {t.pageTitle}
             </h1>
             <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">{t.pageSubtitle}</p>
           </div>
           <button
             onClick={() => setShowCreateRequest(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shrink-0"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shrink-0"
           >
             <Plus className="w-4 h-4" />
             {t.createRequest}
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit mb-5">
-          {TAB_LIST.map((tab) => {
-            const isActive = activeTab === tab.key
-            return (
-              <button
-                key={tab.key}
-                onClick={() => handleTabChange(tab.key)}
-                className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
-                    : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
-                }`}
-              >
-                {tab.label}
-                <span className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
-                  isActive
-                    ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
-                    : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
-                }`}>
-                  {tab.count}
-                </span>
-              </button>
-            )
-          })}
+        {/* Tabs — dropdown on mobile, pill bar on sm+ */}
+        <div className="mb-5">
+          {/* Mobile: dropdown (wider) + button in one row */}
+          <div className="sm:hidden flex items-center gap-2">
+            <select
+              value={activeTab}
+              onChange={(e) => handleTabChange(e.target.value as Tab)}
+              className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+            >
+              {TAB_LIST.map((tab) => (
+                <option key={tab.key} value={tab.key}>
+                  {tab.label} ({tab.count})
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setShowCreateRequest(true)}
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shrink-0 whitespace-nowrap"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Create
+            </button>
+          </div>
+          {/* Desktop pill bar */}
+          <div className="hidden sm:flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit">
+            {TAB_LIST.map((tab) => {
+              const isActive = activeTab === tab.key
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => handleTabChange(tab.key)}
+                  className={`flex items-center gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                    isActive
+                      ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-50 shadow-sm'
+                      : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
+                  }`}
+                >
+                  {tab.label}
+                  <span className={`text-xs tabular-nums px-1.5 py-0.5 rounded-full ${
+                    isActive
+                      ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
+                  }`}>
+                    {tab.count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Search + Filters */}

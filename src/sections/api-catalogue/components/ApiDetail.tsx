@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, ShieldCheck, IdCard, Truck, ExternalLink, Wallet, Upload, Key, FileText, BookOpen, ArrowDownLeft, ArrowUpRight, Copy, Check, Search, Download, Eye, EyeOff, RotateCcw, type LucideIcon } from 'lucide-react'
+import { ArrowLeft, ShieldCheck, IdCard, Truck, Wallet, Upload, Key, FileText, ArrowDownLeft, ArrowUpRight, Copy, Check, Search, Download, Eye, EyeOff, RotateCcw, type LucideIcon } from 'lucide-react'
 import type { ApiDetailProps } from '@/../product/sections/api-catalogue/types'
 import { ContactModal } from './ContactModal'
 
@@ -70,92 +70,16 @@ const LOGS_DATA = [
   { id: 8, timestamp: '2026-04-23 12:15:48', endpoint: '/v1/challans/UP06KL1234/details', method: 'GET', status: 200, latency: '178ms' },
 ]
 
-const DOC_PARAMS = [
-  { name: 'vehicle_number', type: 'string', required: true, description: 'Vehicle registration number (e.g. DL01AB1234)' },
-  { name: 'state', type: 'string', required: false, description: 'Filter by state code (e.g. DL, MH, KA)' },
-  { name: 'status', type: 'string', required: false, description: 'Filter by challan status: pending, paid, disposed' },
-  { name: 'from_date', type: 'string', required: false, description: 'Start date for range filter (YYYY-MM-DD)' },
-  { name: 'to_date', type: 'string', required: false, description: 'End date for range filter (YYYY-MM-DD)' },
-]
-
-const DOC_SAMPLE_REQUEST = `curl -X GET "https://api.lots247.com/v1/challans/DL01AB1234" \\
-  -H "Authorization: Bearer sk-prod-xxxx-xxxx-xxxx-1a2b" \\
-  -H "Content-Type: application/json"`
-
-const DOC_SAMPLE_RESPONSE = `{
-  "success": true,
-  "data": {
-    "vehicle_number": "DL01AB1234",
-    "total_challans": 3,
-    "pending_amount": 4500,
-    "challans": [
-      {
-        "challan_id": "CH-2026-001",
-        "date": "2026-03-15",
-        "violation": "Over Speeding",
-        "amount": 2000,
-        "status": "pending",
-        "location": "NH-44, Gurugram"
-      },
-      {
-        "challan_id": "CH-2026-002",
-        "date": "2026-02-28",
-        "violation": "Red Light Violation",
-        "amount": 1500,
-        "status": "pending",
-        "location": "MG Road, Delhi"
-      }
-    ]
-  }
-}`
-
-const DOC_EXAMPLES = [
-  {
-    title: 'Basic Lookup',
-    description: 'Fetch all challans for a vehicle number',
-    code: `fetch("https://api.lots247.com/v1/challans/DL01AB1234", {
-  headers: { "Authorization": "Bearer YOUR_TOKEN" }
-})
-.then(res => res.json())
-.then(data => console.log(data))`,
-  },
-  {
-    title: 'Filtered by Status',
-    description: 'Get only pending challans for a vehicle',
-    code: `fetch("https://api.lots247.com/v1/challans/DL01AB1234?status=pending", {
-  headers: { "Authorization": "Bearer YOUR_TOKEN" }
-})
-.then(res => res.json())
-.then(data => console.log(data.challans))`,
-  },
-  {
-    title: 'Bulk Lookup (POST)',
-    description: 'Check challans for multiple vehicles in one request',
-    code: `fetch("https://api.lots247.com/v1/challans/bulk-lookup", {
-  method: "POST",
-  headers: {
-    "Authorization": "Bearer YOUR_TOKEN",
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    vehicle_numbers: ["DL01AB1234", "MH02CD5678", "KA03EF9012"]
-  })
-})
-.then(res => res.json())
-.then(data => console.log(data))`,
-  },
-]
 
 // ─── Tab Definition ────────────────────────────────────────────────────────────
 
-export type TabId = 'wallet' | 'bulk' | 'token' | 'log' | 'docs'
+export type TabId = 'wallet' | 'bulk' | 'token' | 'log'
 
 export const TABS: { id: TabId; label: string; icon: LucideIcon }[] = [
   { id: 'wallet', label: 'Wallet', icon: Wallet },
   { id: 'bulk', label: 'Bulk Request', icon: Upload },
   { id: 'token', label: 'API Token', icon: Key },
   { id: 'log', label: 'Log', icon: FileText },
-  { id: 'docs', label: 'Documentation', icon: BookOpen },
 ]
 
 // ─── Main Component ────────────────────────────────────────────────────────────
@@ -184,7 +108,7 @@ export function ApiDetail({ api, onBack, onContactSubmit }: ApiDetailProps) {
             <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
               <Icon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
               {api.name}
             </h1>
           </div>
@@ -192,16 +116,6 @@ export function ApiDetail({ api, onBack, onContactSubmit }: ApiDetailProps) {
           <p className="text-sm text-stone-600 dark:text-stone-400 leading-relaxed mb-5">
             {api.fullDescription}
           </p>
-
-          <a
-            href={api.documentationUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors mb-6"
-          >
-            View documentation
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
 
           <div className="mb-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500 mb-2">
@@ -257,7 +171,6 @@ export function ApiDetail({ api, onBack, onContactSubmit }: ApiDetailProps) {
             {activeTab === 'bulk' && <BulkRequestTab />}
             {activeTab === 'token' && <ApiTokenTab />}
             {activeTab === 'log' && <LogTab />}
-            {activeTab === 'docs' && <DocumentationTab api={api} />}
           </div>
         </div>
       </div>
@@ -694,136 +607,3 @@ export function LogTab() {
   )
 }
 
-// ─── Documentation Tab ─────────────────────────────────────────────────────────
-
-export function DocumentationTab({ api }: { api: ApiDetailProps['api'] }) {
-  const [copiedBlock, setCopiedBlock] = useState<string | null>(null)
-
-  function copyBlock(text: string, id: string) {
-    navigator.clipboard.writeText(text)
-    setCopiedBlock(id)
-    setTimeout(() => setCopiedBlock(null), 2000)
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Parameters */}
-      <div>
-        <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50 mb-3">Parameters</h3>
-        <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[500px]">
-              <thead>
-                <tr className="border-b border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-800/60">
-                  <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Name</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Type</th>
-                  <th className="text-center px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Required</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Description</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stone-200 dark:divide-stone-800">
-                {DOC_PARAMS.map((p) => (
-                  <tr key={p.name} className="hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors">
-                    <td className="px-5 py-3">
-                      <code className="text-xs font-mono font-medium text-stone-800 dark:text-stone-200 bg-stone-100 dark:bg-stone-800 px-1.5 py-0.5 rounded">{p.name}</code>
-                    </td>
-                    <td className="px-5 py-3 text-xs text-stone-500 dark:text-stone-400 font-mono">{p.type}</td>
-                    <td className="px-5 py-3 text-center">
-                      {p.required ? (
-                        <span className="text-xs font-medium text-red-600 dark:text-red-400">Required</span>
-                      ) : (
-                        <span className="text-xs text-stone-400 dark:text-stone-500">Optional</span>
-                      )}
-                    </td>
-                    <td className="px-5 py-3 text-xs text-stone-600 dark:text-stone-400">{p.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Endpoints */}
-      {api.endpoints.length > 0 && (
-        <div>
-          <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50 mb-3">Endpoints</h3>
-          <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 divide-y divide-stone-200 dark:divide-stone-800">
-            {api.endpoints.map((endpoint, idx) => (
-              <div key={idx} className="px-5 py-4 flex items-start gap-3">
-                <span className={`flex-shrink-0 mt-0.5 text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${METHOD_STYLES[endpoint.method] || METHOD_STYLES.GET}`}>
-                  {endpoint.method}
-                </span>
-                <div className="min-w-0">
-                  <code className="text-sm font-mono text-stone-800 dark:text-stone-200">{endpoint.path}</code>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">{endpoint.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Sample Request */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">Sample Request</h3>
-          <button
-            onClick={() => copyBlock(DOC_SAMPLE_REQUEST, 'request')}
-            className="inline-flex items-center gap-1 text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
-          >
-            {copiedBlock === 'request' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-            {copiedBlock === 'request' ? 'Copied' : 'Copy'}
-          </button>
-        </div>
-        <pre className="bg-stone-900 dark:bg-stone-950 text-stone-100 rounded-xl p-5 text-xs font-mono leading-relaxed overflow-x-auto border border-stone-800">
-          {DOC_SAMPLE_REQUEST}
-        </pre>
-      </div>
-
-      {/* Sample Response */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50">Sample Response</h3>
-          <button
-            onClick={() => copyBlock(DOC_SAMPLE_RESPONSE, 'response')}
-            className="inline-flex items-center gap-1 text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
-          >
-            {copiedBlock === 'response' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-            {copiedBlock === 'response' ? 'Copied' : 'Copy'}
-          </button>
-        </div>
-        <pre className="bg-stone-900 dark:bg-stone-950 text-stone-100 rounded-xl p-5 text-xs font-mono leading-relaxed overflow-x-auto border border-stone-800">
-          {DOC_SAMPLE_RESPONSE}
-        </pre>
-      </div>
-
-      {/* Examples */}
-      <div>
-        <h3 className="text-sm font-semibold text-stone-900 dark:text-stone-50 mb-4">Usage Examples</h3>
-        <div className="space-y-4">
-          {DOC_EXAMPLES.map((example, idx) => (
-            <div key={idx} className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-hidden">
-              <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-stone-800 dark:text-stone-200">{example.title}</p>
-                  <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{example.description}</p>
-                </div>
-                <button
-                  onClick={() => copyBlock(example.code, `example-${idx}`)}
-                  className="inline-flex items-center gap-1 text-xs font-medium text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors flex-shrink-0"
-                >
-                  {copiedBlock === `example-${idx}` ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copiedBlock === `example-${idx}` ? 'Copied' : 'Copy'}
-                </button>
-              </div>
-              <pre className="bg-stone-900 dark:bg-stone-950 text-stone-100 p-5 text-xs font-mono leading-relaxed overflow-x-auto">
-                {example.code}
-              </pre>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}

@@ -153,7 +153,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+          <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
             {t.challansOn}{' '}
             <span className="font-mono">{vehicleNumber}</span>
           </h1>

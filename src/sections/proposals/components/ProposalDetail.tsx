@@ -841,7 +841,7 @@ export function ProposalDetail({
 
                   <div>
                     <div className="flex items-center gap-2.5 flex-wrap">
-                      <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight font-mono">
+                      <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight font-mono">
                         {proposal.displayId}
                       </h1>
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>

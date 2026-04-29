@@ -650,7 +650,7 @@ export function Settings({
       {/* Sidebar Navigation — hidden on mobile */}
       {/* ================================================================= */}
       <div className="w-64 lg:w-72 shrink-0 hidden md:block p-5 sm:p-6 lg:p-8">
-        <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-5">
+        <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-5">
           {t.pageTitle}
         </h1>
         <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
@@ -681,29 +681,18 @@ export function Settings({
       <div className="flex-1 min-w-0 p-5 sm:p-6 lg:p-8">
         {/* Mobile Header + Tab Switcher */}
         <div className="md:hidden mb-5">
-          <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-4">
+          <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-4">
             {t.pageTitle}
           </h1>
-          <div className="flex items-center gap-1 p-1 bg-stone-100 dark:bg-stone-900 rounded-xl w-fit overflow-x-auto scrollbar-hide">
-            {tabs.map((tab) => {
-              const Icon = tab.icon
-              const isActive = activeTab === tab.key
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                    isActive
-                      ? 'bg-white dark:bg-stone-800 text-stone-900 dark:text-stone-100 shadow-sm'
-                      : 'text-stone-500 dark:text-stone-400 hover:text-stone-700 dark:hover:text-stone-300'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
-                </button>
-              )
-            })}
-          </div>
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value as Tab)}
+            className="w-full px-3.5 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2378716c%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_0.75rem_center]"
+          >
+            {tabs.map((tab) => (
+              <option key={tab.key} value={tab.key}>{tab.label}</option>
+            ))}
+          </select>
         </div>
 
         {/* Tab Content Card */}
@@ -1253,7 +1242,7 @@ export function Settings({
               <div className="space-y-0 divide-y divide-stone-100 dark:divide-stone-800">
                 {/* Language */}
                 <div className="py-5 first:pt-0">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
                     <div>
                       <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{t.languageSetting}</p>
                       <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{t.languageDesc}</p>
@@ -1261,7 +1250,7 @@ export function Settings({
                     <select
                       value={generalSettings.language}
                       onChange={(e) => onUpdateGeneralSettings?.({ language: e.target.value as 'en' | 'hi' })}
-                      className="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                      className="w-full sm:w-auto px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                     >
                       <option value="en">{t.english}</option>
                       <option value="hi">{t.hindi}</option>
@@ -1271,7 +1260,7 @@ export function Settings({
 
                 {/* Timezone */}
                 <div className="py-5">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
                     <div>
                       <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{t.timezoneSetting}</p>
                       <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{t.timezoneDesc}</p>
@@ -1279,7 +1268,7 @@ export function Settings({
                     <select
                       value={generalSettings.timezone}
                       onChange={(e) => onUpdateGeneralSettings?.({ timezone: e.target.value })}
-                      className="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                      className="w-full sm:w-auto px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                     >
                       <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
                       <option value="UTC">UTC</option>
@@ -1290,7 +1279,7 @@ export function Settings({
 
                 {/* Date Format */}
                 <div className="py-5">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
                     <div>
                       <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{t.dateFormatSetting}</p>
                       <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{t.dateFormatDesc}</p>
@@ -1298,7 +1287,7 @@ export function Settings({
                     <select
                       value={generalSettings.dateFormat}
                       onChange={(e) => onUpdateGeneralSettings?.({ dateFormat: e.target.value })}
-                      className="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                      className="w-full sm:w-auto px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
                     >
                       <option value="DD MMM YYYY">DD MMM YYYY (31 Mar 2026)</option>
                       <option value="DD/MM/YYYY">DD/MM/YYYY (31/03/2026)</option>
@@ -1310,23 +1299,21 @@ export function Settings({
 
                 {/* Data Retention */}
                 <div className="py-5">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
                     <div>
                       <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{t.dataRetention}</p>
                       <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{t.dataRetentionDesc}</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <select
-                        value={generalSettings.dataRetentionMonths}
-                        onChange={(e) => onUpdateGeneralSettings?.({ dataRetentionMonths: Number(e.target.value) })}
-                        className="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
-                      >
-                        <option value={3}>3 {t.months}</option>
-                        <option value={6}>6 {t.months}</option>
-                        <option value={9}>9 {t.months}</option>
-                        <option value={12}>12 {t.months}</option>
-                      </select>
-                    </div>
+                    <select
+                      value={generalSettings.dataRetentionMonths}
+                      onChange={(e) => onUpdateGeneralSettings?.({ dataRetentionMonths: Number(e.target.value) })}
+                      className="w-full sm:w-auto px-3 py-1.5 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                    >
+                      <option value={3}>3 {t.months}</option>
+                      <option value={6}>6 {t.months}</option>
+                      <option value={9}>9 {t.months}</option>
+                      <option value={12}>12 {t.months}</option>
+                    </select>
                   </div>
                 </div>
 
