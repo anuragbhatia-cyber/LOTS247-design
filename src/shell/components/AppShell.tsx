@@ -87,8 +87,8 @@ const translations: Record<Language, Record<string, string>> = {
     supportTitle: 'Raise a Support Ticket',
     supportTicketSubmitted: 'Ticket Submitted',
     supportTicketSuccess: 'Our team will reach out to you within a few hours. Thank you for your patience.',
-    supportSubscriberId: 'Subscriber ID',
-    supportSubscriberPlaceholder: 'e.g. SUB-10234',
+    supportSubscriberId: 'Your Email',
+    supportSubscriberPlaceholder: 'e.g. name@company.com',
     supportYourName: 'Your Name',
     supportNamePlaceholder: 'Enter your full name',
     supportMessage: 'Message',
@@ -122,8 +122,8 @@ const translations: Record<Language, Record<string, string>> = {
     supportTitle: 'सहायता टिकट बनाएं',
     supportTicketSubmitted: 'टिकट जमा किया गया',
     supportTicketSuccess: 'हमारी टीम कुछ ही घंटों में आपसे संपर्क करेगी। आपके धैर्य के लिए धन्यवाद।',
-    supportSubscriberId: 'सब्सक्राइबर ID',
-    supportSubscriberPlaceholder: 'जैसे SUB-10234',
+    supportSubscriberId: 'आपका ईमेल',
+    supportSubscriberPlaceholder: 'जैसे name@company.com',
     supportYourName: 'आपका नाम',
     supportNamePlaceholder: 'अपना पूरा नाम दर्ज करें',
     supportMessage: 'संदेश',
@@ -282,13 +282,13 @@ function SupportModal({
           /* Form */
           <>
             <div className="p-5 space-y-4">
-              {/* Subscriber ID */}
+              {/* Email */}
               <div>
                 <label className="block text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-1.5">
                   {t.supportSubscriberId}
                 </label>
                 <input
-                  type="text"
+                  type="email"
                   value={subscriberId}
                   onChange={(e) => setSubscriberId(e.target.value)}
                   placeholder={t.supportSubscriberPlaceholder}

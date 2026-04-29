@@ -3,7 +3,7 @@ import { ArrowRight, ArrowLeft, Mail, BookOpen, Key, Wallet, type LucideIcon } f
 import type { ApiCatalogueProps } from '@/../product/sections/api-catalogue/types'
 import { ContactModal } from './ContactModal'
 import { TopUpModal } from './TopUpModal'
-import { WalletTab, BulkRequestTab, ApiTokenTab, LogTab, DocumentationTab, TABS, type TabId } from './ApiDetail'
+import { WalletTab, BulkRequestTab, ApiTokenTab, LogTab, TABS, type TabId } from './ApiDetail'
 
 type SidebarTab = 'all' | 'my'
 
@@ -197,7 +197,6 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
                   {detailTab === 'bulk' && <BulkRequestTab />}
                   {detailTab === 'token' && <ApiTokenTab />}
                   {detailTab === 'log' && <LogTab />}
-                  {detailTab === 'docs' && <DocumentationTab api={selectedApi} />}
                 </div>
               </div>
             </div>

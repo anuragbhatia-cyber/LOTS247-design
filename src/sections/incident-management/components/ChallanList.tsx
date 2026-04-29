@@ -766,7 +766,7 @@ export function ChallanList({
                 onClick={() => onView?.(challan.id)}
                 className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 active:bg-stone-50 dark:active:bg-stone-800/40 transition-colors cursor-pointer"
               >
-                {/* Top: ID + Status */}
+                {/* Top: ID + Action Menu */}
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 font-mono tracking-tight">
@@ -776,11 +776,34 @@ export function ChallanList({
                       {formatDate(challan.issueDate, language)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span className="text-xs text-stone-500 dark:text-stone-400 hidden sm:inline">
-                      {challan.challanType === 'court' ? t.challanTypeCourt : t.challanTypeOnline}
-                    </span>
-                    <StatusBadge status={challan.status} t={t} />
+                  <div
+                    className="relative flex-shrink-0"
+                    ref={openDropdownId === challan.id ? dropdownRef : undefined}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      onClick={() => setOpenDropdownId(openDropdownId === challan.id ? null : challan.id)}
+                      className="p-2 -mr-2 -mt-1 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {openDropdownId === challan.id && (
+                      <div className="absolute right-0 top-full mt-1 z-50 w-44 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden py-1">
+                        {actions.map((action) => (
+                          <button
+                            key={action.label}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              action.onClick()
+                              setOpenDropdownId(null)
+                            }}
+                            className="w-full text-left px-3.5 py-2 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors"
+                          >
+                            {action.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -810,7 +833,7 @@ export function ChallanList({
                   </div>
                 </div>
 
-                {/* Bottom: Amount + SLA + Actions */}
+                {/* Bottom: Amount + SLA + Status */}
                 <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
                   <div>
                     <p className="text-lg font-bold text-stone-900 dark:text-stone-50 tabular-nums">
@@ -820,35 +843,7 @@ export function ChallanList({
                       {sla.label}
                     </p>
                   </div>
-                  <div
-                    className="relative"
-                    ref={openDropdownId === challan.id ? dropdownRef : undefined}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <button
-                      onClick={() => setOpenDropdownId(openDropdownId === challan.id ? null : challan.id)}
-                      className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                    {openDropdownId === challan.id && (
-                      <div className="absolute right-0 bottom-full mb-1 z-50 w-44 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden py-1">
-                        {actions.map((action) => (
-                          <button
-                            key={action.label}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              action.onClick()
-                              setOpenDropdownId(null)
-                            }}
-                            className="w-full text-left px-3.5 py-2 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-700/50 transition-colors"
-                          >
-                            {action.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <StatusBadge status={challan.status} t={t} />
                 </div>
               </div>
             )

@@ -249,7 +249,7 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                               {challan.location}
                             </span>
                           </div>
-                          <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
+                          <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
                             {challan.category === 'court' ? (
                               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400">
                                 {language === 'hi' ? 'कोर्ट चालान' : 'Court Challans'}
@@ -259,9 +259,6 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                                 {language === 'hi' ? 'ऑनलाइन चालान' : 'Online Challans'}
                               </span>
                             )}
-                            <button className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-sm">
-                              {t.payNow}
-                            </button>
                           </div>
                         </div>
                       ))}

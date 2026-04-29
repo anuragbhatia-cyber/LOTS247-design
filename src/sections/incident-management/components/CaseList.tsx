@@ -828,7 +828,7 @@ export function CaseList({
                 onClick={() => onView?.(caseItem.id)}
                 className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-4 active:bg-stone-50 dark:active:bg-stone-800/40 transition-colors cursor-pointer"
               >
-                {/* Top: ID + Status */}
+                {/* Top: ID + Action Menu */}
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <div className="flex items-center gap-2">
@@ -841,7 +841,12 @@ export function CaseList({
                       {formatDate(caseItem.createdAt, language)}
                     </p>
                   </div>
-                  <StatusBadge status={caseItem.status} t={t} />
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
                 </div>
 
                 {/* Type badge */}
@@ -849,37 +854,41 @@ export function CaseList({
                   <CaseTypeBadge caseType={caseItem.caseType} t={t} />
                 </div>
 
-                {/* Description */}
-                <p className="text-sm text-stone-600 dark:text-stone-300 line-clamp-2 mb-3">
-                  {caseItem.description}
-                </p>
-
-                {/* Footer: Vehicle + Lawyer */}
-                <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
-                  <div>
-                    <p className="text-xs text-stone-500 dark:text-stone-400">{t.vehicle}</p>
-                    <p className="text-sm font-medium text-stone-800 dark:text-stone-200">
+                {/* Vehicle + Location */}
+                <div className="space-y-1.5 text-sm mb-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-stone-500 dark:text-stone-400">{t.vehicle}</span>
+                    <span className="font-medium text-stone-800 dark:text-stone-200">
                       {vehicle?.registrationNumber || '\u2014'}
                       {driver && (
                         <span className="font-normal text-stone-500 dark:text-stone-400">
-                          {' '}
-                          · {driver.name}
+                          {' '}· {driver.name}
                         </span>
                       )}
-                    </p>
+                    </span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-stone-500 dark:text-stone-400">{t.lawyer}</p>
-                    {lawyer ? (
-                      <p className="text-sm text-stone-800 dark:text-stone-200">
-                        {lawyer.name}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-stone-500 dark:text-stone-400 italic">
-                        {t.notAssigned}
-                      </p>
-                    )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-stone-500 dark:text-stone-400">{t.location || (language === 'hi' ? 'स्थान' : 'Location')}</span>
+                    <span className="text-stone-800 dark:text-stone-200">{caseItem.location || '\u2014'}</span>
                   </div>
+                </div>
+
+                {/* Footer: Amount + SLA + Status */}
+                <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
+                  {(() => {
+                    const sla = getCaseSlaInfo(caseItem.slaDeadline, caseItem.status, t)
+                    return (
+                      <div>
+                        {caseItem.estimatedAmount != null && (
+                          <p className="text-base font-bold text-stone-900 dark:text-stone-50">
+                            {language === 'hi' ? '₹' : '₹'}{caseItem.estimatedAmount.toLocaleString(language === 'hi' ? 'hi-IN' : 'en-IN')}
+                          </p>
+                        )}
+                        <p className={`text-xs font-medium ${sla.color}`}>{sla.label}</p>
+                      </div>
+                    )
+                  })()}
+                  <StatusBadge status={caseItem.status} t={t} />
                 </div>
               </div>
             )

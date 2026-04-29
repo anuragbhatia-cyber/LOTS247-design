@@ -250,20 +250,27 @@ export function MyProfile({
 
   // Personal info edit state
   const [editName, setEditName] = useState(subscriberProfile.name)
+  const [editPhone, setEditPhone] = useState(subscriberProfile.phone)
   const [editEmail, setEditEmail] = useState(subscriberProfile.email)
   const [editDob, setEditDob] = useState(subscriberProfile.dateOfBirth || '')
 
   // Organization edit state
   const [editBusinessName, setEditBusinessName] = useState(organizationDetails.businessName)
+  const [editBusinessType, setEditBusinessType] = useState(organizationDetails.businessType)
+  const [editCin, setEditCin] = useState(organizationDetails.cinNumber || '')
   const [editGst, setEditGst] = useState(organizationDetails.gstNumber || '')
   const [editAddress, setEditAddress] = useState(organizationDetails.registeredAddress || '')
   const [editCity, setEditCity] = useState(organizationDetails.city)
   const [editState, setEditState] = useState(organizationDetails.state)
   const [editPincode, setEditPincode] = useState(organizationDetails.pincode)
 
-  const verifiedCount = useMemo(
-    () => kycDocuments.filter((d) => d.status === 'verified').length,
+  const kycFiltered = useMemo(
+    () => kycDocuments.filter((d) => d.type === 'aadhaar' || d.type === 'pan'),
     [kycDocuments]
+  )
+  const verifiedCount = useMemo(
+    () => kycFiltered.filter((d) => d.status === 'verified').length,
+    [kycFiltered]
   )
 
   const tabs = [
@@ -409,7 +416,7 @@ export function MyProfile({
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span>{tab.label}</span>
                 </button>
               )
             })}
@@ -478,19 +485,18 @@ export function MyProfile({
                     <Phone className="w-3.5 h-3.5" />
                     {t.mobileNumber}
                   </label>
-                  <div className="flex items-center gap-2">
+                  {isEditingPersonal ? (
+                    <input
+                      type="tel"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                    />
+                  ) : (
                     <p className="text-sm text-stone-900 dark:text-stone-100 font-mono">
                       {formatPhone(subscriberProfile.phone)}
                     </p>
-                    {isEditingPersonal && (
-                      <button
-                        onClick={() => onChangePhone?.('')}
-                        className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
-                      >
-                        {t.edit}
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
 
                 {/* Email */}
@@ -625,7 +631,27 @@ export function MyProfile({
                 </div>
 
                 {/* Business Type */}
-                <FieldRow label={t.businessType} value={businessTypeLabel} />
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide">
+                    {t.businessType}
+                  </label>
+                  {isEditingOrg ? (
+                    <select
+                      value={editBusinessType}
+                      onChange={(e) => setEditBusinessType(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                    >
+                      <option value="Proprietorship">Proprietorship</option>
+                      <option value="Partnership">Partnership</option>
+                      <option value="LLP">LLP</option>
+                      <option value="Pvt Ltd">Pvt Ltd</option>
+                      <option value="Ltd">Ltd</option>
+                      <option value="individual">Individual</option>
+                    </select>
+                  ) : (
+                    <p className="text-sm text-stone-900 dark:text-stone-100">{businessTypeLabel}</p>
+                  )}
+                </div>
 
                 {/* GST Number (conditional) */}
                 {showGstFields && (
@@ -653,7 +679,24 @@ export function MyProfile({
 
                 {/* CIN (conditional) */}
                 {showGstFields && (
-                  <FieldRow label={t.cinNumber} value={organizationDetails.cinNumber} mono />
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wide">
+                      {t.cinNumber}
+                    </label>
+                    {isEditingOrg ? (
+                      <input
+                        type="text"
+                        value={editCin}
+                        onChange={(e) => setEditCin(e.target.value.toUpperCase())}
+                        placeholder="Enter CIN"
+                        className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600"
+                      />
+                    ) : (
+                      <p className="text-sm text-stone-900 dark:text-stone-100 font-mono">
+                        {organizationDetails.cinNumber || '—'}
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -743,28 +786,15 @@ export function MyProfile({
           {/* ----- KYC & Verification Tab ----- */}
           {activeTab === 'kyc' && (
             <div className="p-5 sm:p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-6">
                 <h3 className="text-lg sm:text-xl font-semibold text-stone-900 dark:text-stone-100">
                   {t.tabKyc}
                 </h3>
-                <span className="text-sm text-stone-500 dark:text-stone-400">
-                  {verifiedCount} {t.of} {kycDocuments.length} {t.documentsVerified}
-                </span>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="mb-6">
-                <div className="h-2 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                    style={{ width: `${(verifiedCount / kycDocuments.length) * 100}%` }}
-                  />
-                </div>
               </div>
 
               {/* Document Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {kycDocuments.map((doc) => {
+                {kycDocuments.filter((doc) => doc.type === 'aadhaar' || doc.type === 'pan').map((doc) => {
                   const statusConfig = DOC_STATUS_CONFIG[doc.status]
                   const StatusIcon = statusConfig.icon
                   const DocIcon = DOC_TYPE_ICONS[doc.type]

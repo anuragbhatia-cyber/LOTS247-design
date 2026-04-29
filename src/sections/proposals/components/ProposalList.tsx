@@ -361,9 +361,11 @@ function ProposalRow({
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
-            {t[statusConfig.labelKey]}
-          </span>
+          {!showProposalActions && (
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
+              {t[statusConfig.labelKey]}
+            </span>
+          )}
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -415,6 +417,23 @@ function ProposalRow({
         </div>
       </div>
 
+      {/* Mobile: Accept/Reject buttons (received tab) */}
+      {showProposalActions && (
+        <div className="flex items-center gap-2 sm:hidden mt-1" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={onAccept}
+            className="flex-1 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors"
+          >
+            {t.accept}
+          </button>
+          <button
+            onClick={onReject}
+            className="flex-1 px-3.5 py-2 rounded-lg border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs font-semibold transition-colors"
+          >
+            {t.reject}
+          </button>
+        </div>
+      )}
 
       {/* Mobile: Service Status (past tab only) */}
       {showIncidentColumn && proposal.serviceStatus && proposal.serviceStatus !== 'not_applicable' && (
@@ -431,7 +450,7 @@ function ProposalRow({
         <div className="flex items-center sm:hidden">
           <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
             <ArrowUpRight className="w-3 h-3" />
-            {proposal.linkedIncidentId}
+            {t.viewIncident}
           </span>
         </div>
       )}

@@ -264,15 +264,20 @@ function CategoryCard({
         hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-md dark:hover:shadow-stone-950/40
       `}
     >
-      <div className="mb-3 min-h-[40px]">
-        <p className="text-sm font-medium text-stone-500 dark:text-stone-400 leading-snug">{category.fullLabel}</p>
-        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 transition-colors mt-1.5">
-          <span className="text-xs font-medium">View</span>
-          <ArrowUpRight className="w-3 h-3" />
+      <div className="flex items-center justify-between sm:block mb-3 sm:min-h-[40px]">
+        <div>
+          <p className="text-sm font-medium text-stone-500 dark:text-stone-400 leading-snug">{category.fullLabel}</p>
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-700 text-stone-600 dark:text-stone-300 group-hover:bg-stone-200 dark:group-hover:bg-stone-600 transition-colors mt-1.5">
+            <span className="text-xs font-medium">View</span>
+            <ArrowUpRight className="w-3 h-3" />
+          </div>
+        </div>
+        <div className="sm:hidden flex-shrink-0">
+          <span className="text-2xl font-bold text-stone-900 dark:text-stone-100">{category.compliant}<span className="text-base font-semibold text-stone-400 dark:text-stone-500">/{category.total}</span></span>
         </div>
       </div>
 
-      <div className="mb-3">
+      <div className="hidden sm:block mb-3">
         <span className="text-2xl font-bold text-stone-900 dark:text-stone-100">{category.compliant}<span className="text-base font-semibold text-stone-400 dark:text-stone-500">/{category.total}</span></span>
       </div>
 

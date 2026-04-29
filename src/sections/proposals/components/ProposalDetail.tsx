@@ -891,7 +891,7 @@ export function ProposalDetail({
           </div>
 
           {/* Tabs */}
-          <div className="flex items-center gap-1 px-5 sm:px-6 border-t border-stone-200 dark:border-stone-800">
+          <div className="flex items-center gap-1 px-4 sm:px-6 border-t border-stone-200 dark:border-stone-800 overflow-x-auto">
             {TABS.map((tab) => {
               const TabIcon = tab.icon
               const isTabActive = activeTab === tab.id
