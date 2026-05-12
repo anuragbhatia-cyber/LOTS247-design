@@ -1,15 +1,14 @@
 import { useState } from 'react'
-import { ArrowLeft, FileWarning, CheckCircle2, Calendar, MapPin, Truck, Copy } from 'lucide-react'
+import { ArrowLeft, ArrowRight, FileWarning, CheckCircle2, Gift, Truck } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { ChallanCard, type ChallanCardData } from '@/sections/vehicle-and-driver-management/components/ChallanCard'
+import { ChallanSettlementModal } from '@/sections/vehicle-and-driver-management/components/ChallanSettlementModal'
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
     challansOn: 'Challans on',
     pending: 'Pending',
     paid: 'Paid',
-    totalOutstanding: 'Total Pending',
-    payNow: 'Pay Now',
-    paidOn: 'Paid on',
     noPending: 'No pending challans',
     noPendingDesc: 'This vehicle has no pending traffic challans.',
     noPaid: 'No paid challans',
@@ -21,9 +20,6 @@ const translations: Record<Language, Record<string, string>> = {
     challansOn: 'चालान —',
     pending: 'लंबित',
     paid: 'भुगतान किया',
-    totalOutstanding: 'कुल बकाया',
-    payNow: 'अभी भुगतान करें',
-    paidOn: 'भुगतान तिथि',
     noPending: 'कोई लंबित चालान नहीं',
     noPendingDesc: 'इस वाहन पर कोई बकाया ट्रैफ़िक चालान नहीं है।',
     noPaid: 'कोई भुगतान किया गया चालान नहीं',
@@ -110,36 +106,60 @@ const SAMPLE_CHALLANS: Challan[] = [
 
 type ResultTab = 'pending' | 'paid'
 
-function formatDate(dateStr: string, lang: Language): string {
-  return new Date(dateStr).toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
-function formatCurrency(amount: number, lang: Language): string {
-  return new Intl.NumberFormat(lang === 'hi' ? 'hi-IN' : 'en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
 export interface ChallanResultsViewProps {
   vehicleNumber: string
   onBack: () => void
+}
+
+// Map our local Challan shape to ChallanCardData (paid → submitted so the card shows "Paid")
+function toChallanCardData(c: Challan): ChallanCardData {
+  return {
+    id: c.id,
+    challanNumber: c.challanNumber,
+    violationType: c.violationType,
+    amount: c.amount,
+    issueDate: c.issueDate,
+    location: c.location,
+    status: c.status === 'paid' ? 'submitted' : 'pending',
+    challanType: c.category,
+  }
 }
 
 export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsViewProps) {
   const { language } = useLanguage()
   const t = translations[language]
   const [activeTab, setActiveTab] = useState<ResultTab>('pending')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [showSettlement, setShowSettlement] = useState(false)
 
   const challans = SAMPLE_CHALLANS
   const pendingChallans = challans.filter((c) => c.status === 'pending')
   const paidChallans = challans.filter((c) => c.status === 'paid')
-  const totalOutstanding = pendingChallans.reduce((sum, c) => sum + c.amount, 0)
+
+  const formatAmount = (amt: number) =>
+    new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amt)
+
+  const totalPending = pendingChallans.reduce((sum, c) => sum + c.amount, 0)
+  const selectedTotal = pendingChallans
+    .filter((c) => selectedIds.has(c.id))
+    .reduce((sum, c) => sum + c.amount, 0)
+  const barTotal = selectedIds.size > 0 ? selectedTotal : totalPending
+
+  const cardLabels = {
+    online: language === 'hi' ? 'ऑनलाइन चालान' : 'Online Challans',
+    court: language === 'hi' ? 'कोर्ट चालान' : 'Court Challans',
+  }
+  const toggleSelect = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
 
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
@@ -223,44 +243,15 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                   <>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       {pendingChallans.map((challan) => (
-                        <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
-                              <button
-                                onClick={() => navigator.clipboard.writeText(challan.challanNumber)}
-                                className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                              >
-                                <Copy className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                            <span className="text-lg font-bold text-red-600 dark:text-red-400 tabular-nums">
-                              {formatCurrency(challan.amount, language)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
-                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
-                            <span className="inline-flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5" />
-                              {formatDate(challan.issueDate, language)}
-                            </span>
-                            <span className="inline-flex items-center gap-1.5">
-                              <MapPin className="w-3.5 h-3.5" />
-                              {challan.location}
-                            </span>
-                          </div>
-                          <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
-                            {challan.category === 'court' ? (
-                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400">
-                                {language === 'hi' ? 'कोर्ट चालान' : 'Court Challans'}
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400">
-                                {language === 'hi' ? 'ऑनलाइन चालान' : 'Online Challans'}
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                        <ChallanCard
+                          key={challan.id}
+                          challan={toChallanCardData(challan)}
+                          selected={selectedIds.has(challan.id)}
+                          onToggleSelect={toggleSelect}
+                          onViewDetails={(id) => console.log('View challan details:', id)}
+                          onCopyNumber={(num) => navigator.clipboard?.writeText(num)}
+                          labels={cardLabels}
+                        />
                       ))}
                     </div>
 
@@ -283,41 +274,13 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
                 {paidChallans.length > 0 ? (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {paidChallans.map((challan) => (
-                      <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
-                            <button
-                              onClick={() => navigator.clipboard.writeText(challan.challanNumber)}
-                              className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                            >
-                              <Copy className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                          <span className="inline-flex items-center gap-1.5 text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                            <CheckCircle2 className="w-4 h-4" />
-                            {formatCurrency(challan.amount, language)}
-                          </span>
-                        </div>
-                        <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
-                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
-                          <span className="inline-flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5" />
-                            {formatDate(challan.issueDate, language)}
-                          </span>
-                          <span className="inline-flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5" />
-                            {challan.location}
-                          </span>
-                        </div>
-                        {challan.paidDate && (
-                          <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
-                            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                              {t.paidOn}: {formatDate(challan.paidDate, language)}
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                      <ChallanCard
+                        key={challan.id}
+                        challan={toChallanCardData(challan)}
+                        onViewDetails={(id) => console.log('View challan details:', id)}
+                        onCopyNumber={(num) => navigator.clipboard?.writeText(num)}
+                        labels={cardLabels}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -332,32 +295,55 @@ export function ChallanResultsView({ vehicleNumber, onBack }: ChallanResultsView
               </div>
             )}
 
+            {/* Sticky Pledge & Claim Rewards Bar */}
+            {activeTab === 'pending' && pendingChallans.length > 0 && (
+              <div className="sticky bottom-4 z-30 mt-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-[0_-6px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_-6px_24px_rgba(0,0,0,0.4)] overflow-hidden">
+                {/* Pledge & Claim banner */}
+                <div className="px-5 py-3 bg-gradient-to-r from-amber-100 via-amber-50 to-transparent dark:from-amber-950/40 dark:via-amber-950/20 dark:to-transparent border-b border-amber-200 dark:border-amber-900/40 flex items-center justify-between gap-3">
+                  <p className="text-sm font-bold text-amber-700 dark:text-amber-300">
+                    {language === 'hi' ? 'प्रतिज्ञा करें और पुरस्कार पाएं' : 'Pledge & Claim Rewards'}
+                  </p>
+                  <Gift className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+                </div>
+
+                {/* Total + Proceed CTA */}
+                <div className="px-5 py-4 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs text-stone-500 dark:text-stone-400">
+                      {language === 'hi' ? 'कुल चालान राशि' : 'Total Challan Amount'}
+                    </p>
+                    <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums mt-0.5">
+                      {formatAmount(barTotal)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowSettlement(true)}
+                    className="inline-flex items-center gap-1.5 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-md shadow-emerald-600/30"
+                  >
+                    {language === 'hi' ? 'भुगतान करें' : 'Proceed To Pay'}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
 
       </div>
 
-      {/* Sticky Bottom Bar — Total Outstanding */}
-      {activeTab === 'pending' && pendingChallans.length > 0 && (
-        <div className="sticky bottom-0 z-40 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]">
-          <div className="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-            <div>
-              <p className="text-xs text-amber-700 dark:text-amber-400 font-medium tracking-wider">{language === 'hi' ? 'कुल चालान राशि' : 'Total Challan Amount'}</p>
-              <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums mt-0.5">
-                {formatCurrency(totalOutstanding, language)}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <button className="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 text-sm font-medium transition-colors">
-                {language === 'hi' ? 'प्रस्ताव भेजें' : 'Send Proposal'}
-              </button>
-              <button className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors shadow-sm">
-                {t.payNow}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Challan Settlement Modal — embeds payment success view */}
+      <ChallanSettlementModal
+        isOpen={showSettlement}
+        selectedChallans={(selectedIds.size > 0
+          ? pendingChallans.filter((c) => selectedIds.has(c.id))
+          : pendingChallans
+        ).map(toChallanCardData)}
+        onClose={() => {
+          setShowSettlement(false)
+          setSelectedIds(new Set())
+        }}
+      />
     </div>
   )
 }

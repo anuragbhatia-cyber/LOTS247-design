@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
   ArrowLeft,
+  ArrowRight,
   ArrowUpDown,
   ArrowUpRight,
   ArrowDownRight,
@@ -33,13 +34,12 @@ import {
   MoreVertical,
   X,
   RefreshCw,
-  MapPin,
-  Copy,
   Info,
   Check,
   Minus,
 } from 'lucide-react'
 import { ComplianceDashboardSkeleton } from './ComplianceDashboardSkeleton'
+import { ChallanCard, type ChallanCardData } from '@/sections/vehicle-and-driver-management/components/ChallanCard'
 import type {
   ComplianceDashboardProps,
   ComplianceCategory,
@@ -1280,6 +1280,19 @@ type IndividualChallan = {
   submissionStatus: SubmissionStatus
 }
 
+function toChallanCardData(c: IndividualChallan): ChallanCardData {
+  return {
+    id: c.id,
+    challanNumber: c.challanNumber,
+    violationType: c.violation,
+    amount: c.amount,
+    issueDate: c.date,
+    location: c.location,
+    status: c.status === 'paid' ? 'submitted' : 'pending',
+    challanType: c.challanType,
+  }
+}
+
 function FleetChallanLanding({
   challanRows,
   vehicles,
@@ -1532,10 +1545,10 @@ function FleetChallanView({
 }) {
   const [filter, setFilter] = useState<'pending' | 'paid'>(initialFilter || 'pending')
   const [expandedVehicles, setExpandedVehicles] = useState<Set<string>>(new Set())
-  const [showProposalToast, setShowProposalToast] = useState(false)
   const [selectedVehiclesInit, setSelectedVehiclesInit] = useState(false)
   const [selectedVehicles, setSelectedVehicles] = useState<Set<string>>(new Set())
   const [selectedChallans, setSelectedChallans] = useState<Set<string>>(new Set())
+  const [showProposalToast, setShowProposalToast] = useState(false)
   const [searchVehicle, setSearchVehicle] = useState('')
   const [challanTypeFilter, setChallanTypeFilter] = useState<'all' | 'court' | 'online'>('all')
   const [submissionStatusFilter, setSubmissionStatusFilter] = useState<SubmissionStatus | 'all'>(initialSubmissionFilter || 'all')
@@ -1665,13 +1678,14 @@ function FleetChallanView({
     return entries
   }, [filtered, searchVehicle])
 
-  // Select all vehicles by default on first render
+  // Select all vehicles AND all pending challans by default on first render
   useEffect(() => {
     if (!selectedVehiclesInit && filter === 'pending' && grouped.length > 0) {
       setSelectedVehicles(new Set(grouped.map(([vehNum]) => vehNum)))
+      setSelectedChallans(new Set(filtered.filter(c => c.status === 'pending').map(c => c.id)))
       setSelectedVehiclesInit(true)
     }
-  }, [grouped, filter, selectedVehiclesInit])
+  }, [grouped, filtered, filter, selectedVehiclesInit])
 
   const pendingCount = allChallans.filter(c => c.status === 'pending').length
   const paidCount = allChallans.filter(c => c.status === 'paid').length
@@ -1680,13 +1694,13 @@ function FleetChallanView({
   const paidSubmissionCount = allChallans.filter(c => c.submissionStatus === 'paid').length
 
   const selectedAmount = useMemo(() => {
-    if (selectedVehicles.size === 0) return 0
+    if (selectedChallans.size === 0) return 0
     return filtered
-      .filter(c => selectedVehicles.has(c.vehicleNumber))
+      .filter(c => selectedChallans.has(c.id))
       .reduce((s, c) => s + c.amount, 0)
-  }, [filtered, selectedVehicles])
+  }, [filtered, selectedChallans])
 
-  const showBottomBar = filter === 'pending' && submissionStatusFilter !== 'submitted' && selectedVehicles.size > 0
+  const showBottomBar = filter === 'pending' && submissionStatusFilter !== 'submitted' && selectedChallans.size > 0
 
   return (
     <div className={`${showBottomBar ? 'pb-20' : ''}`}>
@@ -1865,9 +1879,7 @@ function FleetChallanView({
             const vehicleTotal = challans.reduce((s, c) => s + c.amount, 0)
             const isSelected = selectedVehicles.has(vehNum)
             return (
-              <div key={vehNum} className={`rounded-2xl bg-white dark:bg-stone-900 shadow-sm border overflow-hidden transition-colors ${
-                isSelected && filter === 'pending' ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-200 dark:border-stone-800'
-              }`}>
+              <div key={vehNum} className="rounded-2xl bg-white dark:bg-stone-900 shadow-sm border border-stone-200 dark:border-stone-800 overflow-hidden">
                 <div className="flex items-center p-4 hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors">
                   {/* Checkbox — only on pending tab */}
                   {filter === 'pending' && (
@@ -1916,67 +1928,15 @@ function FleetChallanView({
                   <div className="px-4 pb-4 border-t border-stone-200 dark:border-stone-800">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-4">
                       {challans.map(c => (
-                        <div key={c.id} className={`rounded-xl border bg-white dark:bg-stone-900 p-5 transition-colors ${
-                          selectedChallans.has(c.id) && filter === 'pending' ? 'border-emerald-400 dark:border-emerald-600' : 'border-stone-200 dark:border-stone-800'
-                        }`}>
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-2.5">
-                              {filter === 'pending' && (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); toggleSelectChallan(c.id) }}
-                                  className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                                    selectedChallans.has(c.id)
-                                      ? 'bg-emerald-600 border-emerald-600'
-                                      : 'border-stone-300 dark:border-stone-600 hover:border-stone-400 dark:hover:border-stone-500'
-                                  }`}
-                                >
-                                  {selectedChallans.has(c.id) && (
-                                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                  )}
-                                </button>
-                              )}
-                              <div className="flex items-center gap-1.5">
-                                <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{c.challanNumber}</p>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(c.challanNumber) }}
-                                  className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                                >
-                                  <Copy className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            </div>
-                            <span className="text-lg font-bold tabular-nums text-red-600 dark:text-red-400">
-                              {formatCurrency(c.amount)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{c.violation}</p>
-                          <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
-                            <span className="flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5" />
-                              {formatDate(c.date)}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              <MapPin className="w-3.5 h-3.5" />
-                              {c.location}
-                            </span>
-                          </div>
-                          <div className="border-t border-stone-200 dark:border-stone-700 pt-3 flex items-center justify-between">
-                            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
-                              c.challanType === 'court'
-                                ? 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400'
-                                : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400'
-                            }`}>
-                              {c.challanType === 'court' ? 'Court Challans' : 'Online Challans'}
-                            </span>
-                            {filter === 'pending' && (
-                              <button className="px-5 py-2 rounded-full text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-sm">
-                                Pay Now
-                              </button>
-                            )}
-                          </div>
-                        </div>
+                        <ChallanCard
+                          key={c.id}
+                          challan={toChallanCardData(c)}
+                          selected={selectedChallans.has(c.id)}
+                          onToggleSelect={filter === 'pending' ? toggleSelectChallan : undefined}
+                          onCopyNumber={(num) => navigator.clipboard?.writeText(num)}
+                          onViewDetails={(id) => console.log('View challan details:', id)}
+                          labels={{ online: 'Online Challans', court: 'Court Challans' }}
+                        />
                       ))}
                     </div>
                   </div>
@@ -1998,19 +1958,20 @@ function FleetChallanView({
       </div>
 
       {showBottomBar && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 px-4 sm:px-6 lg:px-8 py-4 bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center justify-between max-w-7xl mx-auto">
+        <div className="fixed bottom-4 left-4 right-4 sm:left-6 sm:right-6 lg:left-8 lg:right-8 z-30 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-[0_-6px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_-6px_24px_rgba(0,0,0,0.4)] overflow-hidden">
+          <div className="px-5 py-4 flex items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
-                {selectedVehicles.size} {selectedVehicles.size === 1 ? 'vehicle' : 'vehicles'} selected
+              <p className="text-xs text-stone-500 dark:text-stone-400">Total Challan Amount</p>
+              <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums mt-0.5">
+                {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(selectedAmount)}
               </p>
-              <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{formatCurrency(selectedAmount)} <span className="text-sm font-medium text-stone-500 dark:text-stone-400">+ GST</span></p>
             </div>
             <button
               onClick={() => setShowProposalToast(true)}
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-sm font-medium text-white transition-colors shadow-sm"
+              className="inline-flex items-center gap-1.5 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-md shadow-emerald-600/30"
             >
               Request Proposal
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

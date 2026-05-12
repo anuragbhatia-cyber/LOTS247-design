@@ -49,7 +49,7 @@ export function LoginStep({
   const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber)
   const [localPhoneError, setLocalPhoneError] = useState('')
   const phoneError = externalPhoneError || localPhoneError
-  const [otp, setOtp] = useState(['', '', '', '', '', ''])
+  const [otp, setOtp] = useState(['', '', '', ''])
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const formatPhone = (value: string) => {
@@ -81,7 +81,7 @@ export function LoginStep({
     newOtp[index] = value.slice(-1)
     setOtp(newOtp)
 
-    if (value && index < 5) {
+    if (value && index < 3) {
       otpRefs.current[index + 1]?.focus()
     }
 
@@ -98,17 +98,17 @@ export function LoginStep({
 
   const handleOtpPaste = (e: React.ClipboardEvent, startIndex: number) => {
     e.preventDefault()
-    const available = 6 - startIndex
+    const available = 4 - startIndex
     const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, available)
     if (!pastedData) return
     const newOtp = [...otp]
     pastedData.split('').forEach((digit, i) => {
       const target = startIndex + i
-      if (target < 6) newOtp[target] = digit
+      if (target < 4) newOtp[target] = digit
     })
     setOtp(newOtp)
     // Focus the next empty slot (or the last filled one) for predictable cursor placement
-    const nextFocusIdx = Math.min(startIndex + pastedData.length, 5)
+    const nextFocusIdx = Math.min(startIndex + pastedData.length, 3)
     otpRefs.current[nextFocusIdx]?.focus()
     if (newOtp.every((d) => d)) {
       onVerifyOTP?.(newOtp.join(''))
@@ -253,7 +253,7 @@ export function LoginStep({
                     Enter verification code
                   </h1>
                   <p className="text-stone-600 dark:text-stone-400">
-                    We sent a 6-digit code to +91 {formatPhone(phoneNumber)}
+                    We sent a 4-digit code to +91 {formatPhone(phoneNumber)}
                   </p>
                 </div>
 
@@ -262,7 +262,7 @@ export function LoginStep({
                     <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-3">
                       Enter OTP
                     </label>
-                    <div className="flex gap-1.5 sm:gap-2 justify-between">
+                    <div className="flex gap-2.5 sm:gap-3">
                       {otp.map((digit, index) => (
                         <input
                           key={index}
@@ -272,7 +272,7 @@ export function LoginStep({
                           type="text"
                           inputMode="numeric"
                           autoComplete={index === 0 ? 'one-time-code' : 'off'}
-                          aria-label={`OTP digit ${index + 1} of 6`}
+                          aria-label={`OTP digit ${index + 1} of 4`}
                           maxLength={1}
                           value={digit}
                           disabled={otpExpiry.isExpired}
@@ -280,7 +280,7 @@ export function LoginStep({
                           onKeyDown={(e) => handleOtpKeyDown(index, e)}
                           onPaste={(e) => handleOtpPaste(e, index)}
                           className={`
-                            flex-1 min-w-0 max-w-[3rem] h-12 sm:h-13 text-center text-lg sm:text-xl font-bold
+                            w-12 h-12 sm:w-14 sm:h-14 text-center text-lg sm:text-xl font-bold
                             rounded-xl border-2
                             bg-white dark:bg-stone-900
                             text-stone-900 dark:text-white
@@ -298,18 +298,6 @@ export function LoginStep({
                         />
                       ))}
                     </div>
-                    {/* OTP expiry countdown — color shifts to amber in last 30s, hidden once expired (error takes over) */}
-                    {otpExpiresAt && !otpExpiry.isExpired && (
-                      <p
-                        className={`mt-2 text-xs font-mono text-center ${
-                          otpExpiry.isLowTime
-                            ? 'text-amber-700 dark:text-amber-300'
-                            : 'text-stone-600 dark:text-stone-400'
-                        }`}
-                      >
-                        Expires in {otpExpiry.display}
-                      </p>
-                    )}
                     {otpError && (
                       <p className="mt-3 text-sm text-red-600 flex items-center gap-1.5" role="alert">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

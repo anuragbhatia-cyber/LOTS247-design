@@ -119,7 +119,7 @@ export function ChallanCard({
 
       {/* Row 2: amount | type pill */}
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums">
+        <span className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-50 tabular-nums">
           {formatAmount(challan.amount)}
         </span>
         <span

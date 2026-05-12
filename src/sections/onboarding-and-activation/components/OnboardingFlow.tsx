@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Lottie from 'lottie-react'
 import truckAnimation from '../truck.json'
 import type {
@@ -6,38 +6,19 @@ import type {
   OnboardingProgress,
   SubscriptionPlan,
   VehicleDetailsForm,
-  DriverDetailsForm,
 } from '@/../product/sections/onboarding-and-activation/types'
 import { RegistrationStep } from './RegistrationStep'
 import { LoginStep } from './LoginStep'
-import { VehicleAdditionStep, type VehicleErrorKind } from './VehicleAdditionStep'
-import { DriverAdditionStep } from './DriverAdditionStep'
 import { PlanSelectionStep } from './PlanSelectionStep'
 import { PaymentSuccessStep } from './PaymentSuccessStep'
 import { AuthShellSkeleton } from './AuthShellSkeleton'
 
-// Mock RC lookup: deterministic sample so the design preview always returns something
-const SAMPLE_FETCHED_VEHICLES: Record<string, Partial<VehicleDetailsForm>> = {
-  DL03AF1234: {
-    vehicleName: 'Maruti Suzuki Swift VXi',
-    vehicleType: 'Car',
-    registrationDate: '2020-03-15',
-    ownerName: 'Rajesh Kumar',
-    fuelType: 'Petrol',
-  },
-}
-
-// Deterministic demo triggers — let designers see each error state without a real backend
-const DEMO_RC_INVALID = 'INVALID000'
-const DEMO_RC_APIFAIL = 'FAIL000000'
-const DEMO_RC_TIMEOUT = 'TIMEOUT000'
-const DEMO_VALID_OTP = '123456'
+const DEMO_VALID_OTP = '1234'
 const DEMO_PHONE_EXISTS = '9000000000'
 const DEMO_PHONE_UNREGISTERED = '9000000001'
 const OTP_MAX_ATTEMPTS = 3
-const VEHICLE_FETCH_TIMEOUT_MS = 15000
 const OTP_EXPIRY_MS = 5 * 60 * 1000 // 5 minutes
-const DEMO_OTP_FORCE_EXPIRE = '999999'
+const DEMO_OTP_FORCE_EXPIRE = '9999'
 
 const OTP_ERROR_COPY = {
   invalid: 'The OTP you entered is incorrect. Please try again.',
@@ -48,13 +29,6 @@ const OTP_ERROR_COPY = {
 const PHONE_ERROR_COPY = {
   alreadyExists: 'This phone number is already registered. Please log in instead.',
   notRegistered: "We couldn't find an account for this number. Please sign up first.",
-}
-
-const VEHICLE_ERROR_COPY: Record<VehicleErrorKind, string> = {
-  invalidRC: 'Please enter a valid RC number (e.g., DL03AF1234)',
-  duplicateRC: 'This vehicle is already registered in your account.',
-  apiFailed: 'Unable to fetch vehicle details. Please enter manually.',
-  requiredFields: 'Please fill in all required vehicle details.',
 }
 
 const STORAGE_KEY = 'onboarding:flow-state:v1'
@@ -89,10 +63,6 @@ interface OnboardingFlowProps {
   onVerifyOTP?: (otp: string) => void
   /** Called when user resends OTP */
   onResendOTP?: () => void
-  /** Called when user adds a vehicle */
-  onAddVehicle?: (vehicle: VehicleDetailsForm) => void
-  /** Called when user adds a driver */
-  onAddDriver?: (driver: DriverDetailsForm) => void
   /** Called when user selects a plan */
   onSelectPlan?: (planId: string) => void
   /** Called when payment is completed */
@@ -113,8 +83,6 @@ export function OnboardingFlow({
   onRequestOTP,
   onVerifyOTP,
   onResendOTP,
-  onAddVehicle,
-  onAddDriver,
   onSelectPlan,
   onPaymentComplete,
   onPaymentFailed,
@@ -153,17 +121,9 @@ export function OnboardingFlow({
   const [phoneError, setPhoneError] = useState<string | undefined>()
   const [loginPhoneError, setLoginPhoneError] = useState<string | undefined>()
 
-  // Vehicle step state
-  const [vehicles, setVehicles] = useState<VehicleDetailsForm[]>(persisted?.vehicles || [])
-  const [vehicleData, setVehicleData] = useState<Partial<VehicleDetailsForm> | undefined>()
-  const [isFetchingVehicle, setIsFetchingVehicle] = useState(false)
-  const [vehicleFetchSuccess, setVehicleFetchSuccess] = useState(false)
-  const [vehicleError, setVehicleError] = useState<string | undefined>()
-  const [vehicleErrorKind, setVehicleErrorKind] = useState<VehicleErrorKind | undefined>()
-  const [isManualVehicleMode, setIsManualVehicleMode] = useState(false)
-
-  // Driver step state
-  const [isSubmittingDriver, setIsSubmittingDriver] = useState(false)
+  // Vehicles persisted across sessions but no longer added during onboarding —
+  // kept so the driver and plan steps can still reference any existing fleet.
+  const [vehicles] = useState<VehicleDetailsForm[]>(persisted?.vehicles || [])
 
   const selectedPlan = plans.find((p) => p.id === selectedPlanId) || null
 
@@ -290,7 +250,7 @@ export function OnboardingFlow({
       setOtpAttempts(0)
       setOtpExpiresAt(null)
       setCompletedSteps((prev) => [...prev, 'step-signup'])
-      setCurrentStepId('step-vehicle')
+      setCurrentStepId('step-plan')
     }, 800)
   }
 
@@ -371,121 +331,6 @@ export function OnboardingFlow({
       setLoginOtpExpiresAt(Date.now() + OTP_EXPIRY_MS)
       startLoginCountdown()
     }, 900)
-  }
-
-  // Vehicle handlers — track active timers so we can cancel on timeout / unmount
-  const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const fetchDeadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const clearFetchTimers = () => {
-    if (fetchTimerRef.current) {
-      clearTimeout(fetchTimerRef.current)
-      fetchTimerRef.current = null
-    }
-    if (fetchDeadlineRef.current) {
-      clearTimeout(fetchDeadlineRef.current)
-      fetchDeadlineRef.current = null
-    }
-  }
-
-  useEffect(() => clearFetchTimers, [])
-
-  const setVehicleErrorOfKind = (kind: VehicleErrorKind) => {
-    setVehicleErrorKind(kind)
-    setVehicleError(VEHICLE_ERROR_COPY[kind])
-  }
-
-  const handleFetchVehicleDetails = (rcNumber: string) => {
-    const rc = rcNumber.toUpperCase()
-    clearFetchTimers()
-    setIsFetchingVehicle(true)
-    setVehicleError(undefined)
-    setVehicleErrorKind(undefined)
-
-    // Pre-flight: catch duplicates before incurring the fetch latency
-    if (vehicles.some((v) => v.rcNumber.toUpperCase() === rc)) {
-      setIsFetchingVehicle(false)
-      setVehicleErrorOfKind('duplicateRC')
-      return
-    }
-    if (rc === DEMO_RC_INVALID) {
-      setIsFetchingVehicle(false)
-      setVehicleErrorOfKind('invalidRC')
-      return
-    }
-
-    // Hard deadline — if the (real or simulated) fetch hasn't returned by here,
-    // we surface apiFailed so the user can fall back to manual entry.
-    fetchDeadlineRef.current = setTimeout(() => {
-      clearFetchTimers()
-      setIsFetchingVehicle(false)
-      setVehicleErrorOfKind('apiFailed')
-    }, VEHICLE_FETCH_TIMEOUT_MS)
-
-    const completeAfter = rc === DEMO_RC_TIMEOUT ? VEHICLE_FETCH_TIMEOUT_MS + 1000 : 1400
-    fetchTimerRef.current = setTimeout(() => {
-      // If the deadline already fired, do nothing — error is already shown
-      if (!fetchDeadlineRef.current) return
-      clearFetchTimers()
-      if (rc === DEMO_RC_APIFAIL) {
-        setIsFetchingVehicle(false)
-        setVehicleErrorOfKind('apiFailed')
-        return
-      }
-      const fetched = SAMPLE_FETCHED_VEHICLES[rc] || {
-        vehicleName: 'Tata Nexon XZ+',
-        vehicleType: 'Car',
-        registrationDate: '2021-08-10',
-        ownerName: 'Demo User',
-        fuelType: 'Petrol',
-      }
-      setVehicleData({ ...fetched, rcNumber })
-      setVehicleFetchSuccess(true)
-      setIsFetchingVehicle(false)
-    }, completeAfter)
-  }
-
-  const handleManualVehicleEntry = () => {
-    setIsManualVehicleMode(true)
-    setVehicleFetchSuccess(false)
-    setVehicleData(undefined)
-    setVehicleError(undefined)
-    setVehicleErrorKind(undefined)
-  }
-
-  // Reset just the fetch — keep manual-mode toggle as-is so user can re-edit RC
-  const handleResetVehicleFetch = () => {
-    setVehicleFetchSuccess(false)
-    setVehicleData(undefined)
-    setVehicleError(undefined)
-    setVehicleErrorKind(undefined)
-  }
-
-  const handleAddVehicle = (vehicle: VehicleDetailsForm) => {
-    setVehicles((prev) => [...prev, vehicle])
-    onAddVehicle?.(vehicle)
-    setCompletedSteps((prev) => [...prev, 'step-vehicle'])
-    // Reset for next vehicle if user comes back; clear per-step UI state
-    setVehicleData(undefined)
-    setVehicleFetchSuccess(false)
-    setIsManualVehicleMode(false)
-    setCurrentStepId('step-driver')
-  }
-
-  // Driver handlers
-  const handleAddDriver = (driver: DriverDetailsForm) => {
-    setIsSubmittingDriver(true)
-    onAddDriver?.(driver)
-    setTimeout(() => {
-      setIsSubmittingDriver(false)
-      setCompletedSteps((prev) => [...prev, 'step-driver'])
-      setCurrentStepId('step-plan')
-    }, 800)
-  }
-
-  const handleSkipDriver = () => {
-    setCompletedSteps((prev) => [...prev, 'step-driver'])
-    setCurrentStepId('step-plan')
   }
 
   // Plan handler
@@ -616,33 +461,6 @@ export function OnboardingFlow({
           isSendingOTP={isLoginSendingOTP}
           isVerifying={isLoginVerifying}
           resendCountdown={loginResendCountdown}
-        />
-      )}
-
-      {currentStepId === 'step-vehicle' && (
-        <VehicleAdditionStep
-          onFetchDetails={handleFetchVehicleDetails}
-          onAddVehicle={handleAddVehicle}
-          onManualEntry={handleManualVehicleEntry}
-          onResetFetch={handleResetVehicleFetch}
-          error={vehicleError}
-          errorKind={vehicleErrorKind}
-          isFetching={isFetchingVehicle}
-          vehicleData={vehicleData}
-          fetchSuccess={vehicleFetchSuccess}
-          isManualMode={isManualVehicleMode}
-        />
-      )}
-
-      {currentStepId === 'step-driver' && (
-        <DriverAdditionStep
-          availableVehicles={vehicles.map((v) => ({
-            id: v.rcNumber,
-            name: v.vehicleName,
-          }))}
-          onAddDriver={handleAddDriver}
-          onSkip={handleSkipDriver}
-          isSubmitting={isSubmittingDriver}
         />
       )}
 
