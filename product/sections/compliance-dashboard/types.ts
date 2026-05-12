@@ -233,4 +233,6 @@ export interface ComplianceDashboardProps {
   onScopeChange?: (scope: ScopeFilter, selectedId?: string) => void
   /** Initial drilldown view to open (dl, rc, challan, vehicle) */
   initialView?: 'dl' | 'rc' | 'challan' | 'vehicle' | null
+  /** Render the skeleton placeholder instead of the dashboard while data is loading */
+  isLoading?: boolean
 }

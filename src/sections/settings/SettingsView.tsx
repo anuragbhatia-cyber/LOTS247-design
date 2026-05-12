@@ -1,7 +1,15 @@
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/settings/data.json'
 import { Settings } from './components/Settings'
+import { SettingsSkeleton } from './components/SettingsSkeleton'
 
 export default function SettingsPreview() {
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+  if (isLoading) return <SettingsSkeleton />
   return (
     <Settings
       notificationPreferences={data.notificationPreferences as any}

@@ -16,48 +16,13 @@
   },
   "subscriptionPlans": [
     {
-      "id": "plan-udrive",
-      "name": "U Drive",
-      "displayName": "U Drive",
-      "description": "Perfect for individual vehicle owners",
-      "price": 1000,
-      "billingPeriod": "year",
-      "isRecommended": false,
-      "features": {
-        "vehicleLimit": 1,
-        "onCallResolution": true,
-        "onSiteResolution": "payPerUse",
-        "challanResolution": {
-          "online": 79,
-          "lokAdalat": 1000,
-          "court": 2000
-        },
-        "rtoService": "payPerUse",
-        "dashboardAccess": false,
-        "numberOfUsers": 1,
-        "automatedReports": false,
-        "personalizedReports": false,
-        "whatsappUpdates": false,
-        "addOns": "payPerUse",
-        "valueAddedServices": "payPerUse",
-        "accountManager": false,
-        "bulkChallanResolution": false,
-        "apiIntegration": false
-      },
-      "highlights": [
-        "24/7 on-call legal support",
-        "Challan resolution starting at ₹79",
-        "Full dashboard access"
-      ]
-    },
-    {
       "id": "plan-udrive-plus",
       "name": "U Drive+",
       "displayName": "U Drive+",
       "description": "Complete protection for individual vehicle owners",
       "price": 999,
       "billingPeriod": "year",
-      "isRecommended": false,
+      "isRecommended": true,
       "features": {
         "vehicleLimit": 1,
         "onCallResolution": true,
@@ -88,60 +53,24 @@
       ]
     },
     {
-      "id": "plan-bsafe",
-      "name": "B Safe",
-      "displayName": "B Safe",
-      "description": "Comprehensive protection for growing fleets",
-      "price": 40000,
+      "id": "plan-enterprise",
+      "name": "Enterprise",
+      "displayName": "Enterprise",
+      "description": "Custom fleet solutions for large organizations",
+      "price": 0,
       "billingPeriod": "year",
       "isRecommended": false,
+      "contactSales": true,
       "features": {
         "vehicleLimit": null,
         "onCallResolution": true,
-        "onSiteResolution": "payPerUse",
+        "onSiteResolution": true,
         "challanResolution": {
-          "online": 49,
-          "lokAdalat": 1000,
-          "court": 2000
+          "online": true,
+          "lokAdalat": true,
+          "court": true
         },
-        "rtoService": "payPerUse",
-        "dashboardAccess": true,
-        "numberOfUsers": 3,
-        "automatedReports": true,
-        "personalizedReports": false,
-        "whatsappUpdates": true,
-        "addOns": "payPerUse",
-        "valueAddedServices": "payPerUse",
-        "accountManager": false,
-        "bulkChallanResolution": false,
-        "apiIntegration": false
-      },
-      "highlights": [
-        "24/7 on-call legal support",
-        "Lower challan fees (₹49)",
-        "Multi-user access (3 users)",
-        "Automated compliance reports",
-        "WhatsApp incident updates"
-      ]
-    },
-    {
-      "id": "plan-vcare",
-      "name": "V Care",
-      "displayName": "V Care",
-      "description": "Complete fleet management with premium support",
-      "price": 100000,
-      "billingPeriod": "year",
-      "isRecommended": true,
-      "features": {
-        "vehicleLimit": null,
-        "onCallResolution": true,
-        "onSiteResolution": "payPerUse",
-        "challanResolution": {
-          "online": 39,
-          "lokAdalat": "asPerAddOn",
-          "court": "asPerAddOn"
-        },
-        "rtoService": "payPerUse",
+        "rtoService": true,
         "dashboardAccess": true,
         "numberOfUsers": 10,
         "automatedReports": true,
@@ -154,16 +83,14 @@
         "apiIntegration": true
       },
       "highlights": [
-        "24/7 on-call legal support",
-        "Best challan rates (₹39)",
-        "Up to 10 users",
-        "Personalized compliance reports",
+        "Unlimited vehicles",
+        "All challan services included",
         "Dedicated account manager",
         "Bulk challan resolution",
         "API integration support",
+        "Personalized compliance reports",
         "₹20K value-added services included"
-      ],
-      "badge": "Top Seller"
+      ]
     }
   ],
   "onboardingSteps": [

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import {
   ArrowLeft,
@@ -33,6 +33,8 @@ import {
   MoreHorizontal,
   Paperclip,
   Upload,
+  Gift,
+  ArrowRight,
 } from 'lucide-react'
 import type {
   VehicleDetailProps,
@@ -45,6 +47,9 @@ import type {
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 import { ChallanList } from '@/sections/incident-management/components/ChallanList'
 import { CaseList } from '@/sections/incident-management/components/CaseList'
+import { ChallanCard } from './ChallanCard'
+import { ChallanDetailsModal } from './ChallanDetailsModal'
+import { ChallanSettlementModal } from './ChallanSettlementModal'
 import incidentData from '@/../product/sections/incident-management/data.json'
 
 // ---------------------------------------------------------------------------
@@ -1294,7 +1299,22 @@ export function VehicleDetail({
   const [showAssignDriver, setShowAssignDriver] = useState(false)
   const [challanFetchState, setChallanFetchState] = useState<ChallanFetchState>('idle')
   const [fetchedChallans, setFetchedChallans] = useState<VehicleChallan[]>([])
+  const [selectedChallanIds, setSelectedChallanIds] = useState<Set<string>>(new Set())
+  // When new challans arrive, select pending ones by default so the bulk action is primed
+  useEffect(() => {
+    setSelectedChallanIds(new Set(fetchedChallans.filter(c => c.status === 'pending').map(c => c.id)))
+  }, [fetchedChallans])
+  const toggleChallanSelection = (id: string) => {
+    setSelectedChallanIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
   const [challanActionMenu, setChallanActionMenu] = useState<string | null>(null)
+  const [openChallan, setOpenChallan] = useState<VehicleChallan | null>(null)
+  const [showSettlement, setShowSettlement] = useState(false)
   const [showUploadDoc, setShowUploadDoc] = useState(false)
   const [incidentSubTab, setIncidentSubTab] = useState<'challans' | 'cases' | 'rto' | 'other'>('challans')
   const [expandedCompliance, setExpandedCompliance] = useState<Set<string>>(new Set())
@@ -1868,6 +1888,10 @@ export function VehicleDetail({
               const displayChallans = challanFilter === 'pending' ? pendingChallans : paidChallans
               const formatAmount = (amt: number) => new Intl.NumberFormat(language === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amt)
 
+              const selectedTotal = displayChallans
+                .filter((c) => selectedChallanIds.has(c.id))
+                .reduce((sum, c) => sum + c.amount, 0)
+
               return (
                 <div className="flex flex-col lg:flex-row gap-5">
                   {/* Sidebar filters */}
@@ -1934,60 +1958,21 @@ export function VehicleDetail({
                     {displayChallans.length > 0 ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {displayChallans.map((challan) => (
-                          <div
+                          <ChallanCard
                             key={challan.id}
-                            className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6 flex flex-col"
-                          >
-                            {/* Top: Violation + Amount */}
-                            <div className="flex items-start justify-between mb-3">
-                              <div>
-                                <p className="text-sm font-bold text-stone-900 dark:text-stone-50">
-                                  {challan.violationType}
-                                </p>
-                                <p className="text-xs text-stone-400 dark:text-stone-500 font-mono mt-0.5">
-                                  {challan.challanNumber}
-                                </p>
-                              </div>
-                              <p className="text-lg font-bold text-red-600 dark:text-red-400 tabular-nums whitespace-nowrap">
-                                {formatAmount(challan.amount)}
-                              </p>
-                            </div>
-
-                            {/* Date + Location */}
-                            <div className="flex items-center gap-4 text-xs text-stone-500 dark:text-stone-400 mb-4">
-                              <div className="flex items-center gap-1.5">
-                                <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                                {formatDate(challan.issueDate, language)}
-                              </div>
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                                <span className="truncate">{challan.location}</span>
-                              </div>
-                            </div>
-
-                            {/* Footer: Type badge + Pay Now */}
-                            <div className="flex items-center justify-between mt-auto pt-3 border-t border-stone-200 dark:border-stone-800">
-                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md ${
-                                challan.challanType === 'court'
-                                  ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
-                                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300'
-                              }`}>
-                                {challan.challanType === 'court' ? t.courtChallans : t.onlineChallans}
-                              </span>
-                              {challan.status === 'pending' && (
-                                <button
-                                  onClick={() => {
-                                    setFetchedChallans(prev =>
-                                      prev.map(c => c.id === challan.id ? { ...c, status: 'submitted' as const } : c)
-                                    )
-                                  }}
-                                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm"
-                                >
-                                  {t.payNow}
-                                </button>
-                              )}
-                            </div>
-                          </div>
+                            challan={challan}
+                            selected={selectedChallanIds.has(challan.id)}
+                            onToggleSelect={toggleChallanSelection}
+                            onViewDetails={(id) => {
+                              const found = displayChallans.find((c) => c.id === id)
+                              if (found) setOpenChallan(found)
+                            }}
+                            onCopyNumber={(num) => navigator.clipboard?.writeText(num)}
+                            labels={{
+                              online: t.onlineChallans,
+                              court: t.courtChallans,
+                            }}
+                          />
                         ))}
                       </div>
                     ) : (
@@ -1999,6 +1984,37 @@ export function VehicleDetail({
                         <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
                           {t.noPendingChallansDesc}
                         </p>
+                      </div>
+                    )}
+
+                    {selectedChallanIds.size > 0 && (
+                      <div className="sticky bottom-4 z-30 mt-4 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-[0_-6px_24px_rgba(0,0,0,0.10)] dark:shadow-[0_-6px_24px_rgba(0,0,0,0.4)] overflow-hidden">
+                        {/* Pledge & Claim banner */}
+                        <div className="px-5 py-3 bg-gradient-to-r from-amber-100 via-amber-50 to-transparent dark:from-amber-950/40 dark:via-amber-950/20 dark:to-transparent border-b border-amber-200 dark:border-amber-900/40 flex items-center justify-between gap-3">
+                          <p className="text-sm font-bold text-amber-700 dark:text-amber-300">
+                            {language === 'hi' ? 'प्रतिज्ञा करें और पुरस्कार पाएं' : 'Pledge & Claim Rewards'}
+                          </p>
+                          <Gift className="w-5 h-5 text-amber-700 dark:text-amber-300" />
+                        </div>
+
+                        {/* Total + Proceed CTA */}
+                        <div className="px-5 py-4 flex items-center justify-between gap-4">
+                          <div>
+                            <p className="text-xs text-stone-500 dark:text-stone-400">
+                              {language === 'hi' ? 'कुल चालान राशि' : 'Total Challan Amount'}
+                            </p>
+                            <p className="text-2xl font-bold text-stone-900 dark:text-stone-50 tabular-nums mt-0.5">
+                              {formatAmount(selectedTotal)}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => setShowSettlement(true)}
+                            className="inline-flex items-center gap-1.5 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-md shadow-emerald-600/30"
+                          >
+                            {language === 'hi' ? 'भुगतान करें' : 'Proceed To Pay'}
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -2180,6 +2196,23 @@ export function VehicleDetail({
           onClose={() => setShowUploadDoc(false)}
           rcNumber={vehicle.rcNumber}
           t={t}
+        />
+
+        {/* Challan Details Modal */}
+        <ChallanDetailsModal
+          isOpen={openChallan !== null}
+          challan={openChallan}
+          onClose={() => setOpenChallan(null)}
+        />
+
+        {/* Challan Settlement Modal — embeds payment success view */}
+        <ChallanSettlementModal
+          isOpen={showSettlement}
+          selectedChallans={fetchedChallans.filter((c) => selectedChallanIds.has(c.id))}
+          onClose={() => {
+            setShowSettlement(false)
+            setSelectedChallanIds(new Set())
+          }}
         />
       </div>
     </div>

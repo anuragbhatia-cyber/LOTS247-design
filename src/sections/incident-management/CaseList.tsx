@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/incident-management/data.json'
 import { CaseList } from './components/CaseList'
+import { CaseListSkeleton } from './components/CaseListSkeleton'
 
 const BASE = '/sections/incident-management/screen-designs'
 
@@ -14,6 +16,12 @@ function navigateToScreen(screenName: string, extraParams?: Record<string, strin
 }
 
 export default function CaseListPreview() {
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+  if (isLoading) return <CaseListSkeleton />
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <CaseList

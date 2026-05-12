@@ -39,6 +39,7 @@ import {
   Check,
   Minus,
 } from 'lucide-react'
+import { ComplianceDashboardSkeleton } from './ComplianceDashboardSkeleton'
 import type {
   ComplianceDashboardProps,
   ComplianceCategory,
@@ -2534,7 +2535,11 @@ export function ComplianceDashboard({
   onDateRangeChange,
   onScopeChange,
   initialView,
+  isLoading = false,
 }: ComplianceDashboardProps) {
+  if (isLoading) {
+    return <ComplianceDashboardSkeleton />
+  }
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null)
   const [datePreset, setDatePreset] = useState<DateRangePreset>('last6Months')
   const [dateDropdownOpen, setDateDropdownOpen] = useState(false)

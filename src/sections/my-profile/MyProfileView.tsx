@@ -1,7 +1,15 @@
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/my-profile/data.json'
 import { MyProfile } from './components/MyProfile'
+import { MyProfileSkeleton } from './components/MyProfileSkeleton'
 
 export default function MyProfilePreview() {
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+  if (isLoading) return <MyProfileSkeleton />
   return (
     <MyProfile
       subscriberProfile={data.subscriberProfile as any}

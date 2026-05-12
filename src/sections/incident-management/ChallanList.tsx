@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/incident-management/data.json'
 import { ChallanList } from './components/ChallanList'
+import { ChallanListSkeleton } from './components/ChallanListSkeleton'
 
 const BASE = '/sections/incident-management/screen-designs'
 
@@ -14,6 +16,12 @@ function navigateToScreen(screenName: string, extraParams?: Record<string, strin
 }
 
 export default function ChallanListPreview() {
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+  if (isLoading) return <ChallanListSkeleton />
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <ChallanList

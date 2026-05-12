@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { loadScreenDesignComponent, sectionUsesShell } from '@/lib/section-loader'
 import { loadAppShell, hasShellComponents, loadShellInfo } from '@/lib/shell-loader'
 import { loadProductData } from '@/lib/product-loader'
+import { getSkeletonFor } from '@/lib/skeleton-registry'
 import React from 'react'
 
 const MIN_WIDTH = 320
@@ -315,16 +316,14 @@ export function ScreenDesignFullscreen() {
     )
   }
 
+  // Section-specific skeleton — keeps the loading surface visually coherent with the
+  // real screen instead of dropping a centered "Loading..." text on top of nothing.
+  const SkeletonFallback = getSkeletonFor(sectionId, screenDesignName)
+
   // If shell exists, wrap screen design in AppShell
   if (AppShellComponent) {
     return (
-      <Suspense
-        fallback={
-          <div className="h-screen flex items-center justify-center bg-background">
-            <div className="text-stone-500 dark:text-stone-400">Loading...</div>
-          </div>
-        }
-      >
+      <Suspense fallback={<SkeletonFallback />}>
         <AppShellComponent>
           <ScreenDesignComponent />
         </AppShellComponent>
@@ -334,13 +333,7 @@ export function ScreenDesignFullscreen() {
 
   // No shell, render screen design directly
   return (
-    <Suspense
-      fallback={
-        <div className="h-screen flex items-center justify-center bg-background">
-          <div className="text-stone-500 dark:text-stone-400">Loading...</div>
-        </div>
-      }
-    >
+    <Suspense fallback={<SkeletonFallback />}>
       <ScreenDesignComponent />
     </Suspense>
   )

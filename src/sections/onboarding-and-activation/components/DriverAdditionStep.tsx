@@ -7,8 +7,6 @@ interface DriverAdditionStepProps {
   availableVehicles: Array<{ id: string; name: string }>
   /** Called when user adds driver */
   onAddDriver?: (driver: DriverDetailsForm) => void
-  /** Called when user goes back */
-  onBack?: () => void
   /** Called when user skips this step */
   onSkip?: () => void
   /** Validation error message */
@@ -20,7 +18,6 @@ interface DriverAdditionStepProps {
 export function DriverAdditionStep({
   availableVehicles,
   onAddDriver,
-  onBack,
   onSkip,
   error,
   isSubmitting = false,
@@ -63,7 +60,7 @@ export function DriverAdditionStep({
     }
   }
 
-  const isValid = formData.driverName
+  const isValid = Boolean(formData.driverName?.trim() && formData.licenseNumber && formData.licenseNumber.length >= 8)
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -104,23 +101,17 @@ export function DriverAdditionStep({
 
           {/* Header */}
           <div className="mb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <button
-                onClick={onBack}
-                className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-                aria-label="Go back"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-white">
                 Add a driver
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400">
                 Optional
               </span>
             </div>
+            <p className="text-stone-600 dark:text-stone-400 text-sm">
+              Drivers help us link incidents to specific licenses. You can skip and add this later.
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -130,12 +121,14 @@ export function DriverAdditionStep({
                 htmlFor="driverName"
                 className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2"
               >
-                Driver Name <span className="text-red-500">*</span>
+                Driver Name <span className="text-red-700">*</span>
               </label>
               <input
                 id="driverName"
                 name="driverName"
                 type="text"
+                autoComplete="name"
+                maxLength={60}
                 value={formData.driverName}
                 onChange={handleChange}
                 placeholder="Enter driver's full name"
@@ -151,8 +144,8 @@ export function DriverAdditionStep({
                 className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2"
               >
                 Driver ID{' '}
-                <span className="text-stone-400 dark:text-stone-500 font-normal">
-                  (optional)
+                <span className="text-stone-600 dark:text-stone-400 font-normal">
+                  (auto-generated if blank)
                 </span>
               </label>
               <input
@@ -166,8 +159,51 @@ export function DriverAdditionStep({
               />
             </div>
 
+            {/* Driving License Number */}
+            <div>
+              <label
+                htmlFor="licenseNumber"
+                className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2"
+              >
+                Driving License Number <span className="text-red-700">*</span>
+              </label>
+              <input
+                id="licenseNumber"
+                name="licenseNumber"
+                type="text"
+                value={formData.licenseNumber}
+                onChange={handleLicenseChange}
+                placeholder="e.g., DL-0420180001234"
+                className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-white placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 font-mono uppercase tracking-wider"
+              />
+              <p className="mt-1 text-xs text-stone-600 dark:text-stone-400">
+                {formData.licenseNumber?.length || 0}/20 characters
+              </p>
+            </div>
+
+            {/* License Expiry Date (Optional) */}
+            <div>
+              <label
+                htmlFor="licenseExpiryDate"
+                className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2"
+              >
+                License Expiry{' '}
+                <span className="text-stone-600 dark:text-stone-400 font-normal">
+                  (optional)
+                </span>
+              </label>
+              <input
+                id="licenseExpiryDate"
+                name="licenseExpiryDate"
+                type="date"
+                value={formData.licenseExpiryDate}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+              />
+            </div>
+
             {/* Assign to Vehicle */}
-            {availableVehicles.length > 0 && (
+            {availableVehicles.length > 0 ? (
               <div>
                 <label
                   htmlFor="assignedVehicleId"
@@ -184,21 +220,29 @@ export function DriverAdditionStep({
                 >
                   {availableVehicles.map((vehicle) => (
                     <option key={vehicle.id} value={vehicle.id}>
-                      {vehicle.name} ({vehicle.id})
+                      {vehicle.name || vehicle.id} ({vehicle.id})
                     </option>
                   ))}
                 </select>
               </div>
+            ) : (
+              <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50 px-4 py-3">
+                <p className="text-xs text-stone-600 dark:text-stone-400">
+                  No vehicles yet — you can assign drivers later from your dashboard.
+                </p>
+              </div>
             )}
 
-            {/* Error Message */}
+            {/* Error Message — boxed alert pattern for async submit errors */}
             {error && (
-              <p className="text-sm text-red-500 flex items-center gap-1.5">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-                {error}
-              </p>
+              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800" role="alert">
+                <p className="text-sm text-red-700 dark:text-red-300 flex items-start gap-2">
+                  <svg className="w-4 h-4 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span>{error}</span>
+                </p>
+              </div>
             )}
 
             {/* Submit Button */}
@@ -210,8 +254,8 @@ export function DriverAdditionStep({
                 transition-all duration-200
                 ${
                   isValid && !isSubmitting
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/20'
-                    : 'bg-stone-200 dark:bg-stone-800 text-stone-400 dark:text-stone-500 cursor-not-allowed'
+                    ? 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-lg shadow-emerald-500/20'
+                    : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 cursor-not-allowed'
                 }
               `}
             >
@@ -231,14 +275,14 @@ export function DriverAdditionStep({
             {/* Skip Link */}
             <button
               onClick={onSkip}
-              className="w-full text-center text-sm font-medium text-stone-500 dark:text-stone-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:underline transition-colors py-2"
+              className="w-full text-center text-sm font-medium text-stone-600 dark:text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:underline transition-colors py-2"
             >
               I'll add drivers later →
             </button>
           </div>
 
           {/* Helper text */}
-          <p className="mt-6 text-xs text-stone-400 dark:text-stone-500">
+          <p className="mt-6 text-xs text-stone-600 dark:text-stone-400">
             You can add more drivers from your dashboard after setup
           </p>
         </div>

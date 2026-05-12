@@ -1,7 +1,15 @@
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/reports/data.json'
 import { ReportsList } from './components/ReportsList'
+import { ReportsListSkeleton } from './components/ReportsListSkeleton'
 
 export default function ReportsListPreview() {
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+  if (isLoading) return <ReportsListSkeleton />
   return (
     <ReportsList
       reports={data.reports}

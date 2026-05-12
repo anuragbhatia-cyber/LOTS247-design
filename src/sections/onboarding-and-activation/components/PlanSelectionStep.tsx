@@ -10,17 +10,60 @@ interface PlanSelectionStepProps {
   onBack?: () => void
   /** Called when user selects a plan */
   onSelectPlan?: (planId: string) => void
+  /** Called when user clicks Contact Sales on enterprise plan */
+  onContactSales?: () => void
   /** Payment error message */
   error?: string
   /** Currently processing plan ID */
   processingPlanId?: string | null
+  /** Whether plans are still being fetched (renders skeleton cards) */
+  isLoading?: boolean
 }
 
-const PLAN_STYLES: Record<string, { bg: string; image: string }> = {
-  'plan-udrive': { bg: 'bg-sky-400', image: '/Udrive.webp' },
+/** Single skeleton plan card — mirrors the real card's layout so there's minimal pop-in */
+function PlanCardSkeleton() {
+  return (
+    <div
+      className="relative flex flex-col rounded-2xl overflow-hidden bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 motion-safe:animate-pulse"
+      aria-hidden="true"
+    >
+      {/* Header band */}
+      <div className="bg-stone-100 dark:bg-stone-800 flex flex-col items-center justify-center py-6 px-4 min-h-[88px] gap-2">
+        <div className="h-5 w-32 rounded bg-stone-200 dark:bg-stone-700" />
+        <div className="h-3 w-44 rounded bg-stone-200 dark:bg-stone-700" />
+      </div>
+
+      {/* Body */}
+      <div className="flex flex-col flex-1 p-5">
+        {/* Price */}
+        <div className="text-center pb-4 mb-4 border-b border-stone-100 dark:border-stone-800 space-y-1.5">
+          <div className="h-7 w-20 mx-auto rounded bg-stone-200 dark:bg-stone-700" />
+          <div className="h-3 w-16 mx-auto rounded bg-stone-200 dark:bg-stone-700" />
+        </div>
+
+        {/* Feature rows */}
+        <div className="mt-auto space-y-3.5 mb-5">
+          {[36, 28, 32, 30, 26, 34, 28].map((labelW, i) => (
+            <div key={i} className="flex items-center justify-between">
+              <div
+                className="h-3 rounded bg-stone-200 dark:bg-stone-700"
+                style={{ width: `${labelW * 2}px` }}
+              />
+              <div className="h-3.5 w-4 rounded bg-stone-200 dark:bg-stone-700" />
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div className="h-10 w-full rounded-xl bg-stone-200 dark:bg-stone-700" />
+      </div>
+    </div>
+  )
+}
+
+const PLAN_STYLES: Record<string, { bg: string; image?: string }> = {
   'plan-udrive-plus': { bg: 'bg-violet-500', image: '/Udrive.webp' },
-  'plan-bsafe':  { bg: 'bg-emerald-500', image: '/Bsafe.webp' },
-  'plan-vcare':  { bg: 'bg-orange-400', image: '/Vcare.webp' },
+  'plan-enterprise':  { bg: 'bg-stone-900 dark:bg-stone-800' },
 }
 
 function CheckIcon({ className = '' }: { className?: string }) {
@@ -52,8 +95,10 @@ export function PlanSelectionStep({
   vehicleCount = 1,
   onBack,
   onSelectPlan,
+  onContactSales,
   error,
   processingPlanId = null,
+  isLoading = false,
 }: PlanSelectionStepProps) {
   const isPlanDisabled = (plan: SubscriptionPlan) => {
     if (plan.features.vehicleLimit === null) return false
@@ -90,7 +135,7 @@ export function PlanSelectionStep({
           <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-white mb-2">
             Choose your plan
           </h1>
-          <p className="text-stone-500 dark:text-stone-400 text-sm">
+          <p className="text-stone-600 dark:text-stone-400 text-sm">
             Select the plan that best fits your needs
           </p>
         </div>
@@ -98,7 +143,7 @@ export function PlanSelectionStep({
         {/* Error Message */}
         {error && (
           <div className="max-w-md mx-auto mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
-            <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+            <p className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2">
               <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
@@ -111,13 +156,42 @@ export function PlanSelectionStep({
           </div>
         )}
 
+        {/* Loading state — skeleton cards mirror the real layout */}
+        {isLoading && (
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto"
+            aria-busy="true"
+            role="status"
+          >
+            <span className="sr-only">Loading subscription plans</span>
+            <PlanCardSkeleton />
+            <PlanCardSkeleton />
+          </div>
+        )}
+
+        {/* Empty state — no plans available */}
+        {!isLoading && plans.length === 0 && !error && (
+          <div className="max-w-md mx-auto text-center py-12">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center">
+              <svg className="w-6 h-6 text-stone-600 dark:text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-base font-semibold text-stone-900 dark:text-white mb-1">No plans available right now</h2>
+            <p className="text-sm text-stone-600 dark:text-stone-400">
+              We couldn't load subscription plans. Please refresh or contact support.
+            </p>
+          </div>
+        )}
+
         {/* Plan Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+        {!isLoading && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
           {plans.map((plan) => {
             const disabled = isPlanDisabled(plan)
             const isProcessing = processingPlanId === plan.id
             const style = PLAN_STYLES[plan.id]
-
+            const isEnterprise = plan.contactSales === true
 
             return (
               <div
@@ -136,27 +210,29 @@ export function PlanSelectionStep({
                 {style ? (
                   <div className={`relative ${style.bg} flex items-center justify-center py-1.5 px-4 min-h-[44px]`}>
                     {plan.badge && (
-                      <div className="absolute top-1 right-1">
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold text-white tracking-wide"
-                          style={{
-                            background: 'linear-gradient(160deg, #505050 0%, #111 45%, #2a2a2a 100%)',
-                            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.4)',
-                          }}
-                        >
-                          <StarIcon className="text-yellow-400" />
+                      <div className="absolute -top-2 right-3">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-emerald-700 text-white shadow-md shadow-emerald-700/30 ring-2 ring-white dark:ring-stone-900">
+                          <StarIcon className="text-white" />
                           {plan.badge}
                         </span>
                       </div>
                     )}
                     <div className="flex items-center">
-                      <img
-                        src={style.image}
-                        alt={plan.displayName}
-                        className="h-11 w-auto object-contain"
-                      />
-                      {plan.id === 'plan-udrive-plus' && (
-                        <span className="text-3xl font-bold text-white ml-0.5 -mt-0.5">+</span>
+                      {style.image ? (
+                        <>
+                          <img
+                            src={style.image}
+                            alt={plan.displayName}
+                            className="h-11 w-auto object-contain"
+                          />
+                          {plan.id === 'plan-udrive-plus' && (
+                            <span className="text-3xl font-bold text-white ml-0.5 -mt-0.5">+</span>
+                          )}
+                        </>
+                      ) : (
+                        <h3 className="text-xl font-bold text-white tracking-tight">
+                          {plan.displayName}
+                        </h3>
                       )}
                     </div>
                   </div>
@@ -165,7 +241,7 @@ export function PlanSelectionStep({
                     <h3 className="text-lg font-bold text-stone-900 dark:text-white leading-tight">
                       {plan.displayName}
                     </h3>
-                    <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 text-center">
+                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-0.5 text-center">
                       {plan.description}
                     </p>
                   </div>
@@ -176,14 +252,25 @@ export function PlanSelectionStep({
 
                   {/* Pricing */}
                   <div className="text-center pb-4 mb-4 border-b border-stone-100 dark:border-stone-800">
-                    <div className="text-2xl font-bold text-stone-900 dark:text-white">
-                      {plan.price >= 1000
-                        ? `₹${Math.round(plan.price / 1000)}K`
-                        : `₹${plan.price}`}
-                    </div>
-                    <div className="text-xs text-stone-400 dark:text-stone-500 mt-0.5 uppercase tracking-wide">
-                      Per {plan.billingPeriod === 'year' ? 'Year' : 'Month'}
-                    </div>
+                    {isEnterprise ? (
+                      <>
+                        <div className="text-2xl font-bold text-stone-900 dark:text-white">Custom</div>
+                        <div className="text-xs text-stone-600 dark:text-stone-400 mt-0.5">
+                          Tailored to your fleet
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold text-stone-900 dark:text-white">
+                          {plan.price >= 1000
+                            ? `₹${Math.round(plan.price / 1000)}K`
+                            : `₹${plan.price}`}
+                        </div>
+                        <div className="text-xs text-stone-600 dark:text-stone-400 mt-0.5 uppercase tracking-wide">
+                          Per {plan.billingPeriod === 'year' ? 'Year' : 'Month'}
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Feature Summary Rows */}
@@ -200,7 +287,7 @@ export function PlanSelectionStep({
                       { label: 'Dashboard', value: featureDisplay(plan.features.dashboardAccess) },
                     ].map((row, idx) => (
                       <div key={idx} className={`flex items-center justify-between ${row.indent ? 'pl-3' : ''}`}>
-                        <span className={`${row.indent ? 'text-xs text-stone-400 dark:text-stone-500' : 'text-stone-500 dark:text-stone-400'}`}>
+                        <span className={`${row.indent ? 'text-xs text-stone-600 dark:text-stone-400' : 'text-stone-600 dark:text-stone-400'}`}>
                           {row.label.trim()}
                         </span>
                         {row.value.kind === 'check' ? (
@@ -217,35 +304,45 @@ export function PlanSelectionStep({
                   </div>
 
                   {/* CTA Button */}
-                  <button
-                    onClick={() => !disabled && !isProcessing && onSelectPlan?.(plan.id)}
-                    disabled={disabled || isProcessing}
-                    className={[
-                      'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200',
-                      disabled
-                        ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
-                        : 'bg-stone-900 dark:bg-white hover:bg-stone-700 dark:hover:bg-stone-100 text-white dark:text-stone-900 cursor-pointer',
-                    ].join(' ')}
-                  >
-                    {isProcessing ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        Processing...
-                      </span>
-                    ) : disabled ? (
-                      'Exceeds vehicle limit'
-                    ) : (
-                      'Select Plan'
-                    )}
-                  </button>
+                  {isEnterprise ? (
+                    <button
+                      onClick={() => onContactSales?.()}
+                      className="w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border border-stone-900 dark:border-white text-stone-900 dark:text-white hover:bg-stone-900 hover:text-white dark:hover:bg-white dark:hover:text-stone-900 cursor-pointer"
+                    >
+                      Contact Sales
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => !disabled && !isProcessing && onSelectPlan?.(plan.id)}
+                      disabled={disabled || isProcessing}
+                      className={[
+                        'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200',
+                        disabled
+                          ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
+                          : 'bg-stone-900 dark:bg-white hover:bg-stone-700 dark:hover:bg-stone-100 text-white dark:text-stone-900 cursor-pointer',
+                      ].join(' ')}
+                    >
+                      {isProcessing ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Processing...
+                        </span>
+                      ) : disabled ? (
+                        'Exceeds vehicle limit'
+                      ) : (
+                        'Select Plan'
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             )
           })}
         </div>
+        )}
       </div>
     </div>
   )

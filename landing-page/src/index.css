@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  UDrive by LOTS247 — Landing Page
+  Warm Stone palette + DM Sans, mirroring the app shell.
+  Emerald = "movement / ready / on" accent.
+  Amber = warning / hazard accent for "road reality".
+*/
+@theme {
+  --font-display: "DM Sans", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply bg-stone-50 text-stone-900;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply font-bold tracking-tight;
+  }
+  code, pre, kbd {
+    font-family: var(--font-mono);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 600ms ease-out both;
+  }
+  .animate-fade-up {
+    animation: fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-blink {
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  .animate-marquee {
+    animation: marquee 32s linear infinite;
+  }
+  .animate-soft-pulse {
+    animation: soft-pulse 2s ease-in-out infinite;
+  }
+  .animate-phone-float {
+    animation: phone-float 6s ease-in-out infinite;
+  }
+  .animate-beacon {
+    animation: beacon 1.6s ease-in-out infinite;
+  }
+  .animate-siren-glow {
+    animation: siren-glow 2.4s ease-in-out infinite;
+  }
+  .animate-step-travel {
+    animation: step-travel 6s ease-in-out infinite;
+  }
+  .animate-progress-fill {
+    animation: progress-fill 12s linear infinite;
+  }
+  .animate-lang-nudge {
+    animation: lang-nudge 1.2s ease-in-out 2;
+  }
+  .animate-cta-glow {
+    animation: cta-glow 4.5s ease-in-out infinite;
+  }
+  .animate-orbit-slow {
+    animation: orbit-slow 22s linear infinite;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes soft-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+    50%      { transform: scale(1.04); opacity: 0.95; box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
+  }
+  @keyframes phone-float {
+    0%, 100% { transform: rotate(-2deg) translateY(0); }
+    50%      { transform: rotate(-2deg) translateY(-8px); }
+  }
+  @keyframes beacon {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.85); }
+  }
+  @keyframes siren-glow {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 0.95; }
+  }
+  @keyframes step-travel {
+    0%   { top: 0%;    opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { top: 100%;  opacity: 0; }
+  }
+  @keyframes progress-fill {
+    0%, 100% { transform: scaleX(0); }
+    50%      { transform: scaleX(1); }
+  }
+  @keyframes lang-nudge {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    50%      { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.25); }
+  }
+  @keyframes cta-glow {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50%      { opacity: 0.95; transform: scale(1.04); }
+  }
+  @keyframes orbit-slow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Warning-territory dot pattern for the Road Reality section */
+  .bg-hazard-dots {
+    background-image: radial-gradient(rgba(180, 83, 9, 0.10) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* Subtle paper-grain texture for hero block */
+  .bg-noise {
+    background-image:
+      radial-gradient(at 30% 20%, rgba(255,255,255,0.04) 0px, transparent 50%),
+      radial-gradient(at 80% 90%, rgba(16,185,129,0.06) 0px, transparent 50%);
+  }
+}

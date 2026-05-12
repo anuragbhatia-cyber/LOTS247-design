@@ -65,6 +65,8 @@ export interface SubscriptionPlan {
   limitations?: string[]
   /** Optional badge text (e.g., "Top Seller") */
   badge?: string
+  /** Whether this plan requires contacting sales instead of direct purchase */
+  contactSales?: boolean
 }
 
 export interface OnboardingStep {

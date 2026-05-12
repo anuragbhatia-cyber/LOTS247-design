@@ -205,4 +205,110 @@
     to {
       height: 0;
     }
-  }}
+  }
+}
+
+/* Report page on-screen preview — constrain to A4 proportions */
+#incident-summary-report,
+#incident-closure-report,
+#monthly-incident-summary-report {
+  width: 210mm;
+  max-width: 210mm;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.report-page {
+  width: 210mm;
+  max-width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  max-height: 297mm;
+  overflow: hidden;
+}
+
+/* Print styles for PDF report export */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Set the print viewport to exactly A4 width */
+  html {
+    width: 210mm !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Body fills the viewport */
+  body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: #1c1917 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    overflow: visible !important;
+  }
+
+  /* Strip all wrappers between body and report pages */
+  #root {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+  }
+
+  /* Reset React Router wrappers + preview component wrappers */
+  #root > *,
+  #root > * > *,
+  #root > * > * > *,
+  #root > * > * > * > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* The report containers */
+  #incident-summary-report,
+  #incident-closure-report,
+  #monthly-incident-summary-report {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Each .report-page fills exactly one printed A4 page */
+  .report-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    margin: 0 !important;
+    padding: 0;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    page-break-after: always;
+    break-after: page;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .report-page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+}

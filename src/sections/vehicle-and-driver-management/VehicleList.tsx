@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/vehicle-and-driver-management/data.json'
 import { VehicleList } from './components/VehicleList'
+import { VehicleListSkeleton } from './components/VehicleListSkeleton'
 
 const BASE = '/sections/vehicle-and-driver-management/screen-designs'
 
@@ -14,6 +16,12 @@ function navigateToScreen(screenName: string, extraParams?: Record<string, strin
 }
 
 export default function VehicleListPreview() {
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+  if (isLoading) return <VehicleListSkeleton />
   return (
     <VehicleList
       vehicles={data.vehicles as any}

@@ -1,7 +1,15 @@
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/wallet/data.json'
 import { WalletView } from './components/WalletView'
+import { WalletSkeleton } from './components/WalletSkeleton'
 
 export default function WalletViewPreview() {
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+  if (isLoading) return <WalletSkeleton />
   return (
     <WalletView
       walletSummary={data.walletSummary}

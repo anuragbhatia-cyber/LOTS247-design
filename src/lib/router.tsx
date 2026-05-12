@@ -8,6 +8,9 @@ import { ScreenDesignPage, ScreenDesignFullscreen } from '@/components/ScreenDes
 import { ShellDesignPage, ShellDesignFullscreen } from '@/components/ShellDesignPage'
 import { ExportPage } from '@/components/ExportPage'
 import { FullPreviewPage } from '@/pages/FullPreviewPage'
+import IncidentSummaryReportPreview from '../../Exported-reports/IncidentSummaryReportPreview'
+import IncidentClosureReportPreview from '../../Exported-reports/IncidentClosureReportPreview'
+import MonthlyIncidentSummaryReportPreview from '../../Exported-reports/MonthlyIncidentSummaryReportPreview'
 
 export const router = createBrowserRouter([
   {
@@ -53,5 +56,17 @@ export const router = createBrowserRouter([
   {
     path: '/export',
     element: <ExportPage />,
+  },
+  {
+    path: '/report-preview/incident-summary',
+    element: <IncidentSummaryReportPreview />,
+  },
+  {
+    path: '/report-preview/incident-closure',
+    element: <IncidentClosureReportPreview />,
+  },
+  {
+    path: '/report-preview/monthly-incident-summary',
+    element: <MonthlyIncidentSummaryReportPreview />,
   },
 ])

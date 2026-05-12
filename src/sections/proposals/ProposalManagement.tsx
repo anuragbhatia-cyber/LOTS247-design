@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import data from '@/../product/sections/proposals/data.json'
 import complianceData from '@/../product/sections/compliance-dashboard/data.json'
 import { ProposalList } from './components/ProposalList'
 import { ProposalDetail } from './components/ProposalDetail'
+import { ProposalManagementSkeleton } from './components/ProposalManagementSkeleton'
 import { ComplianceDashboard } from '@/sections/compliance-dashboard/components/ComplianceDashboard'
 import type { CategoryId, DateRangePreset, ScopeFilter } from '@/../product/sections/compliance-dashboard/types'
 
@@ -14,6 +15,12 @@ type Screen =
 
 export default function ProposalManagementPreview() {
   const [screen, setScreen] = useState<Screen>({ type: 'list' })
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+  if (isLoading && screen.type === 'list') return <ProposalManagementSkeleton />
 
   if (screen.type === 'detail') {
     const proposal = data.proposals.find((p) => p.id === screen.proposalId) || data.proposals[0]

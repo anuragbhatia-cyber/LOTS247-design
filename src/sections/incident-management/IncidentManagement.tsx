@@ -3,6 +3,7 @@ import { FileWarning, Briefcase, Building2, MoreHorizontal, CheckCircle2, Clock,
 import data from '@/../product/sections/incident-management/data.json'
 import { ChallanList } from './components/ChallanList'
 import { CaseList } from './components/CaseList'
+import { IncidentManagementSkeleton } from './components/IncidentManagementSkeleton'
 
 const BASE = '/sections/incident-management/screen-designs'
 
@@ -35,6 +36,12 @@ export default function IncidentManagementPreview() {
   const [customTo, setCustomTo] = useState('')
   const dateRangeRef = useRef<HTMLDivElement>(null)
 
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dateRangeRef.current && !dateRangeRef.current.contains(e.target as Node)) {
@@ -53,6 +60,8 @@ export default function IncidentManagementPreview() {
   const docRequestedCases = data.cases.filter((c: { status: string }) => c.status === 'document_requested' || c.status === 'awaiting_documents').length
   const inProgressCases = data.cases.filter((c: { status: string }) => c.status === 'in_progress' || c.status === 'ongoing').length
   const closedCases = data.cases.filter((c: { status: string }) => c.status === 'resolved' || c.status === 'closed').length
+
+  if (isLoading) return <IncidentManagementSkeleton />
 
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">

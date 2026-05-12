@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import data from '@/../product/sections/compliance-dashboard/data.json'
 import { ComplianceDashboard } from './components/ComplianceDashboard'
 import { VehicleWiseReport } from './components/VehicleWiseReport'
@@ -6,6 +7,14 @@ import type { CategoryId, DateRangePreset, ScopeFilter } from '@/../product/sect
 export default function ComplianceDashboardPreview() {
   const params = new URLSearchParams(window.location.search)
   const view = params.get('view') as 'dl' | 'rc' | 'challan' | 'vehicle' | 'vehicle-report' | null
+
+  // Simulate initial-load latency so the design preview shows the skeleton.
+  // Real integrations control this via the isLoading prop directly.
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
 
   if (view === 'vehicle-report') {
     return (
@@ -19,6 +28,7 @@ export default function ComplianceDashboardPreview() {
   return (
     <ComplianceDashboard
       key={view}
+      isLoading={isLoading}
       categories={data.categories as any}
       insights={data.insights as any}
       monthlyTrend={data.monthlyTrend}

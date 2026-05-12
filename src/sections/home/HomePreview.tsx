@@ -1,12 +1,19 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import data from '@/../product/sections/home/data.json'
 import { HomeView } from './components/HomeView'
+import { HomeSkeleton } from './components/HomeSkeleton'
 
 const ONBOARDING_FULLSCREEN = '/sections/onboarding-and-activation/screen-designs/OnboardingFlow/fullscreen'
 const ONBOARDING_VIEW_PARAM = 'onboarding-and-activation:OnboardingFlow'
 
 export default function HomePreview() {
   const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 900)
+    return () => clearTimeout(t)
+  }, [])
 
   const handleLogout = () => {
     if (window.parent !== window) {
@@ -18,6 +25,7 @@ export default function HomePreview() {
     }
   }
 
+  if (isLoading) return <HomeSkeleton />
   return (
     <HomeView
       subscriber={data.subscriber}
