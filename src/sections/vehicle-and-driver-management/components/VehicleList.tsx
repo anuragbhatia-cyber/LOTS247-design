@@ -37,6 +37,7 @@ import type {
   DocumentStatus,
 } from '@/../product/sections/vehicle-and-driver-management/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { DriverInsuranceModal } from './DriverInsuranceModal'
 
 // ---------------------------------------------------------------------------
 // Translations
@@ -135,6 +136,10 @@ const translations: Record<Language, Record<string, string>> = {
     driver: 'Driver',
     licenseNumber: 'License Number',
     licenseExpiry: 'License Expiry',
+    insuranceStatus: 'Insurance Status',
+    insuranceActive: 'Active',
+    insuranceInactive: 'Inactive',
+    viewInsurance: 'View details',
     assignedVehicles: 'Assigned Vehicles',
     noVehiclesAssigned: 'No vehicles assigned',
     changeVehicle: 'Change Vehicle',
@@ -144,6 +149,7 @@ const translations: Record<Language, Record<string, string>> = {
     license: 'License',
     expires: 'Expires',
     expiring: 'Expiring',
+    driverInsurance: 'Insurance',
 
     // Bulk upload modal
     bulkUploadVehicles: 'Bulk Upload Vehicles',
@@ -266,6 +272,10 @@ const translations: Record<Language, Record<string, string>> = {
     driver: 'ड्राइवर',
     licenseNumber: 'लाइसेंस नंबर',
     licenseExpiry: 'लाइसेंस समाप्ति',
+    insuranceStatus: 'बीमा स्थिति',
+    insuranceActive: 'सक्रिय',
+    insuranceInactive: 'निष्क्रिय',
+    viewInsurance: 'विवरण देखें',
     assignedVehicles: 'नियुक्त वाहन',
     noVehiclesAssigned: 'कोई वाहन नियुक्त नहीं',
     changeVehicle: 'वाहन बदलें',
@@ -275,6 +285,7 @@ const translations: Record<Language, Record<string, string>> = {
     license: 'लाइसेंस',
     expires: 'समाप्ति',
     expiring: 'जल्द समाप्त',
+    driverInsurance: 'बीमा',
 
     // Bulk upload modal
     bulkUploadVehicles: 'वाहन बल्क अपलोड',
@@ -706,6 +717,7 @@ export function VehicleList({
   const [driverPage, setDriverPage] = useState(1)
   const [driverActionId, setDriverActionId] = useState<string | null>(null)
   const [changeVehicleDriver, setChangeVehicleDriver] = useState<Driver | null>(null)
+  const [insuranceDriver, setInsuranceDriver] = useState<Driver | null>(null)
   const [fetchedIds, setFetchedIds] = useState<Set<string>>(() => {
     // Vehicles with detailsFetched !== false are already fetched
     return new Set(vehicles.filter((v) => v.detailsFetched !== false).map((v) => v.id))
@@ -1535,6 +1547,9 @@ export function VehicleList({
                       {t.licenseExpiry}
                     </th>
                     <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
+                      {t.insuranceStatus}
+                    </th>
+                    <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
                       {t.assignedVehicles}
                     </th>
                     <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3.5">
@@ -1576,6 +1591,33 @@ export function VehicleList({
                         </td>
                         <td className="px-5 py-4">
                           <ExpiryBadge status={driver.licenseStatus} label={formatDate(driver.licenseExpiry, language)} />
+                        </td>
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
+                                driver.insuranceStatus === 'active'
+                                  ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
+                                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                              }`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  driver.insuranceStatus === 'active' ? 'bg-emerald-500' : 'bg-stone-400 dark:bg-stone-500'
+                                }`}
+                              />
+                              {driver.insuranceStatus === 'active' ? t.insuranceActive : t.insuranceInactive}
+                            </span>
+                            {driver.insuranceStatus === 'active' && (
+                              <button
+                                type="button"
+                                onClick={() => setInsuranceDriver(driver)}
+                                className="text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 hover:underline underline-offset-2 transition-colors"
+                              >
+                                {t.viewInsurance}
+                              </button>
+                            )}
+                          </div>
                         </td>
                         <td className="px-5 py-4">
                           {assignedVehicles.length > 0 ? (
@@ -1681,6 +1723,34 @@ export function VehicleList({
                         <span className="text-xs text-stone-500 dark:text-stone-400">{t.expires}</span>
                         <span className="text-xs text-stone-700 dark:text-stone-300">{formatDate(driver.licenseExpiry, language)}</span>
                       </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-stone-500 dark:text-stone-400">{t.driverInsurance}</span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
+                              driver.insuranceStatus === 'active'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
+                                : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                driver.insuranceStatus === 'active' ? 'bg-emerald-500' : 'bg-stone-400 dark:bg-stone-500'
+                              }`}
+                            />
+                            {driver.insuranceStatus === 'active' ? t.insuranceActive : t.insuranceInactive}
+                          </span>
+                          {driver.insuranceStatus === 'active' && (
+                            <button
+                              type="button"
+                              onClick={() => setInsuranceDriver(driver)}
+                              className="text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:underline underline-offset-2"
+                            >
+                              {t.viewInsurance}
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {assignedVehicles.length > 0 && (
@@ -1762,6 +1832,13 @@ export function VehicleList({
           driver={changeVehicleDriver}
           vehicles={vehicles}
           t={t}
+        />
+
+        {/* Driver Insurance Modal */}
+        <DriverInsuranceModal
+          isOpen={insuranceDriver !== null}
+          driver={insuranceDriver}
+          onClose={() => setInsuranceDriver(null)}
         />
       </div>
     </div>

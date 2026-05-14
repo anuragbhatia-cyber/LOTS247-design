@@ -12,6 +12,8 @@ interface PlanSelectionStepProps {
   onSelectPlan?: (planId: string) => void
   /** Called when user clicks Contact Sales on enterprise plan */
   onContactSales?: () => void
+  /** Called when user skips plan selection */
+  onSkip?: () => void
   /** Payment error message */
   error?: string
   /** Currently processing plan ID */
@@ -96,6 +98,7 @@ export function PlanSelectionStep({
   onBack,
   onSelectPlan,
   onContactSales,
+  onSkip,
   error,
   processingPlanId = null,
   isLoading = false,
@@ -119,12 +122,24 @@ export function PlanSelectionStep({
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex flex-col">
 
       {/* Top Navigation Header */}
-      <header className="sticky top-0 z-50 w-full bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-10 py-3">
+      <header className="sticky top-0 z-50 w-full bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-4 sm:px-10 py-3 flex items-center justify-between gap-3">
         <img
           src="/lots247-logo.png"
           alt="LOTS247"
           className="h-10 w-auto"
         />
+        {onSkip && (
+          <button
+            type="button"
+            onClick={onSkip}
+            className="inline-flex items-center gap-1 px-3 sm:px-4 py-2 rounded-xl text-sm font-semibold text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            Skip
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
       </header>
 
       {/* Page content */}

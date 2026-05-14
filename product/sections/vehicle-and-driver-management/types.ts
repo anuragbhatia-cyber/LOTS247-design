@@ -41,6 +41,20 @@ export interface Vehicle {
   documents: VehicleDocument[]
 }
 
+export type DriverInsuranceStatus = 'active' | 'inactive'
+
+export interface DriverInsurancePolicy {
+  policyNumber: string
+  insurer: string
+  planName: string
+  sumInsured: number
+  premium: number
+  startDate: string
+  endDate: string
+  nominee: string
+  nomineeRelation: string
+}
+
 export interface Driver {
   id: string
   name: string
@@ -48,6 +62,8 @@ export interface Driver {
   licenseNumber: string
   licenseExpiry: string
   licenseStatus: LicenseStatus
+  insuranceStatus: DriverInsuranceStatus
+  insurancePolicy?: DriverInsurancePolicy
   assignedVehicleIds: string[]
 }
 

@@ -469,6 +469,7 @@ export function OnboardingFlow({
           plans={plans}
           vehicleCount={vehicles.length}
           onSelectPlan={handleSelectPlan}
+          onSkip={handleContinueToDashboard}
           processingPlanId={processingPlanId}
           error={paymentError}
           isLoading={isLoadingPlans}

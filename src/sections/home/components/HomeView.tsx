@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Plus, AlertTriangle, PlusCircle, Calendar, ChevronDown, ChevronRight, AlertCircle, ShieldAlert, FileWarning, Search, Building2 } from 'lucide-react'
+import { Plus, AlertTriangle, PlusCircle, Calendar, ChevronDown, ChevronRight, AlertCircle, ShieldAlert, ShieldCheck, FileWarning, Search, Building2 } from 'lucide-react'
 import type { HomeProps } from '@/../product/sections/home/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 import { OverviewCard, type OverviewCardVariant } from './OverviewCard'
@@ -7,6 +7,7 @@ import { ComplianceScore } from './ComplianceScore'
 import { AlertsFeed } from './ActivityFeed'
 import { NotificationsView } from './NotificationsView'
 import { AlertsView } from './ActivityView'
+import { CreateDriverInsuranceModal } from './CreateDriverInsuranceModal'
 
 const homeTranslations: Record<Language, Record<string, string>> = {
   en: {
@@ -22,6 +23,8 @@ const homeTranslations: Record<Language, Record<string, string>> = {
     checkChallanDesc: 'Look up pending traffic challans',
     checkRto: 'Check Vehicle-wise Compliance',
     checkRtoDesc: 'View compliance status by vehicle',
+    createDriverInsurance: 'Create Driver Insurance',
+    createDriverInsuranceDesc: 'Issue a personal accident policy for your driver',
     totalVehicles: 'Total Vehicles',
     totalDrivers: 'Total Drivers',
     pendingChallans: 'Pending Challans',
@@ -66,6 +69,8 @@ const homeTranslations: Record<Language, Record<string, string>> = {
     checkChallanDesc: 'लंबित ट्रैफ़िक चालान खोजें',
     checkRto: 'RTO जाँचें',
     checkRtoDesc: 'वाहन पंजीकरण स्थिति सत्यापित करें',
+    createDriverInsurance: 'ड्राइवर बीमा बनाएं',
+    createDriverInsuranceDesc: 'अपने ड्राइवर के लिए दुर्घटना पॉलिसी जारी करें',
     totalVehicles: 'कुल वाहन',
     totalDrivers: 'कुल ड्राइवर',
     pendingChallans: 'लंबित चालान',
@@ -99,7 +104,15 @@ const homeTranslations: Record<Language, Record<string, string>> = {
   },
 }
 
-const QUICK_ACTIONS = [
+type QuickAction = {
+  id: string
+  label: string
+  description: string
+  image?: string
+  icon?: typeof ShieldCheck
+}
+
+const QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'vehicle',
     label: 'Add Vehicle',
@@ -119,10 +132,10 @@ const QUICK_ACTIONS = [
     image: '/icon-check-challan.png',
   },
   {
-    id: 'rto',
-    label: 'Check Vehicle-wise Compliance',
-    description: 'View compliance status by vehicle',
-    image: '/icon-check-rto.png',
+    id: 'driver-insurance',
+    label: 'Create Driver Insurance',
+    description: 'Issue a personal accident policy for your driver',
+    icon: ShieldCheck,
   },
 ]
 
@@ -186,6 +199,7 @@ export function HomeView({
   const t = homeTranslations[language]
   const [view, setView] = useState<'home' | 'notifications' | 'alerts'>('home')
   const [quickActionsOpen, setQuickActionsOpen] = useState(false)
+  const [driverInsuranceOpen, setDriverInsuranceOpen] = useState(false)
   const [dateRangeOpen, setDateRangeOpen] = useState(false)
   const [selectedRange, setSelectedRange] = useState('last7Days')
   const [customFrom, setCustomFrom] = useState('')
@@ -229,6 +243,7 @@ export function HomeView({
     vehicle: onAddVehicle,
     challan: () => window.parent.postMessage({ type: 'openCheckChallan' }, '*'),
     rto: () => window.parent.postMessage({ type: 'openComplianceCheck' }, '*'),
+    'driver-insurance': () => setDriverInsuranceOpen(true),
   }
 
   const qaTranslations: Record<string, { label: string; description: string }> = {
@@ -236,6 +251,7 @@ export function HomeView({
     vehicle: { label: t.addVehicle, description: t.addVehicleDesc },
     challan: { label: t.checkChallan, description: t.checkChallanDesc },
     rto: { label: t.checkRto, description: t.checkRtoDesc },
+    'driver-insurance': { label: t.createDriverInsurance, description: t.createDriverInsuranceDesc },
   }
 
   const subscriptionVariant = getSubscriptionVariant(subscription.expiryDate, subscription.status)
@@ -313,19 +329,28 @@ export function HomeView({
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-          {QUICK_ACTIONS.map((action) => (
+          {QUICK_ACTIONS.map((action) => {
+            const Icon = action.icon
+            return (
               <button
                 key={action.id}
                 onClick={() => quickActionCallbacks[action.id]?.()}
-                className="group flex flex-row items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-3 sm:py-6 rounded-2xl bg-white dark:bg-stone-900 border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 hover:shadow-md transition-all duration-200 text-left"
+                className="group flex flex-row items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-white dark:bg-stone-900 border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 hover:shadow-md transition-all duration-200 text-left"
               >
-                <img src={action.image} alt="" className="w-11 h-11 sm:w-20 sm:h-20 flex-shrink-0 object-contain" />
+                {action.image ? (
+                  <img src={action.image} alt="" className="w-11 h-11 sm:w-20 sm:h-20 flex-shrink-0 object-contain" />
+                ) : Icon ? (
+                  <div className="w-11 h-11 sm:w-20 sm:h-20 flex-shrink-0 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
+                    <Icon className="w-6 h-6 sm:w-10 sm:h-10 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                ) : null}
                 <div className="min-w-0">
                   <p className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-50 leading-snug">{qaTranslations[action.id]?.label ?? action.label}</p>
                   <p className="text-[10px] sm:text-xs text-stone-500 dark:text-stone-400 leading-snug mt-0.5">{qaTranslations[action.id]?.description ?? action.description}</p>
                 </div>
               </button>
-          ))}
+            )
+          })}
         </div>
 
         {/* Compliance Health + Recent Activity */}
@@ -339,6 +364,11 @@ export function HomeView({
         </section>
 
       </div>
+
+      <CreateDriverInsuranceModal
+        isOpen={driverInsuranceOpen}
+        onClose={() => setDriverInsuranceOpen(false)}
+      />
 
     </div>
   )

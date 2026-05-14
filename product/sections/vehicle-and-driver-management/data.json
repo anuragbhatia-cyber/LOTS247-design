@@ -201,6 +201,18 @@
       "licenseNumber": "MH12190045678",
       "licenseExpiry": "2028-05-14",
       "licenseStatus": "valid",
+      "insuranceStatus": "active",
+      "insurancePolicy": {
+        "policyNumber": "HDFCERGO/PA/2025/00891234",
+        "insurer": "HDFC ERGO General Insurance",
+        "planName": "Driver Personal Accident Cover",
+        "sumInsured": 1500000,
+        "premium": 1499,
+        "startDate": "2025-08-12",
+        "endDate": "2026-08-11",
+        "nominee": "Sunita Kumar",
+        "nomineeRelation": "Spouse"
+      },
       "assignedVehicleIds": ["veh-001"]
     },
     {
@@ -210,6 +222,18 @@
       "licenseNumber": "GJ05200034567",
       "licenseExpiry": "2027-09-22",
       "licenseStatus": "valid",
+      "insuranceStatus": "active",
+      "insurancePolicy": {
+        "policyNumber": "BAJAJ/PA/2025/00547821",
+        "insurer": "Bajaj Allianz General Insurance",
+        "planName": "Driver Personal Accident Cover",
+        "sumInsured": 1500000,
+        "premium": 1299,
+        "startDate": "2025-11-03",
+        "endDate": "2026-11-02",
+        "nominee": "Meena Patel",
+        "nomineeRelation": "Spouse"
+      },
       "assignedVehicleIds": ["veh-002"]
     },
     {
@@ -219,6 +243,7 @@
       "licenseNumber": "RJ14210023456",
       "licenseExpiry": "2029-01-08",
       "licenseStatus": "valid",
+      "insuranceStatus": "inactive",
       "assignedVehicleIds": ["veh-003"]
     },
     {
@@ -228,6 +253,18 @@
       "licenseNumber": "MP09180056789",
       "licenseExpiry": "2026-03-30",
       "licenseStatus": "expiring-soon",
+      "insuranceStatus": "active",
+      "insurancePolicy": {
+        "policyNumber": "ICICILOMB/PA/2026/00229104",
+        "insurer": "ICICI Lombard General Insurance",
+        "planName": "Driver Personal Accident Cover",
+        "sumInsured": 1000000,
+        "premium": 999,
+        "startDate": "2026-02-15",
+        "endDate": "2027-02-14",
+        "nominee": "Kavita Singh",
+        "nomineeRelation": "Spouse"
+      },
       "assignedVehicleIds": ["veh-004"]
     },
     {
@@ -237,6 +274,18 @@
       "licenseNumber": "TN07200012345",
       "licenseExpiry": "2028-11-17",
       "licenseStatus": "valid",
+      "insuranceStatus": "active",
+      "insurancePolicy": {
+        "policyNumber": "TATAAIG/PA/2025/00673458",
+        "insurer": "TATA AIG General Insurance",
+        "planName": "Driver Personal Accident Cover",
+        "sumInsured": 1500000,
+        "premium": 1399,
+        "startDate": "2025-09-21",
+        "endDate": "2026-09-20",
+        "nominee": "Lakshmi Reddy",
+        "nomineeRelation": "Mother"
+      },
       "assignedVehicleIds": ["veh-006"]
     },
     {
@@ -246,6 +295,7 @@
       "licenseNumber": "UP32220067890",
       "licenseExpiry": "2030-07-25",
       "licenseStatus": "valid",
+      "insuranceStatus": "inactive",
       "assignedVehicleIds": ["veh-008", "veh-005"]
     }
   ]
