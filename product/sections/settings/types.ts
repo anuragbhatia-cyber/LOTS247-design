@@ -43,16 +43,14 @@ export type SubscriptionStatus = 'active' | 'expiring_soon' | 'expired'
 export type BillingStatus = 'paid' | 'pending' | 'failed' | 'refunded'
 
 export interface SubscriptionFeatures {
-  onCallResolution: boolean
-  onSiteResolution: boolean | 'payPerUse'
-  challanResolutionOnline: number
-  dashboardAccess: boolean
-  automatedReports: boolean
-  personalizedReports: boolean
-  whatsappUpdates: boolean
-  accountManager: boolean
-  bulkChallanResolution: boolean
-  apiIntegration: boolean
+  vehicleCount: number
+  onCall: boolean
+  onSiteLegal: boolean
+  challanOnline: boolean
+  challanLokAdalat: boolean
+  challanCourt: boolean
+  rtoService: boolean | 'payPerUse'
+  dashboard: boolean
 }
 
 export interface Subscription {
