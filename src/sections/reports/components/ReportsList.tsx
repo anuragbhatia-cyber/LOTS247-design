@@ -14,6 +14,7 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import type { ReportsProps, Report, ReportTab, ReportType } from '@/../product/sections/reports/types'
+import { EmptyState } from '@/shell/components/EmptyState'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -184,6 +185,32 @@ export function ReportsList({
     })
     return counts
   }, [reports])
+
+  if (reports.length === 0) {
+    return (
+      <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
+        <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10 max-w-5xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+              Reports
+            </h1>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+              View, download, and share system-generated reports
+            </p>
+          </div>
+          <EmptyState
+            icon={FileText}
+            title="No reports yet"
+            description="Monthly MIS, incident closure, and challan summaries get generated automatically once your fleet has activity. Add vehicles to start building your reporting history."
+            primaryCta={{
+              label: 'Add Vehicle',
+              onClick: () => window.parent.postMessage({ type: 'openAddVehicle' }, '*'),
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">

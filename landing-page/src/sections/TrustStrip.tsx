@@ -87,31 +87,42 @@ export function TrustStrip() {
 
   return (
     <section
+      id="trust"
       ref={sectionRef}
-      className="relative bg-white border-y border-stone-200"
+      className="relative bg-[var(--color-cream)] border-b border-stone-200/70"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-        {/* Headline */}
-        <div className="text-center max-w-2xl mx-auto">
-          <p className="text-[11px] uppercase tracking-[0.22em] font-semibold text-emerald-700">
-            {t.trustEyebrow}
-          </p>
-          <h2 className="mt-3 text-xl sm:text-2xl lg:text-[1.7rem] font-bold tracking-tight text-stone-900 leading-snug">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 lg:pt-28 pb-16 lg:pb-20">
+        {/* Headline — kicker + serif */}
+        <div className="text-center max-w-3xl mx-auto">
+          <div className="flex items-center justify-center gap-3">
+            <span className="font-mono-label text-[11px] text-emerald-700">
+              {t.trustEyebrow}
+            </span>
+            <span aria-hidden="true" className="rule-em w-12 opacity-80 text-stone-300" />
+          </div>
+          <h2 className="font-serif-display mt-5 font-semibold tracking-tight text-stone-900 text-[1.75rem] sm:text-[2.25rem] lg:text-[2.75rem] leading-[1.05]">
             {t.trustHeadline}
           </h2>
         </div>
 
-        {/* Stats row */}
-        <div className="mt-10 lg:mt-14 grid grid-cols-2 lg:grid-cols-4 gap-y-10 lg:gap-y-0 lg:divide-x lg:divide-stone-200">
+        {/* Stats row — editorial scale, tabular numerals, hairline dividers */}
+        <div className="mt-14 lg:mt-20 grid grid-cols-2 lg:grid-cols-4">
           {t.trustItems.map((item, i) => (
             <div
               key={i}
-              className="flex flex-col items-center text-center px-2 lg:px-6"
+              className={`flex flex-col items-center text-center px-3 lg:px-8 py-6 lg:py-4 ${
+                i > 0 ? 'lg:border-l border-stone-300/60' : ''
+              } ${i === 1 ? 'border-l border-stone-300/60 lg:border-l' : ''}`}
             >
-              <div className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold text-emerald-600 tracking-tight tabular-nums leading-none">
+              <div
+                className="font-serif-display font-medium text-stone-900 num-tabular
+                           text-[3.25rem] sm:text-[4rem] lg:text-[5rem] xl:text-[5.5rem]
+                           leading-[0.92] tracking-[-0.02em]"
+                style={{ fontVariationSettings: '"opsz" 144, "SOFT" 20' }}
+              >
                 <AnimatedStat label={item.label} start={inView} />
               </div>
-              <div className="mt-2 text-sm text-stone-500 max-w-[14ch]">
+              <div className="mt-4 font-mono-label text-[10px] text-stone-500 max-w-[18ch]">
                 {item.sub}
               </div>
             </div>
@@ -119,20 +130,20 @@ export function TrustStrip() {
         </div>
       </div>
 
-      {/* Partner marquee */}
-      <div className="border-t border-stone-200 bg-stone-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-          <p className="text-center text-[10px] uppercase tracking-[0.24em] font-semibold text-stone-500">
+      {/* Partner marquee — quieter, on ink soft band for contrast */}
+      <div className="border-t border-stone-200/70 bg-[var(--color-cream-deep)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-10">
+          <p className="text-center font-mono-label text-[10px] text-stone-500">
             {t.trustPartnersLabel}
           </p>
         </div>
         <div
-          className="relative overflow-hidden pb-8 lg:pb-10"
+          className="relative overflow-hidden pb-8 lg:pb-10 mt-5"
           aria-hidden="true"
         >
-          {/* Edge fades */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-stone-50 to-transparent z-10" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-24 bg-gradient-to-l from-stone-50 to-transparent z-10" />
+          {/* Edge fades — match the cream-deep bg */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-24 bg-gradient-to-r from-[var(--color-cream-deep)] to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-24 bg-gradient-to-l from-[var(--color-cream-deep)] to-transparent z-10" />
 
           <div className="flex w-max animate-marquee">
             {marqueeRow.map((name, i) => (
@@ -140,11 +151,11 @@ export function TrustStrip() {
                 key={`${name}-${i}`}
                 className="flex items-center shrink-0 px-6 sm:px-8 lg:px-10"
               >
-                <span className="font-mono text-xs sm:text-sm uppercase tracking-[0.18em] text-stone-400 whitespace-nowrap">
+                <span className="font-mono text-xs sm:text-sm uppercase tracking-[0.2em] text-stone-500 whitespace-nowrap">
                   {name}
                 </span>
                 <span
-                  className="ml-6 sm:ml-8 lg:ml-10 h-1 w-1 rounded-full bg-stone-300"
+                  className="ml-6 sm:ml-8 lg:ml-10 h-1 w-1 rounded-full bg-stone-400"
                   aria-hidden="true"
                 />
               </div>

@@ -37,6 +37,7 @@ import type {
   DocumentStatus,
 } from '@/../product/sections/vehicle-and-driver-management/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { EmptyState } from '@/shell/components/EmptyState'
 import { DriverInsuranceModal } from './DriverInsuranceModal'
 
 // ---------------------------------------------------------------------------
@@ -48,6 +49,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Page header
     vehiclesAndDrivers: 'Vehicles & Drivers',
     centralRepository: 'Central repository of all vehicles and assigned drivers',
+    fleetEmptyTitle: 'No vehicles yet',
+    fleetEmptyDesc: 'Add your first vehicle by entering an RC number — we fetch the details and documents automatically.',
+    fleetEmptyBulk: 'Upload a CSV for bulk import',
 
     // Header buttons
     bulkUpload: 'Bulk Upload',
@@ -184,6 +188,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Page header
     vehiclesAndDrivers: 'वाहन और ड्राइवर',
     centralRepository: 'सभी वाहनों और नियुक्त ड्राइवरों का केंद्रीय भंडार',
+    fleetEmptyTitle: 'अभी तक कोई वाहन नहीं',
+    fleetEmptyDesc: 'RC नंबर दर्ज करके अपना पहला वाहन जोड़ें — हम विवरण और दस्तावेज़ स्वचालित रूप से प्राप्त करते हैं।',
+    fleetEmptyBulk: 'बल्क आयात के लिए CSV अपलोड करें',
 
     // Header buttons
     bulkUpload: 'बल्क अपलोड',
@@ -843,6 +850,40 @@ export function VehicleList({
   const activeFilterCount =
     (expiryFilter !== 'all' ? 1 : 0) +
     (statusFilter !== 'all' ? 1 : 0)
+
+  const isFleetEmpty = vehicles.length === 0 && drivers.length === 0
+
+  if (isFleetEmpty) {
+    return (
+      <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
+        <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10 max-w-5xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+              {t.vehiclesAndDrivers}
+            </h1>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+              {t.centralRepository}
+            </p>
+          </div>
+          <EmptyState
+            icon={Truck}
+            title={t.fleetEmptyTitle}
+            description={t.fleetEmptyDesc}
+            primaryCta={{
+              label: t.addVehicle,
+              icon: Plus,
+              onClick: () => window.parent.postMessage({ type: 'openAddVehicle' }, '*'),
+            }}
+            secondaryCta={{
+              label: t.fleetEmptyBulk,
+              icon: Upload,
+              onClick: () => window.parent.postMessage({ type: 'openBulkUpload' }, '*'),
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">

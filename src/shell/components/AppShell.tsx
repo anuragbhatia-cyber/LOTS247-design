@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings } from 'lucide-react'
+import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles } from 'lucide-react'
 import { MainNav } from './MainNav'
 import { useLanguage, type Language } from './LanguageContext'
 import { NotificationsView } from '@/sections/home/components/NotificationsView'
@@ -80,6 +80,7 @@ const translations: Record<Language, Record<string, string>> = {
     myProfile: 'My Profile',
     settings: 'Settings',
     plan: 'Plan',
+    takeTour: 'Take a tour',
     logout: 'Logout',
     collapse: 'Collapse',
     openMenu: 'Open menu',
@@ -115,6 +116,7 @@ const translations: Record<Language, Record<string, string>> = {
     myProfile: 'मेरी प्रोफ़ाइल',
     settings: 'सेटिंग्स',
     plan: 'प्लान',
+    takeTour: 'टूर लें',
     logout: 'लॉग आउट',
     collapse: 'संक्षिप्त करें',
     openMenu: 'मेनू खोलें',
@@ -843,6 +845,25 @@ export function AppShell({
                     >
                       <User className="w-4 h-4 text-stone-400" />
                       {t.myProfile}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setProfileOpen(false)
+                        try {
+                          window.localStorage.removeItem('lots247.tourSeen')
+                        } catch {}
+                        window.dispatchEvent(new CustomEvent('lots247:replay-tour'))
+                        // Reach the embedded preview iframe too
+                        document
+                          .querySelectorAll('iframe')
+                          .forEach((iframe) => {
+                            iframe.contentWindow?.postMessage({ type: 'replay-tour' }, '*')
+                          })
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <Sparkles className="w-4 h-4 text-emerald-500" />
+                      {t.takeTour}
                     </button>
                     <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
                     <button

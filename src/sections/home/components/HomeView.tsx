@@ -8,6 +8,10 @@ import { AlertsFeed } from './ActivityFeed'
 import { NotificationsView } from './NotificationsView'
 import { AlertsView } from './ActivityView'
 import { CreateDriverInsuranceModal } from './CreateDriverInsuranceModal'
+import { EmptyFleetState } from './EmptyFleetState'
+import { OnboardingChecklist } from './OnboardingChecklist'
+import { TourOverlay, type TourStep } from '@/shell/components/TourOverlay'
+import { useTour } from '@/shell/components/useTour'
 
 const homeTranslations: Record<Language, Record<string, string>> = {
   en: {
@@ -23,7 +27,7 @@ const homeTranslations: Record<Language, Record<string, string>> = {
     checkChallanDesc: 'Look up pending traffic challans',
     checkRto: 'Check Vehicle-wise Compliance',
     checkRtoDesc: 'View compliance status by vehicle',
-    createDriverInsurance: 'Create Driver Insurance',
+    createDriverInsurance: 'Activate Driver Insurance',
     createDriverInsuranceDesc: 'Issue a personal accident policy for your driver',
     totalVehicles: 'Total Vehicles',
     totalDrivers: 'Total Drivers',
@@ -69,7 +73,7 @@ const homeTranslations: Record<Language, Record<string, string>> = {
     checkChallanDesc: 'लंबित ट्रैफ़िक चालान खोजें',
     checkRto: 'RTO जाँचें',
     checkRtoDesc: 'वाहन पंजीकरण स्थिति सत्यापित करें',
-    createDriverInsurance: 'ड्राइवर बीमा बनाएं',
+    createDriverInsurance: 'ड्राइवर बीमा सक्रिय करें',
     createDriverInsuranceDesc: 'अपने ड्राइवर के लिए दुर्घटना पॉलिसी जारी करें',
     totalVehicles: 'कुल वाहन',
     totalDrivers: 'कुल ड्राइवर',
@@ -133,7 +137,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   },
   {
     id: 'driver-insurance',
-    label: 'Create Driver Insurance',
+    label: 'Activate Driver Insurance',
     description: 'Issue a personal accident policy for your driver',
     icon: ShieldCheck,
   },
@@ -200,6 +204,88 @@ export function HomeView({
   const [view, setView] = useState<'home' | 'notifications' | 'alerts'>('home')
   const [quickActionsOpen, setQuickActionsOpen] = useState(false)
   const [driverInsuranceOpen, setDriverInsuranceOpen] = useState(false)
+  const [checklistDismissed, setChecklistDismissed] = useState(false)
+
+  const isEmptyFleet = useMemo(() => {
+    const params = new URLSearchParams(window.location.search)
+    return params.get('empty') === '1'
+  }, [])
+
+  const tour = useTour(true)
+
+  useEffect(() => {
+    const handler = () => tour.start()
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'replay-tour') tour.start()
+    }
+    window.addEventListener('lots247:replay-tour', handler)
+    window.addEventListener('message', onMessage)
+    return () => {
+      window.removeEventListener('lots247:replay-tour', handler)
+      window.removeEventListener('message', onMessage)
+    }
+  }, [tour])
+
+  const tourSteps: TourStep[] = useMemo(() => {
+    if (isEmptyFleet) {
+      return [
+        {
+          title: 'Welcome to LOTS247',
+          body: 'This is your fleet command center. Let me walk you through the four things you can do from here.',
+          placement: 'center',
+        },
+        {
+          target: '[data-tour="quick-actions"]',
+          title: 'Quick actions',
+          body: 'Add vehicles, log incidents, check challans, or set up driver insurance — all in one click from this row.',
+          placement: 'bottom',
+        },
+        {
+          target: '[data-tour="checklist"]',
+          title: 'Three steps to get started',
+          body: 'Complete these three steps to unlock your full dashboard. Adding your first vehicle takes 30 seconds — we fetch all docs by RC.',
+          placement: 'bottom',
+        },
+        {
+          target: '[data-tour="quick-actions"]',
+          title: "You're all set",
+          body: 'Click "Add Vehicle" whenever you\'re ready. You can replay this tour anytime from your profile menu.',
+          placement: 'bottom',
+        },
+      ]
+    }
+    return [
+      {
+        title: 'Welcome back to LOTS247',
+        body: 'A quick refresher on how to get the most out of your fleet dashboard.',
+        placement: 'center',
+      },
+      {
+        target: '[data-tour="quick-actions"]',
+        title: 'Quick actions',
+        body: 'Add vehicles, log incidents, check challans, or issue driver insurance from this row.',
+        placement: 'bottom',
+      },
+      {
+        target: '[data-tour="compliance"]',
+        title: 'Fleet compliance at a glance',
+        body: 'Your overall compliance score across RC, insurance, PUC, fitness, and permits. Click a category to drill in.',
+        placement: 'top',
+      },
+      {
+        target: '[data-tour="alerts"]',
+        title: 'Critical alerts surface here',
+        body: 'Pending challans, expiring documents, and incident updates — sorted by urgency. Act on each one inline.',
+        placement: 'top',
+      },
+      {
+        target: '[data-tour="alerts-pill"]',
+        title: "That's the tour",
+        body: 'Keep an eye on the pending-alerts pill in the header for anything time-sensitive. Replay this tour anytime from your profile.',
+        placement: 'bottom',
+      },
+    ]
+  }, [isEmptyFleet])
   const [dateRangeOpen, setDateRangeOpen] = useState(false)
   const [selectedRange, setSelectedRange] = useState('last7Days')
   const [customFrom, setCustomFrom] = useState('')
@@ -303,8 +389,9 @@ export function HomeView({
           </h1>
 
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto sm:flex-shrink-0">
-            {alerts.length > 0 && (
+            {!isEmptyFleet && alerts.length > 0 && (
               <button
+                data-tour="alerts-pill"
                 onClick={() => setView('alerts')}
                 className="flex sm:inline-flex w-full sm:w-auto items-center gap-0 rounded-full text-xs font-semibold overflow-hidden border border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700 transition-colors"
               >
@@ -327,8 +414,20 @@ export function HomeView({
           </div>{/* end right side actions */}
         </div>
 
+        {/* Onboarding checklist for empty-fleet new users */}
+        {isEmptyFleet && !checklistDismissed && (
+          <div className="mb-6" data-tour="checklist">
+            <OnboardingChecklist
+              onAddVehicle={onAddVehicle}
+              onAddDriver={onAddDriver}
+              onOpenProfile={onViewProfile}
+              onDismiss={() => setChecklistDismissed(true)}
+            />
+          </div>
+        )}
+
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div data-tour="quick-actions" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           {QUICK_ACTIONS.map((action) => {
             const Icon = action.icon
             return (
@@ -353,14 +452,25 @@ export function HomeView({
           })}
         </div>
 
-        {/* Compliance Health + Recent Activity */}
+        {/* Compliance Health + Recent Activity (populated) OR Empty-fleet hero */}
         <section>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-            <ComplianceScore data={complianceScore} onViewDetails={() => {
-              window.parent.postMessage({ type: 'navigate', href: '/compliance' }, '*')
-            }} />
-            <AlertsFeed items={alerts} onViewAll={() => setView('alerts')} />
-          </div>
+          {isEmptyFleet ? (
+            <EmptyFleetState
+              onAddVehicle={onAddVehicle}
+              onBulkUpload={() => window.parent.postMessage({ type: 'openBulkUpload' }, '*')}
+            />
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+              <div data-tour="compliance">
+                <ComplianceScore data={complianceScore} onViewDetails={() => {
+                  window.parent.postMessage({ type: 'navigate', href: '/compliance' }, '*')
+                }} />
+              </div>
+              <div data-tour="alerts">
+                <AlertsFeed items={alerts} onViewAll={() => setView('alerts')} />
+              </div>
+            </div>
+          )}
         </section>
 
       </div>
@@ -368,6 +478,15 @@ export function HomeView({
       <CreateDriverInsuranceModal
         isOpen={driverInsuranceOpen}
         onClose={() => setDriverInsuranceOpen(false)}
+      />
+
+      <TourOverlay
+        isOpen={tour.isOpen}
+        steps={tourSteps}
+        stepIndex={tour.stepIndex}
+        onNext={() => tour.next(tourSteps.length)}
+        onBack={tour.back}
+        onClose={tour.close}
       />
 
     </div>

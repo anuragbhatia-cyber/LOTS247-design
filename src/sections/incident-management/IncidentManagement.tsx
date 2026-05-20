@@ -29,6 +29,9 @@ type Tab = 'challans' | 'cases' | 'rto' | 'other'
 export default function IncidentManagementPreview() {
   const params = new URLSearchParams(window.location.search)
   const initialTab = (params.get('tab') as Tab) || 'challans'
+  const isEmpty = params.get('empty') === '1'
+  const challans = isEmpty ? [] : data.challans
+  const cases = isEmpty ? [] : data.cases
   const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [dateRangeOpen, setDateRangeOpen] = useState(false)
   const [selectedRange, setSelectedRange] = useState('last7Days')
@@ -52,14 +55,14 @@ export default function IncidentManagementPreview() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const totalChallans = data.challans.length
-  const settledChallans = data.challans.filter((c: { status: string }) => c.status === 'resolved').length
-  const inProgressChallans = data.challans.filter((c: { status: string }) => c.status !== 'resolved').length
+  const totalChallans = challans.length
+  const settledChallans = challans.filter((c: { status: string }) => c.status === 'resolved').length
+  const inProgressChallans = challans.filter((c: { status: string }) => c.status !== 'resolved').length
 
-  const submittedCases = data.cases.filter((c: { status: string }) => c.status === 'submitted' || c.status === 'new').length
-  const docRequestedCases = data.cases.filter((c: { status: string }) => c.status === 'document_requested' || c.status === 'awaiting_documents').length
-  const inProgressCases = data.cases.filter((c: { status: string }) => c.status === 'in_progress' || c.status === 'ongoing').length
-  const closedCases = data.cases.filter((c: { status: string }) => c.status === 'resolved' || c.status === 'closed').length
+  const submittedCases = cases.filter((c: { status: string }) => c.status === 'submitted' || c.status === 'new').length
+  const docRequestedCases = cases.filter((c: { status: string }) => c.status === 'document_requested' || c.status === 'awaiting_documents').length
+  const inProgressCases = cases.filter((c: { status: string }) => c.status === 'in_progress' || c.status === 'ongoing').length
+  const closedCases = cases.filter((c: { status: string }) => c.status === 'resolved' || c.status === 'closed').length
 
   if (isLoading) return <IncidentManagementSkeleton />
 
@@ -194,7 +197,7 @@ export default function IncidentManagementPreview() {
                 ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                 : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
             }`}>
-              {data.challans.length}
+              {challans.length}
             </span>
           </button>
           <button
@@ -212,7 +215,7 @@ export default function IncidentManagementPreview() {
                 ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                 : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
             }`}>
-              {data.cases.length}
+              {cases.length}
             </span>
           </button>
           <button
@@ -337,7 +340,7 @@ export default function IncidentManagementPreview() {
       {activeTab === 'challans' && (
         <div className="px-4 sm:px-6 lg:px-8">
         <ChallanList
-          challans={data.challans}
+          challans={challans}
           vehicles={data.vehicles}
           drivers={data.drivers}
           onView={(id) => navigateToScreen('ChallanDetail', { id })}
@@ -349,7 +352,7 @@ export default function IncidentManagementPreview() {
       {activeTab === 'cases' && (
         <div className="px-4 sm:px-6 lg:px-8">
         <CaseList
-          cases={data.cases}
+          cases={cases}
           vehicles={data.vehicles}
           drivers={data.drivers}
           lawyers={data.lawyers}

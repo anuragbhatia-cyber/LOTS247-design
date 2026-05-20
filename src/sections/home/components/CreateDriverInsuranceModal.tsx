@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, ShieldCheck, Search, Truck, Check, User, Mail, Phone, IdCard } from 'lucide-react'
+import { X, ShieldCheck, Search, Truck, Check, User, Mail, Phone, IdCard, Calendar } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 import vehicleData from '@/../product/sections/vehicle-and-driver-management/data.json'
 import type { Vehicle } from '@/../product/sections/vehicle-and-driver-management/types'
@@ -17,6 +17,8 @@ const translations: Record<Language, {
   phonePlaceholder: string
   licenseNumber: string
   licenseNumberPlaceholder: string
+  dateOfBirth: string
+  dateOfBirthPlaceholder: string
   assignedVehicle: string
   searchVehiclePlaceholder: string
   noVehiclesFound: string
@@ -27,7 +29,7 @@ const translations: Record<Language, {
   done: string
 }> = {
   en: {
-    title: 'Create Driver Insurance',
+    title: 'Activate Driver Insurance',
     subtitle: "Issue a personal accident policy for one of your drivers",
     close: 'Close',
     driverName: 'Driver Name',
@@ -38,17 +40,19 @@ const translations: Record<Language, {
     phonePlaceholder: '+91 98765 43210',
     licenseNumber: 'Driving License Number',
     licenseNumberPlaceholder: 'e.g. MH12 19 0045678',
+    dateOfBirth: 'Date of Birth',
+    dateOfBirthPlaceholder: 'DD / MM / YYYY',
     assignedVehicle: 'Vehicle Assigned',
     searchVehiclePlaceholder: 'Search by RC number, make, model…',
     noVehiclesFound: 'No vehicles match your search',
     cancel: 'Cancel',
-    createPolicy: 'Create Policy',
+    createPolicy: 'Activate Policy',
     success: 'Policy Request Submitted',
     successDesc: 'Insurance partner will reach out within 24 hours to complete KYC and issue the policy.',
     done: 'Done',
   },
   hi: {
-    title: 'ड्राइवर बीमा बनाएं',
+    title: 'ड्राइवर बीमा सक्रिय करें',
     subtitle: 'अपने ड्राइवर के लिए व्यक्तिगत दुर्घटना पॉलिसी जारी करें',
     close: 'बंद करें',
     driverName: 'ड्राइवर का नाम',
@@ -59,11 +63,13 @@ const translations: Record<Language, {
     phonePlaceholder: '+91 98765 43210',
     licenseNumber: 'ड्राइविंग लाइसेंस नंबर',
     licenseNumberPlaceholder: 'जैसे MH12 19 0045678',
+    dateOfBirth: 'जन्म तिथि',
+    dateOfBirthPlaceholder: 'DD / MM / YYYY',
     assignedVehicle: 'नियुक्त वाहन',
     searchVehiclePlaceholder: 'RC नंबर, निर्माता, मॉडल से खोजें…',
     noVehiclesFound: 'खोज से कोई वाहन नहीं मिला',
     cancel: 'रद्द करें',
-    createPolicy: 'पॉलिसी बनाएं',
+    createPolicy: 'पॉलिसी सक्रिय करें',
     success: 'पॉलिसी अनुरोध सबमिट हो गया',
     successDesc: 'बीमा साझेदार KYC पूरा करने और पॉलिसी जारी करने के लिए 24 घंटों में संपर्क करेगा।',
     done: 'पूर्ण',
@@ -85,6 +91,7 @@ export function CreateDriverInsuranceModal({ isOpen, onClose }: CreateDriverInsu
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [licenseNumber, setLicenseNumber] = useState('')
+  const [dateOfBirth, setDateOfBirth] = useState('')
   const [vehicleQuery, setVehicleQuery] = useState('')
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null)
   const [vehicleDropdownOpen, setVehicleDropdownOpen] = useState(false)
@@ -115,6 +122,7 @@ export function CreateDriverInsuranceModal({ isOpen, onClose }: CreateDriverInsu
       setEmail('')
       setPhone('')
       setLicenseNumber('')
+      setDateOfBirth('')
       setVehicleQuery('')
       setSelectedVehicleId(null)
       setVehicleDropdownOpen(false)
@@ -153,6 +161,7 @@ export function CreateDriverInsuranceModal({ isOpen, onClose }: CreateDriverInsu
     email.trim().length > 0 &&
     phone.trim().length > 0 &&
     licenseNumber.trim().length > 0 &&
+    dateOfBirth.trim().length > 0 &&
     selectedVehicleId !== null
 
   if (!isOpen) return null
@@ -246,15 +255,25 @@ export function CreateDriverInsuranceModal({ isOpen, onClose }: CreateDriverInsu
               />
             </div>
 
-            {/* License Number */}
-            <Field
-              label={t.licenseNumber}
-              icon={<IdCard className="w-4 h-4" />}
-              value={licenseNumber}
-              onChange={(v) => setLicenseNumber(v.toUpperCase())}
-              placeholder={t.licenseNumberPlaceholder}
-              mono
-            />
+            {/* License Number + Date of Birth */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field
+                label={t.licenseNumber}
+                icon={<IdCard className="w-4 h-4" />}
+                value={licenseNumber}
+                onChange={(v) => setLicenseNumber(v.toUpperCase())}
+                placeholder={t.licenseNumberPlaceholder}
+                mono
+              />
+              <Field
+                label={t.dateOfBirth}
+                type="date"
+                icon={<Calendar className="w-4 h-4" />}
+                value={dateOfBirth}
+                onChange={setDateOfBirth}
+                placeholder={t.dateOfBirthPlaceholder}
+              />
+            </div>
 
             {/* Vehicle search */}
             <div ref={vehicleFieldRef}>
