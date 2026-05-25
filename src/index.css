@@ -312,3 +312,162 @@
     break-after: auto;
   }
 }
+
+/*
+  /newlanding — UDrive landing page styles, scoped to the .newlanding subtree
+  so they don't leak into the rest of Design OS (different fonts, cream bg,
+  brand emerald override, etc.).
+*/
+.newlanding {
+  /* Theme token overrides — only descendants of .newlanding see these */
+  --font-display: "Fraunces", "DM Sans", ui-serif, Georgia, serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Brand emerald (#00b876) — overrides Tailwind's default within this subtree */
+  --color-emerald-50:  #e6fbf2;
+  --color-emerald-100: #c2f5dd;
+  --color-emerald-300: #6ee7c0;
+  --color-emerald-400: #34d39a;
+  --color-emerald-500: #00b876;
+  --color-emerald-600: #009660;
+  --color-emerald-700: #007a4d;
+
+  /* Editorial cream + warm-ink tokens used by the page */
+  --color-cream: #f7f3ec;
+  --color-cream-deep: #efe9dd;
+  --color-ink: #181513;
+  --color-ink-soft: #26211c;
+
+  background-color: var(--color-cream);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.newlanding h1,
+.newlanding h2,
+.newlanding h3,
+.newlanding h4,
+.newlanding h5,
+.newlanding h6 {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 96, "SOFT" 30;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.newlanding code,
+.newlanding pre,
+.newlanding kbd {
+  font-family: var(--font-mono);
+}
+
+/* `animate-fade-in` already exists globally at 200ms; UDrive expects 600ms */
+.newlanding .animate-fade-in {
+  animation: fade-in 600ms ease-out both;
+}
+
+@layer utilities {
+  .newlanding .num-tabular,
+  .num-tabular {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .font-serif-display {
+    font-family: var(--font-serif, "Fraunces", ui-serif, Georgia, serif);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    letter-spacing: -0.02em;
+  }
+  .font-mono-label {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  .rule-em {
+    height: 1px;
+    background-image: linear-gradient(to right, currentColor 0, currentColor 14px, transparent 14px, transparent 22px, currentColor 22px, currentColor 36px);
+  }
+  .bg-hazard-dots {
+    background-image: radial-gradient(rgba(180, 83, 9, 0.10) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .bg-noise {
+    background-image:
+      radial-gradient(at 30% 20%, rgba(255,255,255,0.04) 0px, transparent 50%),
+      radial-gradient(at 80% 90%, rgba(16,185,129,0.06) 0px, transparent 50%);
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .animate-fade-up      { animation: fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-blink        { animation: blink 1.4s ease-in-out infinite; }
+  .animate-marquee      { animation: marquee 32s linear infinite; }
+  .animate-soft-pulse   { animation: soft-pulse 2s ease-in-out infinite; }
+  .animate-phone-float  { animation: phone-float 6s ease-in-out infinite; }
+  .animate-beacon       { animation: beacon 1.6s ease-in-out infinite; }
+  .animate-siren-glow   { animation: siren-glow 2.4s ease-in-out infinite; }
+  .animate-step-travel  { animation: step-travel 6s ease-in-out infinite; }
+  .animate-progress-fill{ animation: progress-fill 12s linear infinite; }
+  .animate-lang-nudge   { animation: lang-nudge 1.2s ease-in-out 2; }
+  .animate-cta-glow     { animation: cta-glow 4.5s ease-in-out infinite; }
+  .animate-orbit-slow   { animation: orbit-slow 22s linear infinite; }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes soft-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+    50%      { transform: scale(1.04); opacity: 0.95; box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
+  }
+  @keyframes phone-float {
+    0%, 100% { transform: rotate(-2deg) translateY(0); }
+    50%      { transform: rotate(-2deg) translateY(-8px); }
+  }
+  @keyframes beacon {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.85); }
+  }
+  @keyframes siren-glow {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 0.95; }
+  }
+  @keyframes step-travel {
+    0%   { top: 0%;    opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { top: 100%;  opacity: 0; }
+  }
+  @keyframes progress-fill {
+    0%, 100% { transform: scaleX(0); }
+    50%      { transform: scaleX(1); }
+  }
+  @keyframes lang-nudge {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    50%      { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.25); }
+  }
+  @keyframes cta-glow {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50%      { opacity: 0.95; transform: scale(1.04); }
+  }
+  @keyframes orbit-slow {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+}
