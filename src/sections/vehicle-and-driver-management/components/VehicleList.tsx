@@ -27,6 +27,7 @@ import {
   RefreshCw,
   Loader2,
   Download,
+  Coins,
 } from 'lucide-react'
 import type {
   VehicleAndDriverManagementProps,
@@ -1456,6 +1457,10 @@ export function VehicleList({
                                 <>
                                   <RefreshCw className="w-3 h-3" />
                                   {t.fetchDetails}
+                                  <span className="inline-flex items-center gap-0.5 ml-1 pl-1.5 border-l border-emerald-300/60 dark:border-emerald-700/60 text-emerald-600 dark:text-emerald-400">
+                                    <Coins className="w-3 h-3 text-amber-500" aria-hidden="true" />
+                                    2
+                                  </span>
                                 </>
                               )}
                             </button>

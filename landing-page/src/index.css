@@ -185,4 +185,13 @@
       radial-gradient(at 30% 20%, rgba(255,255,255,0.04) 0px, transparent 50%),
       radial-gradient(at 80% 90%, rgba(16,185,129,0.06) 0px, transparent 50%);
   }
+
+  /* Hide native scrollbar — used for snap carousels on mobile */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

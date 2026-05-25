@@ -122,32 +122,36 @@ export function LoginStep({
   }, [otpSent])
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-[30%] bg-white dark:bg-stone-900 flex-col relative border-r border-stone-200 dark:border-stone-800">
-        <div className="p-8">
-          <img
-            src="/lots247-logo.png"
-            alt="LOTS247 - India's First Road Side Legal Assistance Platform"
-            className="h-20 w-auto"
-          />
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex items-center justify-center px-4 py-4 lg:py-6">
+      <div className="w-full max-w-4xl bg-white dark:bg-stone-900 rounded-3xl ring-1 ring-stone-200 dark:ring-stone-800 overflow-hidden flex flex-col lg:flex-row">
+        {/* Left Panel - Branding + Illustration */}
+        <div className="hidden lg:flex lg:w-[42%] bg-white dark:bg-stone-900 flex-col">
+          <div className="px-8 pt-8">
+            <img
+              src="/lots247-logo.png"
+              alt="LOTS247 - India's First Road Side Legal Assistance Platform"
+              className="h-16 w-auto"
+            />
+          </div>
+          <div className="mt-auto">
+            <img
+              src="/truck-illustration.png"
+              alt="Truck illustration"
+              className="block w-full h-auto"
+              style={{
+                maskImage: 'linear-gradient(to bottom, transparent 0%, black 14%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 14%)',
+              }}
+            />
+          </div>
         </div>
-        <div className="mt-auto flex justify-center px-10 pb-10">
-          <img
-            src="/truck-illustration.png"
-            alt="Truck illustration"
-            className="w-full max-w-xs h-auto"
-          />
-        </div>
-      </div>
 
-      {/* Right Panel - Form */}
-      <div className="flex-1 overflow-y-auto bg-stone-100 dark:bg-stone-950">
-        <div className="min-h-full flex items-start lg:items-center justify-center px-6 py-10 lg:py-12">
-          <div className="w-full max-w-md">
+        {/* Right Panel - Form */}
+        <div className="flex-1 px-6 sm:px-8 lg:px-10 py-6 lg:py-8">
+          <div className="w-full max-w-md mx-auto">
             {/* Mobile Logo */}
-            <div className="lg:hidden mb-8 flex justify-center">
-              <img src="/lots247-logo.png" alt="LOTS247" className="h-16 w-auto" />
+            <div className="lg:hidden mb-6 flex justify-center">
+              <img src="/lots247-logo.png" alt="LOTS247" className="h-14 w-auto" />
             </div>
 
             {!otpSent ? (
@@ -182,7 +186,7 @@ export function LoginStep({
                         onChange={handlePhoneChange}
                         placeholder="Enter phone number"
                         className={`
-                          flex-1 px-4 py-3 rounded-r-xl border text-base
+                          flex-1 px-4 py-2.5 rounded-r-xl border text-base
                           bg-white dark:bg-stone-900
                           text-stone-900 dark:text-white
                           placeholder:text-stone-400 dark:placeholder:text-stone-500
@@ -211,7 +215,7 @@ export function LoginStep({
                     onClick={handleSubmit}
                     disabled={isSendingOTP}
                     className={`
-                      w-full py-3.5 rounded-xl font-semibold text-base
+                      w-full py-3 rounded-xl font-semibold text-base
                       transition-all duration-200
                       ${
                         isSendingOTP
@@ -316,7 +320,7 @@ export function LoginStep({
                     onClick={() => onVerifyOTP?.(otp.join(''))}
                     disabled={!otp.every((d) => d) || isVerifying || otpExpiry.isExpired}
                     className={`
-                      w-full py-3.5 rounded-xl font-semibold text-base
+                      w-full py-3 rounded-xl font-semibold text-base
                       transition-all duration-200
                       ${
                         otp.every((d) => d) && !isVerifying && !otpExpiry.isExpired

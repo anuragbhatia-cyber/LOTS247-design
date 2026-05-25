@@ -119,55 +119,257 @@ function DisplayHeading({
 
 function Header() {
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [lang, setLang] = useState<'English' | 'Hindi'>('English')
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Lock body scroll + close on Escape while drawer is open
+  useEffect(() => {
+    if (!menuOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [menuOpen])
+
+  const navItems = [
+    { href: '#pricing', label: 'Pricing' },
+    { href: '#features', label: 'Features' },
+    { href: '#faq', label: 'FAQ' },
+  ]
+
   return (
-    <header
-      className={[
-        'fixed inset-x-0 top-0 z-40 h-[72px] transition-[background,backdrop-filter,border-color,box-shadow] duration-300',
-        scrolled
-          ? 'bg-white/80 backdrop-blur-md border-b border-stone-200/70 shadow-[0_4px_18px_-12px_rgba(0,0,0,0.18)]'
-          : 'bg-transparent border-b border-transparent',
-      ].join(' ')}
-    >
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16 h-full flex items-center justify-between">
-        <Wordmark tone="dark" />
-        <nav className="hidden md:flex items-center gap-1 text-[13px] font-medium text-stone-700">
-          <a href="#pricing" className="px-4 py-2 rounded-full hover:bg-stone-900/5 hover:text-stone-900 transition-colors">Pricing</a>
-          <a href="#features" className="px-4 py-2 rounded-full hover:bg-stone-900/5 hover:text-stone-900 transition-colors">Features</a>
-          <a href="#faq" className="px-4 py-2 rounded-full hover:bg-stone-900/5 hover:text-stone-900 transition-colors">FAQ</a>
-        </nav>
-        <div className="flex items-center gap-2.5">
-          <LangSwitch />
-          <button className="group inline-flex items-center gap-2 rounded-full bg-stone-900 hover:bg-stone-800 transition-colors px-4 py-2 text-[13px] font-semibold text-white">
-            <span>Create My Dashboard</span>
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 transition-transform group-hover:translate-x-0.5">
-              <ArrowRight className="w-3 h-3 text-white" />
-            </span>
+    <>
+      <header
+        className={[
+          'fixed inset-x-0 top-0 z-40 h-[64px] sm:h-[72px] transition-[background,backdrop-filter,border-color,box-shadow] duration-300',
+          scrolled
+            ? 'bg-white/80 backdrop-blur-md border-b border-stone-200/70 shadow-[0_4px_18px_-12px_rgba(0,0,0,0.18)]'
+            : 'bg-transparent border-b border-transparent',
+        ].join(' ')}
+      >
+        <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16 h-full flex items-center justify-between">
+          <Wordmark tone="dark" />
+
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1 text-[13px] font-medium text-stone-700">
+            {navItems.map(n => (
+              <a
+                key={n.href}
+                href={n.href}
+                className="px-4 py-2 rounded-full hover:bg-stone-900/5 hover:text-stone-900 transition-colors"
+              >
+                {n.label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Desktop right cluster */}
+          <div className="hidden md:flex items-center gap-2.5">
+            <LangSwitch value={lang} onChange={setLang} />
+            <button className="group inline-flex items-center gap-2 rounded-full bg-stone-900 hover:bg-stone-800 transition-colors px-4 py-2 text-[13px] font-semibold text-white">
+              <span>Create My Dashboard</span>
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 transition-transform group-hover:translate-x-0.5">
+                <ArrowRight className="w-3 h-3 text-white" />
+              </span>
+            </button>
+          </div>
+
+          {/* Mobile menu trigger */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            className="md:hidden -mr-2 inline-flex items-center justify-center w-11 h-11 rounded-full text-stone-900 hover:bg-stone-900/5 active:bg-stone-900/10 transition-colors"
+          >
+            <svg viewBox="0 0 24 24" className="w-[22px] h-[22px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="4" y1="7" x2="20" y2="7" />
+              <line x1="4" y1="13" x2="20" y2="13" />
+              <line x1="4" y1="19" x2="14" y2="19" />
+            </svg>
           </button>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <MobileDrawer
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        nav={navItems}
+        lang={lang}
+        onLangChange={setLang}
+      />
+    </>
   )
 }
 
-function LangSwitch() {
-  const langs = ['English', 'Hindi']
-  const [open, setOpen] = useState(false)
-  const [active, setActive] = useState('English')
+function MobileDrawer({
+  open, onClose, nav, lang, onLangChange,
+}: {
+  open: boolean
+  onClose: () => void
+  nav: { href: string; label: string }[]
+  lang: 'English' | 'Hindi'
+  onLangChange: (l: 'English' | 'Hindi') => void
+}) {
   return (
-    <div className="relative hidden sm:block">
+    <div
+      className={[
+        'md:hidden fixed inset-0 z-50 transition-opacity duration-200',
+        open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+      ].join(' ')}
+      aria-hidden={!open}
+    >
+      {/* Backdrop */}
+      <button
+        type="button"
+        aria-label="Close menu"
+        tabIndex={open ? 0 : -1}
+        onClick={onClose}
+        className="absolute inset-0 bg-stone-950/40 backdrop-blur-sm"
+      />
+
+      {/* Panel — slides from right, takes ~88% width to keep the page peeking */}
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        className={[
+          'absolute right-0 top-0 h-full w-[88%] max-w-[400px] bg-[var(--color-cream)]',
+          'flex flex-col shadow-[0_0_60px_-10px_rgba(0,0,0,0.35)]',
+          'transition-transform duration-300 ease-out',
+          open ? 'translate-x-0' : 'translate-x-full',
+        ].join(' ')}
+      >
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-5 h-[64px] border-b border-stone-200/70 shrink-0">
+          <Wordmark tone="dark" />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close menu"
+            className="-mr-2 inline-flex items-center justify-center w-11 h-11 rounded-full text-stone-700 hover:bg-stone-900/5 transition-colors"
+          >
+            <svg viewBox="0 0 24 24" className="w-[22px] h-[22px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="6" y1="6" x2="18" y2="18" />
+              <line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto px-5 py-7 flex flex-col gap-7">
+          {/* Nav */}
+          <nav className="flex flex-col">
+            {nav.map((n, i) => (
+              <a
+                key={n.href}
+                href={n.href}
+                onClick={onClose}
+                className={[
+                  'group flex items-center justify-between py-4 -mx-1 px-1 transition-colors',
+                  i > 0 ? 'border-t border-stone-200/80' : '',
+                ].join(' ')}
+              >
+                <span
+                  className="font-serif-display text-[1.75rem] leading-[1.1] tracking-[-0.01em] text-stone-900"
+                  style={{ fontVariationSettings: '"opsz" 96, "SOFT" 35' }}
+                >
+                  {n.label}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white border border-stone-200 text-stone-500 transition-all group-hover:bg-stone-900 group-hover:text-white group-hover:border-stone-900"
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </a>
+            ))}
+          </nav>
+
+          {/* Language toggle — full-width segmented */}
+          <div>
+            <div className="font-mono-label text-[10px] text-stone-500 mb-2">Language</div>
+            <div className="inline-flex items-center rounded-full bg-white border border-stone-200 p-1 w-full">
+              {(['English', 'Hindi'] as const).map(l => {
+                const active = lang === l
+                return (
+                  <button
+                    key={l}
+                    type="button"
+                    onClick={() => onLangChange(l)}
+                    className={[
+                      'flex-1 h-10 rounded-full text-[13px] font-semibold transition-colors',
+                      active ? 'bg-stone-900 text-white shadow-sm' : 'text-stone-600 hover:text-stone-900',
+                    ].join(' ')}
+                  >
+                    {l}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Call affordance */}
+          <a
+            href="tel:+919999999999"
+            className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-white border border-stone-200 transition-colors hover:border-emerald-300 hover:bg-emerald-50/50"
+          >
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white shrink-0">
+              <PhoneIcon className="w-[18px] h-[18px]" />
+            </span>
+            <span className="flex flex-col leading-tight">
+              <span className="text-[13px] font-semibold text-stone-900">Talk to support</span>
+              <span className="text-[11.5px] text-stone-500">Mon–Sat · 9 AM–9 PM IST</span>
+            </span>
+          </a>
+        </div>
+
+        {/* Pinned CTA */}
+        <div className="px-5 py-4 border-t border-stone-200/70 bg-[var(--color-cream)] shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="group relative w-full inline-flex items-center justify-center rounded-2xl bg-stone-900 px-6 py-[16px] text-[15px] font-semibold text-white hover:bg-stone-800 transition-colors shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]"
+          >
+            <span>Create My Dashboard</span>
+            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500 text-white transition-transform group-hover:translate-x-0.5">
+              <ArrowRight className="w-4 h-4" />
+            </span>
+          </button>
+          <p className="mt-3 text-center font-mono-label text-[9.5px] text-stone-500">
+            By continuing, you agree to our Terms &amp; Conditions
+          </p>
+        </div>
+      </aside>
+    </div>
+  )
+}
+
+function LangSwitch({
+  value, onChange,
+}: { value: 'English' | 'Hindi'; onChange: (l: 'English' | 'Hindi') => void }) {
+  const langs: Array<'English' | 'Hindi'> = ['English', 'Hindi']
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="relative">
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         className="inline-flex items-center gap-2 rounded-full bg-[#f8f5f2] px-3.5 py-1.5 text-[11px] font-semibold text-stone-900 hover:bg-stone-200 transition-colors"
       >
-        <span>{active}</span>
+        <span>{value}</span>
         <svg viewBox="0 0 24 24" className={`w-3 h-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -178,8 +380,8 @@ function LangSwitch() {
             <button
               key={l}
               type="button"
-              onMouseDown={() => { setActive(l); setOpen(false) }}
-              className={`w-full text-left px-3 py-2 text-[12px] ${active === l ? 'text-emerald-600 font-semibold' : 'text-stone-700 hover:bg-stone-50'}`}
+              onMouseDown={() => { onChange(l); setOpen(false) }}
+              className={`w-full text-left px-3 py-2 text-[12px] ${value === l ? 'text-emerald-600 font-semibold' : 'text-stone-700 hover:bg-stone-50'}`}
             >
               {l}
             </button>
@@ -208,7 +410,7 @@ function Hero() {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1280px] px-8 lg:px-16 pt-10 lg:pt-14 pb-16 lg:pb-24">
+      <div className="relative mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16 pt-10 lg:pt-14 pb-16 lg:pb-24">
         <div className="grid lg:grid-cols-12 items-end gap-10 lg:gap-12">
           {/* Left copy + form */}
           <div className="lg:col-span-6 max-w-[640px]">
@@ -277,7 +479,7 @@ function Stats() {
   ]
   return (
     <section className="bg-white border-y border-stone-200/70">
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="grid grid-cols-2 sm:grid-cols-4">
           {stats.map((s, i) => (
             <div
@@ -327,7 +529,7 @@ function Clientele() {
   ]
   return (
     <section className="bg-white border-b border-stone-200/70">
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16 py-10 lg:py-14">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16 py-10 lg:py-14">
         <p className="font-mono-label text-[10.5px] text-stone-500 text-center">
           Trusted by fleets &amp; logistics teams across India
         </p>
@@ -385,7 +587,7 @@ function RoadReality() {
       {/* warning-territory dot pattern — subtle, hazard-tone */}
       <div className="absolute inset-0 bg-hazard-dots opacity-50 pointer-events-none" />
 
-      <div className="relative mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="relative mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="max-w-[920px]">
           <SectionKicker label="The reality" tone="amber" align="left" />
           <DisplayHeading align="left" size="lg" className="mt-5">
@@ -431,7 +633,7 @@ function WhatYouGet() {
   ]
   return (
     <section id="features" className="bg-[var(--color-cream)] py-24 lg:py-32">
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="max-w-[820px] mx-auto text-center">
           <SectionKicker label="What you get" />
           <DisplayHeading className="mt-5" size="lg">
@@ -531,52 +733,124 @@ function HowItWorks() {
 
   const progress = total > 1 ? active / (total - 1) : 0
 
+  // Mobile carousel — track which card is centered, sync with autoplay
+  const trackRef = useRef<HTMLUListElement | null>(null)
+  const [mobileActive, setMobileActive] = useState(0)
+
+  // Drive autoplay → scroll on mobile when paused === false
+  useEffect(() => {
+    if (paused) return
+    const track = trackRef.current
+    if (!track) return
+    const card = track.children[active] as HTMLElement | undefined
+    if (!card) return
+    track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: 'smooth' })
+  }, [active, paused])
+
+  // Observe scroll on mobile track to keep dots / desktop active synced
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+    let raf = 0
+    const onScroll = () => {
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        const center = track.scrollLeft + track.clientWidth / 2
+        let nearest = 0
+        let bestDist = Infinity
+        for (let i = 0; i < track.children.length; i++) {
+          const el = track.children[i] as HTMLElement
+          const elCenter = el.offsetLeft + el.offsetWidth / 2 - track.offsetLeft
+          const d = Math.abs(elCenter - center)
+          if (d < bestDist) { bestDist = d; nearest = i }
+        }
+        setMobileActive(nearest)
+      })
+    }
+    track.addEventListener('scroll', onScroll, { passive: true })
+    return () => track.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
     <section className="bg-white py-20 lg:py-28 border-y border-stone-200/60">
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="text-center max-w-[1100px] mx-auto">
           <SectionKicker label="How it works" />
           <DisplayHeading className="mt-5" size="lg">
             Start in 4 simple steps
           </DisplayHeading>
-          <p className="mt-5 text-[15px] text-stone-600 leading-relaxed whitespace-nowrap">
+          <p className="mt-5 text-[14px] sm:text-[15px] text-stone-600 leading-relaxed max-w-[34ch] sm:max-w-none mx-auto">
             From vehicle entry to active legal cover in under two minutes — no documents required upfront.
           </p>
         </div>
 
         <div
-          className="mt-12 lg:mt-20"
+          className="mt-10 lg:mt-20"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onTouchStart={() => setPaused(true)}
         >
-          {/* MOBILE: stacked cards with inline image (always visible) */}
-          <div className="lg:hidden space-y-5">
-            {steps.map((step, i) => (
-              <article
-                key={i}
-                className="relative rounded-2xl bg-white ring-1 ring-stone-200 shadow-[0_18px_40px_-22px_rgba(0,0,0,0.18)] p-5"
-              >
-                <header className="flex items-center gap-3">
-                  <span className="shrink-0 inline-flex items-center justify-center w-11 h-11 rounded-full bg-emerald-500 text-white text-[12px] font-bold font-mono">
-                    0{i + 1}
-                  </span>
-                  <h3 className="text-[16px] font-bold leading-tight tracking-tight text-stone-900">
-                    {step.title}
-                  </h3>
-                </header>
-                <p className="mt-3 text-[14px] leading-relaxed text-stone-600">
-                  {step.body}
-                </p>
-                <div className="relative mt-5 mx-auto w-full max-w-[280px] rounded-[20px] bg-gradient-to-br from-emerald-50 via-white to-stone-50 border border-stone-200/80 px-2 py-1 overflow-hidden">
-                  <div className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 h-32 w-[85%] rounded-full bg-emerald-500/20 blur-3xl" />
-                  <div className="pointer-events-none absolute -top-16 -right-16 h-36 w-36 rounded-full bg-emerald-200/40 blur-3xl" />
-                  <div className="relative">
-                    <HowPhoneScreen step={i} />
-                  </div>
-                </div>
-              </article>
-            ))}
+          {/* MOBILE: horizontal snap carousel — full-bleed, peek next card */}
+          <div className="lg:hidden -mx-4">
+            <ul
+              ref={trackRef}
+              className="no-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-px-4 px-4 py-3"
+              style={{ scrollPaddingLeft: '16px' }}
+            >
+              {steps.map((step, i) => (
+                <li
+                  key={i}
+                  className="snap-start shrink-0 w-[82vw] max-w-[320px]"
+                >
+                  <article className="relative h-full rounded-2xl bg-white ring-1 ring-stone-200 shadow-[0_18px_40px_-22px_rgba(0,0,0,0.18)] p-5 flex flex-col">
+                    <header className="flex items-center gap-3">
+                      <span className="shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500 text-white text-[11px] font-bold font-mono">
+                        0{i + 1}
+                      </span>
+                      <h3 className="text-[15px] font-bold leading-tight tracking-tight text-stone-900">
+                        {step.title}
+                      </h3>
+                    </header>
+                    <p className="mt-3 text-[13.5px] leading-relaxed text-stone-600">
+                      {step.body}
+                    </p>
+                    <div className="relative mt-4 mx-auto w-full max-w-[220px] rounded-[20px] bg-gradient-to-br from-emerald-50 via-white to-stone-50 border border-stone-200/80 px-2 py-1 overflow-hidden">
+                      <div className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 h-32 w-[85%] rounded-full bg-emerald-500/20 blur-3xl" />
+                      <div className="pointer-events-none absolute -top-16 -right-16 h-36 w-36 rounded-full bg-emerald-200/40 blur-3xl" />
+                      <div className="relative">
+                        <HowPhoneScreen step={i} />
+                      </div>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ul>
+
+            {/* Progress dots */}
+            <div className="mt-5 px-4 flex items-center justify-center gap-2">
+              {steps.map((_, i) => {
+                const isActive = i === mobileActive
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-label={`Go to step ${i + 1}`}
+                    onClick={() => {
+                      const track = trackRef.current
+                      if (!track) return
+                      const card = track.children[i] as HTMLElement
+                      track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: 'smooth' })
+                      setPaused(true)
+                    }}
+                    className={[
+                      'h-1.5 rounded-full transition-all',
+                      isActive ? 'w-6 bg-stone-900' : 'w-1.5 bg-stone-300 hover:bg-stone-400',
+                    ].join(' ')}
+                  />
+                )
+              })}
+            </div>
           </div>
 
           {/* DESKTOP: vertical stepper + sticky phone */}
@@ -698,7 +972,7 @@ function DashboardPreview() {
             'radial-gradient(700px 380px at 20% 20%, rgba(0,184,118,0.10), transparent 60%), radial-gradient(700px 500px at 90% 80%, rgba(255,255,255,0.04), transparent 60%)',
         }}
       />
-      <div className="relative mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="relative mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="text-center max-w-[680px] mx-auto">
           <SectionKicker label="The dashboard" surface="dark" />
           <h2
@@ -708,19 +982,72 @@ function DashboardPreview() {
             Your vehicle dashboard, built for daily business movement
           </h2>
         </div>
-        <div className="relative mt-16">
+
+        {/* MOBILE: dashboard preview visible, unlock card stacked below */}
+        <div className="lg:hidden mt-12 space-y-4">
+          <div className="relative overflow-hidden rounded-2xl bg-stone-950 border border-white/10 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)]">
+            <img
+              src="/dashboard-preview.png"
+              alt="LOTS247 vehicle dashboard"
+              className="block w-full h-auto"
+            />
+            {/* Soft fade at bottom edge to hint there's more & blend into the unlock card */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-stone-950 to-transparent"
+            />
+          </div>
+
+          <div className="rounded-2xl bg-white/[0.04] border border-white/10 p-5">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex w-11 h-11 rounded-xl bg-stone-950 border border-white/10 items-center justify-center text-white shrink-0">
+                <LockIcon className="w-5 h-5" />
+              </span>
+              <div className="min-w-0">
+                <div className="font-mono-label text-[10px] text-amber-400">Locked</div>
+                <div className="text-[15px] font-semibold text-white leading-tight">
+                  Unlock after activation
+                </div>
+              </div>
+            </div>
+
+            <ul className="mt-5 space-y-2">
+              {lockedFeatures.map((f) => (
+                <li
+                  key={f}
+                  className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.04] border border-white/10 px-4 py-3"
+                >
+                  <span className="text-[13px] text-stone-200 truncate">{f}</span>
+                  <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-amber-400 uppercase tracking-[0.12em] flex-shrink-0">
+                    <LockIcon className="w-3 h-3" />
+                    Locked
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <button className="group relative mt-5 w-full inline-flex items-center justify-center rounded-2xl bg-emerald-500 px-6 py-[16px] text-[14px] font-semibold text-white hover:bg-emerald-600 transition-colors shadow-[0_8px_24px_-12px_rgba(0,184,118,0.55)]">
+              <span>Create My Dashboard</span>
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-stone-950/25 transition-transform group-hover:translate-x-0.5">
+                <ArrowRight className="w-4 h-4 text-white" />
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* DESKTOP: side-by-side preview with right-side unlock overlay */}
+        <div className="hidden lg:block relative mt-16">
           <div className="absolute -inset-x-5 top-10 rounded-[32px] bg-emerald-500/8" />
-          <div className="relative overflow-hidden rounded-3xl shadow-[0_24px_80px_-20px_rgba(0,0,0,0.25)] bg-stone-950 min-h-[640px] lg:min-h-[760px]">
+          <div className="relative overflow-hidden rounded-3xl shadow-[0_24px_80px_-20px_rgba(0,0,0,0.25)] bg-stone-950 min-h-[760px]">
             <img
               src="/dashboard-preview.png"
               alt="LOTS247 vehicle dashboard"
               className="absolute inset-0 w-full h-full object-cover object-left-top block"
             />
 
-            {/* Locked overlay — covers right ~58% on desktop, full on mobile */}
-            <div className="absolute inset-y-0 right-0 left-0 lg:left-[42%] backdrop-blur-md bg-white/55 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-y-0 right-0 left-[42%] backdrop-blur-md bg-white/55 flex items-center justify-center pointer-events-none">
               <div
-                className="absolute inset-0 hidden lg:block"
+                className="absolute inset-0"
                 style={{
                   background:
                     'linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 8%, rgba(255,255,255,0.7) 100%)',
@@ -792,7 +1119,7 @@ function Pricing() {
   ]
   return (
     <section id="pricing" className="relative bg-[var(--color-cream)] py-24 lg:py-32 overflow-hidden">
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="text-center">
           <SectionKicker label="Pricing" />
           <DisplayHeading className="mt-5" size="lg">
@@ -939,7 +1266,7 @@ function UseCases() {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="relative mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         {/* heading */}
         <div className="mx-auto max-w-3xl text-center">
           <div className="inline-flex items-center gap-3 font-mono-label text-[10.5px] text-stone-500">
@@ -1029,7 +1356,7 @@ function Testimonials() {
   ]
   return (
     <section className="bg-[var(--color-cream)] py-24 lg:py-32">
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="text-center">
           <SectionKicker label="Voices from the road" />
           <DisplayHeading className="mt-5" size="lg">
@@ -1105,7 +1432,7 @@ function Faq() {
   const [open, setOpen] = useState<number>(0)
   return (
     <section id="faq" className="bg-white py-24 lg:py-32 border-y border-stone-200/70">
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="text-center">
           <SectionKicker label="FAQ" />
           <DisplayHeading className="mt-5" size="lg">
@@ -1198,7 +1525,7 @@ function Faq() {
 function Footer() {
   return (
     <footer className="bg-black pt-20 pb-12 border-t border-stone-900">
-      <div className="mx-auto max-w-[1280px] px-8 lg:px-16">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-8 lg:px-16">
         <div className="grid grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
           <div className="col-span-2 lg:col-span-5">
             <Wordmark variant="full" />

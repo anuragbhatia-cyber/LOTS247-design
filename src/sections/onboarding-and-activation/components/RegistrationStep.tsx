@@ -174,7 +174,7 @@ export function RegistrationStep({
   }, [otpSent])
 
   const inputClassName = (field: keyof RegistrationFormData) => `
-    w-full px-4 py-3 rounded-xl border text-base
+    w-full px-4 py-2.5 rounded-xl border text-base
     bg-white dark:bg-stone-900
     text-stone-900 dark:text-white
     placeholder:text-stone-400 dark:placeholder:text-stone-500
@@ -198,48 +198,52 @@ export function RegistrationStep({
     ) : null
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-[30%] bg-white dark:bg-stone-900 flex-col relative border-r border-stone-200 dark:border-stone-800">
-        <div className="p-8">
-          <img
-            src="/lots247-logo.png"
-            alt="LOTS247 - India's First Road Side Legal Assistance Platform"
-            className="h-20 w-auto"
-          />
+    <div className="min-h-screen bg-stone-100 dark:bg-stone-950 flex items-center justify-center px-4 py-4 lg:py-6">
+      <div className="w-full max-w-4xl bg-white dark:bg-stone-900 rounded-3xl ring-1 ring-stone-200 dark:ring-stone-800 overflow-hidden flex flex-col lg:flex-row">
+        {/* Left Panel - Branding + Illustration */}
+        <div className="hidden lg:flex lg:w-[42%] bg-white dark:bg-stone-900 flex-col">
+          <div className="px-8 pt-8">
+            <img
+              src="/lots247-logo.png"
+              alt="LOTS247 - India's First Road Side Legal Assistance Platform"
+              className="h-16 w-auto"
+            />
+          </div>
+          <div className="mt-auto">
+            <img
+              src="/truck-illustration.png"
+              alt="Truck illustration"
+              className="block w-full h-auto"
+              style={{
+                maskImage: 'linear-gradient(to bottom, transparent 0%, black 14%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 14%)',
+              }}
+            />
+          </div>
         </div>
-        <div className="mt-auto flex justify-center px-10 pb-10">
-          <img
-            src="/truck-illustration.png"
-            alt="Truck illustration"
-            className="w-full max-w-xs h-auto"
-          />
-        </div>
-      </div>
 
-      {/* Right Panel - Form */}
-      <div className="flex-1 overflow-y-auto bg-stone-100 dark:bg-stone-950">
-        <div className="min-h-full flex items-start lg:items-center justify-center px-6 py-10 lg:py-12">
-          <div className="w-full max-w-md">
+        {/* Right Panel - Form */}
+        <div className="flex-1 px-6 sm:px-8 lg:px-10 py-6 lg:py-8">
+          <div className="w-full max-w-md mx-auto">
             {/* Mobile Logo */}
-            <div className="lg:hidden mb-8 flex justify-center">
-              <img src="/lots247-logo.png" alt="LOTS247" className="h-16 w-auto" />
+            <div className="lg:hidden mb-6 flex justify-center">
+              <img src="/lots247-logo.png" alt="LOTS247" className="h-14 w-auto" />
             </div>
 
             {!otpSent ? (
               <>
                 {/* Header */}
-                <div className="mb-6">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-stone-900 dark:text-white">
+                <div className="mb-4">
+                  <h1 className="text-xl sm:text-2xl font-bold text-stone-900 dark:text-white">
                     Create your account
                   </h1>
                 </div>
 
                 {/* Registration Form */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* Full Name */}
                   <div>
-                    <label htmlFor="fullName" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+                    <label htmlFor="fullName" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
                       Full Name <span className="text-red-700">*</span>
                     </label>
                     <input
@@ -257,7 +261,7 @@ export function RegistrationStep({
 
                   {/* Mobile Number */}
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+                    <label htmlFor="phone" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
                       Mobile Number <span className="text-red-700">*</span>
                     </label>
                     <div className="flex">
@@ -273,7 +277,7 @@ export function RegistrationStep({
                         onChange={handlePhoneChange}
                         placeholder="Enter phone number"
                         className={`
-                          flex-1 px-4 py-3 rounded-r-xl border text-base
+                          flex-1 px-4 py-2.5 rounded-r-xl border text-base
                           bg-white dark:bg-stone-900
                           text-stone-900 dark:text-white
                           placeholder:text-stone-400 dark:placeholder:text-stone-500
@@ -288,7 +292,7 @@ export function RegistrationStep({
 
                   {/* Business/Individual Name */}
                   <div>
-                    <label htmlFor="businessName" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+                    <label htmlFor="businessName" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
                       Business / Individual Name <span className="text-red-700">*</span>
                     </label>
                     <input
@@ -308,7 +312,7 @@ export function RegistrationStep({
                   {/* State + Pincode Row */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label htmlFor="state" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+                      <label htmlFor="state" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
                         State <span className="text-red-700">*</span>
                       </label>
                       <select
@@ -327,7 +331,7 @@ export function RegistrationStep({
                       <ErrorMessage field="state" />
                     </div>
                     <div>
-                      <label htmlFor="pincode" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+                      <label htmlFor="pincode" className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1">
                         Pincode <span className="text-red-700">*</span>
                       </label>
                       <input
@@ -371,7 +375,7 @@ export function RegistrationStep({
                     onClick={handleSubmit}
                     disabled={isSendingOTP}
                     className={`
-                      w-full py-3.5 rounded-xl font-semibold text-base
+                      w-full py-3 rounded-xl font-semibold text-base
                       transition-all duration-200
                       ${
                         isSendingOTP
@@ -476,7 +480,7 @@ export function RegistrationStep({
                     onClick={() => onVerifyOTP?.(otp.join(''))}
                     disabled={!otp.every((d) => d) || isVerifying || otpExpiry.isExpired}
                     className={`
-                      w-full py-3.5 rounded-xl font-semibold text-base
+                      w-full py-3 rounded-xl font-semibold text-base
                       transition-all duration-200
                       ${
                         otp.every((d) => d) && !isVerifying && !otpExpiry.isExpired

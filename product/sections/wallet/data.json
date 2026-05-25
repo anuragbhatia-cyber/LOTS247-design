@@ -2,19 +2,19 @@
   "_meta": {
     "models": {
       "walletSummary": "The subscriber's current wallet state — balance, last recharge details, and the threshold below which a low-balance warning is shown.",
-      "transactions": "Each transaction is a single credit or debit entry in the wallet ledger. Credits come from recharges and refunds; debits go towards subscriptions, challans, and legal fees.",
+      "transactions": "Each transaction is a single credit or debit entry in the wallet ledger. Credits come from recharges; debits go towards LOTS247 services — challan checks (2 coins each), RC fetches (2 coins each), and on-demand legal fees.",
       "quickAmounts": "Preset recharge amounts displayed as quick-select buttons in the Add Money modal."
     },
     "relationships": [
       "walletSummary.currentBalance reflects the net of all successful transactions",
-      "Each transaction has a category linking it to the system area that triggered it (Recharge, Subscription, Challan, Legal Fee, Refund)",
-      "Debit transactions include a relatedEntityId linking back to the challan, subscription, or incident that caused the charge",
+      "Each transaction has a category linking it to the system area that triggered it (Recharge, Challan Check, RC Fetch, Legal Fee)",
+      "Debit transactions include a relatedEntityId linking back to the vehicle (for challan checks and RC fetches) or incident (for legal fees) that caused the charge",
       "The runningBalance on each transaction shows the wallet balance after that transaction was applied",
       "quickAmounts are configuration values used by the Add Money modal UI"
     ]
   },
   "walletSummary": {
-    "currentBalance": 12750,
+    "currentBalance": 18000,
     "currency": "INR",
     "lowBalanceThreshold": 2000,
     "lastRecharge": {
@@ -35,7 +35,7 @@
       "referenceId": "pay_QR7x9kLmN2pV8s",
       "status": "success",
       "date": "2026-03-22T14:30:00",
-      "runningBalance": 12750,
+      "runningBalance": 18000,
       "relatedEntityId": null,
       "relatedEntityType": null
     },
@@ -43,29 +43,29 @@
       "id": "txn-002",
       "type": "debit",
       "category": "challan",
-      "amount": 1500,
+      "amount": 2,
       "currency": "INR",
-      "description": "Challan payment — UP32MM1113",
-      "referenceId": "CLN-UP200417102541",
+      "description": "Challan check — UP32MM1113",
+      "referenceId": "CHK-UP32MM1113-MAR21",
       "status": "success",
       "date": "2026-03-21T10:15:00",
-      "runningBalance": 7750,
-      "relatedEntityId": "UP200417102541",
-      "relatedEntityType": "challan"
+      "runningBalance": 13000,
+      "relatedEntityId": "UP32MM1113",
+      "relatedEntityType": "vehicle"
     },
     {
       "id": "txn-003",
       "type": "debit",
-      "category": "subscription",
-      "amount": 2999,
+      "category": "rcFetch",
+      "amount": 2,
       "currency": "INR",
-      "description": "Fleet plan — monthly renewal",
-      "referenceId": "SUB-FLEET-MAR26",
+      "description": "RC fetch — DL01AB1234",
+      "referenceId": "RCF-DL01AB1234-MAR20",
       "status": "success",
-      "date": "2026-03-20T00:05:00",
-      "runningBalance": 9250,
-      "relatedEntityId": "subs-001",
-      "relatedEntityType": "subscription"
+      "date": "2026-03-20T14:20:00",
+      "runningBalance": 13002,
+      "relatedEntityId": "DL01AB1234",
+      "relatedEntityType": "vehicle"
     },
     {
       "id": "txn-004",
@@ -77,7 +77,7 @@
       "referenceId": "pay_PP4m8jKnR1oT6q",
       "status": "success",
       "date": "2026-03-18T09:45:00",
-      "runningBalance": 12249,
+      "runningBalance": 13004,
       "relatedEntityId": null,
       "relatedEntityType": null
     },
@@ -91,37 +91,37 @@
       "referenceId": "LGL-IRN11106557",
       "status": "success",
       "date": "2026-03-17T16:20:00",
-      "runningBalance": 2249,
+      "runningBalance": 3004,
       "relatedEntityId": "IRN-11106557",
       "relatedEntityType": "incident"
     },
     {
       "id": "txn-006",
-      "type": "credit",
-      "category": "refund",
-      "amount": 750,
+      "type": "debit",
+      "category": "challan",
+      "amount": 2,
       "currency": "INR",
-      "description": "Challan dispute refund — UP32NN2224",
-      "referenceId": "RFD-DID5209",
+      "description": "Challan check — UP32NN2224",
+      "referenceId": "CHK-UP32NN2224-MAR15",
       "status": "success",
       "date": "2026-03-15T11:00:00",
-      "runningBalance": 5749,
-      "relatedEntityId": "DID-5209",
-      "relatedEntityType": "dispute"
+      "runningBalance": 6504,
+      "relatedEntityId": "UP32NN2224",
+      "relatedEntityType": "vehicle"
     },
     {
       "id": "txn-007",
       "type": "debit",
-      "category": "challan",
-      "amount": 2000,
+      "category": "rcFetch",
+      "amount": 2,
       "currency": "INR",
-      "description": "Challan payment — UP32NN2224",
-      "referenceId": "CLN-UP200518203652",
+      "description": "RC fetch — UP32NN2224",
+      "referenceId": "RCF-UP32NN2224-MAR14",
       "status": "success",
       "date": "2026-03-14T08:30:00",
-      "runningBalance": 4999,
-      "relatedEntityId": "UP200518203652",
-      "relatedEntityType": "challan"
+      "runningBalance": 6506,
+      "relatedEntityId": "UP32NN2224",
+      "relatedEntityType": "vehicle"
     },
     {
       "id": "txn-008",
@@ -133,7 +133,7 @@
       "referenceId": "LGL-IRN11207891",
       "status": "success",
       "date": "2026-03-12T14:10:00",
-      "runningBalance": 6999,
+      "runningBalance": 6508,
       "relatedEntityId": "IRN-11207891",
       "relatedEntityType": "incident"
     },
@@ -147,7 +147,7 @@
       "referenceId": "pay_NN2k6hJmQ0nS5p",
       "status": "success",
       "date": "2026-03-10T17:55:00",
-      "runningBalance": 8499,
+      "runningBalance": 8008,
       "relatedEntityId": null,
       "relatedEntityType": null
     },
@@ -155,15 +155,15 @@
       "id": "txn-010",
       "type": "debit",
       "category": "challan",
-      "amount": 500,
+      "amount": 2,
       "currency": "INR",
-      "description": "Challan payment — UP32PP3335",
-      "referenceId": "CLN-UP200619304763",
+      "description": "Challan check — UP32PP3335",
+      "referenceId": "CHK-UP32PP3335-MAR08",
       "status": "success",
       "date": "2026-03-08T12:40:00",
-      "runningBalance": 6499,
-      "relatedEntityId": "UP200619304763",
-      "relatedEntityType": "challan"
+      "runningBalance": 6008,
+      "relatedEntityId": "UP32PP3335",
+      "relatedEntityType": "vehicle"
     },
     {
       "id": "txn-011",
@@ -175,23 +175,9 @@
       "referenceId": "pay_MM1j5gImP9mR4o",
       "status": "failed",
       "date": "2026-03-07T20:15:00",
-      "runningBalance": 6999,
+      "runningBalance": 6010,
       "relatedEntityId": null,
       "relatedEntityType": null
-    },
-    {
-      "id": "txn-012",
-      "type": "debit",
-      "category": "subscription",
-      "amount": 2999,
-      "currency": "INR",
-      "description": "Fleet plan — monthly renewal",
-      "referenceId": "SUB-FLEET-FEB26",
-      "status": "success",
-      "date": "2026-02-20T00:05:00",
-      "runningBalance": 6999,
-      "relatedEntityId": "subs-001",
-      "relatedEntityType": "subscription"
     }
   ]
 }

@@ -114,6 +114,7 @@ type QuickAction = {
   description: string
   image?: string
   icon?: typeof ShieldCheck
+  banner?: string
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
@@ -139,7 +140,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     id: 'driver-insurance',
     label: 'Activate Driver Insurance',
     description: 'Issue a personal accident policy for your driver',
-    icon: ShieldCheck,
+    banner: '/driver-insurance-banner.png',
   },
 ]
 
@@ -427,9 +428,30 @@ export function HomeView({
         )}
 
         {/* Quick Actions */}
-        <div data-tour="quick-actions" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div data-tour="quick-actions" className="grid grid-cols-2 lg:grid-cols-4 auto-rows-fr gap-3 sm:gap-4 mb-6">
           {QUICK_ACTIONS.map((action) => {
             const Icon = action.icon
+            const label = qaTranslations[action.id]?.label ?? action.label
+            const description = qaTranslations[action.id]?.description ?? action.description
+
+            if (action.banner) {
+              return (
+                <button
+                  key={action.id}
+                  onClick={() => quickActionCallbacks[action.id]?.()}
+                  aria-label={label}
+                  className="group relative h-full overflow-hidden rounded-2xl border border-transparent hover:border-emerald-500 shadow-sm dark:shadow-stone-950/20 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+                >
+                  <img
+                    src={action.banner}
+                    alt=""
+                    className="block w-full h-full object-cover select-none"
+                    draggable={false}
+                  />
+                </button>
+              )
+            }
+
             return (
               <button
                 key={action.id}
@@ -444,8 +466,8 @@ export function HomeView({
                   </div>
                 ) : null}
                 <div className="min-w-0">
-                  <p className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-50 leading-snug">{qaTranslations[action.id]?.label ?? action.label}</p>
-                  <p className="text-[10px] sm:text-xs text-stone-500 dark:text-stone-400 leading-snug mt-0.5">{qaTranslations[action.id]?.description ?? action.description}</p>
+                  <p className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-50 leading-snug">{label}</p>
+                  <p className="text-[10px] sm:text-xs text-stone-500 dark:text-stone-400 leading-snug mt-0.5">{description}</p>
                 </div>
               </button>
             )
