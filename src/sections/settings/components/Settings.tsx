@@ -30,6 +30,8 @@ import {
   UserMinus,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
 import type {
   SettingsProps,
   NotificationChannels,
@@ -535,7 +537,7 @@ export function Settings({
       {/* ================================================================= */}
       {/* Sidebar Navigation — hidden on mobile */}
       {/* ================================================================= */}
-      <div className="w-64 lg:w-72 shrink-0 hidden md:block p-5 sm:p-6 lg:p-8">
+      <div data-tour="settings-nav" className="w-64 lg:w-72 shrink-0 hidden md:block p-5 sm:p-6 lg:p-8">
         <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-5">
           {t.pageTitle}
         </h1>
@@ -582,7 +584,7 @@ export function Settings({
         </div>
 
         {/* Tab Content Card */}
-        <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800">
+        <div data-tour="settings-content" className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800">
 
           {/* ----- Notifications Tab ----- */}
           {activeTab === 'notifications' && (
@@ -1457,6 +1459,28 @@ export function Settings({
         </div>,
         document.body
       )}
+
+      <SectionTour tourId="settings" steps={SETTINGS_TOUR_STEPS} />
     </div>
   )
 }
+
+const SETTINGS_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Make LOTS247 your own',
+    body: 'Tune notifications, billing, team access, and preferences from one place.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="settings-nav"]',
+    title: 'Jump between sections',
+    body: 'Switch between Notifications, Subscription, Team, Reports, and General settings.',
+    placement: 'right',
+  },
+  {
+    target: '[data-tour="settings-content"]',
+    title: 'Edit and save inline',
+    body: 'Most changes save automatically. Sensitive actions like plan changes confirm before applying.',
+    placement: 'top',
+  },
+]

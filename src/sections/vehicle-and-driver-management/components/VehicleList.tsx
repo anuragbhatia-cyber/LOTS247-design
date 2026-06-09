@@ -39,6 +39,8 @@ import type {
 } from '@/../product/sections/vehicle-and-driver-management/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 import { EmptyState } from '@/shell/components/EmptyState'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
 import { DriverInsuranceModal } from './DriverInsuranceModal'
 
 // ---------------------------------------------------------------------------
@@ -899,7 +901,7 @@ export function VehicleList({
               {t.centralRepository}
             </p>
           </div>
-          <div className="flex items-center justify-between gap-2">
+          <div data-tour="fleet-actions" className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <button
                 className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
@@ -926,7 +928,7 @@ export function VehicleList({
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div data-tour="fleet-summary" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
@@ -990,7 +992,7 @@ export function VehicleList({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-full sm:w-fit mb-5">
+        <div data-tour="fleet-tabs" className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-full sm:w-fit mb-5">
           <button
             onClick={() => setActiveTab('vehicles')}
             className={`flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
@@ -1030,7 +1032,7 @@ export function VehicleList({
         </div>
 
         {/* Search + Filters */}
-        <div className="mb-4 space-y-3">
+        <div data-tour="fleet-search" className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
@@ -1887,6 +1889,40 @@ export function VehicleList({
           onClose={() => setInsuranceDriver(null)}
         />
       </div>
+
+      <SectionTour tourId="fleet" steps={FLEET_TOUR_STEPS} />
     </div>
   )
 }
+
+const FLEET_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Your fleet, in one place',
+    body: 'This is where every vehicle and driver lives.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="fleet-summary"]',
+    title: 'Fleet at a glance',
+    body: 'Total vehicles, average compliance, and how many docs are expired or expiring.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="fleet-tabs"]',
+    title: 'Switch between vehicles and drivers',
+    body: 'Same screen, two views. Drivers live alongside vehicles so you can assign and re-assign in seconds.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="fleet-search"]',
+    title: 'Find anything fast',
+    body: 'Search by RC, make, driver name, or licence. Use filters to slice by category, document status, or active/inactive.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="fleet-actions"]',
+    title: 'Add vehicles and drivers',
+    body: 'Add a single vehicle by RC, bulk-upload via CSV, or onboard a new driver.',
+    placement: 'bottom',
+  },
+]

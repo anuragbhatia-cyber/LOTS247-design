@@ -226,7 +226,7 @@ export function ReportsList({
         </div>
 
         {/* Tabs — dropdown on mobile, pill bar on sm+ */}
-        <div className="mb-5">
+        <div data-tour="reports-tabs" className="mb-5">
           {/* Mobile dropdown */}
           <div className="sm:hidden">
             <select
@@ -270,7 +270,7 @@ export function ReportsList({
         </div>
 
         {/* Search + Filters */}
-        <div className="mb-4 space-y-3">
+        <div data-tour="reports-search" className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
@@ -342,7 +342,7 @@ export function ReportsList({
         </div>
 
         {/* Desktop Table */}
-        <div className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
+        <div data-tour="reports-table" className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
           <table className="w-full table-fixed">
             <colgroup>
               <col className="w-[30%]" />

@@ -1284,7 +1284,7 @@ export function KnowledgeBase({
         </div>
 
         {/* Search + Filter button */}
-        <div className="flex gap-3 mb-5">
+        <div data-tour="kb-search" className="flex gap-3 mb-5">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-stone-400 dark:text-stone-500" />
             <input
@@ -1431,7 +1431,7 @@ export function KnowledgeBase({
         )}
 
         {/* Category tabs */}
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-1 -mx-1 px-1">
+        <div data-tour="kb-categories" className="flex gap-2 mb-4 overflow-x-auto pb-1 -mx-1 px-1">
           {CATEGORY_TABS.map((cat) => {
             const isActive = activeCategory === cat
             const isAll = cat === 'all'
@@ -1468,7 +1468,7 @@ export function KnowledgeBase({
 
         {/* Article grid */}
         {filteredArticles.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div data-tour="kb-articles" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredArticles.map((article) => (
               <ArticleCard
                 key={article.id}

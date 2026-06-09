@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react'
+import { X, ArrowRight, Sparkles } from 'lucide-react'
 
 export interface TourStep {
   /** CSS selector for the element to spotlight (e.g. '[data-tour="quick-actions"]'). If unset, the tooltip centers on screen. */
@@ -173,7 +173,6 @@ export function TourOverlay({
 
   const tooltipPos = computeTooltipPosition(rect, step.placement, viewport)
   const totalSteps = steps.length
-  const isFirst = stepIndex === 0
   const isLast = stepIndex === totalSteps - 1
 
   return createPortal(
@@ -296,15 +295,6 @@ export function TourOverlay({
             Skip tour
           </button>
           <div className="flex items-center gap-1.5">
-            {!isFirst && (
-              <button
-                onClick={onBack}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Back
-              </button>
-            )}
             <button
               onClick={onNext}
               className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors shadow-sm shadow-emerald-600/20"

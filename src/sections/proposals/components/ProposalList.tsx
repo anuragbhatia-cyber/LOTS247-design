@@ -23,6 +23,28 @@ import {
 } from 'lucide-react'
 import type { ProposalListProps, Proposal, ProposalStatus, ProposalType, ServiceStatus } from '@/../product/sections/proposals/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
+
+const PROPOSALS_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Request Proposals',
+    body: 'Raise renewal, fitness, permit, or insurance requests and the LOTS team responds with a quote you can accept or decline.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="proposals-tabs"]',
+    title: 'Track every request by stage',
+    body: 'Sent, under review, received, and past — see exactly where each request is in our queue.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="proposals-create"]',
+    title: 'Create a new request',
+    body: 'One button to request any service. We respond with pricing and timelines, typically within a few hours.',
+    placement: 'left',
+  },
+]
 
 // ---------------------------------------------------------------------------
 // Translations
@@ -1133,6 +1155,7 @@ export function ProposalList({
             <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">{t.pageSubtitle}</p>
           </div>
           <button
+            data-tour="proposals-create"
             onClick={() => setShowCreateRequest(true)}
             className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shrink-0"
           >
@@ -1142,7 +1165,7 @@ export function ProposalList({
         </div>
 
         {/* Tabs — dropdown on mobile, pill bar on sm+ */}
-        <div className="mb-5">
+        <div data-tour="proposals-tabs" className="mb-5">
           {/* Mobile: dropdown (wider) + button in one row */}
           <div className="sm:hidden flex items-center gap-2">
             <select
@@ -1193,7 +1216,7 @@ export function ProposalList({
         </div>
 
         {/* Search + Filters */}
-        <div className="mb-4 space-y-3">
+        <div data-tour="proposals-search" className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
             {/* Search */}
             <div className="relative flex-1">
@@ -1525,6 +1548,8 @@ export function ProposalList({
         onCreateRequest={onCreateRequest}
         t={t}
       />
+
+      <SectionTour tourId="proposals" steps={PROPOSALS_TOUR_STEPS} />
     </div>
   )
 }

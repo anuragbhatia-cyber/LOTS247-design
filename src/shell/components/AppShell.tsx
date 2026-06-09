@@ -11,6 +11,7 @@ import { BulkUploadModal } from '@/sections/vehicle-and-driver-management/compon
 import { ChallanResultsView } from '@/sections/home/components/ChallanResultsView'
 import { VehicleComplianceResultsView } from '@/sections/home/components/VehicleComplianceResultsView'
 import { VehicleComplianceCheck } from '@/sections/home/components/VehicleComplianceCheck'
+import { CreateDriverInsuranceModal } from '@/sections/home/components/CreateDriverInsuranceModal'
 
 interface Notification {
   id: string
@@ -384,6 +385,7 @@ export function AppShell({
   const [showAddIncident, setShowAddIncident] = useState(false)
   const [showComplianceCheck, setShowComplianceCheck] = useState(false)
   const [showBulkUpload, setShowBulkUpload] = useState(false)
+  const [showCreateDriverInsurance, setShowCreateDriverInsurance] = useState(false)
   const [challanResultsVehicle, setChallanResultsVehicle] = useState<string | null>(null)
   const [complianceResultsVehicle, setComplianceResultsVehicle] = useState<string | null>(null)
   const [iframeOverlay, setIframeOverlay] = useState(false)
@@ -441,6 +443,9 @@ export function AppShell({
       }
       if (event.data?.type === 'openBulkUpload') {
         setShowBulkUpload(true)
+      }
+      if (event.data?.type === 'openCreateDriverInsurance') {
+        setShowCreateDriverInsurance(true)
       }
       if (event.data?.type === 'openChallanResults' && event.data?.vehicleNumber) {
         setChallanResultsVehicle(event.data.vehicleNumber)
@@ -850,7 +855,15 @@ export function AppShell({
                       onClick={() => {
                         setProfileOpen(false)
                         try {
+                          // Clear legacy single-tour key
                           window.localStorage.removeItem('lots247.tourSeen')
+                          // Clear all per-module tour keys
+                          const toRemove: string[] = []
+                          for (let i = 0; i < window.localStorage.length; i += 1) {
+                            const key = window.localStorage.key(i)
+                            if (key && key.startsWith('lots247.tourSeen.')) toRemove.push(key)
+                          }
+                          toRemove.forEach((k) => window.localStorage.removeItem(k))
                         } catch {}
                         window.dispatchEvent(new CustomEvent('lots247:replay-tour'))
                         // Reach the embedded preview iframe too
@@ -910,6 +923,12 @@ export function AppShell({
       <AddVehicleModal
         isOpen={showAddVehicle}
         onClose={() => setShowAddVehicle(false)}
+      />
+
+      {/* Activate Driver Insurance Modal */}
+      <CreateDriverInsuranceModal
+        isOpen={showCreateDriverInsurance}
+        onClose={() => setShowCreateDriverInsurance(false)}
       />
 
       {/* Add Driver Modal */}

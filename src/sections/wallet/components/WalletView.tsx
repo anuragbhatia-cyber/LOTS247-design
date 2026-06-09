@@ -36,6 +36,40 @@ import type {
   TransactionFilters,
   RelatedEntityType,
 } from '@/../product/sections/wallet/types'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
+
+const WALLET_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Your Wallet Coins',
+    body: 'Coins power every paid action — challan checks, RC fetches, API calls. Top up once and run lookups all month.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="wallet-balance"]',
+    title: 'Balance and recent recharge',
+    body: 'Current balance and your last recharge. If it dips low, we warn you here before something fails.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="wallet-add-money"]',
+    title: 'Add money in one click',
+    body: 'Top up via UPI, card, or netbanking. Coins land instantly in your wallet.',
+    placement: 'left',
+  },
+  {
+    target: '[data-tour="wallet-search"]',
+    title: 'Search and filter transactions',
+    body: 'Find any debit or credit by description or reference. Filters slice by type, category, status, and date.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="wallet-transactions"]',
+    title: 'Every transaction, traceable',
+    body: 'Click a row to see what it paid for — challan, RC fetch, API call — and jump straight to that entity.',
+    placement: 'top',
+  },
+]
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -842,6 +876,7 @@ export function WalletView({
                 <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
               </div>
               <button
+                data-tour="wallet-add-money"
                 onClick={() => {
                   setShowAddMoney(true)
                   window.parent.postMessage({ type: 'showOverlay' }, '*')
@@ -858,7 +893,7 @@ export function WalletView({
         {/* ----------------------------------------------------------------- */}
         {/* Stats Cards                                                       */}
         {/* ----------------------------------------------------------------- */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
+        <div data-tour="wallet-balance" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
           {/* Balance */}
           <div className={`col-span-2 rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6`}>
             <div className="flex items-start justify-between">
@@ -941,7 +976,7 @@ export function WalletView({
         {/* ----------------------------------------------------------------- */}
         {/* Search & Filter Bar (standalone, outside table card)              */}
         {/* ----------------------------------------------------------------- */}
-        <div className="flex items-center gap-3 mb-4">
+        <div data-tour="wallet-search" className="flex items-center gap-3 mb-4">
           {/* Search — takes remaining width */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
@@ -1057,7 +1092,7 @@ export function WalletView({
         {/* ----------------------------------------------------------------- */}
         {/* Transaction History Card                                          */}
         {/* ----------------------------------------------------------------- */}
-        <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 mb-6">
+        <div data-tour="wallet-transactions" className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 mb-6">
           {/* Card header */}
           <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-50">Transaction History</h2>
@@ -1330,6 +1365,8 @@ export function WalletView({
           onNavigateToEntity={onNavigateToEntity}
         />
       )}
+
+      <SectionTour tourId="wallet" steps={WALLET_TOUR_STEPS} />
     </div>
   )
 }

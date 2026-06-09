@@ -7,7 +7,6 @@ import { ComplianceScore } from './ComplianceScore'
 import { AlertsFeed } from './ActivityFeed'
 import { NotificationsView } from './NotificationsView'
 import { AlertsView } from './ActivityView'
-import { CreateDriverInsuranceModal } from './CreateDriverInsuranceModal'
 import { EmptyFleetState } from './EmptyFleetState'
 import { OnboardingChecklist } from './OnboardingChecklist'
 import { TourOverlay, type TourStep } from '@/shell/components/TourOverlay'
@@ -204,7 +203,6 @@ export function HomeView({
   const t = homeTranslations[language]
   const [view, setView] = useState<'home' | 'notifications' | 'alerts'>('home')
   const [quickActionsOpen, setQuickActionsOpen] = useState(false)
-  const [driverInsuranceOpen, setDriverInsuranceOpen] = useState(false)
   const [checklistDismissed, setChecklistDismissed] = useState(false)
 
   const isEmptyFleet = useMemo(() => {
@@ -212,7 +210,7 @@ export function HomeView({
     return params.get('empty') === '1'
   }, [])
 
-  const tour = useTour(true)
+  const tour = useTour('home', true)
 
   useEffect(() => {
     const handler = () => tour.start()
@@ -330,7 +328,7 @@ export function HomeView({
     vehicle: onAddVehicle,
     challan: () => window.parent.postMessage({ type: 'openCheckChallan' }, '*'),
     rto: () => window.parent.postMessage({ type: 'openComplianceCheck' }, '*'),
-    'driver-insurance': () => setDriverInsuranceOpen(true),
+    'driver-insurance': () => window.parent.postMessage({ type: 'openCreateDriverInsurance' }, '*'),
   }
 
   const qaTranslations: Record<string, { label: string; description: string }> = {
@@ -496,11 +494,6 @@ export function HomeView({
         </section>
 
       </div>
-
-      <CreateDriverInsuranceModal
-        isOpen={driverInsuranceOpen}
-        onClose={() => setDriverInsuranceOpen(false)}
-      />
 
       <TourOverlay
         isOpen={tour.isOpen}
