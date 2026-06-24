@@ -41,7 +41,7 @@ export interface Vehicle {
   documents: VehicleDocument[]
 }
 
-export type DriverInsuranceStatus = 'active' | 'inactive'
+export type DriverInsuranceStatus = 'active' | 'inactive' | 'under-process'
 
 export interface DriverInsurancePolicy {
   policyNumber: string

@@ -28,6 +28,7 @@ import {
   Loader2,
   Download,
   Coins,
+  Info,
 } from 'lucide-react'
 import type {
   VehicleAndDriverManagementProps,
@@ -146,6 +147,11 @@ const translations: Record<Language, Record<string, string>> = {
     insuranceStatus: 'Insurance Status',
     insuranceActive: 'Active',
     insuranceInactive: 'Inactive',
+    insuranceUnderProcess: 'Under Process',
+    underProcessInfoTitle: 'Activation in progress',
+    underProcessInfoBody:
+      'Your insurance activation is under process. Our partner is verifying KYC documents and underwriting the policy. The policy document will arrive on your registered email within 24–48 hours.',
+    underProcessInfoAria: 'What does Under Process mean?',
     viewInsurance: 'View details',
     assignedVehicles: 'Assigned Vehicles',
     noVehiclesAssigned: 'No vehicles assigned',
@@ -285,6 +291,11 @@ const translations: Record<Language, Record<string, string>> = {
     insuranceStatus: 'बीमा स्थिति',
     insuranceActive: 'सक्रिय',
     insuranceInactive: 'निष्क्रिय',
+    insuranceUnderProcess: 'प्रक्रियाधीन',
+    underProcessInfoTitle: 'सक्रियण प्रगति में',
+    underProcessInfoBody:
+      'आपका बीमा सक्रियण प्रक्रियाधीन है। हमारा साझेदार KYC दस्तावेज़ों की पुष्टि कर रहा है और पॉलिसी अंडरराइट कर रहा है। पॉलिसी दस्तावेज़ 24–48 घंटों में आपके पंजीकृत ईमेल पर पहुँच जाएगा।',
+    underProcessInfoAria: 'प्रक्रियाधीन का क्या अर्थ है?',
     viewInsurance: 'विवरण देखें',
     assignedVehicles: 'नियुक्त वाहन',
     noVehiclesAssigned: 'कोई वाहन नियुक्त नहीं',
@@ -432,6 +443,64 @@ function FilterPill({ label, onClear }: { label: string; onClear: () => void }) 
         <X className="w-3 h-3" />
       </button>
     </span>
+  )
+}
+
+function UnderProcessInfo({
+  title,
+  body,
+  ariaLabel,
+}: {
+  title: string
+  body: string
+  ariaLabel: string
+}) {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onClick = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onClick)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  return (
+    <div ref={wrapRef} className="relative inline-flex">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          setOpen((o) => !o)
+        }}
+        aria-label={ariaLabel}
+        aria-expanded={open}
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+      >
+        <Info className="w-3.5 h-3.5" />
+      </button>
+      {open && (
+        <div
+          role="dialog"
+          className="absolute z-30 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 p-3"
+        >
+          <p className="text-xs font-bold text-stone-900 dark:text-stone-50">{title}</p>
+          <p className="mt-1 text-xs leading-relaxed text-stone-600 dark:text-stone-400">{body}</p>
+          <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-white dark:bg-stone-900 border-b border-r border-stone-200 dark:border-stone-700" />
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -1646,15 +1715,25 @@ export function VehicleList({
                               className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
                                 driver.insuranceStatus === 'active'
                                   ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
-                                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                                  : driver.insuranceStatus === 'under-process'
+                                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
+                                    : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
                               }`}
                             >
                               <span
                                 className={`w-1.5 h-1.5 rounded-full ${
-                                  driver.insuranceStatus === 'active' ? 'bg-emerald-500' : 'bg-stone-400 dark:bg-stone-500'
+                                  driver.insuranceStatus === 'active'
+                                    ? 'bg-emerald-500'
+                                    : driver.insuranceStatus === 'under-process'
+                                      ? 'bg-amber-500 animate-pulse'
+                                      : 'bg-stone-400 dark:bg-stone-500'
                                 }`}
                               />
-                              {driver.insuranceStatus === 'active' ? t.insuranceActive : t.insuranceInactive}
+                              {driver.insuranceStatus === 'active'
+                                ? t.insuranceActive
+                                : driver.insuranceStatus === 'under-process'
+                                  ? t.insuranceUnderProcess
+                                  : t.insuranceInactive}
                             </span>
                             {driver.insuranceStatus === 'active' && (
                               <button
@@ -1664,6 +1743,13 @@ export function VehicleList({
                               >
                                 {t.viewInsurance}
                               </button>
+                            )}
+                            {driver.insuranceStatus === 'under-process' && (
+                              <UnderProcessInfo
+                                title={t.underProcessInfoTitle}
+                                body={t.underProcessInfoBody}
+                                ariaLabel={t.underProcessInfoAria}
+                              />
                             )}
                           </div>
                         </td>
@@ -1778,15 +1864,25 @@ export function VehicleList({
                             className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
                               driver.insuranceStatus === 'active'
                                 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
-                                : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                                : driver.insuranceStatus === 'under-process'
+                                  ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
+                                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
                             }`}
                           >
                             <span
                               className={`w-1.5 h-1.5 rounded-full ${
-                                driver.insuranceStatus === 'active' ? 'bg-emerald-500' : 'bg-stone-400 dark:bg-stone-500'
+                                driver.insuranceStatus === 'active'
+                                  ? 'bg-emerald-500'
+                                  : driver.insuranceStatus === 'under-process'
+                                    ? 'bg-amber-500 animate-pulse'
+                                    : 'bg-stone-400 dark:bg-stone-500'
                               }`}
                             />
-                            {driver.insuranceStatus === 'active' ? t.insuranceActive : t.insuranceInactive}
+                            {driver.insuranceStatus === 'active'
+                              ? t.insuranceActive
+                              : driver.insuranceStatus === 'under-process'
+                                ? t.insuranceUnderProcess
+                                : t.insuranceInactive}
                           </span>
                           {driver.insuranceStatus === 'active' && (
                             <button
@@ -1796,6 +1892,13 @@ export function VehicleList({
                             >
                               {t.viewInsurance}
                             </button>
+                          )}
+                          {driver.insuranceStatus === 'under-process' && (
+                            <UnderProcessInfo
+                              title={t.underProcessInfoTitle}
+                              body={t.underProcessInfoBody}
+                              ariaLabel={t.underProcessInfoAria}
+                            />
                           )}
                         </div>
                       </div>

@@ -11,7 +11,7 @@ import { BulkUploadModal } from '@/sections/vehicle-and-driver-management/compon
 import { ChallanResultsView } from '@/sections/home/components/ChallanResultsView'
 import { VehicleComplianceResultsView } from '@/sections/home/components/VehicleComplianceResultsView'
 import { VehicleComplianceCheck } from '@/sections/home/components/VehicleComplianceCheck'
-import { CreateDriverInsuranceModal } from '@/sections/home/components/CreateDriverInsuranceModal'
+import { DriverInsuranceHubModal } from '@/sections/home/components/DriverInsuranceHubModal'
 
 interface Notification {
   id: string
@@ -925,8 +925,8 @@ export function AppShell({
         onClose={() => setShowAddVehicle(false)}
       />
 
-      {/* Activate Driver Insurance Modal */}
-      <CreateDriverInsuranceModal
+      {/* Driver Insurance Hub Modal */}
+      <DriverInsuranceHubModal
         isOpen={showCreateDriverInsurance}
         onClose={() => setShowCreateDriverInsurance(false)}
       />
