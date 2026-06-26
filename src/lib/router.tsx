@@ -9,9 +9,10 @@ import { ShellDesignPage, ShellDesignFullscreen } from '@/components/ShellDesign
 import { ExportPage } from '@/components/ExportPage'
 import { FullPreviewPage } from '@/pages/FullPreviewPage'
 import { NewLandingPage } from '@/pages/NewLandingPage'
-import IncidentSummaryReportPreview from '../../Exported-reports/IncidentSummaryReportPreview'
-import IncidentClosureReportPreview from '../../Exported-reports/IncidentClosureReportPreview'
-import MonthlyIncidentSummaryReportPreview from '../../Exported-reports/MonthlyIncidentSummaryReportPreview'
+import IncidentSummaryReportPreview from '@/sections/reports/IncidentSummaryReportPreview'
+import IncidentClosureReportPreview from '@/sections/reports/IncidentClosureReportPreview'
+import MonthlyIncidentSummaryReportPreview from '@/sections/reports/MonthlyIncidentSummaryReportPreview'
+import MonthlyChallanSummaryReportPreview from '@/sections/reports/MonthlyChallanSummaryReportPreview'
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
   {
     path: '/report-preview/monthly-incident-summary',
     element: <MonthlyIncidentSummaryReportPreview />,
+  },
+  {
+    path: '/report-preview/monthly-challan-summary',
+    element: <MonthlyChallanSummaryReportPreview />,
   },
   {
     path: '/newlanding',

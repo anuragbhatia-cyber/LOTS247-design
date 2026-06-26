@@ -1,0 +1,13 @@
+Vehicle Number,Challan No,Offence,Issued Date,State,Court,Hearing Date,Amount (INR),Status
+UP32MM1113,DL/E/2025/0048217,Over-speeding 80 in 60 zone,2025-12-18,Delhi,Tis Hazari MM-3,2026-04-12,5000,Pending In Court
+UP32MM1113,DL/E/2025/0049884,Driving without seatbelt,2025-12-22,Delhi,Tis Hazari MM-3,2026-04-12,1000,Pending In Court
+UP32MM1113,DL/E/2026/0001124,Red-light jumping,2026-01-04,Delhi,Tis Hazari MM-5,2026-04-19,5000,Pending In Court
+UP32MM1113,DL/E/2026/0003567,Improper lane change,2026-01-11,Delhi,Tis Hazari MM-5,2026-04-19,500,Pending In Court
+UP32MM1113,DL/E/2026/0007211,Stop-line violation,2026-01-22,Delhi,Tis Hazari MM-5,2026-04-19,500,Pending In Court
+HR55AB1234,HR/PKL/2025/00890,Carrying excess load,2025-11-30,Haryana,Panchkula JMFC-2,2026-05-03,5000,Pending In Court
+HR55AB1234,HR/PKL/2026/00112,No reflective tape,2026-01-08,Haryana,Panchkula JMFC-2,2026-05-03,500,Pending In Court
+UP32MM1113,UP/MTP/2025/12340,Fitness expired,2025-11-20,Uttar Pradesh,Mathura MM-1,2026-04-22,5000,Pending In Court
+RJ14CD5678,RJ/JPR/2025/00721,Improper parking,2025-12-15,Rajasthan,Jaipur Metro Court 3,2026-04-30,500,Pending In Court
+UK04EF9012,UK/DDN/2026/00109,No PUC certificate,2026-01-19,Uttarakhand,Dehradun JMFC-1,2026-05-08,1500,Pending In Court
+HP09GH3456,HP/SHL/2025/00984,Carrying more than permitted passengers,2025-12-29,Himachal Pradesh,Shimla JMFC-2,2026-05-06,1500,Pending In Court
+CH01IJ7890,CH/CHD/2025/00451,Triple riding,2025-12-11,Chandigarh,Chandigarh JMFC-3,2026-04-26,1000,Pending In Court

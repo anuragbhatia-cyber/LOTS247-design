@@ -1,0 +1,11 @@
+Vehicle Number,Challan No,Offence,Issued Date,Disposed Date,Mode,Amount Paid (INR),Status
+UP32MM1113,DL/E/2025/0042118,No PUC certificate,2025-11-15,2026-02-04,Lok Adalat,500,Disposed
+HR55AB1234,HR/PKL/2025/00721,Stop-line violation,2025-11-22,2026-02-08,Lok Adalat,500,Disposed
+UP32MM1113,DL/ONL/2025/00978,Improper parking,2025-12-02,2026-02-11,Online Payment,500,Disposed
+RJ14CD5678,RJ/JPR/2025/00450,Improper lane change,2025-12-09,2026-02-15,Lok Adalat,500,Disposed
+UK04EF9012,UK/DDN/2025/00321,No reflective tape,2025-12-14,2026-02-18,Online Payment,500,Disposed
+UP32MM1113,DL/E/2026/0000122,Stop-line violation,2026-01-03,2026-02-23,Lok Adalat,500,Disposed
+HR55AB1234,HR/PKL/2026/00018,Improper parking,2026-01-08,2026-02-26,Online Payment,500,Disposed
+RJ14CD5678,RJ/JPR/2026/00031,No reflective tape,2026-01-11,2026-02-26,Lok Adalat,500,Disposed
+UP32MM1113,DL/ONL/2026/00091,Improper parking,2026-01-19,2026-02-27,Online Payment,500,Disposed
+UK04EF9012,UK/DDN/2026/00077,Stop-line violation,2026-01-21,2026-02-28,Lok Adalat,500,Disposed

@@ -15,6 +15,7 @@ import {
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 import vehicleData from '@/../product/sections/vehicle-and-driver-management/data.json'
 import type { Vehicle, Driver } from '@/../product/sections/vehicle-and-driver-management/types'
+import { DriverInsuranceModal } from '@/sections/vehicle-and-driver-management/components/DriverInsuranceModal'
 
 const INDIAN_STATES = [
   'Andhra Pradesh',
@@ -116,6 +117,20 @@ type T = {
   validTill: string
   nominee: string
   active: string
+  viewPolicy: string
+  back: string
+  detailTitle: string
+  detailSubtitle: string
+  planName: string
+  insurer: string
+  premium: string
+  perYear: string
+  validFrom: string
+  driverPhone: string
+  licenseNumber: string
+  nomineeRelation: string
+  coveredVehicles: string
+  downloadPolicy: string
 }
 
 const translations: Record<Language, T> = {
@@ -180,6 +195,20 @@ const translations: Record<Language, T> = {
     validTill: 'Valid till',
     nominee: 'Nominee',
     active: 'Active',
+    viewPolicy: 'View policy',
+    back: 'Back',
+    detailTitle: 'Policy Details',
+    detailSubtitle: 'Personal accident cover for the selected driver',
+    planName: 'Plan',
+    insurer: 'Insurer',
+    premium: 'Premium',
+    perYear: '/ year',
+    validFrom: 'Valid from',
+    driverPhone: 'Driver phone',
+    licenseNumber: 'License no.',
+    nomineeRelation: 'Relation',
+    coveredVehicles: 'Covered vehicles',
+    downloadPolicy: 'Download policy',
   },
   hi: {
     hubTitle: 'ड्राइवर बीमा',
@@ -242,6 +271,20 @@ const translations: Record<Language, T> = {
     validTill: 'तक वैध',
     nominee: 'नामांकित',
     active: 'सक्रिय',
+    viewPolicy: 'पॉलिसी देखें',
+    back: 'वापस',
+    detailTitle: 'पॉलिसी विवरण',
+    detailSubtitle: 'चयनित ड्राइवर के लिए व्यक्तिगत दुर्घटना कवर',
+    planName: 'प्लान',
+    insurer: 'बीमाकर्ता',
+    premium: 'प्रीमियम',
+    perYear: '/ वर्ष',
+    validFrom: 'से वैध',
+    driverPhone: 'ड्राइवर फ़ोन',
+    licenseNumber: 'लाइसेंस नं.',
+    nomineeRelation: 'संबंध',
+    coveredVehicles: 'कवर किए गए वाहन',
+    downloadPolicy: 'पॉलिसी डाउनलोड करें',
   },
 }
 
@@ -292,6 +335,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
   const t = translations[language]
 
   const [view, setView] = useState<View>('choose')
+  const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null)
 
   const [memberName, setMemberName] = useState('')
   const [email, setEmail] = useState('')
@@ -338,6 +382,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
   useEffect(() => {
     if (!isOpen) {
       setView('choose')
+      setSelectedDriverId(null)
       setMemberName('')
       setEmail('')
       setMobile('')
@@ -382,6 +427,11 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
     )
   }, [vehicleQuery])
 
+  const selectedDriver = useMemo(
+    () => activeDrivers.find((d) => d.id === selectedDriverId) ?? null,
+    [activeDrivers, selectedDriverId],
+  )
+
   const aadhaarDigits = aadhaar.replace(/\s/g, '')
 
   const isValid =
@@ -414,6 +464,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
   })()
 
   return createPortal(
+    <>
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
 
@@ -543,6 +594,17 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
                         </dd>
                       </div>
                     </dl>
+
+                    <div className="mt-3 pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDriverId(d.id)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors"
+                      >
+                        {t.viewPolicy}
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -805,7 +867,14 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
           )
         )}
       </div>
-    </div>,
+    </div>
+
+    <DriverInsuranceModal
+      isOpen={selectedDriver !== null}
+      driver={selectedDriver}
+      onClose={() => setSelectedDriverId(null)}
+    />
+    </>,
     document.body,
   )
 }
@@ -951,3 +1020,4 @@ function SelectField({
     </div>
   )
 }
+

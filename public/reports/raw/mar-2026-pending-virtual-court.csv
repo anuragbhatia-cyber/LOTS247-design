@@ -1,0 +1,9 @@
+Vehicle Number,Challan No,Offence,Issued Date,Virtual Court,Hearing Date,Amount (INR),Status
+UP32MM1113,DL/VC/2026/00012,Over-speeding 100 in 80 zone,2026-01-09,Delhi Virtual Court,2026-04-25,8000,Pending Virtual Court
+UP32MM1113,DL/VC/2026/00034,Driving against traffic,2026-01-21,Delhi Virtual Court,2026-04-25,4000,Pending Virtual Court
+HR55AB1234,DL/VC/2026/00041,Red-light jumping,2026-01-24,Delhi Virtual Court,2026-04-25,5000,Pending Virtual Court
+HR55AB1234,DL/VC/2026/00067,Carrying excess load,2026-02-02,Delhi Virtual Court,2026-05-10,5000,Pending Virtual Court
+RJ14CD5678,DL/VC/2026/00089,No insurance,2026-02-09,Delhi Virtual Court,2026-05-10,2000,Pending Virtual Court
+UK04EF9012,DL/VC/2026/00112,Mobile while driving,2026-02-15,Delhi Virtual Court,2026-05-10,5000,Pending Virtual Court
+UP32MM1113,DL/VC/2026/00130,Over-speeding 100 in 60,2026-02-20,Delhi Virtual Court,2026-05-22,10000,Pending Virtual Court
+RJ14CD5678,DL/VC/2026/00145,Improper lane change,2026-02-25,Delhi Virtual Court,2026-05-22,2000,Pending Virtual Court
