@@ -4,6 +4,28 @@ import type { ApiCatalogueProps } from '@/../product/sections/api-catalogue/type
 import { ContactModal } from './ContactModal'
 import { TopUpModal } from './TopUpModal'
 import { WalletTab, BulkRequestTab, ApiTokenTab, LogTab, TABS, type TabId } from './ApiDetail'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
+
+const API_CATALOGUE_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Wire LOTS data into your stack',
+    body: 'Vehicle, challan, and licence APIs you can plug into your TMS, ERP, or app. Pay-as-you-go on credits.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="api-sidebar"]',
+    title: 'Browse vs. manage',
+    body: 'All APIs shows the catalogue. My APIs shows what you have already subscribed to — switch any time.',
+    placement: 'right',
+  },
+  {
+    target: '[data-tour="api-grid"]',
+    title: 'Open any API',
+    body: 'Click a card to see endpoints, credit pricing, and code samples. Contact us if you need volume pricing.',
+    placement: 'top',
+  },
+]
 
 type SidebarTab = 'all' | 'my'
 
@@ -72,7 +94,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-64 lg:w-72 shrink-0 hidden md:block px-5 sm:px-6 lg:px-8 pb-5 sm:pb-6 lg:pb-8 pt-0">
+        <div data-tour="api-sidebar" className="w-64 lg:w-72 shrink-0 hidden md:block px-5 sm:px-6 lg:px-8 pb-5 sm:pb-6 lg:pb-8 pt-0">
           <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-2 space-y-1 sticky top-6">
             {SIDEBAR_ITEMS.map((item) => {
               const Icon = item.icon
@@ -205,7 +227,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
             <>
               {/* ─── All APIs tab ──────────────────────────────────────────── */}
               {activeTab === 'all' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div data-tour="api-grid" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {apis.map((api) => {
                     const isMyApi = MY_API_IDS.includes(api.id)
                     return (
@@ -268,7 +290,7 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
               ) : (
                 <>
                   {/* ─── My APIs tab ─────────────────────────────────────────── */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div data-tour="api-grid" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {displayedApis.map((api) => (
                       <div
                         key={api.id}
@@ -349,6 +371,8 @@ export function ApiCatalogue({ apis, onContactPricing }: ApiCatalogueProps & { o
           console.log('Top-up Balance amount:', amount)
         }}
       />
+
+      <SectionTour tourId="api-catalogue" steps={API_CATALOGUE_TOUR_STEPS} />
     </div>
   )
 }

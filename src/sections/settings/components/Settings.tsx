@@ -6,11 +6,9 @@ import {
   CreditCard,
   AlertTriangle,
   X,
-  CheckCircle2,
   Lock,
   Download,
   Sparkles,
-  Truck,
   Users,
   Check,
   Home,
@@ -32,18 +30,20 @@ import {
   UserMinus,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
 import type {
   SettingsProps,
   NotificationChannels,
   LandingPage,
   SubscriptionStatus,
   BillingStatus,
-  AvailablePlan,
   PaymentMethodType,
   TeamMemberRole,
   TeamMemberStatus,
   ReportFrequency,
   ReportFormat,
+  SubscriptionFeatures,
 } from '@/../product/sections/settings/types'
 
 // =============================================================================
@@ -81,7 +81,7 @@ const translations: Record<Language, Record<string, string>> = {
     sidebarBadgesDesc: 'Show vehicle count badges on sidebar navigation items',
     // Subscription
     currentPlan: 'Current Plan',
-    changePlan: 'Change Plan',
+    changePlan: 'Add Another Plan',
     nextRenewal: 'Next Renewal',
     startedOn: 'Started',
     vehicles: 'Vehicles',
@@ -226,7 +226,7 @@ const translations: Record<Language, Record<string, string>> = {
     sidebarBadges: 'साइडबार वाहन बैज',
     sidebarBadgesDesc: 'साइडबार नेविगेशन में वाहन गणना बैज दिखाएं',
     currentPlan: 'वर्तमान प्लान',
-    changePlan: 'प्लान बदलें',
+    changePlan: 'दूसरा प्लान जोड़ें',
     nextRenewal: 'अगला नवीनीकरण',
     startedOn: 'शुरू किया',
     vehicles: 'वाहन',
@@ -372,18 +372,21 @@ const BILLING_STATUS_CONFIG: Record<BillingStatus, { color: string; bg: string }
   refunded: { color: 'text-stone-600 dark:text-stone-400', bg: 'bg-stone-100 dark:bg-stone-800' },
 }
 
-const FEATURE_LABELS: Record<string, string> = {
-  onCallResolution: '24/7 On-Call Resolution',
-  onSiteResolution: 'On-Site Resolution',
-  challanResolutionOnline: 'Online Challan Resolution',
-  dashboardAccess: 'Dashboard Access',
-  automatedReports: 'Automated Reports',
-  personalizedReports: 'Personalized Reports',
-  whatsappUpdates: 'WhatsApp Updates',
-  accountManager: 'Dedicated Account Manager',
-  bulkChallanResolution: 'Bulk Challan Resolution',
-  apiIntegration: 'API Integration',
-}
+type PlanFeatureRow =
+  | { type: 'data'; key: keyof SubscriptionFeatures; label: string; indent?: boolean }
+  | { type: 'header'; label: string }
+
+const PLAN_FEATURES: PlanFeatureRow[] = [
+  { type: 'data', key: 'vehicleCount', label: 'No. of Vehicles' },
+  { type: 'data', key: 'onCall', label: '24/7 On-Call' },
+  { type: 'data', key: 'onSiteLegal', label: 'On-Site Legal' },
+  { type: 'header', label: 'Challan Service' },
+  { type: 'data', key: 'challanOnline', label: 'Online', indent: true },
+  { type: 'data', key: 'challanLokAdalat', label: 'Lok Adalat', indent: true },
+  { type: 'data', key: 'challanCourt', label: 'Court', indent: true },
+  { type: 'data', key: 'rtoService', label: 'RTO-as-a-Service' },
+  { type: 'data', key: 'dashboard', label: 'Dashboard' },
+]
 
 const PAYMENT_METHOD_ICONS: Record<PaymentMethodType, typeof CreditCard> = {
   upi: Smartphone,
@@ -462,120 +465,6 @@ function StatusBadge({ label, color, bg }: { label: string; color: string; bg: s
   )
 }
 
-function UsageMeter({ label, used, limit, t }: { label: string; used: number; limit: number | null; t: Record<string, string> }) {
-  const percentage = limit ? Math.min((used / limit) * 100, 100) : 0
-  const isNearLimit = limit ? percentage >= 80 : false
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-stone-700 dark:text-stone-300">{label}</span>
-        <span className="text-sm text-stone-500 dark:text-stone-400">
-          {used} {limit ? `${t.of} ${limit}` : `(${t.noLimit})`}
-        </span>
-      </div>
-      {limit ? (
-        <div className="h-2 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${isNearLimit ? 'bg-amber-500' : 'bg-emerald-500'}`}
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-      ) : (
-        <div className="h-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-full overflow-hidden">
-          <div className="h-full w-full bg-emerald-500/20 rounded-full" />
-        </div>
-      )}
-    </div>
-  )
-}
-
-function PlanComparisonModal({
-  plans,
-  onSelect,
-  onClose,
-  t,
-}: {
-  plans: AvailablePlan[]
-  onSelect: (planId: string) => void
-  onClose: () => void
-  t: Record<string, string>
-}) {
-  return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-stone-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-700 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
-          <h3 className="text-lg font-semibold text-stone-900 dark:text-stone-100">{t.changePlan}</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-500 transition-colors">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative rounded-xl border-2 p-5 transition-all ${
-                plan.isCurrentPlan
-                  ? 'border-emerald-300 dark:border-emerald-700 bg-emerald-50/50 dark:bg-emerald-950/20'
-                  : plan.isRecommended
-                  ? 'border-amber-300 dark:border-amber-700 bg-amber-50/30 dark:bg-amber-950/10'
-                  : 'border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600'
-              }`}
-            >
-              {plan.badge && (
-                <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-amber-500 text-white text-xs font-semibold rounded-full">{plan.badge}</span>
-              )}
-              {plan.isCurrentPlan && (
-                <span className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-emerald-500 text-white text-xs font-semibold rounded-full">{t.currentPlanBadge}</span>
-              )}
-              <div className="mb-4">
-                <h4 className="text-lg font-bold text-stone-900 dark:text-stone-100">{plan.name}</h4>
-                <div className="flex items-baseline gap-1 mt-1">
-                  <span className="text-2xl font-bold text-stone-900 dark:text-stone-100">{plan.price === 0 ? 'Free' : `₹${plan.price}`}</span>
-                  {plan.price > 0 && <span className="text-sm text-stone-500 dark:text-stone-400">{t.perMonth}</span>}
-                </div>
-              </div>
-              <div className="mb-4 space-y-1.5 text-sm text-stone-600 dark:text-stone-400">
-                <div className="flex items-center gap-1.5">
-                  <Truck className="w-3.5 h-3.5 text-stone-400" />
-                  <span>{plan.vehicleLimit ? `${plan.vehicleLimit} ${t.vehicles}` : `${t.unlimited} ${t.vehicles}`}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5 text-stone-400" />
-                  <span>{plan.userLimit} {t.users}</span>
-                </div>
-              </div>
-              <ul className="space-y-1.5 mb-5">
-                {plan.highlights.map((h, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-stone-600 dark:text-stone-400">
-                    <Check className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>{h}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => { if (!plan.isCurrentPlan) onSelect(plan.id) }}
-                disabled={plan.isCurrentPlan}
-                className={`w-full py-2 rounded-xl text-sm font-medium transition-colors ${
-                  plan.isCurrentPlan
-                    ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 dark:text-stone-500 cursor-not-allowed'
-                    : plan.isRecommended
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                    : 'bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-stone-200'
-                }`}
-              >
-                {plan.isCurrentPlan ? t.currentPlanBadge : t.selectPlan}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>,
-    document.body
-  )
-}
-
 // =============================================================================
 // Main Component
 // =============================================================================
@@ -610,7 +499,6 @@ export function Settings({
   const t = translations[language]
 
   const [activeTab, setActiveTab] = useState<Tab>('general')
-  const [showPlanModal, setShowPlanModal] = useState(false)
   const [showCancelPlanModal, setShowCancelPlanModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false)
@@ -649,7 +537,7 @@ export function Settings({
       {/* ================================================================= */}
       {/* Sidebar Navigation — hidden on mobile */}
       {/* ================================================================= */}
-      <div className="w-64 lg:w-72 shrink-0 hidden md:block p-5 sm:p-6 lg:p-8">
+      <div data-tour="settings-nav" className="w-64 lg:w-72 shrink-0 hidden md:block p-5 sm:p-6 lg:p-8">
         <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight mb-5">
           {t.pageTitle}
         </h1>
@@ -696,7 +584,7 @@ export function Settings({
         </div>
 
         {/* Tab Content Card */}
-        <div className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800">
+        <div data-tour="settings-content" className="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800">
 
           {/* ----- Notifications Tab ----- */}
           {activeTab === 'notifications' && (
@@ -902,7 +790,7 @@ export function Settings({
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <button
-                      onClick={() => { setShowPlanModal(true); sendOverlay(true) }}
+                      onClick={() => { window.parent.postMessage({ type: 'navigate', href: '/plans' }, '*') }}
                       className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
                     >
                       <Sparkles className="w-4 h-4" />
@@ -918,40 +806,37 @@ export function Settings({
                 </div>
               </div>
 
-              {/* Usage Meters */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
-                <UsageMeter label={t.vehicles} used={subscription.vehiclesUsed} limit={subscription.vehicleLimit} t={t} />
-                <UsageMeter label={t.users} used={subscription.usersUsed} limit={subscription.userLimit} t={t} />
-              </div>
-
               {/* Plan Features */}
               <div className="mb-6">
                 <h4 className="text-sm font-semibold text-stone-900 dark:text-stone-100 mb-3">{t.planFeatures}</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {Object.entries(subscription.features).map(([key, value]) => {
-                    const label = FEATURE_LABELS[key]
-                    if (!label) return null
+                <div className="divide-y divide-stone-100 dark:divide-stone-800 border-l-2 border-stone-200 dark:border-stone-700">
+                  {PLAN_FEATURES.map((row, i) => {
+                    if (row.type === 'header') {
+                      return (
+                        <div key={`h-${i}`} className="flex items-center justify-between py-2.5 pl-4 pr-2">
+                          <span className="text-sm text-stone-700 dark:text-stone-300">{row.label}</span>
+                          <Check className="w-4 h-4 text-emerald-500" />
+                        </div>
+                      )
+                    }
+                    const value = subscription.features[row.key]
                     const isIncluded = value === true
                     const isPayPerUse = value === 'payPerUse'
                     const isNumeric = typeof value === 'number'
                     return (
-                      <div key={key} className="flex items-center gap-2.5 py-1.5">
-                        {isIncluded || isPayPerUse || isNumeric ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        ) : (
-                          <Lock className="w-4 h-4 text-stone-300 dark:text-stone-600 shrink-0" />
-                        )}
-                        <span className={`text-sm ${
-                          isIncluded || isPayPerUse || isNumeric
-                            ? 'text-stone-700 dark:text-stone-300'
-                            : 'text-stone-400 dark:text-stone-500'
-                        }`}>
-                          {label}
-                          {isNumeric && ` (₹${value})`}
-                          {isPayPerUse && (
-                            <span className="text-xs text-amber-600 dark:text-amber-400 ml-1">({t.payPerUse})</span>
-                          )}
+                      <div key={row.key} className={`flex items-center justify-between py-2.5 pr-2 ${row.indent ? 'pl-10' : 'pl-4'}`}>
+                        <span className={`text-sm ${isIncluded || isPayPerUse || isNumeric ? 'text-stone-700 dark:text-stone-300' : 'text-stone-400 dark:text-stone-500'}`}>
+                          {row.label}
                         </span>
+                        {isNumeric ? (
+                          <span className="text-sm text-stone-900 dark:text-stone-100">{value}</span>
+                        ) : isPayPerUse ? (
+                          <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">{t.payPerUse}</span>
+                        ) : isIncluded ? (
+                          <Check className="w-4 h-4 text-emerald-500" />
+                        ) : (
+                          <Lock className="w-4 h-4 text-stone-300 dark:text-stone-600" />
+                        )}
                       </div>
                     )
                   })}
@@ -1323,20 +1208,6 @@ export function Settings({
         </div>
       </div>
 
-      {/* Plan Comparison Modal */}
-      {showPlanModal && (
-        <PlanComparisonModal
-          plans={availablePlans}
-          onSelect={(planId) => {
-            onChangePlan?.(planId)
-            setShowPlanModal(false)
-            sendOverlay(false)
-          }}
-          onClose={() => { setShowPlanModal(false); sendOverlay(false) }}
-          t={t}
-        />
-      )}
-
       {/* Cancel Plan Confirmation Modal */}
       {showCancelPlanModal && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
@@ -1588,6 +1459,28 @@ export function Settings({
         </div>,
         document.body
       )}
+
+      <SectionTour tourId="settings" steps={SETTINGS_TOUR_STEPS} />
     </div>
   )
 }
+
+const SETTINGS_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Make LOTS247 your own',
+    body: 'Tune notifications, billing, team access, and preferences from one place.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="settings-nav"]',
+    title: 'Jump between sections',
+    body: 'Switch between Notifications, Subscription, Team, Reports, and General settings.',
+    placement: 'right',
+  },
+  {
+    target: '[data-tour="settings-content"]',
+    title: 'Edit and save inline',
+    body: 'Most changes save automatically. Sensitive actions like plan changes confirm before applying.',
+    placement: 'top',
+  },
+]

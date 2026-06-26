@@ -27,6 +27,8 @@ import {
   RefreshCw,
   Loader2,
   Download,
+  Coins,
+  Info,
 } from 'lucide-react'
 import type {
   VehicleAndDriverManagementProps,
@@ -37,6 +39,9 @@ import type {
   DocumentStatus,
 } from '@/../product/sections/vehicle-and-driver-management/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { EmptyState } from '@/shell/components/EmptyState'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
 import { DriverInsuranceModal } from './DriverInsuranceModal'
 
 // ---------------------------------------------------------------------------
@@ -48,6 +53,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Page header
     vehiclesAndDrivers: 'Vehicles & Drivers',
     centralRepository: 'Central repository of all vehicles and assigned drivers',
+    fleetEmptyTitle: 'No vehicles yet',
+    fleetEmptyDesc: 'Add your first vehicle by entering an RC number — we fetch the details and documents automatically.',
+    fleetEmptyBulk: 'Upload a CSV for bulk import',
 
     // Header buttons
     bulkUpload: 'Bulk Upload',
@@ -139,6 +147,11 @@ const translations: Record<Language, Record<string, string>> = {
     insuranceStatus: 'Insurance Status',
     insuranceActive: 'Active',
     insuranceInactive: 'Inactive',
+    insuranceUnderProcess: 'Under Process',
+    underProcessInfoTitle: 'Activation in progress',
+    underProcessInfoBody:
+      'Your insurance activation is under process. Our partner is verifying KYC documents and underwriting the policy. The policy document will arrive on your registered email within 24–48 hours.',
+    underProcessInfoAria: 'What does Under Process mean?',
     viewInsurance: 'View details',
     assignedVehicles: 'Assigned Vehicles',
     noVehiclesAssigned: 'No vehicles assigned',
@@ -184,6 +197,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Page header
     vehiclesAndDrivers: 'वाहन और ड्राइवर',
     centralRepository: 'सभी वाहनों और नियुक्त ड्राइवरों का केंद्रीय भंडार',
+    fleetEmptyTitle: 'अभी तक कोई वाहन नहीं',
+    fleetEmptyDesc: 'RC नंबर दर्ज करके अपना पहला वाहन जोड़ें — हम विवरण और दस्तावेज़ स्वचालित रूप से प्राप्त करते हैं।',
+    fleetEmptyBulk: 'बल्क आयात के लिए CSV अपलोड करें',
 
     // Header buttons
     bulkUpload: 'बल्क अपलोड',
@@ -275,6 +291,11 @@ const translations: Record<Language, Record<string, string>> = {
     insuranceStatus: 'बीमा स्थिति',
     insuranceActive: 'सक्रिय',
     insuranceInactive: 'निष्क्रिय',
+    insuranceUnderProcess: 'प्रक्रियाधीन',
+    underProcessInfoTitle: 'सक्रियण प्रगति में',
+    underProcessInfoBody:
+      'आपका बीमा सक्रियण प्रक्रियाधीन है। हमारा साझेदार KYC दस्तावेज़ों की पुष्टि कर रहा है और पॉलिसी अंडरराइट कर रहा है। पॉलिसी दस्तावेज़ 24–48 घंटों में आपके पंजीकृत ईमेल पर पहुँच जाएगा।',
+    underProcessInfoAria: 'प्रक्रियाधीन का क्या अर्थ है?',
     viewInsurance: 'विवरण देखें',
     assignedVehicles: 'नियुक्त वाहन',
     noVehiclesAssigned: 'कोई वाहन नियुक्त नहीं',
@@ -422,6 +443,64 @@ function FilterPill({ label, onClear }: { label: string; onClear: () => void }) 
         <X className="w-3 h-3" />
       </button>
     </span>
+  )
+}
+
+function UnderProcessInfo({
+  title,
+  body,
+  ariaLabel,
+}: {
+  title: string
+  body: string
+  ariaLabel: string
+}) {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onClick = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onClick)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  return (
+    <div ref={wrapRef} className="relative inline-flex">
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          setOpen((o) => !o)
+        }}
+        aria-label={ariaLabel}
+        aria-expanded={open}
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400/40"
+      >
+        <Info className="w-3.5 h-3.5" />
+      </button>
+      {open && (
+        <div
+          role="dialog"
+          className="absolute z-30 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 p-3"
+        >
+          <p className="text-xs font-bold text-stone-900 dark:text-stone-50">{title}</p>
+          <p className="mt-1 text-xs leading-relaxed text-stone-600 dark:text-stone-400">{body}</p>
+          <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-white dark:bg-stone-900 border-b border-r border-stone-200 dark:border-stone-700" />
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -844,6 +923,40 @@ export function VehicleList({
     (expiryFilter !== 'all' ? 1 : 0) +
     (statusFilter !== 'all' ? 1 : 0)
 
+  const isFleetEmpty = vehicles.length === 0 && drivers.length === 0
+
+  if (isFleetEmpty) {
+    return (
+      <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
+        <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10 max-w-5xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+              {t.vehiclesAndDrivers}
+            </h1>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+              {t.centralRepository}
+            </p>
+          </div>
+          <EmptyState
+            icon={Truck}
+            title={t.fleetEmptyTitle}
+            description={t.fleetEmptyDesc}
+            primaryCta={{
+              label: t.addVehicle,
+              icon: Plus,
+              onClick: () => window.parent.postMessage({ type: 'openAddVehicle' }, '*'),
+            }}
+            secondaryCta={{
+              label: t.fleetEmptyBulk,
+              icon: Upload,
+              onClick: () => window.parent.postMessage({ type: 'openBulkUpload' }, '*'),
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10">
@@ -857,7 +970,7 @@ export function VehicleList({
               {t.centralRepository}
             </p>
           </div>
-          <div className="flex items-center justify-between gap-2">
+          <div data-tour="fleet-actions" className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <button
                 className="flex items-center gap-2 px-3.5 py-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-medium text-stone-700 dark:text-stone-300 hover:bg-stone-100 hover:border-stone-300 dark:hover:bg-stone-800 dark:hover:border-stone-600 transition-colors"
@@ -884,7 +997,7 @@ export function VehicleList({
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div data-tour="fleet-summary" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <div className="rounded-xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between mb-1">
@@ -948,7 +1061,7 @@ export function VehicleList({
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-full sm:w-fit mb-5">
+        <div data-tour="fleet-tabs" className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-full sm:w-fit mb-5">
           <button
             onClick={() => setActiveTab('vehicles')}
             className={`flex-1 sm:flex-initial flex items-center justify-center sm:justify-start gap-2 px-4 py-2 min-h-11 rounded-md text-sm font-medium transition-colors ${
@@ -988,7 +1101,7 @@ export function VehicleList({
         </div>
 
         {/* Search + Filters */}
-        <div className="mb-4 space-y-3">
+        <div data-tour="fleet-search" className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
@@ -1415,6 +1528,10 @@ export function VehicleList({
                                 <>
                                   <RefreshCw className="w-3 h-3" />
                                   {t.fetchDetails}
+                                  <span className="inline-flex items-center gap-0.5 ml-1 pl-1.5 border-l border-emerald-300/60 dark:border-emerald-700/60 text-emerald-600 dark:text-emerald-400">
+                                    <Coins className="w-3 h-3 text-amber-500" aria-hidden="true" />
+                                    2
+                                  </span>
                                 </>
                               )}
                             </button>
@@ -1598,15 +1715,25 @@ export function VehicleList({
                               className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
                                 driver.insuranceStatus === 'active'
                                   ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
-                                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                                  : driver.insuranceStatus === 'under-process'
+                                    ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
+                                    : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
                               }`}
                             >
                               <span
                                 className={`w-1.5 h-1.5 rounded-full ${
-                                  driver.insuranceStatus === 'active' ? 'bg-emerald-500' : 'bg-stone-400 dark:bg-stone-500'
+                                  driver.insuranceStatus === 'active'
+                                    ? 'bg-emerald-500'
+                                    : driver.insuranceStatus === 'under-process'
+                                      ? 'bg-amber-500 animate-pulse'
+                                      : 'bg-stone-400 dark:bg-stone-500'
                                 }`}
                               />
-                              {driver.insuranceStatus === 'active' ? t.insuranceActive : t.insuranceInactive}
+                              {driver.insuranceStatus === 'active'
+                                ? t.insuranceActive
+                                : driver.insuranceStatus === 'under-process'
+                                  ? t.insuranceUnderProcess
+                                  : t.insuranceInactive}
                             </span>
                             {driver.insuranceStatus === 'active' && (
                               <button
@@ -1616,6 +1743,13 @@ export function VehicleList({
                               >
                                 {t.viewInsurance}
                               </button>
+                            )}
+                            {driver.insuranceStatus === 'under-process' && (
+                              <UnderProcessInfo
+                                title={t.underProcessInfoTitle}
+                                body={t.underProcessInfoBody}
+                                ariaLabel={t.underProcessInfoAria}
+                              />
                             )}
                           </div>
                         </td>
@@ -1730,15 +1864,25 @@ export function VehicleList({
                             className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${
                               driver.insuranceStatus === 'active'
                                 ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400'
-                                : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                                : driver.insuranceStatus === 'under-process'
+                                  ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400'
+                                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
                             }`}
                           >
                             <span
                               className={`w-1.5 h-1.5 rounded-full ${
-                                driver.insuranceStatus === 'active' ? 'bg-emerald-500' : 'bg-stone-400 dark:bg-stone-500'
+                                driver.insuranceStatus === 'active'
+                                  ? 'bg-emerald-500'
+                                  : driver.insuranceStatus === 'under-process'
+                                    ? 'bg-amber-500 animate-pulse'
+                                    : 'bg-stone-400 dark:bg-stone-500'
                               }`}
                             />
-                            {driver.insuranceStatus === 'active' ? t.insuranceActive : t.insuranceInactive}
+                            {driver.insuranceStatus === 'active'
+                              ? t.insuranceActive
+                              : driver.insuranceStatus === 'under-process'
+                                ? t.insuranceUnderProcess
+                                : t.insuranceInactive}
                           </span>
                           {driver.insuranceStatus === 'active' && (
                             <button
@@ -1748,6 +1892,13 @@ export function VehicleList({
                             >
                               {t.viewInsurance}
                             </button>
+                          )}
+                          {driver.insuranceStatus === 'under-process' && (
+                            <UnderProcessInfo
+                              title={t.underProcessInfoTitle}
+                              body={t.underProcessInfoBody}
+                              ariaLabel={t.underProcessInfoAria}
+                            />
                           )}
                         </div>
                       </div>
@@ -1841,6 +1992,40 @@ export function VehicleList({
           onClose={() => setInsuranceDriver(null)}
         />
       </div>
+
+      <SectionTour tourId="fleet" steps={FLEET_TOUR_STEPS} />
     </div>
   )
 }
+
+const FLEET_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Your fleet, in one place',
+    body: 'This is where every vehicle and driver lives.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="fleet-summary"]',
+    title: 'Fleet at a glance',
+    body: 'Total vehicles, average compliance, and how many docs are expired or expiring.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="fleet-tabs"]',
+    title: 'Switch between vehicles and drivers',
+    body: 'Same screen, two views. Drivers live alongside vehicles so you can assign and re-assign in seconds.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="fleet-search"]',
+    title: 'Find anything fast',
+    body: 'Search by RC, make, driver name, or licence. Use filters to slice by category, document status, or active/inactive.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="fleet-actions"]',
+    title: 'Add vehicles and drivers',
+    body: 'Add a single vehicle by RC, bulk-upload via CSV, or onboard a new driver.',
+    placement: 'bottom',
+  },
+]

@@ -14,6 +14,7 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import type { ReportsProps, Report, ReportTab, ReportType } from '@/../product/sections/reports/types'
+import { EmptyState } from '@/shell/components/EmptyState'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -88,17 +89,49 @@ function getReportName(report: Report): string {
   return `${report.type}_${month}_${year}`
 }
 
+const PREVIEW_URL_BY_TYPE: Record<ReportType, string> = {
+  MIS: '/report-preview/monthly-incident-summary',
+  'MIS-CHALLAN': '/report-preview/monthly-challan-summary',
+  ICR: '/report-preview/incident-closure',
+  ISR: '/report-preview/incident-summary',
+}
+
+function getReportPreviewUrl(report: Report): string {
+  return PREVIEW_URL_BY_TYPE[report.type]
+}
+
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function TypeBadge({ type }: { type: ReportType }) {
+function TypeBadge({
+  type,
+  href,
+  onActivate,
+}: {
+  type: ReportType
+  href?: string
+  onActivate?: () => void
+}) {
   const config = TYPE_CONFIG[type]
-  return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
-      {config.label}
-    </span>
-  )
+  const className = `inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold transition-colors ${config.bg} ${config.text}`
+  if (href) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => {
+          e.stopPropagation()
+          onActivate?.()
+        }}
+        className={`${className} hover:brightness-95 dark:hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-emerald-500/40`}
+      >
+        {config.label}
+      </a>
+    )
+  }
+  return <span className={className}>{config.label}</span>
 }
 
 // ---------------------------------------------------------------------------
@@ -185,6 +218,32 @@ export function ReportsList({
     return counts
   }, [reports])
 
+  if (reports.length === 0) {
+    return (
+      <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
+        <div className="px-4 sm:px-6 lg:px-8 py-5 sm:py-7 lg:py-10 max-w-5xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
+              Reports
+            </h1>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+              View, download, and share system-generated reports
+            </p>
+          </div>
+          <EmptyState
+            icon={FileText}
+            title="No reports yet"
+            description="Monthly MIS, incident closure, and challan summaries get generated automatically once your fleet has activity. Add vehicles to start building your reporting history."
+            primaryCta={{
+              label: 'Add Vehicle',
+              onClick: () => window.parent.postMessage({ type: 'openAddVehicle' }, '*'),
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-950">
       <div className="px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 lg:pt-8">
@@ -199,7 +258,7 @@ export function ReportsList({
         </div>
 
         {/* Tabs — dropdown on mobile, pill bar on sm+ */}
-        <div className="mb-5">
+        <div data-tour="reports-tabs" className="mb-5">
           {/* Mobile dropdown */}
           <div className="sm:hidden">
             <select
@@ -243,7 +302,7 @@ export function ReportsList({
         </div>
 
         {/* Search + Filters */}
-        <div className="mb-4 space-y-3">
+        <div data-tour="reports-search" className="mb-4 space-y-3">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
@@ -315,7 +374,7 @@ export function ReportsList({
         </div>
 
         {/* Desktop Table */}
-        <div className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
+        <div data-tour="reports-table" className="hidden md:block bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl overflow-hidden">
           <table className="w-full table-fixed">
             <colgroup>
               <col className="w-[30%]" />
@@ -344,57 +403,78 @@ export function ReportsList({
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-200 dark:divide-stone-800/60">
-              {paginatedItems.map((report) => (
-                <tr
-                  key={report.id}
-                  className="group hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
-                >
-                  <td className="px-5 py-4">
-                    <p className="text-sm font-medium text-stone-900 dark:text-stone-50 font-mono tracking-tight">
-                      {getReportName(report)}
-                    </p>
-                  </td>
+              {paginatedItems.map((report) => {
+                const previewUrl = getReportPreviewUrl(report)
+                return (
+                  <tr
+                    key={report.id}
+                    onClick={() => {
+                      onPreview?.(report.id)
+                      window.open(previewUrl, '_blank', 'noopener,noreferrer')
+                    }}
+                    className="group cursor-pointer hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                  >
+                    <td className="px-5 py-4">
+                      <p className="text-sm font-medium text-stone-900 dark:text-stone-50 font-mono tracking-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                        {getReportName(report)}
+                      </p>
+                    </td>
 
-                  <td className="px-5 py-4">
-                    <TypeBadge type={report.type} />
-                  </td>
+                    <td className="px-5 py-4">
+                      <TypeBadge
+                        type={report.type}
+                        href={previewUrl}
+                        onActivate={() => onPreview?.(report.id)}
+                      />
+                    </td>
 
-                  <td className="px-5 py-4">
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-stone-500 dark:text-stone-400">
-                      <FileText className="w-3 h-3" />
-                      {report.format}
-                    </span>
-                  </td>
+                    <td className="px-5 py-4">
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-stone-500 dark:text-stone-400">
+                        <FileText className="w-3 h-3" />
+                        {report.format}
+                      </span>
+                    </td>
 
-                  <td className="px-5 py-4">
-                    <p className="text-sm text-stone-700 dark:text-stone-300">
-                      {formatDate(report.generatedAt)}
-                    </p>
-                    <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-                      {formatTime(report.generatedAt)}
-                    </p>
-                  </td>
+                    <td className="px-5 py-4">
+                      <p className="text-sm text-stone-700 dark:text-stone-300">
+                        {formatDate(report.generatedAt)}
+                      </p>
+                      <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
+                        {formatTime(report.generatedAt)}
+                      </p>
+                    </td>
 
-                  <td className="px-5 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => onDownload?.(report.id)}
-                        className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-                        title="Download PDF"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => onShareWhatsApp?.(report.id)}
-                        className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
-                        title="Share via WhatsApp"
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    <td className="px-5 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <a
+                          href={previewUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onDownload?.(report.id)
+                          }}
+                          className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors inline-flex items-center justify-center"
+                          title="Open and download PDF"
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onShareWhatsApp?.(report.id)
+                          }}
+                          className="p-2 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                          title="Share via WhatsApp"
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
 
@@ -411,54 +491,75 @@ export function ReportsList({
 
         {/* Mobile Card View */}
         <div className="md:hidden space-y-3">
-          {paginatedItems.map((report) => (
-            <div
-              key={report.id}
-              className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-sm font-medium text-stone-900 dark:text-stone-50 font-mono tracking-tight">
-                    {getReportName(report)}
-                  </p>
-                </div>
-                <TypeBadge type={report.type} />
-              </div>
-
-              <div className="space-y-1.5 mb-3">
-                {report.vehicleRegistration && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-stone-500 dark:text-stone-400">Vehicle</span>
-                    <span className="text-sm text-stone-800 dark:text-stone-200">{report.vehicleRegistration}</span>
+          {paginatedItems.map((report) => {
+            const previewUrl = getReportPreviewUrl(report)
+            return (
+              <div
+                key={report.id}
+                onClick={() => {
+                  onPreview?.(report.id)
+                  window.open(previewUrl, '_blank', 'noopener,noreferrer')
+                }}
+                className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5 sm:p-6 cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-600 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-50 font-mono tracking-tight">
+                      {getReportName(report)}
+                    </p>
                   </div>
-                )}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-stone-500 dark:text-stone-400">Generated</span>
-                  <span className="text-sm text-stone-600 dark:text-stone-300">{formatDate(report.generatedAt)}</span>
+                  <TypeBadge
+                    type={report.type}
+                    href={previewUrl}
+                    onActivate={() => onPreview?.(report.id)}
+                  />
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-stone-500 dark:text-stone-400">Format</span>
-                  <span className="text-xs font-medium text-stone-500 dark:text-stone-400">{report.format}</span>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-2 pt-3 border-t border-stone-200 dark:border-stone-800">
-                <button
-                  onClick={() => onDownload?.(report.id)}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Download
-                </button>
-                <button
-                  onClick={() => onShareWhatsApp?.(report.id)}
-                  className="p-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-400 transition-colors"
-                >
-                  <Share2 className="w-4 h-4" />
-                </button>
+                <div className="space-y-1.5 mb-3">
+                  {report.vehicleRegistration && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-stone-500 dark:text-stone-400">Vehicle</span>
+                      <span className="text-sm text-stone-800 dark:text-stone-200">{report.vehicleRegistration}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-stone-500 dark:text-stone-400">Generated</span>
+                    <span className="text-sm text-stone-600 dark:text-stone-300">{formatDate(report.generatedAt)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-stone-500 dark:text-stone-400">Format</span>
+                    <span className="text-xs font-medium text-stone-500 dark:text-stone-400">{report.format}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-3 border-t border-stone-200 dark:border-stone-800">
+                  <a
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDownload?.(report.id)
+                    }}
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Open
+                  </a>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onShareWhatsApp?.(report.id)
+                    }}
+                    className="p-2.5 min-h-11 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-600 dark:text-stone-400 transition-colors"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
 
           {filtered.length === 0 && (
             <div className="py-16 text-center">

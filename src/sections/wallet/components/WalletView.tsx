@@ -13,7 +13,6 @@ import {
   Receipt,
   Scale,
   RefreshCw,
-  RotateCcw,
   SlidersHorizontal,
   CheckCircle2,
   XCircle,
@@ -26,6 +25,7 @@ import {
   IndianRupee,
   ChevronDown,
   Calendar,
+  Coins,
 } from 'lucide-react'
 import type {
   WalletProps,
@@ -36,6 +36,40 @@ import type {
   TransactionFilters,
   RelatedEntityType,
 } from '@/../product/sections/wallet/types'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
+
+const WALLET_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Your Wallet Coins',
+    body: 'Coins power every paid action — challan checks, RC fetches, API calls. Top up once and run lookups all month.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="wallet-balance"]',
+    title: 'Balance and recent recharge',
+    body: 'Current balance and your last recharge. If it dips low, we warn you here before something fails.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="wallet-add-money"]',
+    title: 'Add money in one click',
+    body: 'Top up via UPI, card, or netbanking. Coins land instantly in your wallet.',
+    placement: 'left',
+  },
+  {
+    target: '[data-tour="wallet-search"]',
+    title: 'Search and filter transactions',
+    body: 'Find any debit or credit by description or reference. Filters slice by type, category, status, and date.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="wallet-transactions"]',
+    title: 'Every transaction, traceable',
+    body: 'Click a row to see what it paid for — challan, RC fetch, API call — and jump straight to that entity.',
+    placement: 'top',
+  },
+]
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -57,6 +91,10 @@ function formatDateTime(iso: string): string {
 
 function formatCurrency(amount: number): string {
   return `₹${amount.toLocaleString('en-IN')}`
+}
+
+function formatCoins(amount: number): string {
+  return amount.toLocaleString('en-IN')
 }
 
 function getRelativeDate(iso: string): string {
@@ -91,19 +129,19 @@ const CATEGORY_CONFIG: Record<TransactionCategory, { label: string; icon: typeof
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     iconBg: 'bg-emerald-100 dark:bg-emerald-900/50',
   },
-  subscription: {
-    label: 'Subscription',
-    icon: CreditCard,
-    color: 'text-blue-700 dark:text-blue-300',
-    bg: 'bg-blue-50 dark:bg-blue-950/40',
-    iconBg: 'bg-blue-100 dark:bg-blue-900/50',
-  },
   challan: {
-    label: 'Challan',
+    label: 'Challan Check',
     icon: Receipt,
     color: 'text-amber-700 dark:text-amber-300',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
     iconBg: 'bg-amber-100 dark:bg-amber-900/50',
+  },
+  rcFetch: {
+    label: 'RC Fetch',
+    icon: RefreshCw,
+    color: 'text-blue-700 dark:text-blue-300',
+    bg: 'bg-blue-50 dark:bg-blue-950/40',
+    iconBg: 'bg-blue-100 dark:bg-blue-900/50',
   },
   legalFee: {
     label: 'Legal Fee',
@@ -111,13 +149,6 @@ const CATEGORY_CONFIG: Record<TransactionCategory, { label: string; icon: typeof
     color: 'text-purple-700 dark:text-purple-300',
     bg: 'bg-purple-50 dark:bg-purple-950/40',
     iconBg: 'bg-purple-100 dark:bg-purple-900/50',
-  },
-  refund: {
-    label: 'Refund',
-    icon: RotateCcw,
-    color: 'text-teal-700 dark:text-teal-300',
-    bg: 'bg-teal-50 dark:bg-teal-950/40',
-    iconBg: 'bg-teal-100 dark:bg-teal-900/50',
   },
 }
 
@@ -157,15 +188,40 @@ const TYPE_OPTIONS: { id: TransactionType | 'all'; label: string }[] = [
 const CATEGORY_OPTIONS: { id: TransactionCategory | 'all'; label: string }[] = [
   { id: 'all', label: 'All' },
   { id: 'recharge', label: 'Recharge' },
-  { id: 'subscription', label: 'Subscription' },
-  { id: 'challan', label: 'Challan' },
+  { id: 'challan', label: 'Challan Check' },
+  { id: 'rcFetch', label: 'RC Fetch' },
   { id: 'legalFee', label: 'Legal Fee' },
-  { id: 'refund', label: 'Refund' },
 ]
 
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
+
+function CoinAmount({
+  amount,
+  sign,
+  size = 'sm',
+  className = '',
+}: {
+  amount: number
+  sign?: '+' | '−' | null
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+  className?: string
+}) {
+  const iconSize =
+    size === 'xl' ? 'w-7 h-7'
+    : size === 'lg' ? 'w-5 h-5'
+    : size === 'md' ? 'w-4 h-4'
+    : size === 'xs' ? 'w-3 h-3'
+    : 'w-3.5 h-3.5'
+  return (
+    <span className={`inline-flex items-center gap-1 ${className}`}>
+      {sign && <span>{sign}</span>}
+      <Coins className={`${iconSize} text-amber-500 shrink-0`} aria-hidden="true" />
+      <span className="tabular-nums">{formatCoins(amount)}</span>
+    </span>
+  )
+}
 
 function CategoryBadge({ category }: { category: TransactionCategory }) {
   const config = CATEGORY_CONFIG[category]
@@ -266,16 +322,28 @@ function AddMoneyModal({
                 </div>
               </div>
               <h3 className="text-xl font-bold text-stone-900 dark:text-white">Payment Successful</h3>
-              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">
-                {formatCurrency(paidAmount)} added to your wallet
+              <p className="text-sm text-stone-500 dark:text-stone-400 mt-1 inline-flex items-center justify-center gap-1.5 flex-wrap">
+                <span>{formatCurrency(paidAmount)} paid</span>
+                <span className="text-stone-300 dark:text-stone-600">·</span>
+                <span className="inline-flex items-center gap-1 font-semibold text-stone-700 dark:text-stone-200">
+                  <Coins className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                  {formatCoins(paidAmount)} coins added
+                </span>
               </p>
             </div>
 
             {/* Details */}
             <div className="bg-stone-50 dark:bg-stone-800/50 rounded-xl p-4 space-y-3 mb-6">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-stone-500 dark:text-stone-400">Amount</span>
+                <span className="text-sm text-stone-500 dark:text-stone-400">Amount paid</span>
                 <span className="text-sm font-bold text-stone-900 dark:text-white">{formatCurrency(paidAmount)}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-stone-500 dark:text-stone-400">Coins credited</span>
+                <span className="inline-flex items-center gap-1 text-sm font-bold text-stone-900 dark:text-white">
+                  <Coins className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                  {formatCoins(paidAmount)}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-stone-500 dark:text-stone-400">Transaction ID</span>
@@ -307,7 +375,10 @@ function AddMoneyModal({
             <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-200 dark:border-stone-800">
               <div>
                 <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 tracking-tight">Add Money</h3>
-                <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">Top up your LOTS247 wallet</p>
+                <p className="text-xs text-stone-500 dark:text-stone-400 mt-1 inline-flex items-center gap-1.5">
+                  <Coins className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                  <span>₹1 = 1 coin · Use coins across LOTS247 services</span>
+                </p>
               </div>
               <button
                 onClick={onClose}
@@ -334,12 +405,19 @@ function AddMoneyModal({
                     className="flex-1 text-lg font-bold bg-transparent text-stone-900 dark:text-stone-100 placeholder:text-stone-300 dark:placeholder:text-stone-600 focus:outline-none"
                   />
                 </div>
-                {error && (
+                {error ? (
                   <p className="mt-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" />
                     {error}
                   </p>
-                )}
+                ) : effectiveAmount > 0 ? (
+                  <p className="mt-1.5 text-xs text-stone-500 dark:text-stone-400 inline-flex items-center gap-1">
+                    <span>You'll get</span>
+                    <Coins className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                    <span className="font-semibold text-stone-700 dark:text-stone-200 tabular-nums">{formatCoins(effectiveAmount)}</span>
+                    <span>coins</span>
+                  </p>
+                ) : null}
               </div>
 
               {/* Quick amounts */}
@@ -430,9 +508,16 @@ function TransactionDetail({
             <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-3 ${catConfig.iconBg}`}>
               <CatIcon className={`w-5 h-5 ${catConfig.color}`} />
             </div>
-            <p className={`text-3xl font-bold tabular-nums tracking-tight ${isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-900 dark:text-stone-50'}`}>
-              {isCredit ? '+' : '−'}{formatCurrency(transaction.amount)}
+            <p className={`text-3xl font-bold tracking-tight inline-flex items-center justify-center gap-2 ${isCredit ? 'text-emerald-600 dark:text-emerald-400' : 'text-stone-900 dark:text-stone-50'}`}>
+              <span>{isCredit ? '+' : '−'}</span>
+              <Coins className="w-7 h-7 text-amber-500 shrink-0" aria-hidden="true" />
+              <span className="tabular-nums">{formatCoins(transaction.amount)}</span>
             </p>
+            {transaction.category === 'recharge' && transaction.status !== 'failed' && (
+              <p className="text-xs text-stone-500 dark:text-stone-400 mt-1.5 tabular-nums">
+                {formatCurrency(transaction.amount)} paid via Razorpay
+              </p>
+            )}
             <p className="text-sm text-stone-500 dark:text-stone-400 mt-1">{transaction.description}</p>
           </div>
 
@@ -451,7 +536,11 @@ function TransactionDetail({
             <DetailRow label="Status">
               <StatusBadge status={transaction.status} />
             </DetailRow>
-            <DetailRow label="Balance After" value={formatCurrency(transaction.runningBalance)} />
+            <DetailRow label="Balance After">
+              <span className="text-sm font-semibold text-stone-900 dark:text-stone-50">
+                <CoinAmount amount={transaction.runningBalance} size="sm" />
+              </span>
+            </DetailRow>
           </div>
 
           {/* Related entity link */}
@@ -482,6 +571,135 @@ function DetailRow({ label, value, children }: { label: string; value?: string; 
       <span className="text-xs font-medium text-stone-500 dark:text-stone-400">{label}</span>
       {children || <span className="text-sm font-semibold text-stone-900 dark:text-stone-50">{value}</span>}
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// All Recharges Modal
+// ---------------------------------------------------------------------------
+
+function AllRechargesModal({
+  transactions,
+  onClose,
+  onAddMoney,
+}: {
+  transactions: Transaction[]
+  onClose: () => void
+  onAddMoney: () => void
+}) {
+  const recharges = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.category === 'recharge')
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [transactions],
+  )
+
+  const successfulRecharges = recharges.filter((r) => r.status === 'success')
+  const totalPaid = successfulRecharges.reduce((s, r) => s + r.amount, 0)
+
+  useEffect(() => {
+    window.parent.postMessage({ type: 'showOverlay' }, '*')
+    return () => { window.parent.postMessage({ type: 'hideOverlay' }, '*') }
+  }, [])
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+      <div className="absolute inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
+      <div className="relative w-full max-w-lg max-h-[85vh] bg-white dark:bg-stone-900 rounded-2xl shadow-2xl dark:shadow-stone-950/50 overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="flex items-start justify-between p-5 sm:p-6 border-b border-stone-200 dark:border-stone-800 shrink-0">
+          <div>
+            <h3 className="text-lg font-bold text-stone-900 dark:text-stone-50 tracking-tight">All Recharges</h3>
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+              {recharges.length} recharge{recharges.length !== 1 ? 's' : ''} · {formatCurrency(totalPaid)} added in total
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Body */}
+        {recharges.length === 0 ? (
+          <div className="py-16 text-center px-6">
+            <div className="w-12 h-12 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mx-auto mb-3">
+              <Banknote className="w-5 h-5 text-stone-400 dark:text-stone-500" />
+            </div>
+            <p className="text-sm font-medium text-stone-600 dark:text-stone-300">No recharges yet</p>
+            <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
+              Add money to your wallet to see recharge history here
+            </p>
+            <button
+              onClick={onAddMoney}
+              className="inline-flex items-center gap-2 px-4 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors mt-5"
+            >
+              <Plus className="w-4 h-4" />
+              Add Money
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-y-auto divide-y divide-stone-200 dark:divide-stone-800/60">
+            {recharges.map((r) => {
+              const statusConfig = STATUS_CONFIG[r.status]
+              const StatusIcon = statusConfig.icon
+              const isSuccess = r.status === 'success'
+
+              return (
+                <div key={r.id} className="px-5 sm:px-6 py-4 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                    <Banknote className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <p className="text-sm font-semibold text-stone-900 dark:text-stone-50">
+                        {formatCurrency(r.amount)} paid
+                      </p>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusConfig.bg} ${statusConfig.color}`}>
+                        <StatusIcon className="w-2.5 h-2.5" />
+                        {statusConfig.label}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 mt-1">
+                      <p className="text-xs text-stone-500 dark:text-stone-400">
+                        {formatDateTime(r.date)}
+                      </p>
+                      {isSuccess && (
+                        <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400 inline-flex items-center gap-1">
+                          <Coins className="w-3 h-3 text-amber-500" aria-hidden="true" />
+                          +{formatCoins(r.amount)} coins
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-stone-400 dark:text-stone-500 font-mono mt-1 truncate">
+                      {r.referenceId}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Footer CTA */}
+        {recharges.length > 0 && (
+          <div className="p-4 sm:p-5 border-t border-stone-200 dark:border-stone-800 shrink-0">
+            <button
+              onClick={onAddMoney}
+              className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Money
+            </button>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body,
   )
 }
 
@@ -523,6 +741,7 @@ export function WalletView({
   onSearch,
 }: WalletProps) {
   const [showAddMoney, setShowAddMoney] = useState(false)
+  const [showAllRecharges, setShowAllRecharges] = useState(false)
   const [selectedTxnId, setSelectedTxnId] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
@@ -657,6 +876,7 @@ export function WalletView({
                 <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-400 pointer-events-none" />
               </div>
               <button
+                data-tour="wallet-add-money"
                 onClick={() => {
                   setShowAddMoney(true)
                   window.parent.postMessage({ type: 'showOverlay' }, '*')
@@ -673,16 +893,18 @@ export function WalletView({
         {/* ----------------------------------------------------------------- */}
         {/* Stats Cards                                                       */}
         {/* ----------------------------------------------------------------- */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
+        <div data-tour="wallet-balance" className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5 sm:mb-6">
           {/* Balance */}
           <div className={`col-span-2 rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 p-5 sm:p-6`}>
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Current Balance</p>
-                <p className={`text-xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 ${
+                <p className={`text-xl sm:text-3xl font-bold tracking-tight mt-1 flex items-center gap-2 ${
                   isLowBalance ? 'text-amber-600 dark:text-amber-400' : 'text-stone-900 dark:text-stone-50'
                 }`}>
-                  {formatCurrency(walletSummary.currentBalance)}
+                  <Coins className="w-5 h-5 sm:w-7 sm:h-7 text-amber-500 shrink-0" aria-hidden="true" />
+                  <span className="tabular-nums">{formatCoins(walletSummary.currentBalance)}</span>
+                  <span className="text-xs font-medium uppercase tracking-wider text-stone-400 dark:text-stone-500 self-end pb-1">coins</span>
                 </p>
                 {isLowBalance && (
                   <div className="flex items-center gap-1.5 mt-2">
@@ -691,15 +913,24 @@ export function WalletView({
                   </div>
                 )}
               </div>
-              <div className="p-1.5 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40">
-                <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-1 sm:p-1.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40">
+                <Wallet className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
-            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
-              <RefreshCw className="w-3.5 h-3.5 text-stone-400" />
-              <span className="text-xs text-stone-500 dark:text-stone-400">
-                Last recharge {formatCurrency(walletSummary.lastRecharge.amount)} on {formatDate(walletSummary.lastRecharge.date)}
+            <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
+              <span className="inline-flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400 min-w-0 truncate">
+                <RefreshCw className="w-3.5 h-3.5 text-stone-400 shrink-0" aria-hidden="true" />
+                <span className="truncate">
+                  Last recharge {formatCurrency(walletSummary.lastRecharge.amount)} on {formatDate(walletSummary.lastRecharge.date)}
+                </span>
               </span>
+              <button
+                onClick={() => setShowAllRecharges(true)}
+                className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors"
+              >
+                See all
+                <ChevronRight className="w-3 h-3" aria-hidden="true" />
+              </button>
             </div>
           </div>
 
@@ -708,12 +939,13 @@ export function WalletView({
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Total In</p>
-                <p className="text-xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 text-stone-900 dark:text-stone-50">
-                  {formatCurrency(totalCredits)}
+                <p className="text-xl sm:text-3xl font-bold tracking-tight mt-1 text-stone-900 dark:text-stone-50 flex items-center gap-2">
+                  <Coins className="w-5 h-5 sm:w-7 sm:h-7 text-amber-500 shrink-0" aria-hidden="true" />
+                  <span className="tabular-nums">{formatCoins(totalCredits)}</span>
                 </p>
               </div>
-              <div className="p-1.5 sm:p-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40">
-                <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-1 sm:p-1.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40">
+                <TrendingDown className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
             <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
@@ -726,12 +958,13 @@ export function WalletView({
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest">Total Out</p>
-                <p className="text-xl sm:text-3xl font-bold tabular-nums tracking-tight mt-1 text-stone-900 dark:text-stone-50">
-                  {formatCurrency(totalDebits)}
+                <p className="text-xl sm:text-3xl font-bold tracking-tight mt-1 text-stone-900 dark:text-stone-50 flex items-center gap-2">
+                  <Coins className="w-5 h-5 sm:w-7 sm:h-7 text-amber-500 shrink-0" aria-hidden="true" />
+                  <span className="tabular-nums">{formatCoins(totalDebits)}</span>
                 </p>
               </div>
-              <div className="p-1.5 sm:p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400" />
+              <div className="p-1 sm:p-1.5 rounded-md bg-red-50 dark:bg-red-950/40">
+                <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-600 dark:text-red-400" />
               </div>
             </div>
             <p className="text-xs text-stone-400 dark:text-stone-500 mt-3 pt-3 border-t border-stone-200 dark:border-stone-800">
@@ -743,7 +976,7 @@ export function WalletView({
         {/* ----------------------------------------------------------------- */}
         {/* Search & Filter Bar (standalone, outside table card)              */}
         {/* ----------------------------------------------------------------- */}
-        <div className="flex items-center gap-3 mb-4">
+        <div data-tour="wallet-search" className="flex items-center gap-3 mb-4">
           {/* Search — takes remaining width */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-stone-500" />
@@ -859,7 +1092,7 @@ export function WalletView({
         {/* ----------------------------------------------------------------- */}
         {/* Transaction History Card                                          */}
         {/* ----------------------------------------------------------------- */}
-        <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 mb-6">
+        <div data-tour="wallet-transactions" className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 mb-6">
           {/* Card header */}
           <div className="px-5 py-3.5 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-stone-900 dark:text-stone-50">Transaction History</h2>
@@ -894,9 +1127,10 @@ export function WalletView({
               <div className="hidden md:block overflow-hidden">
                 <table className="w-full table-fixed">
                   <colgroup>
-                    <col className="w-[35%]" />
-                    <col className="w-[20%]" />
-                    <col className="w-[15%]" />
+                    <col className="w-[26%]" />
+                    <col className="w-[16%]" />
+                    <col className="w-[14%]" />
+                    <col className="w-[14%]" />
                     <col className="w-[15%]" />
                     <col className="w-[15%]" />
                   </colgroup>
@@ -910,6 +1144,9 @@ export function WalletView({
                       </th>
                       <th className="text-left text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3">
                         Category
+                      </th>
+                      <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3">
+                        Amount Paid
                       </th>
                       <th className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider px-5 py-3">
                         Amount
@@ -953,16 +1190,27 @@ export function WalletView({
                             <CategoryBadge category={txn.category} />
                           </td>
 
+                          {/* Amount Paid (rupees) — only for recharges */}
+                          <td className="px-5 py-3.5 text-right">
+                            {txn.category === 'recharge' && txn.status !== 'failed' ? (
+                              <p className="text-sm font-medium text-stone-700 dark:text-stone-300 tabular-nums">
+                                {formatCurrency(txn.amount)}
+                              </p>
+                            ) : (
+                              <span className="text-sm text-stone-300 dark:text-stone-600">—</span>
+                            )}
+                          </td>
+
                           {/* Amount */}
                           <td className="px-5 py-3.5 text-right">
-                            <p className={`text-sm font-semibold tabular-nums ${
+                            <p className={`text-sm font-semibold inline-flex items-center justify-end ${
                               txn.status === 'failed'
                                 ? 'text-stone-400 dark:text-stone-500 line-through'
                                 : isCredit
                                   ? 'text-emerald-600 dark:text-emerald-400'
                                   : 'text-stone-900 dark:text-stone-50'
                             }`}>
-                              {isCredit ? '+' : '−'}{formatCurrency(txn.amount)}
+                              <CoinAmount amount={txn.amount} sign={isCredit ? '+' : '−'} size="xs" />
                             </p>
                             {txn.status === 'failed' && (
                               <span className="inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 font-medium mt-0.5">
@@ -973,8 +1221,8 @@ export function WalletView({
 
                           {/* Balance */}
                           <td className="px-5 py-3.5 text-right">
-                            <p className="text-sm text-stone-600 dark:text-stone-300 tabular-nums">
-                              {formatCurrency(txn.runningBalance)}
+                            <p className="text-sm text-stone-600 dark:text-stone-300 inline-flex items-center justify-end">
+                              <CoinAmount amount={txn.runningBalance} size="xs" />
                             </p>
                           </td>
                         </tr>
@@ -1017,17 +1265,23 @@ export function WalletView({
                               </p>
                             </div>
                             <div className="flex-shrink-0 text-right">
-                              <p className={`text-sm font-semibold tabular-nums ${
+                              <p className={`text-sm font-semibold inline-flex items-center justify-end ${
                                 txn.status === 'failed'
                                   ? 'text-stone-400 dark:text-stone-500 line-through'
                                   : isCredit
                                     ? 'text-emerald-600 dark:text-emerald-400'
                                     : 'text-stone-900 dark:text-stone-50'
                               }`}>
-                                {isCredit ? '+' : '−'}{formatCurrency(txn.amount)}
+                                <CoinAmount amount={txn.amount} sign={isCredit ? '+' : '−'} size="xs" />
                               </p>
-                              <p className="text-[11px] text-stone-400 dark:text-stone-500 tabular-nums mt-0.5">
-                                Bal {formatCurrency(txn.runningBalance)}
+                              {txn.category === 'recharge' && txn.status !== 'failed' && (
+                                <p className="text-[11px] text-stone-400 dark:text-stone-500 tabular-nums mt-0.5">
+                                  {formatCurrency(txn.amount)} paid
+                                </p>
+                              )}
+                              <p className="text-[11px] text-stone-400 dark:text-stone-500 mt-0.5 inline-flex items-center justify-end gap-1">
+                                <span>Bal</span>
+                                <CoinAmount amount={txn.runningBalance} size="xs" />
                               </p>
                             </div>
                           </button>
@@ -1092,6 +1346,18 @@ export function WalletView({
         />
       )}
 
+      {showAllRecharges && (
+        <AllRechargesModal
+          transactions={transactions}
+          onClose={() => setShowAllRecharges(false)}
+          onAddMoney={() => {
+            setShowAllRecharges(false)
+            setShowAddMoney(true)
+            window.parent.postMessage({ type: 'showOverlay' }, '*')
+          }}
+        />
+      )}
+
       {selectedTransaction && (
         <TransactionDetail
           transaction={selectedTransaction}
@@ -1099,6 +1365,8 @@ export function WalletView({
           onNavigateToEntity={onNavigateToEntity}
         />
       )}
+
+      <SectionTour tourId="wallet" steps={WALLET_TOUR_STEPS} />
     </div>
   )
 }

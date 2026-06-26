@@ -310,7 +310,7 @@ const en: Copy = {
   pricingCTA: 'Create My Dashboard',
   pricingFinePrint: '*Pricing indicative. Final values confirmed at activation. On-ground lawyer support charged on actual basis when required.',
   pricingNetValueLabel: 'Net value on day one',
-  pricingNetValueHeadline: 'You pay ₹999, you get ₹1,499 back.',
+  pricingNetValueHeadline: 'You pay ₹999, you get ₹1,499 wallet benefit back.',
   pricingNetValueSub: 'That’s ₹500 of wallet credit ahead of your spend — plus 24×7 legal support running in the background, all year.',
   pricingWalletHeadline: '₹1,499 wallet credit included',
   pricingWalletSubtext: 'Covers roughly 3 lawyer calls or 1 on-ground visit before you spend more.',

@@ -35,6 +35,7 @@ import {
   Upload,
   Gift,
   ArrowRight,
+  Coins,
 } from 'lucide-react'
 import type {
   VehicleDetailProps,
@@ -1409,7 +1410,14 @@ export function VehicleDetail({
                         {detailsFetching ? (
                           <><Loader2 className="w-3 h-3 animate-spin" />{t.fetchingDetails}</>
                         ) : (
-                          <><RefreshCw className="w-3 h-3" />{t.fetchDetails}</>
+                          <>
+                            <RefreshCw className="w-3 h-3" />
+                            {t.fetchDetails}
+                            <span className="inline-flex items-center gap-0.5 ml-1 pl-1.5 border-l border-emerald-300/60 dark:border-emerald-700/60">
+                              <Coins className="w-3 h-3 text-amber-500" aria-hidden="true" />
+                              2
+                            </span>
+                          </>
                         )}
                       </button>
                     )}
@@ -1491,7 +1499,14 @@ export function VehicleDetail({
                   {detailsFetching ? (
                     <><Loader2 className="w-4 h-4 animate-spin" />{t.fetchingDetails}</>
                   ) : (
-                    <><RefreshCw className="w-4 h-4" />{t.fetchDetails}</>
+                    <>
+                      <RefreshCw className="w-4 h-4" />
+                      {t.fetchDetails}
+                      <span className="inline-flex items-center gap-1 ml-1.5 pl-2 border-l border-emerald-300/60 dark:border-emerald-700/60">
+                        <Coins className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                        2
+                      </span>
+                    </>
                   )}
                 </button>
               </div>
@@ -1862,7 +1877,15 @@ export function VehicleDetail({
                 >
                   <RefreshCw className="w-4 h-4" />
                   {t.fetchChallans}
+                  <span className="inline-flex items-center gap-1 ml-1 pl-2 border-l border-emerald-400/60">
+                    <Coins className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
+                    2
+                  </span>
                 </button>
+                <p className="mt-3 text-[11px] text-stone-400 dark:text-stone-500 inline-flex items-center gap-1.5">
+                  <Coins className="w-3 h-3 text-amber-500" aria-hidden="true" />
+                  2 coins will be deducted from your wallet
+                </p>
               </div>
             )}
 

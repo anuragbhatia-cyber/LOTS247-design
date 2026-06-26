@@ -40,6 +40,28 @@ import {
 } from 'lucide-react'
 import { ComplianceDashboardSkeleton } from './ComplianceDashboardSkeleton'
 import { ChallanCard, type ChallanCardData } from '@/sections/vehicle-and-driver-management/components/ChallanCard'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
+
+const COMPLIANCE_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Your compliance command center',
+    body: 'See the health of your fleet at a glance — RC, insurance, PUC, permits, DL, challans, and more — and drill down into anything that needs action.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="compliance-score"]',
+    title: 'Fleet compliance score',
+    body: 'A single percentage rolls up every category. Insights on the right call out what changed since last month.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="compliance-categories"]',
+    title: 'Drill into a category',
+    body: 'Click any category card to see exactly which vehicles or drivers are non-compliant — and renew straight from the drilldown.',
+    placement: 'top',
+  },
+]
 import type {
   ComplianceDashboardProps,
   ComplianceCategory,
@@ -2645,7 +2667,7 @@ export function ComplianceDashboard({
             <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">Fleet Overview</h1>
           </div>
 
-          <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
+          <div data-tour="compliance-filters" className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
             <div className="flex items-center gap-2">
               {/* Refresh */}
               <button
@@ -2834,7 +2856,7 @@ export function ComplianceDashboard({
               {/* -------------------------------------------------------------- */}
               {/* Hero Row: Compliance Health + Insights side by side              */}
               {/* -------------------------------------------------------------- */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+              <div data-tour="compliance-score" className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
                 {/* Compliance Health Card */}
                 <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40">
                   {/* Header */}
@@ -3178,7 +3200,7 @@ export function ComplianceDashboard({
             {/* -------------------------------------------------------------- */}
             {/* Category Cards Grid                                             */}
             {/* -------------------------------------------------------------- */}
-            <div className="mb-6 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
+            <div data-tour="compliance-categories" className="mb-6 rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 p-5 sm:p-6">
               <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider mb-4">Compliance Categories</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {categories.map(cat => (
@@ -3253,7 +3275,7 @@ export function ComplianceDashboard({
             {/* -------------------------------------------------------------- */}
             {/* Expiry Urgency Table                                            */}
             {/* -------------------------------------------------------------- */}
-            <div className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
+            <div data-tour="compliance-expiry" className="rounded-2xl bg-white dark:bg-stone-900 shadow-md shadow-stone-200/60 dark:shadow-stone-950/40 overflow-hidden">
               <div className="px-5 sm:px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-stone-900 dark:text-stone-50 uppercase tracking-wider">Documents Expiry</h3>
                 <span className="text-xs text-stone-400 dark:text-stone-500">{expiryUrgencyItems.length} items</span>
@@ -3460,6 +3482,8 @@ export function ComplianceDashboard({
         </div>,
         document.body
       )}
+
+      <SectionTour tourId="compliance" steps={COMPLIANCE_TOUR_STEPS} />
     </div>
   )
 }

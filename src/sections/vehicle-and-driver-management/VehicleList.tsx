@@ -21,11 +21,12 @@ export default function VehicleListPreview() {
     const t = setTimeout(() => setIsLoading(false), 900)
     return () => clearTimeout(t)
   }, [])
+  const isEmpty = new URLSearchParams(window.location.search).get('empty') === '1'
   if (isLoading) return <VehicleListSkeleton />
   return (
     <VehicleList
-      vehicles={data.vehicles as any}
-      drivers={data.drivers as any}
+      vehicles={isEmpty ? [] : (data.vehicles as any)}
+      drivers={isEmpty ? [] : (data.drivers as any)}
       onViewVehicle={(id) => navigateToScreen('VehicleDetail', { id })}
       onAddVehicle={() => console.log('Add vehicle')}
       onBulkUpload={() => console.log('Bulk upload')}

@@ -24,6 +24,7 @@ import type {
   Driver,
 } from '@/../product/sections/incident-management/types'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { EmptyState } from '@/shell/components/EmptyState'
 
 // ---------------------------------------------------------------------------
 // Translations
@@ -104,6 +105,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Empty state
     noChallansFound: 'No challans found',
     tryAdjusting: 'Try adjusting your search or filters',
+    challansEmptyTitle: 'No challans yet',
+    challansEmptyDesc: 'Once you add vehicles, traffic challans get fetched automatically from the relevant RTOs across India.',
+    challansEmptyCta: 'Add Vehicle',
   },
   hi: {
     // Page header
@@ -179,6 +183,9 @@ const translations: Record<Language, Record<string, string>> = {
     // Empty state
     noChallansFound: 'कोई चालान नहीं मिला',
     tryAdjusting: 'अपनी खोज या फ़िल्टर बदलकर देखें',
+    challansEmptyTitle: 'अभी तक कोई चालान नहीं',
+    challansEmptyDesc: 'एक बार वाहन जोड़ने के बाद, भारत भर के संबंधित RTO से चालान स्वचालित रूप से प्राप्त हो जाते हैं।',
+    challansEmptyCta: 'वाहन जोड़ें',
   },
 }
 
@@ -450,6 +457,22 @@ export function ChallanList({
     }
 
     return actions
+  }
+
+  if (challans.length === 0) {
+    return (
+      <div className="py-2">
+        <EmptyState
+          icon={FileText}
+          title={t.challansEmptyTitle}
+          description={t.challansEmptyDesc}
+          primaryCta={{
+            label: t.challansEmptyCta,
+            onClick: () => window.parent.postMessage({ type: 'openAddVehicle' }, '*'),
+          }}
+        />
+      </div>
+    )
   }
 
   return (

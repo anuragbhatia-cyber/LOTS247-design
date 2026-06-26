@@ -4,6 +4,40 @@ import data from '@/../product/sections/incident-management/data.json'
 import { ChallanList } from './components/ChallanList'
 import { CaseList } from './components/CaseList'
 import { IncidentManagementSkeleton } from './components/IncidentManagementSkeleton'
+import { SectionTour } from '@/shell/components/SectionTour'
+import type { TourStep } from '@/shell/components/TourOverlay'
+
+const INCIDENTS_TOUR_STEPS: TourStep[] = [
+  {
+    title: 'Every incident, tracked end-to-end',
+    body: 'Challans, legal cases, and RTO matters live here.',
+    placement: 'center',
+  },
+  {
+    target: '[data-tour="incidents-tabs"]',
+    title: 'Challans, cases, RTO, other',
+    body: 'Switch between incident types. Counts on each tab show what needs your attention today.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="incidents-overview"]',
+    title: 'Status overview',
+    body: 'See submitted, in-progress, and settled counts at a glance so you can prioritise what to chase.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="incidents-date-range"]',
+    title: 'Filter by date',
+    body: 'Slice incidents by today, week, month, or a custom range — useful when you raise reports.',
+    placement: 'bottom',
+  },
+  {
+    target: '[data-tour="incidents-add"]',
+    title: 'Add a new incident',
+    body: 'Log an accident, FIR, or legal matter in seconds. We route it to the right lawyer immediately.',
+    placement: 'bottom',
+  },
+]
 
 const BASE = '/sections/incident-management/screen-designs'
 
@@ -29,6 +63,9 @@ type Tab = 'challans' | 'cases' | 'rto' | 'other'
 export default function IncidentManagementPreview() {
   const params = new URLSearchParams(window.location.search)
   const initialTab = (params.get('tab') as Tab) || 'challans'
+  const isEmpty = params.get('empty') === '1'
+  const challans = isEmpty ? [] : data.challans
+  const cases = isEmpty ? [] : data.cases
   const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [dateRangeOpen, setDateRangeOpen] = useState(false)
   const [selectedRange, setSelectedRange] = useState('last7Days')
@@ -52,14 +89,14 @@ export default function IncidentManagementPreview() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const totalChallans = data.challans.length
-  const settledChallans = data.challans.filter((c: { status: string }) => c.status === 'resolved').length
-  const inProgressChallans = data.challans.filter((c: { status: string }) => c.status !== 'resolved').length
+  const totalChallans = challans.length
+  const settledChallans = challans.filter((c: { status: string }) => c.status === 'resolved').length
+  const inProgressChallans = challans.filter((c: { status: string }) => c.status !== 'resolved').length
 
-  const submittedCases = data.cases.filter((c: { status: string }) => c.status === 'submitted' || c.status === 'new').length
-  const docRequestedCases = data.cases.filter((c: { status: string }) => c.status === 'document_requested' || c.status === 'awaiting_documents').length
-  const inProgressCases = data.cases.filter((c: { status: string }) => c.status === 'in_progress' || c.status === 'ongoing').length
-  const closedCases = data.cases.filter((c: { status: string }) => c.status === 'resolved' || c.status === 'closed').length
+  const submittedCases = cases.filter((c: { status: string }) => c.status === 'submitted' || c.status === 'new').length
+  const docRequestedCases = cases.filter((c: { status: string }) => c.status === 'document_requested' || c.status === 'awaiting_documents').length
+  const inProgressCases = cases.filter((c: { status: string }) => c.status === 'in_progress' || c.status === 'ongoing').length
+  const closedCases = cases.filter((c: { status: string }) => c.status === 'resolved' || c.status === 'closed').length
 
   if (isLoading) return <IncidentManagementSkeleton />
 
@@ -79,7 +116,7 @@ export default function IncidentManagementPreview() {
           <div className="flex items-center justify-between gap-2 sm:gap-3 flex-shrink-0">
             <div className="flex items-center gap-2">
               {/* Date Range Filter */}
-              <div ref={dateRangeRef} className="relative">
+              <div ref={dateRangeRef} data-tour="incidents-date-range" className="relative">
                 <button
                   onClick={() => setDateRangeOpen(!dateRangeOpen)}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 text-sm text-stone-700 dark:text-stone-300 transition-colors"
@@ -168,6 +205,7 @@ export default function IncidentManagementPreview() {
 
             {/* Add Incident Button */}
             <button
+              data-tour="incidents-add"
               onClick={() => window.parent.postMessage({ type: 'openAddIncident' }, '*')}
               className="flex items-center gap-2 px-4 py-2 min-h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
             >
@@ -178,7 +216,7 @@ export default function IncidentManagementPreview() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit max-w-full overflow-x-auto mb-4">
+        <div data-tour="incidents-tabs" className="flex items-center gap-1 p-1 bg-stone-200/40 dark:bg-stone-900 rounded-lg w-fit max-w-full overflow-x-auto mb-4">
           <button
             onClick={() => setActiveTab('challans')}
             className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
@@ -194,7 +232,7 @@ export default function IncidentManagementPreview() {
                 ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                 : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
             }`}>
-              {data.challans.length}
+              {challans.length}
             </span>
           </button>
           <button
@@ -212,7 +250,7 @@ export default function IncidentManagementPreview() {
                 ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                 : 'bg-stone-200 dark:bg-stone-700 text-stone-500 dark:text-stone-400'
             }`}>
-              {data.cases.length}
+              {cases.length}
             </span>
           </button>
           <button
@@ -255,7 +293,7 @@ export default function IncidentManagementPreview() {
 
         {/* Overview Cards — Challans */}
         {activeTab === 'challans' && (
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
+          <div data-tour="incidents-overview" className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
               <div className="p-3 sm:p-6">
                 <div className="flex items-start justify-between mb-1">
@@ -295,7 +333,7 @@ export default function IncidentManagementPreview() {
 
         {/* Overview Cards — Cases */}
         {activeTab === 'cases' && (
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
+          <div data-tour="incidents-overview" className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
             <div className="rounded-xl bg-white dark:bg-stone-900 shadow-sm dark:shadow-stone-950/20 overflow-hidden">
               <div className="p-3 sm:p-6">
                 <div className="flex items-start justify-between mb-1">
@@ -337,7 +375,7 @@ export default function IncidentManagementPreview() {
       {activeTab === 'challans' && (
         <div className="px-4 sm:px-6 lg:px-8">
         <ChallanList
-          challans={data.challans}
+          challans={challans}
           vehicles={data.vehicles}
           drivers={data.drivers}
           onView={(id) => navigateToScreen('ChallanDetail', { id })}
@@ -349,7 +387,7 @@ export default function IncidentManagementPreview() {
       {activeTab === 'cases' && (
         <div className="px-4 sm:px-6 lg:px-8">
         <CaseList
-          cases={data.cases}
+          cases={cases}
           vehicles={data.vehicles}
           drivers={data.drivers}
           lawyers={data.lawyers}
@@ -372,6 +410,7 @@ export default function IncidentManagementPreview() {
         </div>
       )}
 
+      <SectionTour tourId="incidents" steps={INCIDENTS_TOUR_STEPS} />
     </div>
   )
 }

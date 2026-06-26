@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Search, Loader2 } from 'lucide-react'
+import { X, Search, Loader2, Coins } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 
 const translations: Record<Language, Record<string, string>> = {
@@ -12,6 +12,7 @@ const translations: Record<Language, Record<string, string>> = {
     checkButton: 'Check Challan Status',
     checking: 'Checking Challans...',
     checkingDesc: 'Looking up Parivahan and government databases for',
+    cost: '2 coins per check',
   },
   hi: {
     title: 'चालान जाँचें',
@@ -21,6 +22,7 @@ const translations: Record<Language, Record<string, string>> = {
     checkButton: 'चालान स्थिति जाँचें',
     checking: 'चालान जाँच रहे हैं...',
     checkingDesc: 'परिवहन और सरकारी डेटाबेस में खोज रहे हैं',
+    cost: 'प्रत्येक जाँच के लिए 2 सिक्के',
   },
 }
 
@@ -112,7 +114,11 @@ export function CheckChallanModal({ isOpen, onClose, onCheck, onShowResults }: C
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 pointer-events-none" />
               </div>
             </div>
-            <div className="flex items-center justify-end px-6 py-4 border-t border-stone-200 dark:border-stone-800">
+            <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
+              <span className="inline-flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+                <Coins className="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
+                {t.cost}
+              </span>
               <button
                 onClick={handleSubmit}
                 disabled={!isValid}

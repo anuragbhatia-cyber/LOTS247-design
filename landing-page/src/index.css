@@ -9,10 +9,28 @@
   Amber = warning / hazard accent for "road reality".
 */
 @theme {
-  --font-display: "DM Sans", system-ui, sans-serif;
+  --font-display: "Fraunces", "DM Sans", ui-serif, Georgia, serif;
   --font-body: "DM Sans", system-ui, sans-serif;
   --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Brand green — overrides Tailwind's emerald-500 token */
+  --color-emerald-500: #00b876;
+  /* Re-derived scale around #00b876 so neighbouring shades stay in family */
+  --color-emerald-300: #6ee7c0;
+  --color-emerald-400: #34d39a;
+  --color-emerald-600: #009660;
+  --color-emerald-700: #007a4d;
+  --color-emerald-50:  #e6fbf2;
+  --color-emerald-100: #c2f5dd;
+
+  /* Warm cream page surface — slightly warmer than stone-50, gives editorial paper feel */
+  --color-cream: #f7f3ec;
+  --color-cream-deep: #efe9dd;
+  /* Ink — a near-black with warm undertone for dark surfaces, sits better with cream than pure stone-950 */
+  --color-ink: #181513;
+  --color-ink-soft: #26211c;
 }
 
 @layer base {
@@ -23,14 +41,39 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    @apply bg-stone-50 text-stone-900;
+    background-color: var(--color-cream);
+    @apply text-stone-900;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    @apply font-bold tracking-tight;
+    font-variation-settings: "opsz" 96, "SOFT" 30;
+    @apply font-medium tracking-tight;
   }
   code, pre, kbd {
     font-family: var(--font-mono);
+  }
+  /* Tabular numerals for stats and prices */
+  .num-tabular {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+}
+
+@layer utilities {
+  .font-serif-display {
+    font-family: var(--font-serif);
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+    letter-spacing: -0.02em;
+  }
+  .font-mono-label {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
+  }
+  /* Editorial rule line — used as decorative separator under kicker labels */
+  .rule-em {
+    height: 1px;
+    background-image: linear-gradient(to right, currentColor 0, currentColor 14px, transparent 14px, transparent 22px, currentColor 22px, currentColor 36px);
   }
 }
 
@@ -141,5 +184,14 @@
     background-image:
       radial-gradient(at 30% 20%, rgba(255,255,255,0.04) 0px, transparent 50%),
       radial-gradient(at 80% 90%, rgba(16,185,129,0.06) 0px, transparent 50%);
+  }
+
+  /* Hide native scrollbar — used for snap carousels on mobile */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -90,7 +90,7 @@
   "subscription": {
     "id": "subs-001",
     "planId": "plan-bsafe",
-    "planName": "B Safe",
+    "planName": "Udrive",
     "status": "active",
     "price": 0,
     "billingPeriod": "month",
@@ -101,16 +101,14 @@
     "usersUsed": 2,
     "userLimit": 3,
     "features": {
-      "onCallResolution": true,
-      "onSiteResolution": "payPerUse",
-      "challanResolutionOnline": 49,
-      "dashboardAccess": true,
-      "automatedReports": true,
-      "personalizedReports": false,
-      "whatsappUpdates": true,
-      "accountManager": false,
-      "bulkChallanResolution": false,
-      "apiIntegration": false
+      "vehicleCount": 1,
+      "onCall": true,
+      "onSiteLegal": true,
+      "challanOnline": true,
+      "challanLokAdalat": true,
+      "challanCourt": true,
+      "rtoService": "payPerUse",
+      "dashboard": true
     }
   },
   "billingHistory": [

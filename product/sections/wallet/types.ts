@@ -19,18 +19,16 @@ export type TransactionType = 'credit' | 'debit'
 
 export type TransactionCategory =
   | 'recharge'
-  | 'subscription'
   | 'challan'
+  | 'rcFetch'
   | 'legalFee'
-  | 'refund'
 
 export type TransactionStatus = 'success' | 'pending' | 'failed'
 
 export type RelatedEntityType =
   | 'challan'
-  | 'subscription'
+  | 'vehicle'
   | 'incident'
-  | 'dispute'
 
 export interface Transaction {
   id: string

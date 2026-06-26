@@ -11,12 +11,9 @@ import {
   Search,
   Loader2,
   CheckCircle2,
-  Check,
-  Calendar,
-  MapPin,
-  Copy,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
+import { ChallanCard } from '@/sections/vehicle-and-driver-management/components/ChallanCard'
 
 type Category = 'challan' | 'case' | 'rto' | 'other'
 
@@ -199,10 +196,6 @@ const SAMPLE_CHALLANS: SampleChallan[] = [
   { id: 'ch4', challanNumber: 'UP1213389821', violationType: 'Parking Violation', amount: 1500, issueDate: '2025-11-08', location: 'Connaught Place, Delhi', status: 'paid', category: 'online', paidDate: '2025-11-20' },
   { id: 'ch5', challanNumber: 'UP1213389647', violationType: 'No Seatbelt', amount: 1000, issueDate: '2025-09-15', location: 'Noida Expressway, Sector 62', status: 'paid', category: 'online', paidDate: '2025-10-02' },
 ]
-
-function formatChallanDate(dateStr: string, lang: Language): string {
-  return new Date(dateStr).toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-}
 
 function formatChallanCurrency(amount: number, lang: Language): string {
   return new Intl.NumberFormat(lang === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount)
@@ -544,106 +537,56 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
 
                         {/* Pending challans */}
                         {challanTab === 'pending' && pendingChallans.map((challan) => (
-                          <div key={challan.id} className={`bg-white dark:bg-stone-900 border rounded-xl p-5 transition-colors ${selectedChallans.has(challan.id) ? 'border-emerald-300 dark:border-emerald-700' : 'border-stone-200 dark:border-stone-800'}`}>
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-center gap-2.5">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedChallans(prev => {
-                                      const next = new Set(prev)
-                                      if (next.has(challan.id)) next.delete(challan.id)
-                                      else next.add(challan.id)
-                                      return next
-                                    })
-                                  }}
-                                  className={`w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 transition-colors mt-0.5 ${
-                                    selectedChallans.has(challan.id)
-                                      ? 'bg-emerald-600 text-white'
-                                      : 'border-2 border-stone-300 dark:border-stone-600'
-                                  }`}
-                                >
-                                  {selectedChallans.has(challan.id) && (
-                                    <Check className="w-3.5 h-3.5" strokeWidth={3} />
-                                  )}
-                                </button>
-                                <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(challan.challanNumber) }}
-                                  className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                                >
-                                  <Copy className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                              <span className="text-lg font-bold text-red-600 dark:text-red-400 tabular-nums">
-                                {formatChallanCurrency(challan.amount, language)}
-                              </span>
-                            </div>
-                            <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
-                            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
-                              <span className="inline-flex items-center gap-1.5">
-                                <Calendar className="w-3.5 h-3.5" />
-                                {formatChallanDate(challan.issueDate, language)}
-                              </span>
-                              <span className="inline-flex items-center gap-1.5">
-                                <MapPin className="w-3.5 h-3.5" />
-                                {challan.location}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between pt-3 border-t border-stone-200 dark:border-stone-800">
-                              {challan.category === 'court' ? (
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400">
-                                  {t.courtChallan}
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-400">
-                                  {t.onlineChallan}
-                                </span>
-                              )}
-                              <button className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-sm">
-                                {t.payNow}
-                              </button>
-                            </div>
-                          </div>
+                          <ChallanCard
+                            key={challan.id}
+                            challan={{
+                              id: challan.id,
+                              challanNumber: challan.challanNumber,
+                              violationType: challan.violationType,
+                              amount: challan.amount,
+                              issueDate: challan.issueDate,
+                              location: challan.location,
+                              status: 'pending',
+                              challanType: challan.category,
+                            }}
+                            selected={selectedChallans.has(challan.id)}
+                            onToggleSelect={(id) => {
+                              setSelectedChallans(prev => {
+                                const next = new Set(prev)
+                                if (next.has(id)) next.delete(id)
+                                else next.add(id)
+                                return next
+                              })
+                            }}
+                            onCopyNumber={(num) => navigator.clipboard?.writeText(num)}
+                            labels={{
+                              online: t.onlineChallan,
+                              court: t.courtChallan,
+                            }}
+                          />
                         ))}
 
                         {/* Paid challans */}
                         {challanTab === 'paid' && paidChallans.length > 0 && paidChallans.map((challan) => (
-                              <div key={challan.id} className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-5">
-                                <div className="flex items-start justify-between">
-                                  <div className="flex items-center gap-1.5">
-                                    <p className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">{challan.challanNumber}</p>
-                                    <button
-                                      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(challan.challanNumber) }}
-                                      className="p-1 rounded hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-                                    >
-                                      <Copy className="w-3.5 h-3.5" />
-                                    </button>
-                                  </div>
-                                  <span className="inline-flex items-center gap-1.5 text-lg font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                                    <CheckCircle2 className="w-4 h-4" />
-                                    {formatChallanCurrency(challan.amount, language)}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-stone-500 dark:text-stone-400 mt-2">{challan.violationType}</p>
-                                <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-stone-500 dark:text-stone-400 mt-2 mb-4">
-                                  <span className="inline-flex items-center gap-1.5">
-                                    <Calendar className="w-3.5 h-3.5" />
-                                    {formatChallanDate(challan.issueDate, language)}
-                                  </span>
-                                  <span className="inline-flex items-center gap-1.5">
-                                    <MapPin className="w-3.5 h-3.5" />
-                                    {challan.location}
-                                  </span>
-                                </div>
-                                {challan.paidDate && (
-                                  <div className="pt-3 border-t border-stone-200 dark:border-stone-800">
-                                    <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                                      {t.paidOn}: {formatChallanDate(challan.paidDate, language)}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
+                          <ChallanCard
+                            key={challan.id}
+                            challan={{
+                              id: challan.id,
+                              challanNumber: challan.challanNumber,
+                              violationType: challan.violationType,
+                              amount: challan.amount,
+                              issueDate: challan.issueDate,
+                              location: challan.location,
+                              status: 'resolved',
+                              challanType: challan.category,
+                            }}
+                            onCopyNumber={(num) => navigator.clipboard?.writeText(num)}
+                            labels={{
+                              online: t.onlineChallan,
+                              court: t.courtChallan,
+                              paid: t.paidChallans,
+                            }}
+                          />
                         ))}
 
                         {challanTab === 'paid' && paidChallans.length === 0 && (

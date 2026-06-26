@@ -6,6 +6,7 @@ interface SectionHeadingProps {
   description?: string
   align?: 'left' | 'center'
   accent?: 'emerald' | 'amber' | 'stone'
+  tone?: 'light' | 'dark'
   className?: string
 }
 
@@ -15,34 +16,61 @@ export function SectionHeading({
   description,
   align = 'center',
   accent = 'emerald',
+  tone = 'light',
   className,
 }: SectionHeadingProps) {
-  const accentColor = {
-    emerald: 'text-emerald-600',
-    amber: 'text-amber-600',
-    stone: 'text-stone-500',
+  const eyebrowColor = {
+    emerald: tone === 'dark' ? 'text-emerald-300' : 'text-emerald-700',
+    amber: tone === 'dark' ? 'text-amber-300' : 'text-amber-700',
+    stone: tone === 'dark' ? 'text-stone-400' : 'text-stone-500',
   }[accent]
+
+  const titleColor = tone === 'dark' ? 'text-white' : 'text-stone-900'
+  const descColor = tone === 'dark' ? 'text-stone-300' : 'text-stone-600'
+  const ruleColor = tone === 'dark' ? 'text-stone-700' : 'text-stone-300'
 
   return (
     <div
       className={cn(
-        align === 'center' ? 'text-center mx-auto max-w-2xl' : 'max-w-2xl',
+        align === 'center' ? 'text-center mx-auto max-w-3xl' : 'max-w-3xl',
         className,
       )}
     >
+      {/* Kicker row: mono label + decorative rule (no copy added — rule is purely decorative) */}
       <div
         className={cn(
-          'inline-flex items-center text-[11px] uppercase tracking-[0.2em] font-bold',
-          accentColor,
+          'flex items-center gap-3',
+          align === 'center' ? 'justify-center' : 'justify-start',
         )}
       >
-        {eyebrow}
+        <span className={cn('font-mono-label text-[11px]', eyebrowColor)}>
+          {eyebrow}
+        </span>
+        <span
+          aria-hidden="true"
+          className={cn('rule-em w-12 opacity-80', ruleColor)}
+        />
       </div>
-      <h2 className="mt-4 text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-stone-900 leading-[1.1]">
+
+      <h2
+        className={cn(
+          'font-serif-display mt-5 font-semibold text-balance',
+          'text-[2rem] sm:text-[2.5rem] lg:text-[3.25rem] xl:text-[3.6rem]',
+          'leading-[1.02]',
+          titleColor,
+        )}
+      >
         {title}
       </h2>
+
       {description && (
-        <p className="mt-4 text-base sm:text-lg text-stone-600 leading-relaxed">
+        <p
+          className={cn(
+            'mt-5 text-base sm:text-lg leading-relaxed',
+            align === 'center' && 'mx-auto max-w-2xl',
+            descColor,
+          )}
+        >
           {description}
         </p>
       )}

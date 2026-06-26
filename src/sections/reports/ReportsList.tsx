@@ -9,10 +9,11 @@ export default function ReportsListPreview() {
     const t = setTimeout(() => setIsLoading(false), 900)
     return () => clearTimeout(t)
   }, [])
+  const isEmpty = new URLSearchParams(window.location.search).get('empty') === '1'
   if (isLoading) return <ReportsListSkeleton />
   return (
     <ReportsList
-      reports={data.reports}
+      reports={isEmpty ? [] : data.reports}
       onPreview={(id) => console.log('Preview report:', id)}
       onDownload={(id) => console.log('Download report:', id)}
       onShareEmail={(id) => console.log('Share via email:', id)}
