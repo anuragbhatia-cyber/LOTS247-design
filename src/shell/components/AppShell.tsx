@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles } from 'lucide-react'
+import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles, Car } from 'lucide-react'
 import { MainNav } from './MainNav'
 import { useLanguage, type Language } from './LanguageContext'
 import { NotificationsView } from '@/sections/home/components/NotificationsView'
@@ -165,6 +165,9 @@ export interface AppShellProps {
     avatarUrl?: string
     plan?: 'Basic' | 'Fleet' | 'Enterprise'
   }
+  vehicles?: Array<{ id: string; registration: string }>
+  activeVehicleId?: string
+  onVehicleChange?: (id: string) => void
   onNavigate?: (href: string) => void
   onLogout?: () => void
 }
@@ -366,9 +369,17 @@ export function AppShell({
   secondaryItems,
   activePath,
   user,
+  vehicles,
+  activeVehicleId,
+  onVehicleChange,
   onNavigate,
   onLogout,
 }: AppShellProps) {
+  const [vehicleMenuOpen, setVehicleMenuOpen] = useState(false)
+  const vehicleMenuRef = useRef<HTMLDivElement>(null)
+  const activeVehicle =
+    vehicles?.find((v) => v.id === activeVehicleId) ?? vehicles?.[0]
+  const hasMultipleVehicles = (vehicles?.length ?? 0) > 1
   const { language, setLanguage } = useLanguage()
   const t = translations[language]
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -414,6 +425,9 @@ export function AppShell({
       }
       if (mobileLangRef.current && !mobileLangRef.current.contains(e.target as Node)) {
         setMobileLangOpen(false)
+      }
+      if (vehicleMenuRef.current && !vehicleMenuRef.current.contains(e.target as Node)) {
+        setVehicleMenuOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -688,9 +702,69 @@ export function AppShell({
       >
         {/* Top bar — matches sidebar logo header height */}
         <div
-          className="hidden lg:flex fixed top-0 right-0 h-16 bg-white dark:bg-stone-950 z-40 items-center justify-end px-6 gap-4 border-b border-stone-200 dark:border-stone-800"
+          className="hidden lg:flex fixed top-0 right-0 h-16 bg-white dark:bg-stone-950 z-40 items-center justify-between px-6 gap-4 border-b border-stone-200 dark:border-stone-800"
           style={{ left: isCollapsed ? '4rem' : '15rem' }}
         >
+          {/* Active vehicle badge / switcher */}
+          {activeVehicle ? (
+            <div ref={vehicleMenuRef} className="relative">
+              <button
+                onClick={() => hasMultipleVehicles && setVehicleMenuOpen((o) => !o)}
+                disabled={!hasMultipleVehicles}
+                aria-haspopup={hasMultipleVehicles ? 'menu' : undefined}
+                aria-expanded={hasMultipleVehicles ? vehicleMenuOpen : undefined}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
+                  hasMultipleVehicles
+                    ? 'border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 cursor-pointer'
+                    : 'border-stone-200 dark:border-stone-700 cursor-default'
+                }`}
+              >
+                <Car className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-[13px] font-mono font-bold text-stone-900 dark:text-stone-100">
+                  {activeVehicle.registration}
+                </span>
+                {hasMultipleVehicles && (
+                  <ChevronDown
+                    className={`w-4 h-4 text-stone-500 dark:text-stone-400 transition-transform ${
+                      vehicleMenuOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                )}
+              </button>
+
+              {hasMultipleVehicles && vehicleMenuOpen && (
+                <div className="absolute left-0 top-full mt-2 w-64 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden py-1">
+                  {vehicles!.map((v) => {
+                    const isActive = v.id === activeVehicle.id
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => {
+                          onVehicleChange?.(v.id)
+                          setVehicleMenuOpen(false)
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors ${
+                          isActive ? 'bg-stone-50 dark:bg-stone-800' : ''
+                        }`}
+                      >
+                        <Car className="w-4 h-4 text-stone-500 dark:text-stone-400 flex-shrink-0" />
+                        <span className="flex-1 text-[13px] font-mono font-bold text-stone-900 dark:text-stone-100">
+                          {v.registration}
+                        </span>
+                        {isActive && (
+                          <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div />
+          )}
+
+          <div className="flex items-center gap-4">
           {/* Help */}
           <button
             onClick={() => setShowSupport(true)}
@@ -894,6 +968,7 @@ export function AppShell({
               )}
             </div>
           )}
+          </div>
         </div>
         <div className={iframeOverlay ? 'relative z-[95]' : ''}>
           {showNotifications ? (

@@ -5,7 +5,7 @@ const sampleReport: MonthlyChallanSummaryReportProps = {
   subscriberId: 'sub-001',
   subscriberName: 'Rajesh Kumar',
   dateGenerated: '01 Mar 2026',
-  reportMonth: 'March',
+  reportMonth: 'February',
   reportYear: '2026',
 
   overallStatus: [

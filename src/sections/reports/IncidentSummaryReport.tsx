@@ -1,15 +1,29 @@
-interface IncidentSummaryReportProps {
-  vehicleNumber: string
-  incidentId: string
-  subscriberId: string
-  subscriberName: string
-  dateGenerated: string
-  reporterName: string
-  reporterPhone: string
+type Priority = 'Low' | 'Medium' | 'High' | 'Critical'
 
-  dateOfReporting: string
-  incidentType: string
-  incidentSummary: string
+interface POC {
+  name: string
+  designation: string
+}
+
+interface CostTimeComparison {
+  estimated: string
+  actual: string
+}
+
+interface IncidentSummaryReportProps {
+  incidentNumber: string
+  dateGenerated: string
+
+  vehicleNumber: string
+  customerName: string
+  accountId: string
+  customerPOC: POC
+
+  dateTimeOfIncident: string
+  caseCategory: string
+  caseSubCategory?: string
+  priority: Priority
+  reportedBy: string
   location: {
     roadName?: string
     area?: string
@@ -18,59 +32,17 @@ interface IncidentSummaryReportProps {
     pin?: string
   }
 
-  resolutionOpinion?: string
-  stage: string
-  expectedResolutionDate: string
+  incidentDetails: string
+  postCoordinationInfo: string
+  remedialSteps: string
+  challenges: string
+
+  finalStatus: string
+  cost: CostTimeComparison
+  time: CostTimeComparison
 }
 
 /* ── Shared sub-components ── */
-
-function SectionCard({
-  title,
-  icon,
-  iconBg = 'bg-stone-100',
-  children,
-}: {
-  title: string
-  icon: React.ReactNode
-  iconBg?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-      <div className="flex items-center gap-2 px-8 py-4 border-b border-stone-100 bg-white">
-        <span className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconBg}`}>{icon}</span>
-        <h3 className="text-[14pt] font-display font-extrabold text-emerald-700 tracking-tight">
-          {title}
-        </h3>
-      </div>
-      <div className="px-8 py-6 bg-stone-50/60">{children}</div>
-    </div>
-  )
-}
-
-function LabelValue({
-  label,
-  value,
-  mono,
-  large,
-}: {
-  label: string
-  value: string
-  mono?: boolean
-  large?: boolean
-}) {
-  return (
-    <div>
-      <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1">
-        {label}
-      </p>
-      <p className={`font-medium text-stone-800 leading-snug ${mono ? 'font-mono' : ''} ${large ? 'text-[13pt]' : 'text-[11pt]'}`}>
-        {value}
-      </p>
-    </div>
-  )
-}
 
 function PageHeader({ title, subtitle }: { title: string; subtitle: string }) {
   return (
@@ -94,32 +66,173 @@ function PageFooter({ page, total }: { page: number; total: number }) {
   )
 }
 
+function SectionTitle({ title, icon }: { title: string; icon: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <span className="w-7 h-7 rounded-md flex items-center justify-center bg-emerald-50">
+        {icon}
+      </span>
+      <h3 className="text-[16pt] font-display font-extrabold text-emerald-700 tracking-tight">
+        {title}
+      </h3>
+    </div>
+  )
+}
+
+function LabelValue({
+  label,
+  value,
+  mono,
+  large,
+}: {
+  label: string
+  value: string
+  mono?: boolean
+  large?: boolean
+}) {
+  return (
+    <div>
+      <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1">
+        {label}
+      </p>
+      <p
+        className={`font-medium text-stone-800 leading-snug ${mono ? 'font-mono' : ''} ${
+          large ? 'text-[13pt]' : 'text-[11pt]'
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  )
+}
+
+const PRIORITY_TONE: Record<Priority, { bg: string; border: string; text: string; dot: string }> = {
+  Low: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+  Medium: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', dot: 'bg-amber-500' },
+  High: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', dot: 'bg-red-500' },
+  Critical: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', dot: 'bg-red-500' },
+}
+
+function PriorityBadge({ priority }: { priority: Priority }) {
+  const tone = PRIORITY_TONE[priority]
+  return (
+    <span
+      className={`inline-flex items-center px-3 py-1.5 rounded-md text-[10.5pt] font-bold border ${tone.bg} ${tone.border} ${tone.text}`}
+    >
+      {priority}
+    </span>
+  )
+}
+
+function Narrative({ label, body }: { label: string; body: string }) {
+  return (
+    <div>
+      <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-2">
+        {label}
+      </p>
+      <p className="text-[11pt] font-medium text-stone-800 leading-[1.8] bg-white rounded-lg px-5 py-4 border border-stone-200">
+        {body}
+      </p>
+    </div>
+  )
+}
+
+function TimelineStep({
+  label,
+  body,
+  isLast = false,
+}: {
+  label: string
+  body: string
+  isLast?: boolean
+}) {
+  return (
+    <div className="flex gap-3">
+      <div className="flex flex-col items-center flex-shrink-0 w-3">
+        <div className="w-2.5 h-2.5 rounded-full bg-stone-500 mt-[5px]" />
+        {!isLast && <div className="flex-1 w-px bg-stone-200 mt-1" />}
+      </div>
+      <div className={`flex-1 ${isLast ? '' : 'pb-4'}`}>
+        <p className="text-[11pt] font-bold text-stone-900 mb-2 leading-tight capitalize">
+          {label}
+        </p>
+        <p className="text-[11pt] font-medium text-stone-800 leading-[1.8] bg-white rounded-lg px-5 py-4 border border-stone-200">
+          {body}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function ComparisonBlock({
+  label,
+  estimated,
+  actual,
+}: {
+  label: string
+  estimated: string
+  actual: string
+}) {
+  return (
+    <div className="border border-stone-200 rounded-lg overflow-hidden">
+      <div className="px-4 py-2 bg-stone-50 border-b border-stone-200">
+        <p className="text-[10pt] font-display font-bold uppercase tracking-wide text-stone-700">
+          {label}
+        </p>
+      </div>
+      <div className="grid grid-cols-2 divide-x divide-stone-200">
+        <div className="px-4 py-3">
+          <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1">Estimated</p>
+          <p className="text-[14pt] font-bold text-stone-900 tabular-nums">{estimated}</p>
+        </div>
+        <div className="px-4 py-3">
+          <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1">Actual</p>
+          <p className="text-[14pt] font-bold text-emerald-700 tabular-nums">{actual}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ── SVG icons ── */
 
 const icons = {
   fileText: (
-    <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
     </svg>
   ),
-  checkCircle: (
-    <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+  user: (
+    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
     </svg>
   ),
   mapPin: (
-    <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
     </svg>
   ),
+  checkCircle: (
+    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+    </svg>
+  ),
+  scale: (
+    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
+    </svg>
+  ),
 }
 
-/* ── Report: 3 A4 pages ── */
+/* ── Main Report (3 A4 pages) ── */
 
-export default function IncidentSummaryReport(
-  props: IncidentSummaryReportProps
-) {
+export default function IncidentSummaryReport(props: IncidentSummaryReportProps) {
+  const headerSubtitle = `${props.incidentNumber} · ${props.vehicleNumber}`
+  const locationLine = [props.location.area, props.location.city, props.location.state]
+    .filter(Boolean)
+    .join(', ')
+
   return (
     <div
       id="incident-summary-report"
@@ -127,68 +240,75 @@ export default function IncidentSummaryReport(
     >
       {/* ════════════ PAGE 1: COVER ════════════ */}
       <div className="report-page w-[210mm] h-[297mm] mx-auto bg-white text-stone-900 font-sans print:shadow-none shadow-lg flex flex-col overflow-hidden">
-        {/* Hero image with wave */}
-        <div className="w-full h-[38%] flex-shrink-0">
-          <img src="/report-cover-bg.png" alt="" className="w-full h-full object-cover object-top" />
+        <div className="w-full h-[24%] flex-shrink-0 overflow-hidden">
+          <img src="/report-cover-bg.png" alt="" className="w-full h-full object-cover object-bottom" />
         </div>
 
-        {/* Content below wave */}
         <div className="flex-1 flex flex-col items-center px-14 text-center">
-          {/* Logo */}
-          <div className="pt-6 pb-4">
-            <img src="/lots247-logo.png" alt="LOTS247" className="h-10 w-auto mx-auto" />
+          <div className="pt-7 pb-6">
+            <img src="/lots247-logo.png" alt="LOTS247" className="h-16 w-auto mx-auto" />
           </div>
 
-          {/* Title */}
-          <h1 className="text-[26pt] font-display font-bold text-stone-900 tracking-tight leading-tight">
+          <h1 className="text-[34pt] font-display font-bold text-stone-900 tracking-tight leading-[1.05]">
             Incident Summary
           </h1>
-          <h1 className="text-[26pt] font-display font-bold text-stone-900 tracking-tight leading-tight mb-6">
+          <h1 className="text-[34pt] font-display font-bold text-stone-900 tracking-tight leading-[1.05] mb-10">
             Report
           </h1>
 
-          {/* Key identifiers card */}
-          <div className="w-full max-w-sm bg-white border border-stone-200 rounded-xl overflow-hidden mb-10">
-            <div className="flex border-b border-stone-200">
-              <div className="flex-1 px-6 py-5 border-r border-stone-200 text-center">
-                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-2">Incident ID</p>
-                <p className="text-[16pt] font-mono font-bold text-stone-900">{props.incidentId}</p>
+          <div className="w-full max-w-sm bg-white border border-stone-200 rounded-xl overflow-hidden mb-9">
+            <div className="flex">
+              <div className="flex-1 px-6 py-3.5 border-r border-stone-200 text-center">
+                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Incident Number</p>
+                <p className="text-[15pt] font-mono font-bold text-stone-900">{props.incidentNumber}</p>
               </div>
-              <div className="flex-1 px-6 py-5 text-center">
-                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-2">Vehicle No.</p>
-                <p className="text-[16pt] font-mono font-bold text-stone-900">{props.vehicleNumber}</p>
-              </div>
-            </div>
-            <div className="px-6 py-3 bg-stone-50">
-              <div className="flex items-center justify-center gap-3">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span className="text-[11pt] font-medium text-stone-600">{props.incidentType}</span>
-                <span className="text-stone-300 mx-1">&middot;</span>
-                <span className="text-[11pt] text-stone-500">{props.stage}</span>
+              <div className="flex-1 px-6 py-3.5 text-center">
+                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Vehicle No.</p>
+                <p className="text-[15pt] font-mono font-bold text-stone-900">{props.vehicleNumber}</p>
               </div>
             </div>
           </div>
 
-          {/* Details grid */}
+          <div className="w-full max-w-md bg-stone-50 border border-stone-200 rounded-xl px-7 py-5 mb-9 text-left">
+            <p className="text-[15pt] font-display font-bold text-stone-900 capitalize mb-4">
+              This report covers
+            </p>
+            <ul className="flex flex-col gap-3">
+              {[
+                'Incident — ID, date, category & priority',
+                'Subscriber & reporter details',
+                'Incident narrative and resolution journey',
+                'Final status with cost & time comparison',
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-3">
+                  <svg
+                    className="w-5 h-5 text-emerald-600 flex-shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.75}
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="9.5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.5 12 2.5 2.5 4.5-5" />
+                  </svg>
+                  <span className="text-[10.5pt] font-semibold text-stone-900 leading-snug capitalize">
+                    {item}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <div className="w-full max-w-md">
-            <div className="grid grid-cols-3 gap-x-8 text-left">
+            <div className="grid grid-cols-2 gap-x-12 gap-y-6 text-left">
               <div>
-                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Subscriber</p>
-                <p className="text-[14pt] font-bold text-stone-900">{props.subscriberName}</p>
-                <p className="text-[10pt] font-mono text-stone-500 mt-1">{props.subscriberId}</p>
+                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-2">Subscriber</p>
+                <p className="text-[14pt] font-bold text-stone-900">{props.customerName}</p>
+                <p className="text-[10pt] font-mono text-stone-500 mt-1">{props.accountId}</p>
               </div>
               <div>
-                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Reporter</p>
-                <p className="text-[14pt] font-bold text-stone-900">{props.reporterName}</p>
-                <p className="text-[10pt] font-mono text-stone-500 mt-1">{props.reporterPhone}</p>
-              </div>
-              <div>
-                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Date Generated</p>
+                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-2">Date Generated</p>
                 <p className="text-[14pt] font-bold text-stone-900">{props.dateGenerated}</p>
-              </div>
-              <div>
-                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Date of Reporting</p>
-                <p className="text-[14pt] font-bold text-stone-900">{props.dateOfReporting}</p>
               </div>
             </div>
           </div>
@@ -199,130 +319,188 @@ export default function IncidentSummaryReport(
       </div>
 
       {/* ════════════ PAGE 2: INCIDENT DETAILS ════════════ */}
-      <div className="report-page w-[210mm] h-[297mm] mx-auto bg-white text-stone-900 font-sans print:shadow-none shadow-lg flex flex-col mt-8 print:mt-0">
-        <PageHeader title="Incident Summary Report" subtitle={`${props.incidentId} · ${props.vehicleNumber}`} />
+      <div className="report-page report-page--flow w-[210mm] min-h-[297mm] mx-auto bg-white text-stone-900 font-sans print:shadow-none shadow-lg flex flex-col mt-8 print:mt-0">
+        <PageHeader title="Incident Summary Report" subtitle={headerSubtitle} />
 
-        <div className="flex-1 px-10 py-8 flex flex-col">
-          <div className="flex-1 bg-white border border-stone-200 rounded-xl overflow-hidden flex flex-col">
-            <div className="flex items-center gap-2 px-8 py-5 border-b border-stone-100 bg-white">
-              <span className="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-50">{icons.fileText}</span>
-              <h3 className="text-[16pt] font-display font-extrabold text-emerald-700 tracking-tight">
-                Incident Details
-              </h3>
-            </div>
-            <div className="flex-1 px-8 py-8 bg-stone-50/60 flex flex-col">
-              {/* Top row: type + date */}
-              <div className="grid grid-cols-2 gap-x-10 mb-8">
-                <LabelValue label="Date of Reporting" value={props.dateOfReporting} large />
-                <LabelValue label="Incident Type" value={props.incidentType} large />
-              </div>
-
-              {/* Summary */}
-              <div className="border-t border-stone-200 pt-6 mb-8">
-                <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-3">
-                  Incident Summary
-                </p>
-                <p className="text-[12pt] font-medium text-stone-800 leading-[1.9] bg-white rounded-lg px-6 py-5 border border-stone-200">
-                  {props.incidentSummary}
-                </p>
-              </div>
-
-              {/* Location */}
-              <div className="border-t border-stone-200 pt-6 flex-1">
-                <div className="flex items-center gap-1.5 mb-5">
-                  {icons.mapPin}
-                  <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider">
-                    Location
-                  </p>
+        <div className="px-10 py-6 flex flex-col gap-7">
+          {/* Incident Metadata */}
+          <div>
+            <SectionTitle title="Incident Details" icon={icons.fileText} />
+            <p className="text-[10.5pt] text-stone-700 leading-[1.75] mb-5">
+              This report captures every detail of incident{' '}
+              <span className="font-bold text-stone-900">{props.incidentNumber}</span> — a{' '}
+              <span className={`font-bold ${PRIORITY_TONE[props.priority].text}`}>{props.priority}</span> priority{' '}
+              <span className="font-bold text-stone-900">{props.caseCategory}</span> case involving vehicle{' '}
+              <span className="font-bold text-stone-900">{props.vehicleNumber}</span>, reported on{' '}
+              <span className="font-bold text-stone-900">{props.dateTimeOfIncident}</span>. The case is currently{' '}
+              <span className="font-bold text-yellow-700">{props.finalStatus}</span>, with the full resolution journey,
+              cost & time comparison, and challenges documented below.
+            </p>
+            <div className="border border-stone-200 rounded-md overflow-hidden">
+              <div className="grid grid-cols-2 divide-x divide-stone-200">
+                <div className="px-5 py-4">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Incident Number</p>
+                  <p className="text-[13pt] font-mono font-bold text-stone-900">{props.incidentNumber}</p>
                 </div>
-
-                {props.location.roadName && (
-                  <div className="mb-6 bg-white rounded-lg px-6 py-5 border border-stone-200">
-                    <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Road / Highway</p>
-                    <p className="text-[13pt] font-bold text-stone-800">{props.location.roadName}</p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-x-10 gap-y-6">
-                  {props.location.area && (
-                    <LabelValue label="Area" value={props.location.area} large />
+                <div className="px-5 py-4">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Date &amp; Time of Incident</p>
+                  <p className="text-[13pt] font-bold text-stone-900">{props.dateTimeOfIncident}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 divide-x divide-stone-200 border-t border-stone-200">
+                <div className="px-5 py-4">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Case Category</p>
+                  <p className="text-[12pt] font-bold text-stone-900">{props.caseCategory}</p>
+                  {props.caseSubCategory && (
+                    <p className="text-[10pt] font-medium text-stone-500 mt-0.5">{props.caseSubCategory}</p>
                   )}
-                  {props.location.city && (
-                    <LabelValue label="City" value={props.location.city} large />
-                  )}
-                  {props.location.state && (
-                    <LabelValue label="State" value={props.location.state} large />
-                  )}
-                  {props.location.pin && (
-                    <LabelValue label="PIN Code" value={props.location.pin} mono large />
-                  )}
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Priority / Severity</p>
+                  <PriorityBadge priority={props.priority} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 divide-x divide-stone-200 border-t border-stone-200">
+                <div className="px-5 py-4">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Vehicle Number</p>
+                  <p className="text-[13pt] font-mono font-bold text-stone-900">{props.vehicleNumber}</p>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Incident Reported By</p>
+                  <p className="text-[12pt] font-bold text-stone-900">{props.reportedBy}</p>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Subscriber */}
+          <div>
+            <SectionTitle title="Subscriber" icon={icons.user} />
+            <div className="border border-stone-200 rounded-md overflow-hidden">
+              <div className="grid grid-cols-2 divide-x divide-stone-200">
+                <div className="px-5 py-4">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Subscriber / Fleet Operator</p>
+                  <p className="text-[13pt] font-bold text-stone-900">{props.customerName}</p>
+                </div>
+                <div className="px-5 py-4">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Subscriber ID</p>
+                  <p className="text-[13pt] font-mono font-bold text-stone-900">{props.accountId}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Location */}
+          <div>
+            <SectionTitle title="Location of Incident" icon={icons.mapPin} />
+            <div className="border border-stone-200 rounded-md overflow-hidden">
+              {props.location.roadName && (
+                <div className="px-5 py-4 border-b border-stone-200">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Road / Highway</p>
+                  <p className="text-[13pt] font-bold text-stone-900">{props.location.roadName}</p>
+                </div>
+              )}
+              {props.location.area && (
+                <div className="px-5 py-4 border-b border-stone-200">
+                  <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">Area</p>
+                  <p className="text-[12pt] font-bold text-stone-900">{props.location.area}</p>
+                </div>
+              )}
+              <div className="grid grid-cols-3 divide-x divide-stone-200">
+                {props.location.city && (
+                  <div className="px-5 py-4">
+                    <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">City</p>
+                    <p className="text-[12pt] font-bold text-stone-900">{props.location.city}</p>
+                  </div>
+                )}
+                {props.location.state && (
+                  <div className="px-5 py-4">
+                    <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">State</p>
+                    <p className="text-[12pt] font-bold text-stone-900">{props.location.state}</p>
+                  </div>
+                )}
+                {props.location.pin && (
+                  <div className="px-5 py-4">
+                    <p className="text-[8.5pt] font-semibold text-stone-400 uppercase tracking-wider mb-1.5">PIN Code</p>
+                    <p className="text-[12pt] font-mono font-bold text-stone-900">{props.location.pin}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Incident Narrative */}
+          <div>
+            <SectionTitle title="Incident Details (as shared on first call)" icon={icons.fileText} />
+            <p className="text-[11pt] font-medium text-stone-800 leading-[1.8] bg-stone-50 rounded-lg px-5 py-4 border border-stone-200">
+              {props.incidentDetails}
+            </p>
+          </div>
         </div>
 
-        <div className="h-0.5 bg-emerald-600" />
+        <div className="mt-auto h-0.5 bg-emerald-600" />
         <PageFooter page={2} total={3} />
       </div>
 
-      {/* ════════════ PAGE 3: RESOLUTION ════════════ */}
-      <div className="report-page w-[210mm] h-[297mm] mx-auto bg-white text-stone-900 font-sans print:shadow-none shadow-lg flex flex-col mt-8 print:mt-0">
-        <PageHeader title="Incident Summary Report" subtitle={`${props.incidentId} · ${props.vehicleNumber}`} />
+      {/* ════════════ PAGE 3: RESOLUTION & OUTCOME ════════════ */}
+      <div className="report-page report-page--flow w-[210mm] min-h-[297mm] mx-auto bg-white text-stone-900 font-sans print:shadow-none shadow-lg flex flex-col mt-8 print:mt-0">
+        <PageHeader title="Incident Summary Report" subtitle={headerSubtitle} />
 
-        <div className="flex-1 px-10 py-8 flex flex-col gap-6">
-          <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
-            <div className="flex items-center gap-2 px-8 py-5 border-b border-stone-100 bg-white">
-              <span className="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-50">{icons.checkCircle}</span>
-              <h3 className="text-[16pt] font-display font-extrabold text-emerald-700 tracking-tight">
-                Resolution Details
-              </h3>
+        <div className="px-10 py-6 flex flex-col gap-7">
+          {/* Resolution Journey */}
+          <div>
+            <SectionTitle title="Resolution Journey" icon={icons.checkCircle} />
+            <div className="flex flex-col">
+              <TimelineStep
+                label="Information developed post-Lawyered coordination"
+                body={props.postCoordinationInfo}
+              />
+              <TimelineStep
+                label="Remedial steps / resolution provided"
+                body={props.remedialSteps}
+              />
+              <TimelineStep
+                label="Challenges & complexities"
+                body={props.challenges}
+                isLast
+              />
             </div>
-            <div className="px-8 py-8 bg-stone-50/60">
-              {props.resolutionOpinion && (
-                <div className="mb-8">
-                  <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-3">
-                    Resolution / Opinion
-                  </p>
-                  <p className="text-[12pt] font-medium text-stone-800 leading-[1.9] bg-white rounded-lg px-6 py-5 border border-stone-200">
-                    {props.resolutionOpinion}
-                  </p>
-                </div>
-              )}
+          </div>
 
-              <div className="grid grid-cols-2 gap-x-10 border-t border-stone-200 pt-6">
-                <div>
-                  <p className="text-[9pt] font-semibold text-stone-400 uppercase tracking-wider mb-2">Current Stage</p>
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[11pt] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                    {props.stage}
-                  </span>
-                </div>
-                <LabelValue label="Expected Resolution Date" value={props.expectedResolutionDate} large />
+          {/* Final Status & Comparison */}
+          <div>
+            <SectionTitle title="Final Status & Comparison" icon={icons.scale} />
+            <div className="border border-stone-200 rounded-md overflow-hidden mb-4">
+              <div className="px-5 py-4 bg-yellow-50 border-b border-yellow-100">
+                <p className="text-[8.5pt] font-semibold text-yellow-700 uppercase tracking-wider mb-1.5">Final Status</p>
+                <p className="text-[14pt] font-display font-bold text-yellow-700">{props.finalStatus}</p>
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <ComparisonBlock label="Cost" estimated={props.cost.estimated} actual={props.cost.actual} />
+              <ComparisonBlock label="Time" estimated={props.time.estimated} actual={props.time.actual} />
             </div>
           </div>
 
           {/* Quick reference */}
-          <div className="bg-stone-50 border border-stone-200 rounded-xl px-8 py-8">
-            <h3 className="text-[14pt] font-display font-bold text-stone-700 mb-6">Quick Reference</h3>
-            <div className="grid grid-cols-3 gap-x-8 gap-y-7">
-              <LabelValue label="Incident ID" value={props.incidentId} mono large />
-              <LabelValue label="Vehicle Number" value={props.vehicleNumber} mono large />
-              <LabelValue label="Incident Type" value={props.incidentType} large />
-              <LabelValue label="Subscriber" value={props.subscriberName} large />
-              <LabelValue label="Reporter" value={props.reporterName} large />
-              <LabelValue label="Reporter Contact" value={props.reporterPhone} mono large />
+          <div className="bg-stone-50 border border-stone-200 rounded-xl px-6 py-5">
+            <h3 className="text-[12pt] font-display font-bold text-stone-700 mb-4">Quick Reference</h3>
+            <div className="grid grid-cols-3 gap-x-6 gap-y-5">
+              <LabelValue label="Incident Number" value={props.incidentNumber} mono />
+              <LabelValue label="Vehicle" value={props.vehicleNumber} mono />
+              <LabelValue label="Subscriber ID" value={props.accountId} mono />
+              <LabelValue label="Subscriber" value={props.customerName} />
+              <LabelValue label="POC" value={props.customerPOC.name} />
+              <LabelValue label="Location" value={locationLine} />
             </div>
           </div>
         </div>
 
-        {/* Disclaimer */}
-        <div className="px-10 pb-5">
+        <div className="mt-auto px-10 pb-3">
           <p className="text-[9pt] font-bold text-stone-400 mb-1.5">Disclaimer</p>
           <p className="text-[9pt] text-stone-400 leading-relaxed">
-            This is a system-generated report. The information contained herein is based on data provided by the subscriber and may not
-            reflect the complete facts of the incident. For further details, please refer to our Terms &amp; Conditions.
+            This is a system-generated report. Information is captured during the incident lifecycle and may be updated as the case
+            progresses. For further details, please refer to our Terms &amp; Conditions.
           </p>
         </div>
 

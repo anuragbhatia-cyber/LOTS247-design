@@ -12,48 +12,6 @@
   },
   "reports": [
     {
-      "id": "rpt-001",
-      "type": "MIS",
-      "title": "Monthly Incident Summary — February 2026",
-      "period": "Feb 2026",
-      "format": "PDF",
-      "generatedAt": "2026-03-01T06:00:00Z",
-      "fileUrl": "/reports/mis-feb-2026.pdf",
-      "incidentId": null,
-      "vehicleRegistration": null,
-      "totalIncidents": 7,
-      "resolvedIncidents": 5,
-      "pendingIncidents": 2
-    },
-    {
-      "id": "rpt-002",
-      "type": "MIS",
-      "title": "Monthly Incident Summary — January 2026",
-      "period": "Jan 2026",
-      "format": "PDF",
-      "generatedAt": "2026-02-01T06:00:00Z",
-      "fileUrl": "/reports/mis-jan-2026.pdf",
-      "incidentId": null,
-      "vehicleRegistration": null,
-      "totalIncidents": 4,
-      "resolvedIncidents": 4,
-      "pendingIncidents": 0
-    },
-    {
-      "id": "rpt-003",
-      "type": "MIS",
-      "title": "Monthly Incident Summary — December 2025",
-      "period": "Dec 2025",
-      "format": "PDF",
-      "generatedAt": "2026-01-01T06:00:00Z",
-      "fileUrl": "/reports/mis-dec-2025.pdf",
-      "incidentId": null,
-      "vehicleRegistration": null,
-      "totalIncidents": 11,
-      "resolvedIncidents": 9,
-      "pendingIncidents": 2
-    },
-    {
       "id": "rpt-004",
       "type": "MIS-CHALLAN",
       "title": "Monthly Challan Summary — February 2026",
@@ -82,6 +40,34 @@
       "resolvedChallans": 9,
       "pendingChallans": 0,
       "totalFines": 27000
+    },
+    {
+      "id": "rpt-cases-001",
+      "type": "MIS",
+      "title": "Monthly Incident Summary — February 2026",
+      "period": "Feb 2026",
+      "format": "PDF",
+      "generatedAt": "2026-03-01T06:00:00Z",
+      "fileUrl": "/reports/mis-cases-feb-2026.pdf",
+      "incidentId": null,
+      "vehicleRegistration": null,
+      "totalIncidents": 29,
+      "resolvedIncidents": 8,
+      "pendingIncidents": 21
+    },
+    {
+      "id": "rpt-cases-002",
+      "type": "MIS",
+      "title": "Monthly Incident Summary — January 2026",
+      "period": "Jan 2026",
+      "format": "PDF",
+      "generatedAt": "2026-02-01T06:00:00Z",
+      "fileUrl": "/reports/mis-cases-jan-2026.pdf",
+      "incidentId": null,
+      "vehicleRegistration": null,
+      "totalIncidents": 24,
+      "resolvedIncidents": 15,
+      "pendingIncidents": 9
     },
     {
       "id": "rpt-006",

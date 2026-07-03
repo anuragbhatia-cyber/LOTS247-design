@@ -1,54 +1,57 @@
-interface ChallanStatusRow {
+interface CaseStatusRow {
   status: string
+  cases: number
   vehicles: number
-  count: number
-  amount: number
+}
+
+interface CaseTypeRow {
+  type: string
+  cases: number
+  vehicles: number
+  open: number
+  resolved: number
 }
 
 interface StateRow {
   state: string
+  cases: number
   vehicles: number
-  count: number
-  amount: number
+  open: number
 }
 
-interface AmountRangeRow {
-  range: string
+interface AuthorityRow {
+  authority: string
+  cases: number
   vehicles: number
-  count: number
-  amount: number
+  open: number
 }
 
 interface RawDataLink {
   label: string
   href: string
+  cases: number
   vehicles: number
-  challans: number
-  amount: number
-  tone: 'amber' | 'red' | 'blue' | 'stone'
+  tone: 'amber' | 'red' | 'blue' | 'stone' | 'emerald'
 }
 
-interface MonthlyChallanSummaryReportProps {
+interface MonthlyCasesSummaryReportProps {
   subscriberId: string
   subscriberName: string
   dateGenerated: string
   reportMonth: string
   reportYear: string
 
-  overallStatus: ChallanStatusRow[]
-  overallTotal: ChallanStatusRow
+  overallStatus: CaseStatusRow[]
+  overallTotal: CaseStatusRow
 
-  stateWisePendingOnline: StateRow[]
-  stateWisePendingOnlineTotal: StateRow
+  caseTypeBreakdown: CaseTypeRow[]
+  caseTypeTotal: CaseTypeRow
 
-  stateWisePendingInCourt: StateRow[]
-  stateWisePendingInCourtTotal: StateRow
+  stateWise: StateRow[]
+  stateWiseTotal: StateRow
 
-  amountRangePendingOnline: AmountRangeRow[]
-  amountRangePendingOnlineTotal: AmountRangeRow
-
-  amountRangePendingInCourt: AmountRangeRow[]
-  amountRangePendingInCourtTotal: AmountRangeRow
+  authorityWise: AuthorityRow[]
+  authorityWiseTotal: AuthorityRow
 
   rawDataLinks: RawDataLink[]
 }
@@ -90,76 +93,19 @@ function SectionTitle({ title, icon }: { title: string; icon: React.ReactNode })
   )
 }
 
-function formatINR(n: number): string {
-  return `₹${n.toLocaleString('en-IN')}`
-}
-
-function formatAmountRange(range: string): string {
-  if (range.trim().toLowerCase() === 'grand total') return range
-  const parts = range.split(/\s*[-–]\s*/)
-  return parts
-    .map((p) => {
-      const n = Number(p.replace(/[^\d]/g, ''))
-      return Number.isFinite(n) ? `₹${n.toLocaleString('en-IN')}` : p
-    })
-    .join(' – ')
-}
-
-/* ── Tables ── */
-
-const STATUS_TEXT_TONE: Record<string, string> = {
-  paid: 'text-emerald-700',
-  pending: 'text-red-700',
-  'pending online': 'text-red-700',
-  'pending in court': 'text-red-700',
-  'moved to physical court': 'text-red-700',
-  disposed: 'text-emerald-700',
-}
-
-function statusToneClass(status: string): string {
-  return STATUS_TEXT_TONE[status.trim().toLowerCase()] ?? 'text-stone-800'
-}
+/* ── Case status tone map (Open = red, Resolved = emerald) ── */
 
 const STATUS_CARD_TONE: Record<
   string,
-  { bg: string; border: string; label: string; dot: string }
+  { bg: string; border: string; label: string }
 > = {
-  paid: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    label: 'text-emerald-700',
-    dot: 'bg-emerald-500',
-  },
-  pending: {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    label: 'text-red-700',
-    dot: 'bg-red-500',
-  },
-  'pending online': {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    label: 'text-red-700',
-    dot: 'bg-red-500',
-  },
-  'pending in court': {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    label: 'text-red-700',
-    dot: 'bg-red-500',
-  },
-  'moved to physical court': {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    label: 'text-red-700',
-    dot: 'bg-red-500',
-  },
-  disposed: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    label: 'text-emerald-700',
-    dot: 'bg-emerald-500',
-  },
+  open: { bg: 'bg-red-50', border: 'border-red-200', label: 'text-red-700' },
+  'in progress': { bg: 'bg-red-50', border: 'border-red-200', label: 'text-red-700' },
+  submitted: { bg: 'bg-red-50', border: 'border-red-200', label: 'text-red-700' },
+  extended: { bg: 'bg-red-50', border: 'border-red-200', label: 'text-red-700' },
+  'document requested': { bg: 'bg-red-50', border: 'border-red-200', label: 'text-red-700' },
+  resolved: { bg: 'bg-emerald-50', border: 'border-emerald-200', label: 'text-emerald-700' },
+  closed: { bg: 'bg-emerald-50', border: 'border-emerald-200', label: 'text-emerald-700' },
 }
 
 function statusCardTone(status: string) {
@@ -168,7 +114,6 @@ function statusCardTone(status: string) {
       bg: 'bg-stone-50',
       border: 'border-stone-200',
       label: 'text-stone-700',
-      dot: 'bg-stone-400',
     }
   )
 }
@@ -194,12 +139,12 @@ function StatBlock({
   )
 }
 
-function StatusTable({
+function OverallStatusBento({
   rows,
   total,
 }: {
-  rows: ChallanStatusRow[]
-  total: ChallanStatusRow
+  rows: CaseStatusRow[]
+  total: CaseStatusRow
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -207,10 +152,9 @@ function StatusTable({
         <p className="text-[9.5pt] font-bold uppercase tracking-wider text-blue-700 mb-3">
           Grand Total
         </p>
-        <div className="grid grid-cols-3 gap-4">
-          <StatBlock label="Unique Vehicles" value={total.vehicles} />
-          <StatBlock label="No of Challan" value={total.count} />
-          <StatBlock label="Challan Amount" value={formatINR(total.amount)} align="right" />
+        <div className="grid grid-cols-2 gap-4">
+          <StatBlock label="Total Cases" value={total.cases} />
+          <StatBlock label="Unique Vehicles" value={total.vehicles} align="right" />
         </div>
       </div>
 
@@ -225,10 +169,9 @@ function StatusTable({
               <p className={`text-[10.5pt] font-bold uppercase tracking-wide ${tone.label} mb-3`}>
                 {r.status}
               </p>
-              <div className="grid grid-cols-3 gap-3">
-                <StatBlock label="Vehicles" value={r.vehicles} />
-                <StatBlock label="Challans" value={r.count} />
-                <StatBlock label="Amount" value={formatINR(r.amount)} align="right" />
+              <div className="grid grid-cols-2 gap-3">
+                <StatBlock label="Cases" value={r.cases} />
+                <StatBlock label="Vehicles" value={r.vehicles} align="right" />
               </div>
             </div>
           )
@@ -238,48 +181,51 @@ function StatusTable({
   )
 }
 
-function StateTable({
-  title,
+/* ── Tables ── */
+
+function CaseTypeTable({
   rows,
   total,
   showTotal = true,
 }: {
-  title: string
-  rows: StateRow[]
-  total: StateRow
+  rows: CaseTypeRow[]
+  total: CaseTypeRow
   showTotal?: boolean
 }) {
   return (
     <div className="border border-stone-200 rounded-md overflow-hidden">
-      <div className="px-3 py-2 bg-red-50 border-b border-stone-200">
-        <p className="text-center text-[10pt] font-display font-bold uppercase tracking-wide text-red-700">
-          {title}
+      <div className="px-3 py-2 bg-blue-50 border-b border-stone-200">
+        <p className="text-center text-[10pt] font-display font-bold uppercase tracking-wide text-blue-700">
+          Case Type Breakdown
         </p>
       </div>
       <table className="w-full text-[10.5pt] border-separate border-spacing-0">
         <thead>
           <tr className="bg-blue-50">
-            <th className="px-3 py-3 text-left font-bold text-stone-900 border-b border-stone-200">State</th>
-            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Unique Vehicle Count</th>
-            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">No of Challan</th>
-            <th className="px-3 py-3 text-right font-bold text-stone-900 border-l border-b border-stone-200">Challan Amount</th>
+            <th className="px-3 py-3 text-left font-bold text-stone-900 border-b border-stone-200">Case Type</th>
+            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Total Cases</th>
+            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Open</th>
+            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Resolved</th>
+            <th className="px-3 py-3 text-right font-bold text-stone-900 border-l border-b border-stone-200">Vehicles</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={r.state} className={i % 2 === 1 ? 'bg-stone-50' : ''}>
-              <td className="px-3 py-3 text-stone-900 font-medium border-b border-stone-200">{r.state}</td>
-              <td className="px-3 py-3 text-center text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.vehicles}</td>
-              <td className="px-3 py-3 text-center text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.count}</td>
-              <td className="px-3 py-3 text-right text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{formatINR(r.amount)}</td>
+            <tr key={r.type} className={i % 2 === 1 ? 'bg-stone-50' : ''}>
+              <td className="px-3 py-3 text-stone-900 font-medium border-b border-stone-200">{r.type}</td>
+              <td className="px-3 py-3 text-center text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.cases}</td>
+              <td className="px-3 py-3 text-center text-red-700 font-medium tabular-nums border-l border-b border-stone-200">{r.open}</td>
+              <td className="px-3 py-3 text-center text-emerald-700 font-medium tabular-nums border-l border-b border-stone-200">{r.resolved}</td>
+              <td className="px-3 py-3 text-right text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.vehicles}</td>
             </tr>
           ))}
           {showTotal && (
             <tr className="font-bold bg-blue-50">
               <td className="px-3 py-3 text-stone-900">Grand Total</td>
-              <td className="px-3 py-3 text-center tabular-nums text-stone-900 border-l border-stone-200">{total.vehicles}</td>
-              <td className="px-3 py-3 text-center tabular-nums text-stone-900 border-l border-stone-200">{total.count}</td>
-              <td className="px-3 py-3 text-right tabular-nums text-stone-900 border-l border-stone-200">{formatINR(total.amount)}</td>
+              <td className="px-3 py-3 text-center tabular-nums text-stone-900 border-l border-stone-200">{total.cases}</td>
+              <td className="px-3 py-3 text-center tabular-nums text-red-700 border-l border-stone-200">{total.open}</td>
+              <td className="px-3 py-3 text-center tabular-nums text-emerald-700 border-l border-stone-200">{total.resolved}</td>
+              <td className="px-3 py-3 text-right tabular-nums text-stone-900 border-l border-stone-200">{total.vehicles}</td>
             </tr>
           )}
         </tbody>
@@ -288,48 +234,94 @@ function StateTable({
   )
 }
 
-function AmountRangeTable({
-  title,
+function StateTable({
   rows,
   total,
   showTotal = true,
 }: {
-  title: string
-  rows: AmountRangeRow[]
-  total: AmountRangeRow
+  rows: StateRow[]
+  total: StateRow
   showTotal?: boolean
 }) {
   return (
     <div className="border border-stone-200 rounded-md overflow-hidden">
-      <div className="px-3 py-2 bg-red-50 border-b border-stone-200">
-        <p className="text-center text-[10pt] font-display font-bold uppercase tracking-wide text-red-700">
-          {title}
+      <div className="px-3 py-2 bg-blue-50 border-b border-stone-200">
+        <p className="text-center text-[10pt] font-display font-bold uppercase tracking-wide text-blue-700">
+          State Wise Cases
         </p>
       </div>
       <table className="w-full text-[10.5pt] border-separate border-spacing-0">
         <thead>
           <tr className="bg-blue-50">
-            <th className="px-3 py-3 text-left font-bold text-stone-900 border-b border-stone-200">Grouped Amount</th>
-            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Unique Vehicle Count</th>
-            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">No of Challan</th>
-            <th className="px-3 py-3 text-right font-bold text-stone-900 border-l border-b border-stone-200">Challan Amount</th>
+            <th className="px-3 py-3 text-left font-bold text-stone-900 border-b border-stone-200">State</th>
+            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Total Cases</th>
+            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Open</th>
+            <th className="px-3 py-3 text-right font-bold text-stone-900 border-l border-b border-stone-200">Vehicles</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
-            <tr key={r.range} className={i % 2 === 1 ? 'bg-stone-50' : ''}>
-              <td className="px-3 py-3 text-stone-900 font-medium tabular-nums border-b border-stone-200">{formatAmountRange(r.range)}</td>
-              <td className="px-3 py-3 text-center text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.vehicles}</td>
-              <td className="px-3 py-3 text-center text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.count}</td>
-              <td className="px-3 py-3 text-right text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{formatINR(r.amount)}</td>
+            <tr key={r.state} className={i % 2 === 1 ? 'bg-stone-50' : ''}>
+              <td className="px-3 py-3 text-stone-900 font-medium border-b border-stone-200">{r.state}</td>
+              <td className="px-3 py-3 text-center text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.cases}</td>
+              <td className="px-3 py-3 text-center text-red-700 font-medium tabular-nums border-l border-b border-stone-200">{r.open}</td>
+              <td className="px-3 py-3 text-right text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.vehicles}</td>
             </tr>
           ))}
           {showTotal && (
             <tr className="font-bold bg-blue-50">
               <td className="px-3 py-3 text-stone-900">Grand Total</td>
-              <td className="px-3 py-3 text-center tabular-nums text-stone-900 border-l border-stone-200">{total.vehicles}</td>
-              <td className="px-3 py-3 text-center tabular-nums text-stone-900 border-l border-stone-200">{total.count}</td>
-              <td className="px-3 py-3 text-right tabular-nums text-stone-900 border-l border-stone-200">{formatINR(total.amount)}</td>
+              <td className="px-3 py-3 text-center tabular-nums text-stone-900 border-l border-stone-200">{total.cases}</td>
+              <td className="px-3 py-3 text-center tabular-nums text-red-700 border-l border-stone-200">{total.open}</td>
+              <td className="px-3 py-3 text-right tabular-nums text-stone-900 border-l border-stone-200">{total.vehicles}</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function AuthorityTable({
+  rows,
+  total,
+  showTotal = true,
+}: {
+  rows: AuthorityRow[]
+  total: AuthorityRow
+  showTotal?: boolean
+}) {
+  return (
+    <div className="border border-stone-200 rounded-md overflow-hidden">
+      <div className="px-3 py-2 bg-blue-50 border-b border-stone-200">
+        <p className="text-center text-[10pt] font-display font-bold uppercase tracking-wide text-blue-700">
+          Authority Wise Cases
+        </p>
+      </div>
+      <table className="w-full text-[10.5pt] border-separate border-spacing-0">
+        <thead>
+          <tr className="bg-blue-50">
+            <th className="px-3 py-3 text-left font-bold text-stone-900 border-b border-stone-200">Authority</th>
+            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Total Cases</th>
+            <th className="px-3 py-3 text-center font-bold text-stone-900 border-l border-b border-stone-200">Open</th>
+            <th className="px-3 py-3 text-right font-bold text-stone-900 border-l border-b border-stone-200">Vehicles</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={r.authority} className={i % 2 === 1 ? 'bg-stone-50' : ''}>
+              <td className="px-3 py-3 text-stone-900 font-medium border-b border-stone-200">{r.authority}</td>
+              <td className="px-3 py-3 text-center text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.cases}</td>
+              <td className="px-3 py-3 text-center text-red-700 font-medium tabular-nums border-l border-b border-stone-200">{r.open}</td>
+              <td className="px-3 py-3 text-right text-stone-900 font-medium tabular-nums border-l border-b border-stone-200">{r.vehicles}</td>
+            </tr>
+          ))}
+          {showTotal && (
+            <tr className="font-bold bg-blue-50">
+              <td className="px-3 py-3 text-stone-900">Grand Total</td>
+              <td className="px-3 py-3 text-center tabular-nums text-stone-900 border-l border-stone-200">{total.cases}</td>
+              <td className="px-3 py-3 text-center tabular-nums text-red-700 border-l border-stone-200">{total.open}</td>
+              <td className="px-3 py-3 text-right tabular-nums text-stone-900 border-l border-stone-200">{total.vehicles}</td>
             </tr>
           )}
         </tbody>
@@ -346,15 +338,19 @@ const icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
     </svg>
   ),
+  folder: (
+    <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+    </svg>
+  ),
   map: (
     <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" d="m15 11.25 1.5 1.5.75-.75V8.758l2.276-.61a3 3 0 1 0-3.675-3.675l-.61 2.277H12l-.75.75 1.5 1.5M15 11.25l-8.47 8.47c-.34.34-.8.53-1.28.53s-.94.19-1.28.53l-.97.97-.75-.75.97-.97c.34-.34.53-.8.53-1.28s.19-.94.53-1.28L12.75 9M15 11.25 12.75 9" />
     </svg>
   ),
-  rupee: (
+  building: (
     <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14.121 7.629A3 3 0 0 0 9.017 9.43c-.023.212-.002.425.028.636l.506 3.541a4.5 4.5 0 0 1-.43 2.65L9 16.5l1.539-.717a4.5 4.5 0 0 1 2.65-.43l3.54.506c.211.03.424.052.636.028a3 3 0 0 0 1.80-5.105L14.12 7.629Z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 6h9m-9 4.5h9M9 6v6.75M15 6v6.75" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
     </svg>
   ),
   database: (
@@ -374,78 +370,24 @@ const TONE_STYLES: Record<RawDataLink['tone'], { bg: string; border: string; tex
   red: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700' },
   blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700' },
   stone: { bg: 'bg-stone-50', border: 'border-stone-200', text: 'text-stone-700' },
+  emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700' },
 }
 
-/* ── Main Report (3 A4 pages) ── */
+/* ── Main Report ── */
 
-export default function MonthlyChallanSummaryReport(
-  props: MonthlyChallanSummaryReportProps
+export default function MonthlyCasesSummaryReport(
+  props: MonthlyCasesSummaryReportProps,
 ) {
   const headerSubtitle = `${props.reportMonth} ${props.reportYear}`
 
-  const pendingRows = props.overallStatus.filter((r) =>
-    r.status.trim().toLowerCase().includes('pending'),
+  const openRows = props.overallStatus.filter(
+    (r) => !['resolved', 'closed'].includes(r.status.trim().toLowerCase()),
   )
-  const pendingTotalCount = pendingRows.reduce((sum, r) => sum + r.count, 0)
-  const pendingTotalAmount = pendingRows.reduce((sum, r) => sum + r.amount, 0)
-
-  const ROW_PX = 40
-  const TABLE_CHROME_PX = 30 + 42 // title bar + header row
-  const TOTAL_ROW_PX = 42
-  const BENTO_PX = 240
-  const SECTION_TITLE_PX = 44
-  const SECTION_GAP_PX = 28
-  const TABLE_GAP_PX = 16
-  const PAGE_USABLE_PX = 940
-
-  const tableHeight = (rowCount: number, hasTotal: boolean) =>
-    TABLE_CHROME_PX + rowCount * ROW_PX + (hasTotal ? TOTAL_ROW_PX : 0)
-
-  const splitRows = <T,>(rows: T[], capacity: number) => {
-    const first = rows.slice(0, Math.min(rows.length, Math.max(0, capacity)))
-    const rest = rows.slice(first.length)
-    return { first, rest, overflow: rest.length > 0 }
-  }
-
-  // ── Page 2: Pending In Court split ──
-  const pendingOnlineHeight = tableHeight(props.stateWisePendingOnline.length, true)
-  const usedBeforePIC =
-    BENTO_PX +
-    SECTION_GAP_PX +
-    SECTION_TITLE_PX +
-    pendingOnlineHeight +
-    TABLE_GAP_PX +
-    TABLE_CHROME_PX
-  const maxPICRowsOnPage2 = Math.floor(
-    (PAGE_USABLE_PX - usedBeforePIC - TOTAL_ROW_PX) / ROW_PX,
-  )
-  const pic = splitRows(props.stateWisePendingInCourt, maxPICRowsOnPage2)
-  const picFirst = pic.first
-  const picRest = pic.rest
-  const picOverflow = pic.overflow
-
-  // ── Page 3: Amount Range Pending In Court split ──
-  const stateContHeight = picOverflow
-    ? SECTION_TITLE_PX + tableHeight(picRest.length, true) + SECTION_GAP_PX
-    : 0
-  const arPendingOnlineHeight = tableHeight(props.amountRangePendingOnline.length, true)
-  const usedBeforeARPIC =
-    stateContHeight +
-    SECTION_TITLE_PX +
-    arPendingOnlineHeight +
-    TABLE_GAP_PX +
-    TABLE_CHROME_PX
-  const maxARPICRowsOnPage3 = Math.floor(
-    (PAGE_USABLE_PX - usedBeforeARPIC - TOTAL_ROW_PX) / ROW_PX,
-  )
-  const arPic = splitRows(props.amountRangePendingInCourt, maxARPICRowsOnPage3)
-  const arPicFirst = arPic.first
-  const arPicRest = arPic.rest
-  const arPicOverflow = arPic.overflow
+  const openTotalCount = openRows.reduce((sum, r) => sum + r.cases, 0)
 
   return (
     <div
-      id="monthly-challan-summary-report"
+      id="monthly-cases-summary-report"
       style={{ fontFamily: '"DM Sans", system-ui, sans-serif' }}
     >
       {/* ════════════ PAGE 1: COVER ════════════ */}
@@ -460,11 +402,14 @@ export default function MonthlyChallanSummaryReport(
           </div>
 
           <h1 className="text-[34pt] font-display font-bold text-stone-900 tracking-tight leading-[1.05]">
-            Monthly Challan
+            Monthly Incident
           </h1>
-          <h1 className="text-[34pt] font-display font-bold text-stone-900 tracking-tight leading-[1.05] mb-10">
+          <h1 className="text-[34pt] font-display font-bold text-stone-900 tracking-tight leading-[1.05]">
             Summary
           </h1>
+          <p className="text-[12pt] font-medium text-stone-500 mt-2 mb-10">
+            (Cases and RTO)
+          </p>
 
           <div className="w-full max-w-sm bg-white border border-stone-200 rounded-xl overflow-hidden mb-9">
             <div className="flex">
@@ -485,10 +430,10 @@ export default function MonthlyChallanSummaryReport(
             </p>
             <ul className="flex flex-col gap-3">
               {[
-                'Overall challan status — paid, pending & in court',
-                'State-wise pending challan summary',
-                'Pending amount range distribution',
-                'Downloadable raw challan data (Excel)',
+                'Overall case status — open, in progress & resolved',
+                'Case type breakdown across accidents, theft, RTO & more',
+                'State-wise and authority-wise case distribution',
+                'Downloadable raw case data (Excel)',
               ].map((item) => (
                 <li key={item} className="flex items-center gap-3">
                   <svg
@@ -501,7 +446,7 @@ export default function MonthlyChallanSummaryReport(
                     <circle cx="12" cy="12" r="9.5" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="m8.5 12 2.5 2.5 4.5-5" />
                   </svg>
-                  <span className="text-[10.5pt] font-semibold text-stone-900 leading-snug">
+                  <span className="text-[10.5pt] font-semibold text-stone-900 leading-snug capitalize">
                     {item}
                   </span>
                 </li>
@@ -528,45 +473,32 @@ export default function MonthlyChallanSummaryReport(
         <PageFooter page={1} total={4} />
       </div>
 
-      {/* ════════════ PAGE 2: OVERALL + STATE WISE ════════════ */}
+      {/* ════════════ PAGE 2: OVERALL + CASE TYPE ════════════ */}
       <div className="report-page report-page--flow w-[210mm] min-h-[297mm] mx-auto bg-white text-stone-900 font-sans print:shadow-none shadow-lg flex flex-col mt-8 print:mt-0">
-        <PageHeader title="Monthly Challan Summary" subtitle={headerSubtitle} />
+        <PageHeader title="Monthly Incident Summary" subtitle={headerSubtitle} />
 
         <div className="px-10 py-6 flex flex-col gap-7">
           <div>
-            <SectionTitle title="Overall Challan Status" icon={icons.layers} />
+            <SectionTitle title="Overall Case Status" icon={icons.layers} />
             <p className="text-[10.5pt] text-stone-700 leading-[1.75] mb-5">
-              This report summarises every traffic challan reported across fleet during{' '}
+              This report summarises every case & RTO incident logged across fleet during{' '}
               <span className="font-bold text-stone-900">
                 {props.reportMonth} {props.reportYear}
               </span>
               . A total of{' '}
-              <span className="font-bold text-stone-900">{props.overallTotal.count}</span> challans amounting to{' '}
-              <span className="font-bold text-stone-900">{formatINR(props.overallTotal.amount)}</span> were logged across{' '}
+              <span className="font-bold text-stone-900">{props.overallTotal.cases}</span> cases were opened across{' '}
               <span className="font-bold text-stone-900">{props.overallTotal.vehicles}</span> vehicles. Of these,{' '}
               <span className="font-bold text-red-700">
-                {pendingTotalCount} challans worth {formatINR(pendingTotalAmount)} are still pending
+                {openTotalCount} cases are still open
               </span>{' '}
-              and require immediate action to avoid escalation.
+              and require active follow-up to reach resolution.
             </p>
-            <StatusTable rows={props.overallStatus} total={props.overallTotal} />
+            <OverallStatusBento rows={props.overallStatus} total={props.overallTotal} />
           </div>
 
           <div>
-            <SectionTitle title="State Wise Challan" icon={icons.map} />
-            <div className="flex flex-col gap-4">
-              <StateTable
-                title="Pending Online"
-                rows={props.stateWisePendingOnline}
-                total={props.stateWisePendingOnlineTotal}
-              />
-              <StateTable
-                title="Pending In Court"
-                rows={picFirst}
-                total={props.stateWisePendingInCourtTotal}
-                showTotal={!picOverflow}
-              />
-            </div>
+            <SectionTitle title="Case Type Breakdown" icon={icons.folder} />
+            <CaseTypeTable rows={props.caseTypeBreakdown} total={props.caseTypeTotal} />
           </div>
         </div>
 
@@ -574,38 +506,19 @@ export default function MonthlyChallanSummaryReport(
         <PageFooter page={2} total={4} />
       </div>
 
-      {/* ════════════ PAGE 3: AMOUNT RANGE ════════════ */}
+      {/* ════════════ PAGE 3: STATE + AUTHORITY ════════════ */}
       <div className="report-page report-page--flow w-[210mm] min-h-[297mm] mx-auto bg-white text-stone-900 font-sans print:shadow-none shadow-lg flex flex-col mt-8 print:mt-0">
-        <PageHeader title="Monthly Challan Summary" subtitle={headerSubtitle} />
+        <PageHeader title="Monthly Incident Summary" subtitle={headerSubtitle} />
 
-        <div className="px-10 py-6 flex flex-col gap-6">
-          {picOverflow && (
-            <div>
-              <SectionTitle title="State Wise Challan (continued)" icon={icons.map} />
-              <StateTable
-                title="Pending In Court (continued)"
-                rows={picRest}
-                total={props.stateWisePendingInCourtTotal}
-                showTotal
-              />
-            </div>
-          )}
+        <div className="px-10 py-6 flex flex-col gap-7">
+          <div>
+            <SectionTitle title="State Wise Cases" icon={icons.map} />
+            <StateTable rows={props.stateWise} total={props.stateWiseTotal} />
+          </div>
 
           <div>
-            <SectionTitle title="Amount Range" icon={icons.rupee} />
-            <div className="flex flex-col gap-4">
-              <AmountRangeTable
-                title="Pending Online"
-                rows={props.amountRangePendingOnline}
-                total={props.amountRangePendingOnlineTotal}
-              />
-              <AmountRangeTable
-                title="Pending In Court"
-                rows={arPicFirst}
-                total={props.amountRangePendingInCourtTotal}
-                showTotal={!arPicOverflow}
-              />
-            </div>
+            <SectionTitle title="Authority Wise Cases" icon={icons.building} />
+            <AuthorityTable rows={props.authorityWise} total={props.authorityWiseTotal} />
           </div>
         </div>
 
@@ -613,27 +526,15 @@ export default function MonthlyChallanSummaryReport(
         <PageFooter page={3} total={4} />
       </div>
 
-      {/* ════════════ PAGE 4: CHALLAN RAW DATA ════════════ */}
+      {/* ════════════ PAGE 4: RAW DATA ════════════ */}
       <div className="report-page report-page--flow w-[210mm] min-h-[297mm] mx-auto bg-white text-stone-900 font-sans print:shadow-none shadow-lg flex flex-col mt-8 print:mt-0">
-        <PageHeader title="Monthly Challan Summary" subtitle={headerSubtitle} />
+        <PageHeader title="Monthly Incident Summary" subtitle={headerSubtitle} />
 
         <div className="px-10 py-8 flex flex-col gap-5">
-          {arPicOverflow && (
-            <div>
-              <SectionTitle title="Amount Range (continued)" icon={icons.rupee} />
-              <AmountRangeTable
-                title="Pending In Court (continued)"
-                rows={arPicRest}
-                total={props.amountRangePendingInCourtTotal}
-                showTotal
-              />
-            </div>
-          )}
-
-          <SectionTitle title="Challan Raw Data" icon={icons.database} />
+          <SectionTitle title="Cases Raw Data" icon={icons.database} />
 
           <p className="text-[10pt] text-stone-600 leading-relaxed -mt-1">
-            Download the raw challan data for each category. Files open in Microsoft Excel,
+            Download the raw case data for each category. Files open in Microsoft Excel,
             Numbers, or Google Sheets.
           </p>
 
@@ -653,7 +554,7 @@ export default function MonthlyChallanSummaryReport(
                         {link.label}
                       </p>
                       <p className="text-[9pt] text-stone-500 mt-0.5 tabular-nums">
-                        {link.vehicles} vehicles · {link.challans} challans · {formatINR(link.amount)}
+                        {link.vehicles} vehicles · {link.cases} cases
                       </p>
                     </div>
                   </div>
@@ -666,22 +567,22 @@ export default function MonthlyChallanSummaryReport(
               )
             })}
           </div>
-
-          <div className="pb-2 mt-6">
-            <p className="text-[9pt] font-bold text-stone-400 mb-1.5">Disclaimer</p>
-            <p className="text-[9pt] text-stone-400 leading-relaxed">
-              This is a system-generated report. Challan data is fetched from state RTO and traffic
-              department APIs and may lag the source by 24–48 hours. Excel files contain the full
-              raw challan data underlying the summary tables in this report.
-            </p>
-          </div>
         </div>
 
-        <div className="mt-auto h-0.5 bg-emerald-600" />
+        <div className="mt-auto px-10 pb-3">
+          <p className="text-[9pt] font-bold text-stone-400 mb-1.5">Disclaimer</p>
+          <p className="text-[9pt] text-stone-400 leading-relaxed">
+            This is a system-generated report. Case data is captured through the LOTS247 case
+            management pipeline and may lag active field updates by a short window. Excel files
+            contain the full raw case data underlying the summary tables in this report.
+          </p>
+        </div>
+
+        <div className="h-0.5 bg-emerald-600" />
         <PageFooter page={4} total={4} />
       </div>
     </div>
   )
 }
 
-export type { MonthlyChallanSummaryReportProps }
+export type { MonthlyCasesSummaryReportProps }
