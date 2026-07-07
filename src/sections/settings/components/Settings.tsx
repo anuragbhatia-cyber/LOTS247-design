@@ -774,9 +774,11 @@ export function Settings({
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2.5 mb-1">
-                      <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
-                        {subscription.planName}
-                      </h3>
+                      <img
+                        src="/sarathi.png"
+                        alt={subscription.planName}
+                        className="h-5 w-auto object-contain"
+                      />
                       <StatusBadge
                         label={t[subscription.status]}
                         color={subStatusConfig.color}

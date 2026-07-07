@@ -90,7 +90,7 @@
   "subscription": {
     "id": "subs-001",
     "planId": "plan-bsafe",
-    "planName": "Udrive",
+    "planName": "Sarathi",
     "status": "active",
     "price": 0,
     "billingPeriod": "month",
@@ -123,7 +123,7 @@
     {
       "id": "bill-002",
       "date": "20 Dec 2025",
-      "description": "U Drive Plan — One-time Purchase",
+      "description": "Sarathi Plan — One-time Purchase",
       "amount": "₹4,999.00",
       "status": "paid",
       "invoiceId": "INV-2025-1220"
@@ -163,7 +163,7 @@
     },
     {
       "id": "plan-udrive",
-      "name": "U Drive",
+      "name": "Sarathi",
       "price": 0,
       "billingPeriod": "month",
       "vehicleLimit": 1,

@@ -705,8 +705,8 @@ export function AppShell({
           className="hidden lg:flex fixed top-0 right-0 h-16 bg-white dark:bg-stone-950 z-40 items-center justify-between px-6 gap-4 border-b border-stone-200 dark:border-stone-800"
           style={{ left: isCollapsed ? '4rem' : '15rem' }}
         >
-          {/* Active vehicle badge / switcher */}
-          {activeVehicle ? (
+          {/* Active vehicle badge / switcher — temporarily hidden */}
+          {false && activeVehicle ? (
             <div ref={vehicleMenuRef} className="relative">
               <button
                 onClick={() => hasMultipleVehicles && setVehicleMenuOpen((o) => !o)}

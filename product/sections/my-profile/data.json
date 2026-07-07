@@ -142,7 +142,7 @@
     {
       "id": "bill-004",
       "date": "12 Dec 2025",
-      "description": "Plan Upgrade — U Drive to B Safe",
+      "description": "Plan Upgrade — Sarathi to B Safe",
       "amount": "₹0.00",
       "status": "paid",
       "invoiceId": "INV-2025-1212"
@@ -150,7 +150,7 @@
     {
       "id": "bill-005",
       "date": "12 Jun 2024",
-      "description": "U Drive Plan — Monthly Renewal",
+      "description": "Sarathi Plan — Monthly Renewal",
       "amount": "₹0.00",
       "status": "paid",
       "invoiceId": "INV-2024-0612"
@@ -158,7 +158,7 @@
     {
       "id": "bill-006",
       "date": "12 Mar 2024",
-      "description": "U Drive Plan — Initial Subscription",
+      "description": "Sarathi Plan — Initial Subscription",
       "amount": "₹0.00",
       "status": "paid",
       "invoiceId": "INV-2024-0312"
@@ -182,7 +182,7 @@
     },
     {
       "id": "plan-udrive",
-      "name": "U Drive",
+      "name": "Sarathi",
       "price": 0,
       "billingPeriod": "month",
       "vehicleLimit": 1,

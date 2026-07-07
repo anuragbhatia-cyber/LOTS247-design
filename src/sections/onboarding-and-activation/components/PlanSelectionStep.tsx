@@ -64,7 +64,7 @@ function PlanCardSkeleton() {
 }
 
 const PLAN_STYLES: Record<string, { bg: string; image?: string }> = {
-  'plan-udrive-plus': { bg: 'bg-violet-500', image: '/Udrive.webp' },
+  'plan-udrive-plus': { bg: 'bg-[#f1f2f3]', image: '/sarathi.png' },
   'plan-enterprise':  { bg: 'bg-stone-900 dark:bg-stone-800' },
 }
 
@@ -174,12 +174,11 @@ export function PlanSelectionStep({
         {/* Loading state — skeleton cards mirror the real layout */}
         {isLoading && (
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto"
+            className="grid grid-cols-1 gap-5 max-w-2xl mx-auto"
             aria-busy="true"
             role="status"
           >
             <span className="sr-only">Loading subscription plans</span>
-            <PlanCardSkeleton />
             <PlanCardSkeleton />
           </div>
         )}
@@ -201,18 +200,30 @@ export function PlanSelectionStep({
 
         {/* Plan Cards */}
         {!isLoading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl mx-auto">
-          {plans.map((plan) => {
+        <div className="grid grid-cols-1 gap-5 max-w-2xl mx-auto">
+          {plans.filter((plan) => plan.contactSales !== true).map((plan) => {
             const disabled = isPlanDisabled(plan)
             const isProcessing = processingPlanId === plan.id
             const style = PLAN_STYLES[plan.id]
             const isEnterprise = plan.contactSales === true
 
+            const featureRows = [
+              { label: 'No. of Vehicles', value: { kind: 'text' as const, text: plan.features.vehicleLimit === null ? 'Unlimited' : String(plan.features.vehicleLimit) } },
+              { label: '24/7 On-Call', value: featureDisplay(plan.features.onCallResolution) },
+              { label: 'On-Site Legal', value: featureDisplay(plan.features.onSiteResolution) },
+              { label: 'Challan Service', value: featureDisplay(plan.features.challanResolution.online !== false) },
+              { label: '  Online', value: featureDisplay(plan.features.challanResolution.online), indent: true },
+              { label: '  Lok Adalat', value: featureDisplay(plan.features.challanResolution.lokAdalat), indent: true },
+              { label: '  Court', value: featureDisplay(plan.features.challanResolution.court), indent: true },
+              { label: 'RTO-as-a-Service', value: featureDisplay(plan.features.rtoService) },
+              { label: 'Dashboard', value: featureDisplay(plan.features.dashboardAccess) },
+            ]
+
             return (
               <div
                 key={plan.id}
                 className={[
-                  'relative flex flex-col rounded-2xl overflow-hidden transition-all duration-200',
+                  'relative flex flex-col sm:flex-row rounded-2xl overflow-hidden transition-all duration-200',
                   'bg-white dark:bg-stone-900',
                   plan.isRecommended
                     ? 'border-2 border-stone-900 dark:border-white shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60'
@@ -221,137 +232,143 @@ export function PlanSelectionStep({
                       : 'border border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600 hover:shadow-md hover:shadow-stone-100 dark:hover:shadow-stone-950/50',
                 ].join(' ')}
               >
-                {/* Plan Header */}
-                {style ? (
-                  <div className={`relative ${style.bg} flex items-center justify-center py-1.5 px-4 min-h-[44px]`}>
-                    {plan.badge && (
-                      <div className="absolute -top-2 right-3">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-emerald-700 text-white shadow-md shadow-emerald-700/30 ring-2 ring-white dark:ring-stone-900">
-                          <StarIcon className="text-white" />
-                          {plan.badge}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-center">
-                      {style.image ? (
-                        <>
-                          <img
-                            src={style.image}
-                            alt={plan.displayName}
-                            className="h-11 w-auto object-contain"
-                          />
-                          {plan.id === 'plan-udrive-plus' && (
-                            <span className="text-3xl font-bold text-white ml-0.5 -mt-0.5">+</span>
-                          )}
-                        </>
-                      ) : (
-                        <h3 className="text-xl font-bold text-white tracking-tight">
-                          {plan.displayName}
-                        </h3>
-                      )}
+                {/* LEFT PANEL — logo + price + CTA */}
+                <div
+                  className={[
+                    'relative sm:w-2/5 flex flex-col items-center gap-5 p-6 sm:p-8 text-stone-900',
+                    style?.bg ?? 'bg-stone-800',
+                  ].join(' ')}
+                >
+                  {plan.badge && (
+                    <div className="absolute top-3 right-3">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-emerald-700 text-white shadow-md shadow-emerald-700/30 ring-2 ring-white dark:ring-stone-900">
+                        <StarIcon className="text-white" />
+                        {plan.badge}
+                      </span>
                     </div>
-                  </div>
-                ) : (
-                  <div className="bg-stone-100 dark:bg-stone-800 flex flex-col items-center justify-center py-6 px-4 min-h-[88px]">
-                    <h3 className="text-lg font-bold text-stone-900 dark:text-white leading-tight">
-                      {plan.displayName}
-                    </h3>
-                    <p className="text-xs text-stone-600 dark:text-stone-400 mt-0.5 text-center">
-                      {plan.description}
-                    </p>
-                  </div>
-                )}
+                  )}
 
-                {/* Card Body */}
-                <div className="flex flex-col flex-1 p-5">
+                  <div className="flex flex-col items-center">
+                    {style?.image ? (
+                      <img
+                        src={style.image}
+                        alt={plan.displayName}
+                        className="h-10 w-auto object-contain"
+                      />
+                    ) : (
+                      <h3 className="text-xl font-bold text-stone-900 tracking-tight text-center">
+                        {plan.displayName}
+                      </h3>
+                    )}
+                  </div>
 
-                  {/* Pricing */}
-                  <div className="text-center pb-4 mb-4 border-b border-stone-100 dark:border-stone-800">
+                  <div className="text-center flex-1 flex flex-col justify-center">
                     {isEnterprise ? (
                       <>
-                        <div className="text-2xl font-bold text-stone-900 dark:text-white">Custom</div>
-                        <div className="text-xs text-stone-600 dark:text-stone-400 mt-0.5">
-                          Tailored to your fleet
-                        </div>
+                        <div className="text-3xl font-bold text-stone-900">Custom</div>
+                        <div className="text-xs text-stone-600 mt-1">Tailored to your fleet</div>
                       </>
                     ) : (
                       <>
-                        <div className="text-2xl font-bold text-stone-900 dark:text-white">
-                          {plan.price >= 1000
-                            ? `₹${Math.round(plan.price / 1000)}K`
-                            : `₹${plan.price}`}
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-4xl font-bold text-stone-900 leading-none tracking-tight">
+                            {plan.price >= 1000
+                              ? `₹${Math.round(plan.price / 1000)}K`
+                              : `₹${plan.price}`}
+                          </span>
                         </div>
-                        <div className="text-xs text-stone-600 dark:text-stone-400 mt-0.5 uppercase tracking-wide">
-                          Per {plan.billingPeriod === 'year' ? 'Year' : 'Month'}
+                        <div className="text-[11px] font-semibold text-stone-500 mt-1.5 uppercase tracking-widest">
+                          Billed yearly
                         </div>
+                        {plan.billingPeriod === 'year' && plan.price > 0 && (
+                          <div className="text-xs text-stone-600 mt-2">
+                            Just <span className="font-semibold text-stone-800">₹{Math.max(1, Math.round(plan.price / 365))}/day</span>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
 
-                  {/* Feature Summary Rows */}
-                  <div className="mt-auto space-y-3.5 text-xs mb-5">
-                    {[
-                      { label: 'No. of Vehicles', value: { kind: 'text' as const, text: plan.features.vehicleLimit === null ? 'Unlimited' : String(plan.features.vehicleLimit) } },
-                      { label: '24/7 On-Call', value: featureDisplay(plan.features.onCallResolution) },
-                      { label: 'On-Site Legal', value: featureDisplay(plan.features.onSiteResolution) },
-                      { label: 'Challan Service', value: featureDisplay(plan.features.challanResolution.online !== false) },
-                      { label: '  Online', value: featureDisplay(plan.features.challanResolution.online), indent: true },
-                      { label: '  Lok Adalat', value: featureDisplay(plan.features.challanResolution.lokAdalat), indent: true },
-                      { label: '  Court', value: featureDisplay(plan.features.challanResolution.court), indent: true },
-                      { label: 'RTO-as-a-Service', value: featureDisplay(plan.features.rtoService) },
-                      { label: 'Dashboard', value: featureDisplay(plan.features.dashboardAccess) },
-                    ].map((row, idx) => (
-                      <div key={idx} className={`flex items-center justify-between ${row.indent ? 'pl-3' : ''}`}>
-                        <span className={`${row.indent ? 'text-xs text-stone-600 dark:text-stone-400' : 'text-stone-600 dark:text-stone-400'}`}>
+                  <div className="w-full flex flex-col gap-2">
+                    {isEnterprise ? (
+                      <button
+                        onClick={() => onContactSales?.()}
+                        className="w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 bg-stone-900 text-white hover:bg-stone-800 cursor-pointer shadow-sm"
+                      >
+                        Contact Sales
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => !disabled && !isProcessing && onSelectPlan?.(plan.id)}
+                        disabled={disabled || isProcessing}
+                        className={[
+                          'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-sm',
+                          disabled
+                            ? 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                            : 'bg-stone-900 text-white hover:bg-stone-800 cursor-pointer',
+                        ].join(' ')}
+                      >
+                        {isProcessing ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            Processing...
+                          </span>
+                        ) : disabled ? (
+                          'Exceeds vehicle limit'
+                        ) : (
+                          'Activate Sarathi'
+                        )}
+                      </button>
+                    )}
+                    {!isEnterprise && !disabled && (
+                      <p className="text-[11px] text-stone-500 text-center flex items-center justify-center gap-1.5">
+                        <svg className="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Instant activation
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* RIGHT PANEL — features */}
+                <div className="sm:w-3/5 p-5 sm:p-6 flex flex-col justify-center">
+                  <div className="mb-3 pb-3 border-b border-stone-100 dark:border-stone-800">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500 dark:text-stone-400">
+                      What's included
+                    </p>
+                    <h4 className="mt-0.5 text-base font-semibold text-stone-900 dark:text-white">
+                      Everything you need on the road
+                    </h4>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    {featureRows.map((row, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-center justify-between ${row.indent ? 'pl-4 ml-1 border-l-2 border-stone-100 dark:border-stone-800 py-0.5' : ''}`}
+                      >
+                        <span className={`font-medium ${row.indent ? 'text-xs text-stone-500 dark:text-stone-400' : 'text-[13px] text-stone-700 dark:text-stone-300'}`}>
                           {row.label.trim()}
                         </span>
                         {row.value.kind === 'check' ? (
-                          <CheckIcon className="text-emerald-500" />
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100">
+                            <CheckIcon className="text-emerald-500" />
+                          </span>
                         ) : row.value.kind === 'cross' ? (
-                          <CrossIcon className="text-red-400 dark:text-red-500" />
+                          <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100">
+                            <CrossIcon className="text-red-400 dark:text-red-500" />
+                          </span>
                         ) : (
-                          <span className={`font-semibold text-xs text-stone-800 dark:text-stone-200`}>
+                          <span className="font-semibold text-xs text-stone-800 dark:text-stone-200 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full">
                             {row.value.text}
                           </span>
                         )}
                       </div>
                     ))}
                   </div>
-
-                  {/* CTA Button */}
-                  {isEnterprise ? (
-                    <button
-                      onClick={() => onContactSales?.()}
-                      className="w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 border border-stone-900 dark:border-white text-stone-900 dark:text-white hover:bg-stone-900 hover:text-white dark:hover:bg-white dark:hover:text-stone-900 cursor-pointer"
-                    >
-                      Contact Sales
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => !disabled && !isProcessing && onSelectPlan?.(plan.id)}
-                      disabled={disabled || isProcessing}
-                      className={[
-                        'w-full py-2.5 rounded-xl font-semibold text-sm transition-all duration-200',
-                        disabled
-                          ? 'bg-stone-100 dark:bg-stone-800 text-stone-400 cursor-not-allowed'
-                          : 'bg-stone-900 dark:bg-white hover:bg-stone-700 dark:hover:bg-stone-100 text-white dark:text-stone-900 cursor-pointer',
-                      ].join(' ')}
-                    >
-                      {isProcessing ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          Processing...
-                        </span>
-                      ) : disabled ? (
-                        'Exceeds vehicle limit'
-                      ) : (
-                        'Select Plan'
-                      )}
-                    </button>
-                  )}
                 </div>
               </div>
             )
