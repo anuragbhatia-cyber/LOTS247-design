@@ -270,11 +270,12 @@ export function PlanSelectionStep({
                       </>
                     ) : (
                       <>
-                        <div className="flex items-baseline justify-center gap-1">
+                        <div className="flex items-baseline justify-center gap-2">
+                          <span className="text-lg font-medium text-stone-400 line-through decoration-2">
+                            ₹1999
+                          </span>
                           <span className="text-4xl font-bold text-stone-900 leading-none tracking-tight">
-                            {plan.price >= 1000
-                              ? `₹${Math.round(plan.price / 1000)}K`
-                              : `₹${plan.price}`}
+                            ₹{plan.price}
                           </span>
                         </div>
                         <div className="text-[11px] font-semibold text-stone-500 mt-1.5 uppercase tracking-widest">
