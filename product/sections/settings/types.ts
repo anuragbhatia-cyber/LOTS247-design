@@ -101,7 +101,7 @@ export interface PaymentMethod {
   isDefault: boolean
 }
 
-export type TeamMemberRole = 'owner' | 'admin' | 'manager' | 'viewer'
+export type TeamMemberRole = 'owner' | 'admin' | 'manager' | 'member' | 'viewer'
 export type TeamMemberStatus = 'active' | 'invited' | 'deactivated'
 
 export interface TeamMember {

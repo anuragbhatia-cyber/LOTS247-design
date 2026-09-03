@@ -154,6 +154,7 @@ const translations: Record<Language, Record<string, string>> = {
     owner: 'Owner',
     admin: 'Admin',
     manager: 'Manager',
+    member: 'Member',
     viewer: 'Viewer',
     invited: 'Invited',
     deactivated: 'Deactivated',
@@ -341,6 +342,7 @@ const translations: Record<Language, Record<string, string>> = {
     owner: 'मालिक',
     admin: 'व्यवस्थापक',
     manager: 'प्रबंधक',
+    member: 'सदस्य',
     viewer: 'दर्शक',
     invited: 'आमंत्रित',
     deactivated: 'निष्क्रिय',
@@ -505,6 +507,7 @@ const ROLE_CONFIG: Record<TeamMemberRole, { color: string; bg: string }> = {
   owner: { color: 'text-amber-700 dark:text-amber-300', bg: 'bg-amber-50 dark:bg-amber-950/40' },
   admin: { color: 'text-emerald-700 dark:text-emerald-300', bg: 'bg-emerald-50 dark:bg-emerald-950/40' },
   manager: { color: 'text-blue-700 dark:text-blue-300', bg: 'bg-blue-50 dark:bg-blue-950/40' },
+  member: { color: 'text-purple-700 dark:text-purple-300', bg: 'bg-purple-50 dark:bg-purple-950/40' },
   viewer: { color: 'text-stone-600 dark:text-stone-400', bg: 'bg-stone-100 dark:bg-stone-800' },
 }
 
@@ -685,6 +688,22 @@ const DEFAULT_ROLE_PERMISSIONS: Record<TeamMemberRole, Set<string>> = {
     'viewWallet',
     'editProfile',
   ]),
+  member: new Set([
+    'checkCompliance',
+    'uploadVehicleDocs',
+    'checkChallans',
+    'addIncident',
+    'addFollowup',
+    'viewIncidentReports',
+    'uploadIncidentDocs',
+    'viewCompliance',
+    'viewFleet',
+    'viewVehicleReport',
+    'viewProposal',
+    'addNotes',
+    'viewWallet',
+    'editProfile',
+  ]),
   viewer: new Set([
     'checkCompliance',
     'checkChallans',
@@ -785,6 +804,7 @@ export function Settings({
     owner: new Set(DEFAULT_ROLE_PERMISSIONS.owner),
     admin: new Set(DEFAULT_ROLE_PERMISSIONS.admin),
     manager: new Set(DEFAULT_ROLE_PERMISSIONS.manager),
+    member: new Set(DEFAULT_ROLE_PERMISSIONS.member),
     viewer: new Set(DEFAULT_ROLE_PERMISSIONS.viewer),
   }))
 
@@ -1329,7 +1349,7 @@ export function Settings({
               {/* Roles Sub-Tab */}
               {teamSubTab === 'roles' && (
                 <div className="space-y-5">
-                  {(['admin', 'manager', 'viewer'] as TeamMemberRole[]).map((role) => {
+                  {(['admin', 'manager', 'member', 'viewer'] as TeamMemberRole[]).map((role) => {
                     const config = ROLE_CONFIG[role]
                     const checkedSet = rolePerms[role]
                     const togglePerm = (permKey: string) => {
@@ -1729,6 +1749,7 @@ export function Settings({
                 <select className="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-600 bg-white dark:bg-stone-800 text-sm text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 dark:focus:border-emerald-600">
                   <option value="admin">{t.admin}</option>
                   <option value="manager">{t.manager}</option>
+                  <option value="member">{t.member}</option>
                   <option value="viewer">{t.viewer}</option>
                 </select>
               </div>
