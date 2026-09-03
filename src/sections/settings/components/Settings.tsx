@@ -1351,9 +1351,6 @@ export function Settings({
                         <div className="px-5 py-4 space-y-5">
                           {PERMISSION_CATEGORIES.map((category) => (
                             <div key={category.key}>
-                              <h4 className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2.5">
-                                {t[category.titleKey]}
-                              </h4>
                               <div className="space-y-3">
                                 {category.groups.map((group) => (
                                   <div key={group.key}>
