@@ -9,6 +9,7 @@ import {
   PlusCircle,
   ListChecks,
   ChevronRight,
+  ArrowLeft,
   User as UserIcon,
   CalendarDays,
 } from 'lucide-react'
@@ -61,6 +62,12 @@ type T = {
   hubSubtitle: string
   addNewTitle: string
   addNewDesc: string
+  addChooserTitle: string
+  addChooserSubtitle: string
+  addNewInsuranceTitle: string
+  addNewInsuranceDesc: string
+  chooseExistingDriverTitle: string
+  chooseExistingDriverDesc: string
   viewAllTitle: string
   viewAllDesc: string
   listTitle: string
@@ -117,6 +124,7 @@ type T = {
   validTill: string
   nominee: string
   active: string
+  requested: string
   viewPolicy: string
   back: string
   detailTitle: string
@@ -137,15 +145,21 @@ const translations: Record<Language, T> = {
   en: {
     hubTitle: 'Driver Insurance',
     hubSubtitle: 'Issue a new policy or review the ones already active',
-    addNewTitle: 'Add new driver insurance',
+    addNewTitle: 'Add driver insurance',
     addNewDesc: 'Start a fresh personal accident policy for one of your drivers',
+    addChooserTitle: 'Add driver insurance',
+    addChooserSubtitle: 'Issue a policy for a new driver or someone already on your fleet',
+    addNewInsuranceTitle: 'Add new insurance',
+    addNewInsuranceDesc: 'Start a fresh personal accident policy for a driver',
+    chooseExistingDriverTitle: 'Choose existing driver',
+    chooseExistingDriverDesc: 'Pick a driver already on your fleet and issue a policy',
     viewAllTitle: 'View all insurance',
     viewAllDesc: 'See every active driver policy and its coverage details',
-    listTitle: 'Active Driver Insurance',
+    listTitle: 'All driver Insurances',
     listSubtitle: 'All drivers with an active personal accident policy',
     listEmptyTitle: 'No active driver insurance yet',
     listEmptyDesc: 'Activate a policy for any driver and it will show up here.',
-    listEmptyCta: 'Add new driver insurance',
+    listEmptyCta: 'Add driver insurance',
     activePoliciesCount: (n: number) => `${n} active ${n === 1 ? 'policy' : 'policies'}`,
     back: 'Back',
     title: 'Activate Driver Insurance',
@@ -195,6 +209,7 @@ const translations: Record<Language, T> = {
     validTill: 'Valid till',
     nominee: 'Nominee',
     active: 'Active',
+    requested: 'Requested',
     viewPolicy: 'View policy',
     back: 'Back',
     detailTitle: 'Policy Details',
@@ -213,15 +228,21 @@ const translations: Record<Language, T> = {
   hi: {
     hubTitle: 'ड्राइवर बीमा',
     hubSubtitle: 'नई पॉलिसी जारी करें या पहले से सक्रिय पॉलिसियाँ देखें',
-    addNewTitle: 'नया ड्राइवर बीमा जोड़ें',
+    addNewTitle: 'ड्राइवर बीमा जोड़ें',
     addNewDesc: 'अपने ड्राइवर के लिए नई व्यक्तिगत दुर्घटना पॉलिसी शुरू करें',
+    addChooserTitle: 'ड्राइवर बीमा जोड़ें',
+    addChooserSubtitle: 'नए ड्राइवर के लिए या मौजूदा ड्राइवर के लिए पॉलिसी जारी करें',
+    addNewInsuranceTitle: 'नई बीमा जोड़ें',
+    addNewInsuranceDesc: 'ड्राइवर के लिए नई व्यक्तिगत दुर्घटना पॉलिसी शुरू करें',
+    chooseExistingDriverTitle: 'मौजूदा ड्राइवर चुनें',
+    chooseExistingDriverDesc: 'अपने फ्लीट के किसी ड्राइवर को चुनकर पॉलिसी जारी करें',
     viewAllTitle: 'सभी बीमा देखें',
     viewAllDesc: 'सभी सक्रिय ड्राइवर पॉलिसियाँ और उनकी कवरेज देखें',
     listTitle: 'सक्रिय ड्राइवर बीमा',
     listSubtitle: 'सक्रिय व्यक्तिगत दुर्घटना पॉलिसी वाले सभी ड्राइवर',
     listEmptyTitle: 'अभी तक कोई सक्रिय ड्राइवर बीमा नहीं',
     listEmptyDesc: 'किसी भी ड्राइवर के लिए पॉलिसी सक्रिय करें और वह यहाँ दिखेगी।',
-    listEmptyCta: 'नया ड्राइवर बीमा जोड़ें',
+    listEmptyCta: 'ड्राइवर बीमा जोड़ें',
     activePoliciesCount: (n: number) => `${n} सक्रिय पॉलिसी`,
     back: 'वापस',
     title: 'ड्राइवर बीमा सक्रिय करें',
@@ -271,6 +292,7 @@ const translations: Record<Language, T> = {
     validTill: 'तक वैध',
     nominee: 'नामांकित',
     active: 'सक्रिय',
+    requested: 'अनुरोधित',
     viewPolicy: 'पॉलिसी देखें',
     back: 'वापस',
     detailTitle: 'पॉलिसी विवरण',
@@ -323,7 +345,7 @@ function formatShortDate(iso: string): string {
   })
 }
 
-type View = 'choose' | 'create' | 'list'
+type View = 'choose' | 'addChooser' | 'create' | 'chooseDriver' | 'list'
 
 export interface DriverInsuranceHubModalProps {
   isOpen: boolean
@@ -459,7 +481,9 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
 
   const headerCopy = (() => {
     if (view === 'create') return { title: t.title, subtitle: t.subtitle }
-    if (view === 'list') return { title: t.listTitle, subtitle: t.listSubtitle }
+    if (view === 'addChooser') return { title: t.addChooserTitle, subtitle: t.addChooserSubtitle }
+    if (view === 'chooseDriver') return { title: t.chooseExistingDriverTitle, subtitle: t.chooseExistingDriverDesc }
+    if (view === 'list') return { title: t.listTitle, subtitle: '' }
     return { title: t.hubTitle, subtitle: t.hubSubtitle }
   })()
 
@@ -477,16 +501,37 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
         {/* Header */}
         <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-stone-200 dark:border-stone-800 flex-shrink-0">
           <div className="flex items-start gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
+            {view !== 'choose' && (
+              <button
+                onClick={() => {
+                  if (view === 'create') {
+                    setView(selectedDriverId ? 'chooseDriver' : 'addChooser')
+                  } else if (view === 'chooseDriver' || view === 'addChooser') {
+                    setView(view === 'chooseDriver' ? 'addChooser' : 'choose')
+                  } else {
+                    setView('choose')
+                  }
+                }}
+                className="w-10 h-10 inline-flex items-center justify-center rounded-xl border border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors flex-shrink-0"
+                aria-label={t.back}
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+            )}
+            {view === 'choose' && (
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0">
+                <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            )}
             <div className="min-w-0">
               <h2 className="text-base sm:text-lg font-bold text-stone-900 dark:text-stone-50">
                 {headerCopy.title}
               </h2>
-              <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 leading-snug">
-                {headerCopy.subtitle}
-              </p>
+              {headerCopy.subtitle && (
+                <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 leading-snug">
+                  {headerCopy.subtitle}
+                </p>
+              )}
             </div>
           </div>
           <button
@@ -505,7 +550,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
               icon={PlusCircle}
               title={t.addNewTitle}
               description={t.addNewDesc}
-              onClick={() => setView('create')}
+              onClick={() => setView('addChooser')}
             />
             <ChooserCard
               icon={ListChecks}
@@ -513,6 +558,25 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
               description={t.viewAllDesc}
               badge={t.activePoliciesCount(activeDrivers.length)}
               onClick={() => setView('list')}
+            />
+          </div>
+        )}
+
+        {view === 'addChooser' && (
+          <div className="px-6 py-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto w-full">
+            <ChooserCard
+              icon={PlusCircle}
+              title={t.addNewInsuranceTitle}
+              description={t.addNewInsuranceDesc}
+              onClick={() => setView('create')}
+              stacked
+            />
+            <ChooserCard
+              icon={UserIcon}
+              title={t.chooseExistingDriverTitle}
+              description={t.chooseExistingDriverDesc}
+              onClick={() => setView('chooseDriver')}
+              stacked
             />
           </div>
         )}
@@ -607,8 +671,117 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
                     </div>
                   </li>
                 ))}
+
+                <li className="rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+                        <UserIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-stone-900 dark:text-stone-50 truncate">
+                          Amit Sharma
+                        </p>
+                        <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                          ICICI Lombard General Insurance
+                        </p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900 flex-shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                      {t.requested}
+                    </span>
+                  </div>
+
+                  <dl className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div>
+                      <dt className="text-stone-500 dark:text-stone-400">{t.policyNumber}</dt>
+                      <dd className="font-mono font-semibold text-stone-400 dark:text-stone-500">—</dd>
+                    </div>
+                    <div>
+                      <dt className="text-stone-500 dark:text-stone-400">{t.sumInsured}</dt>
+                      <dd className="font-semibold text-stone-400 dark:text-stone-500">—</dd>
+                    </div>
+                    <div>
+                      <dt className="text-stone-500 dark:text-stone-400 flex items-center gap-1">
+                        <CalendarDays className="w-3 h-3" />
+                        {t.validTill}
+                      </dt>
+                      <dd className="font-semibold text-stone-400 dark:text-stone-500">—</dd>
+                    </div>
+                    <div>
+                      <dt className="text-stone-500 dark:text-stone-400">{t.nominee}</dt>
+                      <dd className="font-semibold text-stone-400 dark:text-stone-500">—</dd>
+                    </div>
+                  </dl>
+
+                  <div className="mt-3 pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-stone-400 dark:text-stone-500 cursor-not-allowed"
+                    >
+                      {t.viewPolicy}
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </li>
               </ul>
             )}
+          </div>
+        )}
+
+        {view === 'chooseDriver' && (
+          <div className="flex-1 overflow-y-auto px-6 py-5">
+            <ul className="flex flex-col gap-2">
+              {[...drivers]
+                .sort((a, b) => {
+                  const aInsured = a.insuranceStatus === 'active' ? 1 : 0
+                  const bInsured = b.insuranceStatus === 'active' ? 1 : 0
+                  return aInsured - bInsured
+                })
+                .map((d) => {
+                const alreadyInsured = d.insuranceStatus === 'active'
+                return (
+                  <li
+                    key={d.id}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+                      <UserIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-stone-900 dark:text-stone-50 truncate">
+                        {d.name}
+                      </p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                        {d.phone} · <span className="font-mono">{d.licenseNumber}</span>
+                      </p>
+                    </div>
+                    {alreadyInsured ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 flex-shrink-0">
+                        <Check className="w-3 h-3" />
+                        Insured
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setSelectedDriverId(d.id)
+                          setMemberName(d.name)
+                          setMobile(d.phone)
+                          setLicenseNumber(d.licenseNumber)
+                          setView('create')
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex-shrink-0"
+                      >
+                        <PlusCircle className="w-3.5 h-3.5" />
+                        Add insurance
+                      </button>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
           </div>
         )}
 
@@ -885,13 +1058,42 @@ function ChooserCard({
   description,
   badge,
   onClick,
+  stacked = false,
 }: {
   icon: typeof PlusCircle
   title: string
   description: string
   badge?: string
   onClick: () => void
+  stacked?: boolean
 }) {
+  if (stacked) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="group relative w-full flex flex-col items-center text-center gap-4 px-5 py-6 rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-md hover:shadow-emerald-500/10 hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+      >
+        <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950/60 flex items-center justify-center transition-colors">
+          <Icon className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <p className="text-sm font-bold text-stone-900 dark:text-stone-50">{title}</p>
+            {badge && (
+              <span className="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300">
+                {badge}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-stone-500 dark:text-stone-400 mt-1.5 leading-relaxed">
+            {description}
+          </p>
+        </div>
+      </button>
+    )
+  }
+
   return (
     <button
       type="button"

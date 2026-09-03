@@ -1,20 +1,22 @@
 import IncidentSummaryReport from './IncidentSummaryReport'
 import type { IncidentSummaryReportProps } from './IncidentSummaryReport'
 
-// Sample data sourced from cas-001 (Accidents, IRN-20001)
-// and subscriber sub-001 (Rajesh Kumar)
 const sampleReport: IncidentSummaryReportProps = {
-  vehicleNumber: 'UP32MM1113',
-  incidentId: 'IRN-20001',
-  subscriberId: 'sub-001',
-  subscriberName: 'Rajesh Kumar',
+  incidentNumber: 'IRN-20001',
   dateGenerated: '01 May 2026',
-  reporterName: 'Rajesh Kumar',
-  reporterPhone: '9876543210',
-  dateOfReporting: '18 Jan 2026',
-  incidentType: 'Accidents',
-  incidentSummary:
-    'Rear-end collision on NH48 near Lonavala toll plaza. Front bumper and radiator damaged. Other vehicle involved — Maruti Ertiga (MH04DE5678). No injuries reported. FIR filed at Lonavala Police Station.',
+
+  vehicleNumber: 'UP32MM1113',
+  customerName: 'Rajesh Kumar Transport Co.',
+  accountId: 'LWD-20001',
+  customerPOC: {
+    name: 'Rajesh Kumar',
+    designation: 'Fleet Manager',
+  },
+
+  dateTimeOfIncident: '18 Jan 2026, 14:32',
+  caseCategory: 'Accident',
+  priority: 'High',
+  reportedBy: 'Driver — Suresh Yadav (9876543210)',
   location: {
     roadName: 'NH48 near Lonavala Toll Plaza',
     area: 'Lonavala',
@@ -22,23 +24,37 @@ const sampleReport: IncidentSummaryReportProps = {
     state: 'Maharashtra',
     pin: '410401',
   },
-  resolutionOpinion:
-    'FIR copy obtained. Other party\'s insurance details collected. Contacted Lonavala Police Station.',
-  stage: 'In Progress',
-  expectedResolutionDate: '18 Apr 2026',
+
+  incidentDetails:
+    'Rear-end collision on NH48 near Lonavala toll plaza. Front bumper and radiator damaged. Other vehicle involved — Maruti Ertiga (MH04DE5678). No injuries reported. Driver called the helpline within 5 minutes of the incident requesting on-ground coordination and FIR support.',
+  postCoordinationInfo:
+    'On-ground partner reached the spot within 32 minutes. Both vehicles photographed; insurance details of the other party recorded. Spot inspection report and witness statements collected. Vehicle towed to the nearest authorised service centre in Pune.',
+  remedialSteps:
+    'FIR filed at Lonavala Police Station with the help of Lawyered legal team. Insurance claim initiated with subscriber\'s motor insurer; claim number CL-MH-2026-04812. Service centre estimate received and shared with the customer for approval.',
+  challenges:
+    'Toll authority initially restricted the towing operation due to road blockage. Lawyered escalated to the NHAI control room and got clearance within 18 minutes. Other party\'s insurance company delayed first response — followed up twice through formal letters.',
+
+  finalStatus: 'In Progress',
+  cost: {
+    estimated: '₹65,000',
+    actual: '₹58,400',
+  },
+  time: {
+    estimated: '12 days',
+    actual: '9 days',
+  },
 }
 
 export default function IncidentSummaryReportPreview() {
   return (
     <div className="min-h-screen bg-stone-100 dark:bg-stone-900 print:bg-white print:min-h-0">
-      {/* Toolbar — hidden in print */}
       <div className="print:hidden sticky top-0 z-10 bg-white dark:bg-stone-800 border-b border-stone-200 dark:border-stone-700 px-6 py-3 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold text-stone-900 dark:text-stone-100">
             Incident Summary Report Preview
           </h1>
           <p className="text-sm text-stone-500 dark:text-stone-400">
-            {sampleReport.incidentId} &middot; {sampleReport.vehicleNumber}
+            {sampleReport.incidentNumber} &middot; {sampleReport.vehicleNumber}
           </p>
         </div>
         <button

@@ -146,6 +146,13 @@ function ShellContent() {
     plan: 'Fleet' as const,
   }
 
+  const vehicles = [
+    { id: 'veh-1', registration: 'UP32MM1113' },
+    { id: 'veh-2', registration: 'DL01AB2345' },
+    { id: 'veh-3', registration: 'MH12CD6789' },
+  ]
+  const [activeVehicleId, setActiveVehicleId] = useState(vehicles[0].id)
+
   const screenUrl = getScreenUrl(activePath)
 
   return (
@@ -154,6 +161,9 @@ function ShellContent() {
       secondaryItems={secondaryItems}
       activePath={activePath}
       user={user}
+      vehicles={vehicles}
+      activeVehicleId={activeVehicleId}
+      onVehicleChange={setActiveVehicleId}
       onNavigate={(href) => {
         setActivePath(href)
         const mapping = hrefToScreen[href]
@@ -169,8 +179,8 @@ function ShellContent() {
     >
       {screenUrl ? (
         <iframe
-          key={`${screenUrl}-${language}-${JSON.stringify(extraParams)}`}
-          src={`${screenUrl}?embed=true&lang=${language}${Object.entries(extraParams).map(([k, v]) => `&${k}=${v}`).join('')}`}
+          key={`${screenUrl}-${language}-${activeVehicleId}-${JSON.stringify(extraParams)}`}
+          src={`${screenUrl}?embed=true&lang=${language}&vehicle=${activeVehicleId}${Object.entries(extraParams).map(([k, v]) => `&${k}=${v}`).join('')}`}
           className="w-full border-0"
           style={{ height: 'calc(100vh - 4rem)' }}
           title="Section preview"

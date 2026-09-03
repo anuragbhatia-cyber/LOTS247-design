@@ -227,6 +227,14 @@
   overflow: hidden;
 }
 
+/* Opt-out for pages that need to flow (e.g. variable-length tables). */
+.report-page.report-page--flow {
+  height: auto;
+  min-height: 297mm;
+  max-height: none;
+  overflow: visible;
+}
+
 /* Print styles for PDF report export */
 @media print {
   @page {

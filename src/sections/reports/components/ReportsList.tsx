@@ -22,7 +22,7 @@ import { EmptyState } from '@/shell/components/EmptyState'
 
 const TABS: { id: ReportTab; label: string; description: string }[] = [
   { id: 'All', label: 'All', description: 'All reports' },
-  { id: 'MIS', label: 'MIS', description: 'Monthly Challan Summary' },
+  { id: 'MIS', label: 'MIS', description: 'Monthly Incident Summary (Cases and RTO)' },
   { id: 'ICR', label: 'ICR', description: 'Incident Closure Summary' },
   { id: 'ISR', label: 'ISR', description: 'Incident Summary Report' },
   { id: 'MIS-CHALLAN', label: 'MIS-Challan', description: 'MIS Challan' },
@@ -90,7 +90,7 @@ function getReportName(report: Report): string {
 }
 
 const PREVIEW_URL_BY_TYPE: Record<ReportType, string> = {
-  MIS: '/report-preview/monthly-incident-summary',
+  MIS: '/report-preview/monthly-cases-summary',
   'MIS-CHALLAN': '/report-preview/monthly-challan-summary',
   ICR: '/report-preview/incident-closure',
   ISR: '/report-preview/incident-summary',

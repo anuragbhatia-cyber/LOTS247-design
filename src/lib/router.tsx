@@ -11,8 +11,8 @@ import { FullPreviewPage } from '@/pages/FullPreviewPage'
 import { NewLandingPage } from '@/pages/NewLandingPage'
 import IncidentSummaryReportPreview from '@/sections/reports/IncidentSummaryReportPreview'
 import IncidentClosureReportPreview from '@/sections/reports/IncidentClosureReportPreview'
-import MonthlyIncidentSummaryReportPreview from '@/sections/reports/MonthlyIncidentSummaryReportPreview'
 import MonthlyChallanSummaryReportPreview from '@/sections/reports/MonthlyChallanSummaryReportPreview'
+import MonthlyCasesSummaryReportPreview from '@/sections/reports/MonthlyCasesSummaryReportPreview'
 
 export const router = createBrowserRouter([
   {
@@ -68,12 +68,12 @@ export const router = createBrowserRouter([
     element: <IncidentClosureReportPreview />,
   },
   {
-    path: '/report-preview/monthly-incident-summary',
-    element: <MonthlyIncidentSummaryReportPreview />,
-  },
-  {
     path: '/report-preview/monthly-challan-summary',
     element: <MonthlyChallanSummaryReportPreview />,
+  },
+  {
+    path: '/report-preview/monthly-cases-summary',
+    element: <MonthlyCasesSummaryReportPreview />,
   },
   {
     path: '/newlanding',

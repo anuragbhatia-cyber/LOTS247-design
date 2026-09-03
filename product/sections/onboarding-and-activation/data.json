@@ -17,8 +17,8 @@
   "subscriptionPlans": [
     {
       "id": "plan-udrive-plus",
-      "name": "U Drive+",
-      "displayName": "U Drive+",
+      "name": "Sarathi",
+      "displayName": "Sarathi",
       "description": "Complete protection for individual vehicle owners",
       "price": 999,
       "billingPeriod": "year",
