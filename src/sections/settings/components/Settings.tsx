@@ -167,10 +167,53 @@ const translations: Record<Language, Record<string, string>> = {
     adminDesc: 'Can manage vehicles, drivers, incidents, compliance, and team members. Cannot access billing.',
     managerDesc: 'Can view and manage assigned vehicles, raise proposals, and handle incidents.',
     viewerDesc: 'Read-only access to dashboards, compliance status, and reports.',
-    ownerActivities: 'Manage billing & subscription,Add or remove team members,Change member roles,Access all settings,View & export all reports,Manage vehicles & drivers,Handle incidents & compliance',
-    adminActivities: 'Add or remove team members,Manage vehicles & drivers,Handle incidents & challans,View compliance dashboard,Generate & export reports,Manage proposals',
-    managerActivities: 'View assigned vehicles,Raise & track proposals,Report & manage incidents,View compliance status,Download reports',
-    viewerActivities: 'View dashboards,View compliance status,View reports,View vehicle details',
+    // Permission category headers
+    permCatVehicleDriver: 'Vehicle & Driver',
+    permSubVehicle: 'Vehicle',
+    permSubVDCompliance: 'Compliance',
+    permSubChallans: 'Challans',
+    permSubDriver: 'Driver',
+    permCatIncidents: 'Incidents',
+    permCatCompliance: 'Compliance',
+    permSubFleet: 'Fleet Challans / RC / DL',
+    permSubVehicleReport: 'Vehicle View Report',
+    permCatProposal: 'Proposal',
+    permCatWallet: 'Wallet',
+    permCatSubscriptions: 'Subscriptions',
+    permSubTeam: 'Team Management',
+    permCatProfile: 'Profile',
+    // Individual permissions
+    permAddVehicle: 'Add Vehicle',
+    permEditVehicle: 'Edit Vehicle',
+    permDeactivateVehicle: 'Deactivate Vehicle',
+    permCheckCompliance: 'Check Compliance',
+    permUploadVehicleDocs: 'Upload Documents',
+    permCheckChallans: 'Check Challans',
+    permAddDriver: 'Add Driver',
+    permRemoveDriver: 'Remove Driver',
+    permAssignDriver: 'Assign Driver to Vehicle',
+    permChangeDriver: 'Change Driver',
+    permAddIncident: 'Add Incident',
+    permAddFollowup: 'Add Follow-up',
+    permViewIncidentReports: 'View Reports',
+    permDownloadIncidentReports: 'Download Reports',
+    permUploadIncidentDocs: 'Upload Documents',
+    permExportIncidents: 'Export Incidents',
+    permViewCompliance: 'View Compliance',
+    permExportSummary: 'Export Summary',
+    permViewFleet: 'View',
+    permRequestFleetProposal: 'Request Proposal',
+    permViewVehicleReport: 'View',
+    permViewProposal: 'View Proposal',
+    permRequestProposal: 'Request Proposal',
+    permCancelProposal: 'Cancel Proposal',
+    permAddNotes: 'Add Notes',
+    permViewWallet: 'View Wallet',
+    permChangePlan: 'Change Plan',
+    permAddMember: 'Add Member',
+    permRemoveMember: 'Remove Member',
+    permManagerAccess: 'Manager Access',
+    permEditProfile: 'Edit Profile',
     // Reports
     scheduledReports: 'Scheduled Reports',
     lastGenerated: 'Last generated',
@@ -311,10 +354,53 @@ const translations: Record<Language, Record<string, string>> = {
     adminDesc: 'वाहन, ड्राइवर, घटनाएं, अनुपालन और टीम सदस्यों का प्रबंधन कर सकते हैं। बिलिंग तक पहुंच नहीं।',
     managerDesc: 'सौंपे गए वाहनों को देख और प्रबंधित कर सकते हैं, प्रस्ताव उठा सकते हैं और घटनाओं को संभाल सकते हैं।',
     viewerDesc: 'डैशबोर्ड, अनुपालन स्थिति और रिपोर्ट तक केवल पढ़ने की पहुंच।',
-    ownerActivities: 'बिलिंग और सदस्यता प्रबंधित करें,टीम सदस्य जोड़ें या हटाएं,सदस्य भूमिकाएं बदलें,सभी सेटिंग्स एक्सेस करें,सभी रिपोर्ट देखें और निर्यात करें,वाहन और ड्राइवर प्रबंधित करें,घटनाएं और अनुपालन संभालें',
-    adminActivities: 'टीम सदस्य जोड़ें या हटाएं,वाहन और ड्राइवर प्रबंधित करें,घटनाएं और चालान संभालें,अनुपालन डैशबोर्ड देखें,रिपोर्ट बनाएं और निर्यात करें,प्रस्ताव प्रबंधित करें',
-    managerActivities: 'सौंपे गए वाहन देखें,प्रस्ताव उठाएं और ट्रैक करें,घटनाएं रिपोर्ट और प्रबंधित करें,अनुपालन स्थिति देखें,रिपोर्ट डाउनलोड करें',
-    viewerActivities: 'डैशबोर्ड देखें,अनुपालन स्थिति देखें,रिपोर्ट देखें,वाहन विवरण देखें',
+    // Permission category headers
+    permCatVehicleDriver: 'वाहन और ड्राइवर',
+    permSubVehicle: 'वाहन',
+    permSubVDCompliance: 'अनुपालन',
+    permSubChallans: 'चालान',
+    permSubDriver: 'ड्राइवर',
+    permCatIncidents: 'घटनाएं',
+    permCatCompliance: 'अनुपालन',
+    permSubFleet: 'फ्लीट चालान / RC / DL',
+    permSubVehicleReport: 'वाहन देखें रिपोर्ट',
+    permCatProposal: 'प्रस्ताव',
+    permCatWallet: 'वॉलेट',
+    permCatSubscriptions: 'सदस्यता',
+    permSubTeam: 'टीम प्रबंधन',
+    permCatProfile: 'प्रोफ़ाइल',
+    // Individual permissions
+    permAddVehicle: 'वाहन जोड़ें',
+    permEditVehicle: 'वाहन संपादित करें',
+    permDeactivateVehicle: 'वाहन निष्क्रिय करें',
+    permCheckCompliance: 'अनुपालन जांचें',
+    permUploadVehicleDocs: 'दस्तावेज़ अपलोड करें',
+    permCheckChallans: 'चालान जांचें',
+    permAddDriver: 'ड्राइवर जोड़ें',
+    permRemoveDriver: 'ड्राइवर हटाएं',
+    permAssignDriver: 'वाहन को ड्राइवर सौंपें',
+    permChangeDriver: 'ड्राइवर बदलें',
+    permAddIncident: 'घटना जोड़ें',
+    permAddFollowup: 'फ़ॉलो-अप जोड़ें',
+    permViewIncidentReports: 'रिपोर्ट देखें',
+    permDownloadIncidentReports: 'रिपोर्ट डाउनलोड करें',
+    permUploadIncidentDocs: 'दस्तावेज़ अपलोड करें',
+    permExportIncidents: 'घटनाएं निर्यात करें',
+    permViewCompliance: 'अनुपालन देखें',
+    permExportSummary: 'सारांश निर्यात करें',
+    permViewFleet: 'देखें',
+    permRequestFleetProposal: 'प्रस्ताव अनुरोध करें',
+    permViewVehicleReport: 'देखें',
+    permViewProposal: 'प्रस्ताव देखें',
+    permRequestProposal: 'प्रस्ताव अनुरोध करें',
+    permCancelProposal: 'प्रस्ताव रद्द करें',
+    permAddNotes: 'नोट्स जोड़ें',
+    permViewWallet: 'वॉलेट देखें',
+    permChangePlan: 'योजना बदलें',
+    permAddMember: 'सदस्य जोड़ें',
+    permRemoveMember: 'सदस्य हटाएं',
+    permManagerAccess: 'प्रबंधक पहुंच',
+    permEditProfile: 'प्रोफ़ाइल संपादित करें',
     scheduledReports: 'निर्धारित रिपोर्ट्स',
     lastGenerated: 'अंतिम बार बनाई',
     recipients: 'प्राप्तकर्ता',
@@ -422,6 +508,198 @@ const ROLE_CONFIG: Record<TeamMemberRole, { color: string; bg: string }> = {
   viewer: { color: 'text-stone-600 dark:text-stone-400', bg: 'bg-stone-100 dark:bg-stone-800' },
 }
 
+type PermissionItem = { key: string; labelKey: string }
+type PermissionGroup = { key: string; titleKey?: string; items: PermissionItem[] }
+type PermissionCategory = { key: string; titleKey: string; groups: PermissionGroup[] }
+
+const PERMISSION_CATEGORIES: PermissionCategory[] = [
+  {
+    key: 'vehicleDriver',
+    titleKey: 'permCatVehicleDriver',
+    groups: [
+      {
+        key: 'vehicle',
+        titleKey: 'permSubVehicle',
+        items: [
+          { key: 'addVehicle', labelKey: 'permAddVehicle' },
+          { key: 'editVehicle', labelKey: 'permEditVehicle' },
+          { key: 'deactivateVehicle', labelKey: 'permDeactivateVehicle' },
+        ],
+      },
+      {
+        key: 'vdCompliance',
+        titleKey: 'permSubVDCompliance',
+        items: [
+          { key: 'checkCompliance', labelKey: 'permCheckCompliance' },
+          { key: 'uploadVehicleDocs', labelKey: 'permUploadVehicleDocs' },
+        ],
+      },
+      {
+        key: 'challans',
+        titleKey: 'permSubChallans',
+        items: [
+          { key: 'checkChallans', labelKey: 'permCheckChallans' },
+        ],
+      },
+      {
+        key: 'driver',
+        titleKey: 'permSubDriver',
+        items: [
+          { key: 'addDriver', labelKey: 'permAddDriver' },
+          { key: 'removeDriver', labelKey: 'permRemoveDriver' },
+          { key: 'assignDriver', labelKey: 'permAssignDriver' },
+          { key: 'changeDriver', labelKey: 'permChangeDriver' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'incidents',
+    titleKey: 'permCatIncidents',
+    groups: [
+      {
+        key: 'incidents',
+        items: [
+          { key: 'addIncident', labelKey: 'permAddIncident' },
+          { key: 'addFollowup', labelKey: 'permAddFollowup' },
+          { key: 'viewIncidentReports', labelKey: 'permViewIncidentReports' },
+          { key: 'downloadIncidentReports', labelKey: 'permDownloadIncidentReports' },
+          { key: 'uploadIncidentDocs', labelKey: 'permUploadIncidentDocs' },
+          { key: 'exportIncidents', labelKey: 'permExportIncidents' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'compliance',
+    titleKey: 'permCatCompliance',
+    groups: [
+      {
+        key: 'compliance',
+        items: [
+          { key: 'viewCompliance', labelKey: 'permViewCompliance' },
+          { key: 'exportSummary', labelKey: 'permExportSummary' },
+        ],
+      },
+      {
+        key: 'fleet',
+        titleKey: 'permSubFleet',
+        items: [
+          { key: 'viewFleet', labelKey: 'permViewFleet' },
+          { key: 'requestFleetProposal', labelKey: 'permRequestFleetProposal' },
+        ],
+      },
+      {
+        key: 'vehicleReport',
+        titleKey: 'permSubVehicleReport',
+        items: [
+          { key: 'viewVehicleReport', labelKey: 'permViewVehicleReport' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'proposal',
+    titleKey: 'permCatProposal',
+    groups: [
+      {
+        key: 'proposal',
+        items: [
+          { key: 'viewProposal', labelKey: 'permViewProposal' },
+          { key: 'requestProposal', labelKey: 'permRequestProposal' },
+          { key: 'cancelProposal', labelKey: 'permCancelProposal' },
+          { key: 'addNotes', labelKey: 'permAddNotes' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'wallet',
+    titleKey: 'permCatWallet',
+    groups: [
+      {
+        key: 'wallet',
+        items: [
+          { key: 'viewWallet', labelKey: 'permViewWallet' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'subscriptions',
+    titleKey: 'permCatSubscriptions',
+    groups: [
+      {
+        key: 'subscriptions',
+        items: [
+          { key: 'changePlan', labelKey: 'permChangePlan' },
+        ],
+      },
+      {
+        key: 'team',
+        titleKey: 'permSubTeam',
+        items: [
+          { key: 'addMember', labelKey: 'permAddMember' },
+          { key: 'removeMember', labelKey: 'permRemoveMember' },
+          { key: 'managerAccess', labelKey: 'permManagerAccess' },
+        ],
+      },
+    ],
+  },
+  {
+    key: 'profile',
+    titleKey: 'permCatProfile',
+    groups: [
+      {
+        key: 'profile',
+        items: [
+          { key: 'editProfile', labelKey: 'permEditProfile' },
+        ],
+      },
+    ],
+  },
+]
+
+const ALL_PERMISSION_KEYS: string[] = PERMISSION_CATEGORIES.flatMap((c) =>
+  c.groups.flatMap((g) => g.items.map((i) => i.key)),
+)
+
+const DEFAULT_ROLE_PERMISSIONS: Record<TeamMemberRole, Set<string>> = {
+  owner: new Set(ALL_PERMISSION_KEYS),
+  admin: new Set(ALL_PERMISSION_KEYS.filter((k) => k !== 'changePlan')),
+  manager: new Set([
+    'checkCompliance',
+    'uploadVehicleDocs',
+    'checkChallans',
+    'addIncident',
+    'addFollowup',
+    'viewIncidentReports',
+    'downloadIncidentReports',
+    'uploadIncidentDocs',
+    'viewCompliance',
+    'viewFleet',
+    'viewVehicleReport',
+    'viewProposal',
+    'requestProposal',
+    'addNotes',
+    'viewWallet',
+    'editProfile',
+  ]),
+  viewer: new Set([
+    'checkCompliance',
+    'checkChallans',
+    'viewIncidentReports',
+    'downloadIncidentReports',
+    'viewCompliance',
+    'exportSummary',
+    'viewFleet',
+    'viewVehicleReport',
+    'viewProposal',
+    'viewWallet',
+    'editProfile',
+  ]),
+}
+
 const MEMBER_STATUS_CONFIG: Record<TeamMemberStatus, { color: string; bg: string }> = {
   active: { color: 'text-emerald-700 dark:text-emerald-300', bg: 'bg-emerald-50 dark:bg-emerald-950/40' },
   invited: { color: 'text-amber-700 dark:text-amber-300', bg: 'bg-amber-50 dark:bg-amber-950/40' },
@@ -502,12 +780,13 @@ export function Settings({
   const [showCancelPlanModal, setShowCancelPlanModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false)
-  // Track unchecked permissions per role (some start unchecked)
-  const [uncheckedPerms, setUncheckedPerms] = useState<Record<string, Set<number>>>({
-    admin: new Set([4, 5]),
-    manager: new Set([2, 4]),
-    viewer: new Set([1, 3]),
-  })
+  // Track checked permissions per role (initialized from role defaults)
+  const [rolePerms, setRolePerms] = useState<Record<TeamMemberRole, Set<string>>>(() => ({
+    owner: new Set(DEFAULT_ROLE_PERMISSIONS.owner),
+    admin: new Set(DEFAULT_ROLE_PERMISSIONS.admin),
+    manager: new Set(DEFAULT_ROLE_PERMISSIONS.manager),
+    viewer: new Set(DEFAULT_ROLE_PERMISSIONS.viewer),
+  }))
 
   const sendOverlay = (show: boolean) => {
     window.parent.postMessage({ type: show ? 'showOverlay' : 'hideOverlay' }, '*')
@@ -1050,10 +1329,18 @@ export function Settings({
               {/* Roles Sub-Tab */}
               {teamSubTab === 'roles' && (
                 <div className="space-y-5">
-                  {(['owner', 'admin', 'manager', 'viewer'] as TeamMemberRole[]).map((role) => {
+                  {(['admin', 'manager', 'viewer'] as TeamMemberRole[]).map((role) => {
                     const config = ROLE_CONFIG[role]
-                    const activitiesKey = `${role}Activities` as string
-                    const activities = (t[activitiesKey] || '').split(',')
+                    const checkedSet = rolePerms[role]
+                    const togglePerm = (permKey: string) => {
+                      setRolePerms((prev) => {
+                        const next = { ...prev }
+                        const set = new Set(prev[role])
+                        if (set.has(permKey)) set.delete(permKey); else set.add(permKey)
+                        next[role] = set
+                        return next
+                      })
+                    }
                     return (
                       <div key={role} className="rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
                         <div className="px-5 py-4 bg-stone-50 dark:bg-stone-800/40 border-b border-stone-200 dark:border-stone-700">
@@ -1061,31 +1348,41 @@ export function Settings({
                             {t[role]}
                           </span>
                         </div>
-                        <div className="px-5 py-4">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            {activities.map((activity: string, i: number) => {
-                              const isChecked = !(uncheckedPerms[role]?.has(i))
-                              return (
-                                <label key={i} className="flex items-center gap-2.5 cursor-pointer select-none">
-                                  <input
-                                    type="checkbox"
-                                    checked={isChecked}
-                                    onChange={() => {
-                                      setUncheckedPerms(prev => {
-                                        const next = { ...prev }
-                                        const set = new Set(prev[role] || [])
-                                        if (set.has(i)) set.delete(i); else set.add(i)
-                                        next[role] = set
-                                        return next
-                                      })
-                                    }}
-                                    className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30 cursor-pointer"
-                                  />
-                                  <span className="text-sm text-stone-600 dark:text-stone-400">{activity.trim()}</span>
-                                </label>
-                              )
-                            })}
-                          </div>
+                        <div className="px-5 py-4 space-y-5">
+                          {PERMISSION_CATEGORIES.map((category) => (
+                            <div key={category.key}>
+                              <h4 className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-2.5">
+                                {t[category.titleKey]}
+                              </h4>
+                              <div className="space-y-3">
+                                {category.groups.map((group) => (
+                                  <div key={group.key}>
+                                    {group.titleKey && (
+                                      <p className="text-xs font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+                                        {t[group.titleKey]}
+                                      </p>
+                                    )}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                      {group.items.map((item) => {
+                                        const isChecked = checkedSet.has(item.key)
+                                        return (
+                                          <label key={item.key} className="flex items-center gap-2.5 cursor-pointer select-none">
+                                            <input
+                                              type="checkbox"
+                                              checked={isChecked}
+                                              onChange={() => togglePerm(item.key)}
+                                              className="w-4 h-4 rounded border-stone-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500/30 cursor-pointer"
+                                            />
+                                            <span className="text-sm text-stone-600 dark:text-stone-400">{t[item.labelKey]}</span>
+                                          </label>
+                                        )
+                                      })}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )
