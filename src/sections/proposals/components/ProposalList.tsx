@@ -1169,7 +1169,6 @@ export function ProposalList({
             <h1 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
               {t.pageTitle}
             </h1>
-            <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5">{t.pageSubtitle}</p>
           </div>
           <button
             data-tour="proposals-create"
