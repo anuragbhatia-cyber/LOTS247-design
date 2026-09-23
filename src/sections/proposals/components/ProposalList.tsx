@@ -72,7 +72,7 @@ const translations: Record<Language, Record<string, string>> = {
     accept: 'Accept',
     reject: 'Reject',
     quotations: 'Quotations',
-    viewQuotations: 'View Quotations',
+    viewQuotations: 'View Quotation',
     noSentProposals: 'No sent proposals',
     noSentProposalsDesc: 'Proposals sent from compliance checks will appear here',
     noReceivedProposals: 'No received proposals',
