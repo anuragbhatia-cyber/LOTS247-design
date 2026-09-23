@@ -71,6 +71,8 @@ const translations: Record<Language, Record<string, string>> = {
     cancel: 'Cancel',
     accept: 'Accept',
     reject: 'Reject',
+    quotations: 'Quotations',
+    viewQuotations: 'View Quotations',
     noSentProposals: 'No sent proposals',
     noSentProposalsDesc: 'Proposals sent from compliance checks will appear here',
     noReceivedProposals: 'No received proposals',
@@ -144,6 +146,8 @@ const translations: Record<Language, Record<string, string>> = {
     cancel: 'रद्द करें',
     accept: 'स्वीकार',
     reject: 'अस्वीकार',
+    quotations: 'कोटेशन',
+    viewQuotations: 'कोटेशन देखें',
     noSentProposals: 'कोई भेजे गए प्रस्ताव नहीं',
     noSentProposalsDesc: 'अनुपालन जाँच से भेजे गए प्रस्ताव यहाँ दिखाई देंगे',
     noReceivedProposals: 'कोई प्राप्त प्रस्ताव नहीं',
@@ -507,6 +511,19 @@ function ProposalRow({
         <div className="w-[14%] min-w-[90px]">
           <span className="text-sm font-semibold text-stone-900 dark:text-stone-100 tabular-nums">{formatCurrency(proposal.amount)}</span>
         </div>
+
+        {/* Quotations (received tab only) */}
+        {showProposalActions && (
+          <div className="w-[14%] min-w-[110px]" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={onView}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+            >
+              {t.viewQuotations}
+              <ArrowUpRight className="w-3 h-3" />
+            </button>
+          </div>
+        )}
 
         {/* Status or Accept/Reject */}
         <div className={`${showIncidentColumn ? 'w-[12%] min-w-[80px]' : 'flex-1 min-w-[80px]'}`}>
@@ -1445,6 +1462,9 @@ export function ProposalList({
             <div className="w-[12%] min-w-[70px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">{t.type}</div>
             <div className="w-[8%] min-w-[40px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider text-center">{t.quantity}</div>
             <div className="w-[14%] min-w-[90px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">{t.amount}</div>
+            {activeTab === 'received' && (
+              <div className="w-[14%] min-w-[110px] text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider">{t.quotations}</div>
+            )}
             <div className={`${activeTab === 'past' ? 'w-[12%] min-w-[80px]' : 'flex-1 min-w-[140px]'} text-[11px] font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider`}>
               {activeTab === 'received' ? 'Action' : t.status}
             </div>

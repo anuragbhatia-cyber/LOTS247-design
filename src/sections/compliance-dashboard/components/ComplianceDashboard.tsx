@@ -1746,7 +1746,9 @@ function FleetChallanView({
 
       {/* Mobile filter tabs */}
       <div className="flex md:hidden gap-2 mb-5">
-        {(['pending', 'paid'] as const).map(f => (
+        {(['pending', 'paid'] as const)
+          .filter(f => !(initialFilter === 'paid' && f === 'pending'))
+          .map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -1768,7 +1770,9 @@ function FleetChallanView({
             {([
               { key: 'pending' as const, label: 'Pending', count: pendingCount, icon: FileText, countColor: 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400' },
               { key: 'paid' as const, label: 'Paid', count: paidCount, icon: ShieldCheck, countColor: 'bg-stone-100 dark:bg-stone-800 text-stone-500' },
-            ]).map(item => {
+            ])
+              .filter(item => !(initialFilter === 'paid' && item.key === 'pending'))
+              .map(item => {
               const Icon = item.icon
               const active = filter === item.key
               return (
