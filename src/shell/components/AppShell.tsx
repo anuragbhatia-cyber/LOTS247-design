@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles, Car, PlayCircle } from 'lucide-react'
+import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles, Car, PlayCircle, ArrowLeft } from 'lucide-react'
 import { MainNav } from './MainNav'
 import { useLanguage, type Language } from './LanguageContext'
 import { NotificationsView } from '@/sections/home/components/NotificationsView'
@@ -371,49 +371,64 @@ function SupportModal({
 // User Guide Modal
 // ---------------------------------------------------------------------------
 
+const USER_GUIDE_VIDEOS: Array<{ id: string; label: string; driveId: string }> = [
+  { id: 'v1', label: 'English', driveId: '1tuMToyX6AHMjwiNsTEyVAfBmrl-6i1xe' },
+  { id: 'v2', label: 'Hindi', driveId: '1g7WDiqJxm5IgPKecHab75TmaLc5rFN9w' },
+]
+
 function UserGuideModal({
   isOpen,
   onClose,
   t,
+  isCollapsed,
 }: {
   isOpen: boolean
   onClose: () => void
   t: Record<string, string>
+  isCollapsed: boolean
 }) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-      <div className="absolute inset-0 bg-black/40 dark:bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-3xl bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+    <div
+      className={`fixed top-16 right-0 bottom-0 left-0 z-[45] flex flex-col bg-stone-50 dark:bg-stone-950 overflow-y-auto ${
+        isCollapsed ? 'lg:left-16' : 'lg:left-60'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-stone-800">
-          <div className="flex items-center gap-2">
-            <PlayCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
-              {t.userGuideTitle}
-            </h3>
-          </div>
+        <div className="flex items-center gap-3 mb-6">
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+            aria-label="Back"
+            className="p-3 -ml-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors"
           >
-            <X className="w-4 h-4" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
+          <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-50">
+            {t.userGuideTitle}
+          </h1>
         </div>
 
-        {/* Video */}
-        <div className="p-5">
-          <div className="relative w-full overflow-hidden rounded-xl bg-stone-950" style={{ paddingBottom: '56.25%' }}>
-            <iframe
-              className="absolute inset-0 w-full h-full"
-              src="https://drive.google.com/file/d/1tuMToyX6AHMjwiNsTEyVAfBmrl-6i1xe/preview"
-              title={t.userGuideTitle}
-              frameBorder={0}
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-            />
-          </div>
+        {/* Videos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {USER_GUIDE_VIDEOS.map((v) => (
+            <div key={v.id}>
+              <h4 className="text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">
+                {v.label}
+              </h4>
+              <div className="relative w-full overflow-hidden rounded-xl bg-stone-950" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://drive.google.com/file/d/${v.driveId}/preview`}
+                  title={`${t.userGuideTitle} — ${v.label}`}
+                  frameBorder={0}
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -1199,6 +1214,7 @@ export function AppShell({
         isOpen={showUserGuide}
         onClose={() => setShowUserGuide(false)}
         t={t}
+        isCollapsed={isCollapsed}
       />
     </div>
   )
