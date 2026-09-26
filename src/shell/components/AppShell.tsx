@@ -446,6 +446,7 @@ export function AppShell({
   const [notifOpen, setNotifOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [mobileLangOpen, setMobileLangOpen] = useState(false)
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [showAddVehicle, setShowAddVehicle] = useState(false)
   const [showAddDriver, setShowAddDriver] = useState(false)
@@ -464,6 +465,7 @@ export function AppShell({
   const notifRef = useRef<HTMLDivElement>(null)
   const langRef = useRef<HTMLDivElement>(null)
   const mobileLangRef = useRef<HTMLDivElement>(null)
+  const mobileProfileRef = useRef<HTMLDivElement>(null)
 
   const unreadCount = DUMMY_NOTIFICATIONS.filter((n) => !n.read).length
 
@@ -483,6 +485,9 @@ export function AppShell({
       }
       if (mobileLangRef.current && !mobileLangRef.current.contains(e.target as Node)) {
         setMobileLangOpen(false)
+      }
+      if (mobileProfileRef.current && !mobileProfileRef.current.contains(e.target as Node)) {
+        setMobileProfileOpen(false)
       }
       if (vehicleMenuRef.current && !vehicleMenuRef.current.contains(e.target as Node)) {
         setVehicleMenuOpen(false)
@@ -566,29 +571,102 @@ export function AppShell({
 
           {/* Mobile User Profile */}
           {user && (
-            <button
-              onClick={() => {
-                onNavigate?.('/profile')
-              }}
-              aria-label="My Profile"
-              className="p-1.5 rounded-lg hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-            >
-              {user.avatarUrl ? (
-                <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold text-white">
-                    {user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}
-                  </span>
+            <div ref={mobileProfileRef} className="relative">
+              <button
+                onClick={() => {
+                  setMobileProfileOpen((o) => !o)
+                  setMobileLangOpen(false)
+                }}
+                aria-label="User menu"
+                aria-expanded={mobileProfileOpen}
+                className="p-1.5 rounded-lg hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              >
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-white">
+                      {user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </span>
+                  </div>
+                )}
+              </button>
+
+              {mobileProfileOpen && (
+                <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-stone-100 dark:border-stone-800">
+                    <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 truncate">{user.name}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 truncate mt-0.5">ABC Logistics Pvt Ltd</p>
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        setMobileProfileOpen(false)
+                        onNavigate?.('/profile')
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <User className="w-4 h-4 text-stone-400" />
+                      {t.myProfile}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileProfileOpen(false)
+                        try {
+                          window.localStorage.removeItem('lots247.tourSeen')
+                          const toRemove: string[] = []
+                          for (let i = 0; i < window.localStorage.length; i += 1) {
+                            const key = window.localStorage.key(i)
+                            if (key && key.startsWith('lots247.tourSeen.')) toRemove.push(key)
+                          }
+                          toRemove.forEach((k) => window.localStorage.removeItem(k))
+                        } catch {}
+                        window.dispatchEvent(new CustomEvent('lots247:replay-tour'))
+                        document
+                          .querySelectorAll('iframe')
+                          .forEach((iframe) => {
+                            iframe.contentWindow?.postMessage({ type: 'replay-tour' }, '*')
+                          })
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <Sparkles className="w-4 h-4 text-emerald-500" />
+                      {t.takeTour}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileProfileOpen(false)
+                        setShowUserGuide(true)
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <PlayCircle className="w-4 h-4 text-red-500" />
+                      {t.userGuide}
+                    </button>
+                    <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
+                    <button
+                      onClick={() => {
+                        setMobileProfileOpen(false)
+                        onLogout?.()
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      {t.logout}
+                    </button>
+                  </div>
                 </div>
               )}
-            </button>
+            </div>
           )}
 
           {/* Mobile Language Dropdown */}
           <div ref={mobileLangRef} className="relative">
             <button
-              onClick={() => setMobileLangOpen(!mobileLangOpen)}
+              onClick={() => {
+                setMobileLangOpen(!mobileLangOpen)
+                setMobileProfileOpen(false)
+              }}
               className="flex items-center gap-1 px-2 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             >
               <Languages className="w-4 h-4" />
