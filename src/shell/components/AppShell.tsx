@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles, Car } from 'lucide-react'
+import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles, Car, PlayCircle } from 'lucide-react'
 import { MainNav } from './MainNav'
 import { useLanguage, type Language } from './LanguageContext'
 import { NotificationsView } from '@/sections/home/components/NotificationsView'
@@ -82,6 +82,8 @@ const translations: Record<Language, Record<string, string>> = {
     settings: 'Settings',
     plan: 'Plan',
     takeTour: 'Take a tour',
+    userGuide: 'User Guide',
+    userGuideTitle: 'How to use LOTS247',
     logout: 'Logout',
     collapse: 'Collapse',
     openMenu: 'Open menu',
@@ -118,6 +120,8 @@ const translations: Record<Language, Record<string, string>> = {
     settings: 'सेटिंग्स',
     plan: 'प्लान',
     takeTour: 'टूर लें',
+    userGuide: 'यूज़र गाइड',
+    userGuideTitle: 'LOTS247 का उपयोग कैसे करें',
     logout: 'लॉग आउट',
     collapse: 'संक्षिप्त करें',
     openMenu: 'मेनू खोलें',
@@ -363,6 +367,59 @@ function SupportModal({
   )
 }
 
+// ---------------------------------------------------------------------------
+// User Guide Modal
+// ---------------------------------------------------------------------------
+
+function UserGuideModal({
+  isOpen,
+  onClose,
+  t,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  t: Record<string, string>
+}) {
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60" onClick={onClose} />
+      <div className="relative w-full max-w-3xl bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-stone-800">
+          <div className="flex items-center gap-2">
+            <PlayCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
+              {t.userGuideTitle}
+            </h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Video */}
+        <div className="p-5">
+          <div className="relative w-full overflow-hidden rounded-xl bg-stone-950" style={{ paddingBottom: '56.25%' }}>
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src="https://drive.google.com/file/d/1tuMToyX6AHMjwiNsTEyVAfBmrl-6i1xe/preview"
+              title={t.userGuideTitle}
+              frameBorder={0}
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function AppShell({
   children,
   navigationItems,
@@ -401,6 +458,7 @@ export function AppShell({
   const [complianceResultsVehicle, setComplianceResultsVehicle] = useState<string | null>(null)
   const [iframeOverlay, setIframeOverlay] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
+  const [showUserGuide, setShowUserGuide] = useState(false)
   const quickActionsRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
@@ -952,6 +1010,16 @@ export function AppShell({
                       <Sparkles className="w-4 h-4 text-emerald-500" />
                       {t.takeTour}
                     </button>
+                    <button
+                      onClick={() => {
+                        setProfileOpen(false)
+                        setShowUserGuide(true)
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <PlayCircle className="w-4 h-4 text-red-500" />
+                      {t.userGuide}
+                    </button>
                     <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
                     <button
                       onClick={() => {
@@ -1045,6 +1113,13 @@ export function AppShell({
       <SupportModal
         isOpen={showSupport}
         onClose={() => setShowSupport(false)}
+        t={t}
+      />
+
+      {/* User Guide Modal */}
+      <UserGuideModal
+        isOpen={showUserGuide}
+        onClose={() => setShowUserGuide(false)}
         t={t}
       />
     </div>
