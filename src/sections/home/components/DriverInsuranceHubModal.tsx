@@ -503,7 +503,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
 
   const headerCopy = (() => {
     if (view === 'create') return { title: t.title, subtitle: t.subtitle }
-    if (view === 'addChooser') return { title: t.addChooserTitle, subtitle: t.addChooserSubtitle }
+    if (view === 'addChooser') return { title: t.addChooserTitle, subtitle: '' }
     if (view === 'chooseDriver') return { title: t.chooseExistingDriverTitle, subtitle: t.chooseExistingDriverDesc }
     if (view === 'list') return { title: t.listTitle, subtitle: '' }
     return { title: t.hubTitle, subtitle: t.hubSubtitle }
