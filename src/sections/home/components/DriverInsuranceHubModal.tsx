@@ -12,11 +12,13 @@ import {
   ArrowLeft,
   User as UserIcon,
   CalendarDays,
+  FileSpreadsheet,
 } from 'lucide-react'
 import { useLanguage, type Language } from '@/shell/components/LanguageContext'
 import vehicleData from '@/../product/sections/vehicle-and-driver-management/data.json'
 import type { Vehicle, Driver } from '@/../product/sections/vehicle-and-driver-management/types'
 import { DriverInsuranceModal } from '@/sections/vehicle-and-driver-management/components/DriverInsuranceModal'
+import { BulkUploadModal } from '@/sections/vehicle-and-driver-management/components/BulkUploadModal'
 
 const INDIAN_STATES = [
   'Andhra Pradesh',
@@ -68,6 +70,12 @@ type T = {
   addNewInsuranceDesc: string
   chooseExistingDriverTitle: string
   chooseExistingDriverDesc: string
+  bulkInsuranceTitle: string
+  bulkInsuranceDesc: string
+  bulkInsuranceModalTitle: string
+  bulkInsuranceModalSubtitle: string
+  bulkInsuranceRequiredColumns: string
+  bulkInsuranceRequiredColumnsList: string
   viewAllTitle: string
   viewAllDesc: string
   listTitle: string
@@ -153,6 +161,12 @@ const translations: Record<Language, T> = {
     addNewInsuranceDesc: 'Start a fresh personal accident policy for a driver',
     chooseExistingDriverTitle: 'Choose existing driver',
     chooseExistingDriverDesc: 'Pick a driver already on your fleet and issue a policy',
+    bulkInsuranceTitle: 'Create bulk insurance',
+    bulkInsuranceDesc: 'Upload a sheet to issue policies for many drivers at once',
+    bulkInsuranceModalTitle: 'Bulk Upload Driver Insurance',
+    bulkInsuranceModalSubtitle: 'Issue personal accident policies for many drivers from a spreadsheet',
+    bulkInsuranceRequiredColumns: 'Required columns',
+    bulkInsuranceRequiredColumnsList: 'Driver Name, Mobile, Email, Date of Birth, Gender, State, Pincode, Aadhaar, License No., Nominee Name, Nominee Relation, Vehicle RC',
     viewAllTitle: 'View all insurance',
     viewAllDesc: 'See every active driver policy and its coverage details',
     listTitle: 'All driver Insurances',
@@ -236,6 +250,12 @@ const translations: Record<Language, T> = {
     addNewInsuranceDesc: 'ड्राइवर के लिए नई व्यक्तिगत दुर्घटना पॉलिसी शुरू करें',
     chooseExistingDriverTitle: 'मौजूदा ड्राइवर चुनें',
     chooseExistingDriverDesc: 'अपने फ्लीट के किसी ड्राइवर को चुनकर पॉलिसी जारी करें',
+    bulkInsuranceTitle: 'बल्क बीमा जोड़ें',
+    bulkInsuranceDesc: 'एक साथ कई ड्राइवरों के लिए पॉलिसी जारी करने हेतु शीट अपलोड करें',
+    bulkInsuranceModalTitle: 'बल्क अपलोड ड्राइवर बीमा',
+    bulkInsuranceModalSubtitle: 'स्प्रेडशीट से कई ड्राइवरों के लिए व्यक्तिगत दुर्घटना पॉलिसी जारी करें',
+    bulkInsuranceRequiredColumns: 'आवश्यक कॉलम',
+    bulkInsuranceRequiredColumnsList: 'ड्राइवर नाम, मोबाइल, ईमेल, जन्म तिथि, लिंग, राज्य, पिनकोड, आधार, लाइसेंस नं., नामांकित नाम, नामांकित संबंध, वाहन RC',
     viewAllTitle: 'सभी बीमा देखें',
     viewAllDesc: 'सभी सक्रिय ड्राइवर पॉलिसियाँ और उनकी कवरेज देखें',
     listTitle: 'सक्रिय ड्राइवर बीमा',
@@ -358,6 +378,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
 
   const [view, setView] = useState<View>('choose')
   const [selectedDriverId, setSelectedDriverId] = useState<string | null>(null)
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false)
 
   const [memberName, setMemberName] = useState('')
   const [email, setEmail] = useState('')
@@ -420,6 +441,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
       setSelectedVehicleId(null)
       setVehicleDropdownOpen(false)
       setSubmitted(false)
+      setBulkUploadOpen(false)
     }
   }, [isOpen])
 
@@ -563,7 +585,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
         )}
 
         {view === 'addChooser' && (
-          <div className="px-6 py-8 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto w-full">
+          <div className="px-6 py-8 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
             <ChooserCard
               icon={PlusCircle}
               title={t.addNewInsuranceTitle}
@@ -576,6 +598,13 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
               title={t.chooseExistingDriverTitle}
               description={t.chooseExistingDriverDesc}
               onClick={() => setView('chooseDriver')}
+              stacked
+            />
+            <ChooserCard
+              icon={FileSpreadsheet}
+              title={t.bulkInsuranceTitle}
+              description={t.bulkInsuranceDesc}
+              onClick={() => setBulkUploadOpen(true)}
               stacked
             />
           </div>
@@ -1046,6 +1075,15 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
       isOpen={selectedDriver !== null}
       driver={selectedDriver}
       onClose={() => setSelectedDriverId(null)}
+    />
+
+    <BulkUploadModal
+      isOpen={bulkUploadOpen}
+      onClose={() => setBulkUploadOpen(false)}
+      title={t.bulkInsuranceModalTitle}
+      subtitle={t.bulkInsuranceModalSubtitle}
+      requiredColumnsLabel={t.bulkInsuranceRequiredColumns}
+      requiredColumnsList={t.bulkInsuranceRequiredColumnsList}
     />
     </>,
     document.body,

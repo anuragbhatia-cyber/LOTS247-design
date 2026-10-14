@@ -44,6 +44,10 @@ export interface BulkUploadModalProps {
   onClose: () => void
   onUpload?: () => void
   onDownloadSample?: () => void
+  title?: string
+  subtitle?: string
+  requiredColumnsLabel?: string
+  requiredColumnsList?: string
 }
 
 export function BulkUploadModal({
@@ -51,6 +55,10 @@ export function BulkUploadModal({
   onClose,
   onUpload,
   onDownloadSample,
+  title,
+  subtitle,
+  requiredColumnsLabel,
+  requiredColumnsList,
 }: BulkUploadModalProps) {
   const [dragOver, setDragOver] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -115,10 +123,10 @@ export function BulkUploadModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div>
             <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
-              {t.bulkUploadVehicles}
+              {title ?? t.bulkUploadVehicles}
             </h2>
             <p className="text-xs text-stone-500 dark:text-stone-400">
-              {t.importMultipleVehicles}
+              {subtitle ?? t.importMultipleVehicles}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -204,8 +212,8 @@ export function BulkUploadModal({
             <div className="flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-stone-400 dark:text-stone-500 mt-0.5 flex-shrink-0" />
               <div className="text-xs text-stone-500 dark:text-stone-400">
-                <p className="font-medium text-stone-600 dark:text-stone-300 mb-1">{t.requiredColumns}</p>
-                <p>{t.requiredColumnsList}</p>
+                <p className="font-medium text-stone-600 dark:text-stone-300 mb-1">{requiredColumnsLabel ?? t.requiredColumns}</p>
+                <p>{requiredColumnsList ?? t.requiredColumnsList}</p>
               </div>
             </div>
           </div>
