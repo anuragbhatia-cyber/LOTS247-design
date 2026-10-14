@@ -511,6 +511,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
 
   return createPortal(
     <>
+    {!bulkUploadOpen && (
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
       <div className="fixed inset-0 bg-black/50 dark:bg-black/70" onClick={onClose} />
 
@@ -1070,6 +1071,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
         )}
       </div>
     </div>
+    )}
 
     <DriverInsuranceModal
       isOpen={selectedDriver !== null}
