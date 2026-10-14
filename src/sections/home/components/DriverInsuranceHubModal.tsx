@@ -1083,7 +1083,7 @@ export function DriverInsuranceHubModal({ isOpen, onClose }: DriverInsuranceHubM
       isOpen={bulkUploadOpen}
       onClose={() => setBulkUploadOpen(false)}
       title={t.bulkInsuranceModalTitle}
-      subtitle={t.bulkInsuranceModalSubtitle}
+      subtitle=""
       requiredColumnsLabel={t.bulkInsuranceRequiredColumns}
       requiredColumnsList={t.bulkInsuranceRequiredColumnsList}
     />

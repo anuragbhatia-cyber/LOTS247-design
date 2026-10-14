@@ -125,9 +125,11 @@ export function BulkUploadModal({
             <h2 className="text-base font-bold text-stone-900 dark:text-stone-50">
               {title ?? t.bulkUploadVehicles}
             </h2>
-            <p className="text-xs text-stone-500 dark:text-stone-400">
-              {subtitle ?? t.importMultipleVehicles}
-            </p>
+            {(subtitle ?? t.importMultipleVehicles) && (
+              <p className="text-xs text-stone-500 dark:text-stone-400">
+                {subtitle ?? t.importMultipleVehicles}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <button
