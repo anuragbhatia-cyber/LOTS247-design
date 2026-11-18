@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles, Car } from 'lucide-react'
+import { Menu, X, Plus, AlertTriangle, PlusCircle, Phone, UserPlus, Bell, ChevronDown, User, LogOut, FileWarning, ShieldCheck, CreditCard, Languages, Check, HelpCircle, Send, CheckCircle2, Settings, Sparkles, Car, PlayCircle, ArrowLeft } from 'lucide-react'
 import { MainNav } from './MainNav'
 import { useLanguage, type Language } from './LanguageContext'
 import { NotificationsView } from '@/sections/home/components/NotificationsView'
@@ -82,6 +82,8 @@ const translations: Record<Language, Record<string, string>> = {
     settings: 'Settings',
     plan: 'Plan',
     takeTour: 'Take a tour',
+    userGuide: 'User Guide',
+    userGuideTitle: 'How to use LOTS247',
     logout: 'Logout',
     collapse: 'Collapse',
     openMenu: 'Open menu',
@@ -118,6 +120,8 @@ const translations: Record<Language, Record<string, string>> = {
     settings: 'सेटिंग्स',
     plan: 'प्लान',
     takeTour: 'टूर लें',
+    userGuide: 'यूज़र गाइड',
+    userGuideTitle: 'LOTS247 का उपयोग कैसे करें',
     logout: 'लॉग आउट',
     collapse: 'संक्षिप्त करें',
     openMenu: 'मेनू खोलें',
@@ -363,6 +367,74 @@ function SupportModal({
   )
 }
 
+// ---------------------------------------------------------------------------
+// User Guide Modal
+// ---------------------------------------------------------------------------
+
+const USER_GUIDE_VIDEOS: Array<{ id: string; label: string; driveId: string }> = [
+  { id: 'v1', label: 'English', driveId: '1tuMToyX6AHMjwiNsTEyVAfBmrl-6i1xe' },
+  { id: 'v2', label: 'Hindi', driveId: '1g7WDiqJxm5IgPKecHab75TmaLc5rFN9w' },
+]
+
+function UserGuideModal({
+  isOpen,
+  onClose,
+  t,
+  isCollapsed,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  t: Record<string, string>
+  isCollapsed: boolean
+}) {
+  if (!isOpen) return null
+
+  return (
+    <div
+      className={`fixed top-16 right-0 bottom-0 left-0 z-[45] flex flex-col bg-stone-50 dark:bg-stone-950 overflow-y-auto ${
+        isCollapsed ? 'lg:left-16' : 'lg:left-60'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={onClose}
+            aria-label="Back"
+            className="p-3 -ml-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-xl transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-50">
+            {t.userGuideTitle}
+          </h1>
+        </div>
+
+        {/* Videos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {USER_GUIDE_VIDEOS.map((v) => (
+            <div key={v.id}>
+              <h4 className="text-sm font-semibold text-stone-700 dark:text-stone-300 mb-2">
+                {v.label}
+              </h4>
+              <div className="relative w-full overflow-hidden rounded-xl bg-stone-950" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://drive.google.com/file/d/${v.driveId}/preview`}
+                  title={`${t.userGuideTitle} — ${v.label}`}
+                  frameBorder={0}
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function AppShell({
   children,
   navigationItems,
@@ -389,6 +461,7 @@ export function AppShell({
   const [notifOpen, setNotifOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const [mobileLangOpen, setMobileLangOpen] = useState(false)
+  const [mobileProfileOpen, setMobileProfileOpen] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [showAddVehicle, setShowAddVehicle] = useState(false)
   const [showAddDriver, setShowAddDriver] = useState(false)
@@ -401,11 +474,13 @@ export function AppShell({
   const [complianceResultsVehicle, setComplianceResultsVehicle] = useState<string | null>(null)
   const [iframeOverlay, setIframeOverlay] = useState(false)
   const [showSupport, setShowSupport] = useState(false)
+  const [showUserGuide, setShowUserGuide] = useState(false)
   const quickActionsRef = useRef<HTMLDivElement>(null)
   const profileRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
   const langRef = useRef<HTMLDivElement>(null)
   const mobileLangRef = useRef<HTMLDivElement>(null)
+  const mobileProfileRef = useRef<HTMLDivElement>(null)
 
   const unreadCount = DUMMY_NOTIFICATIONS.filter((n) => !n.read).length
 
@@ -425,6 +500,9 @@ export function AppShell({
       }
       if (mobileLangRef.current && !mobileLangRef.current.contains(e.target as Node)) {
         setMobileLangOpen(false)
+      }
+      if (mobileProfileRef.current && !mobileProfileRef.current.contains(e.target as Node)) {
+        setMobileProfileOpen(false)
       }
       if (vehicleMenuRef.current && !vehicleMenuRef.current.contains(e.target as Node)) {
         setVehicleMenuOpen(false)
@@ -508,29 +586,102 @@ export function AppShell({
 
           {/* Mobile User Profile */}
           {user && (
-            <button
-              onClick={() => {
-                onNavigate?.('/profile')
-              }}
-              aria-label="My Profile"
-              className="p-1.5 rounded-lg hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
-            >
-              {user.avatarUrl ? (
-                <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold text-white">
-                    {user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}
-                  </span>
+            <div ref={mobileProfileRef} className="relative">
+              <button
+                onClick={() => {
+                  setMobileProfileOpen((o) => !o)
+                  setMobileLangOpen(false)
+                }}
+                aria-label="User menu"
+                aria-expanded={mobileProfileOpen}
+                className="p-1.5 rounded-lg hover:bg-stone-800 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              >
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-white">
+                      {user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </span>
+                  </div>
+                )}
+              </button>
+
+              {mobileProfileOpen && (
+                <div className="absolute right-0 top-full mt-2 w-60 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xl shadow-stone-200/60 dark:shadow-stone-950/60 overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-stone-100 dark:border-stone-800">
+                    <p className="text-sm font-semibold text-stone-900 dark:text-stone-50 truncate">{user.name}</p>
+                    <p className="text-xs text-stone-500 dark:text-stone-400 truncate mt-0.5">ABC Logistics Pvt Ltd</p>
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        setMobileProfileOpen(false)
+                        onNavigate?.('/profile')
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <User className="w-4 h-4 text-stone-400" />
+                      {t.myProfile}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileProfileOpen(false)
+                        try {
+                          window.localStorage.removeItem('lots247.tourSeen')
+                          const toRemove: string[] = []
+                          for (let i = 0; i < window.localStorage.length; i += 1) {
+                            const key = window.localStorage.key(i)
+                            if (key && key.startsWith('lots247.tourSeen.')) toRemove.push(key)
+                          }
+                          toRemove.forEach((k) => window.localStorage.removeItem(k))
+                        } catch {}
+                        window.dispatchEvent(new CustomEvent('lots247:replay-tour'))
+                        document
+                          .querySelectorAll('iframe')
+                          .forEach((iframe) => {
+                            iframe.contentWindow?.postMessage({ type: 'replay-tour' }, '*')
+                          })
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <Sparkles className="w-4 h-4 text-emerald-500" />
+                      {t.takeTour}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileProfileOpen(false)
+                        setShowUserGuide(true)
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <PlayCircle className="w-4 h-4 text-red-500" />
+                      {t.userGuide}
+                    </button>
+                    <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
+                    <button
+                      onClick={() => {
+                        setMobileProfileOpen(false)
+                        onLogout?.()
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      {t.logout}
+                    </button>
+                  </div>
                 </div>
               )}
-            </button>
+            </div>
           )}
 
           {/* Mobile Language Dropdown */}
           <div ref={mobileLangRef} className="relative">
             <button
-              onClick={() => setMobileLangOpen(!mobileLangOpen)}
+              onClick={() => {
+                setMobileLangOpen(!mobileLangOpen)
+                setMobileProfileOpen(false)
+              }}
               className="flex items-center gap-1 px-2 py-1.5 min-h-11 text-stone-400 hover:text-stone-100 hover:bg-stone-800 rounded-lg transition-colors text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
             >
               <Languages className="w-4 h-4" />
@@ -952,6 +1103,16 @@ export function AppShell({
                       <Sparkles className="w-4 h-4 text-emerald-500" />
                       {t.takeTour}
                     </button>
+                    <button
+                      onClick={() => {
+                        setProfileOpen(false)
+                        setShowUserGuide(true)
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 min-h-11 text-sm text-stone-700 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors"
+                    >
+                      <PlayCircle className="w-4 h-4 text-red-500" />
+                      {t.userGuide}
+                    </button>
                     <div className="my-1 mx-3 border-t border-stone-100 dark:border-stone-800" />
                     <button
                       onClick={() => {
@@ -1046,6 +1207,14 @@ export function AppShell({
         isOpen={showSupport}
         onClose={() => setShowSupport(false)}
         t={t}
+      />
+
+      {/* User Guide Modal */}
+      <UserGuideModal
+        isOpen={showUserGuide}
+        onClose={() => setShowUserGuide(false)}
+        t={t}
+        isCollapsed={isCollapsed}
       />
     </div>
   )

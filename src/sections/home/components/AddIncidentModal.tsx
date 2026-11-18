@@ -91,6 +91,13 @@ const translations: Record<Language, Record<string, string>> = {
     submit: 'Request Proposal',
     payNow: 'Pay Now',
     back: 'Back',
+    continue: 'Continue',
+    selectSubscription: 'Select Subscription',
+    selectSubscriptionDesc: 'Choose the subscription to raise this incident under',
+    validTill: 'Valid till',
+    expired: 'Expired',
+    vehiclesCovered: 'vehicles covered',
+    unlimitedVehicles: 'Unlimited vehicles',
   },
   hi: {
     addIncident: 'घटना जोड़ें',
@@ -165,6 +172,13 @@ const translations: Record<Language, Record<string, string>> = {
     submit: 'प्रस्ताव अनुरोध',
     payNow: 'अभी भुगतान करें',
     back: 'वापस',
+    continue: 'आगे बढ़ें',
+    selectSubscription: 'सदस्यता चुनें',
+    selectSubscriptionDesc: 'वह सदस्यता चुनें जिसके तहत यह घटना दर्ज करनी है',
+    validTill: 'मान्य तिथि',
+    expired: 'समाप्त',
+    vehiclesCovered: 'वाहन कवर',
+    unlimitedVehicles: 'असीमित वाहन',
   },
 }
 
@@ -201,6 +215,22 @@ function formatChallanCurrency(amount: number, lang: Language): string {
   return new Intl.NumberFormat(lang === 'hi' ? 'hi-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount)
 }
 
+interface SubscriptionOption {
+  id: string
+  planName: string
+  subscriptionId: string
+  validTill: string
+  vehicleLimit: number | null
+  status: 'active' | 'expired'
+}
+
+// Subscriptions owned by the subscriber
+const SUBSCRIPTIONS: SubscriptionOption[] = [
+  { id: 'subs-001', planName: 'B Safe', subscriptionId: 'SUB-2026-0315', validTill: '15 Mar 2027', vehicleLimit: null, status: 'active' },
+  { id: 'subs-002', planName: 'Sarathi', subscriptionId: 'SUB-2025-1220', validTill: '20 Dec 2026', vehicleLimit: 1, status: 'active' },
+  { id: 'subs-003', planName: 'Free Trial', subscriptionId: 'SUB-2025-0612', validTill: '12 Jul 2025', vehicleLimit: 1, status: 'expired' },
+]
+
 const CATEGORIES: {
   id: Category
   labelKey: string
@@ -221,7 +251,8 @@ export interface AddIncidentModalProps {
 }
 
 export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
-  const [step, setStep] = useState<'category' | 'form'>('category')
+  const [step, setStep] = useState<'category' | 'form' | 'subscription'>('category')
+  const [subscriptionId, setSubscriptionId] = useState(SUBSCRIPTIONS.find((s) => s.status === 'active')?.id ?? '')
   const [category, setCategory] = useState<Category | null>(null)
   const [vehicleNumber, setVehicleNumber] = useState('')
   const [vehicleSearch, setVehicleSearch] = useState('')
@@ -322,10 +353,15 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
     setIncidentReporterName('')
     setRtoType('')
     setDescription('')
+    setSubscriptionId(SUBSCRIPTIONS.find((s) => s.status === 'active')?.id ?? '')
     onClose()
   }
 
   function handleBack() {
+    if (step === 'subscription') {
+      setStep('form')
+      return
+    }
     setStep('category')
     setCategory(null)
     setVehicleNumber('')
@@ -374,8 +410,14 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
   }
 
   const categoryMeta = CATEGORIES.find((c) => c.id === category)
-  const headerTitle = step === 'category' ? t.addIncident : categoryMeta ? t[categoryMeta.labelKey] : t.addIncident
-  const headerSubtitle = step === 'category' ? t.selectCategory : undefined
+  const headerTitle =
+    step === 'category' ? t.addIncident
+    : step === 'subscription' ? t.selectSubscription
+    : categoryMeta ? t[categoryMeta.labelKey] : t.addIncident
+  const headerSubtitle =
+    step === 'category' ? t.selectCategory
+    : step === 'subscription' ? t.selectSubscriptionDesc
+    : undefined
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 sm:p-6">
@@ -387,7 +429,7 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-200 dark:border-stone-800">
           <div className="flex items-center gap-3">
-            {step === 'form' && (
+            {step !== 'category' && (
               <button
                 onClick={handleBack}
                 className="p-1.5 -ml-1.5 rounded-xl text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
@@ -434,6 +476,51 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
                       <p className="text-sm font-semibold text-stone-900 dark:text-stone-50">{t[cat.labelKey]}</p>
                       <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{t[cat.descKey]}</p>
                     </div>
+                  </button>
+                )
+              })}
+            </div>
+          ) : step === 'subscription' ? (
+            /* Subscription Selection */
+            <div className="space-y-3">
+              {SUBSCRIPTIONS.map((sub) => {
+                const isExpired = sub.status === 'expired'
+                const isSelected = subscriptionId === sub.id
+                return (
+                  <button
+                    key={sub.id}
+                    onClick={() => !isExpired && setSubscriptionId(sub.id)}
+                    disabled={isExpired}
+                    className={`w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-all duration-200 ${
+                      isExpired
+                        ? 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 opacity-60 cursor-not-allowed'
+                        : isSelected
+                          ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 ring-1 ring-emerald-500'
+                          : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800/50 hover:border-emerald-500 dark:hover:border-emerald-500'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-bold text-stone-900 dark:text-stone-50">{sub.planName}</p>
+                        <span className="text-[11px] font-mono text-stone-400 dark:text-stone-500">{sub.subscriptionId}</span>
+                      </div>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                        {sub.vehicleLimit === null ? t.unlimitedVehicles : `${sub.vehicleLimit} ${t.vehiclesCovered}`}
+                        {' · '}
+                        {isExpired ? (
+                          <span className="text-red-500 font-medium">{t.expired}</span>
+                        ) : (
+                          <>{t.validTill} {sub.validTill}</>
+                        )}
+                      </p>
+                    </div>
+                    <span
+                      className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
+                        isSelected && !isExpired ? 'border-emerald-600' : 'border-stone-300 dark:border-stone-600'
+                      }`}
+                    >
+                      {isSelected && !isExpired && <span className="w-2 h-2 rounded-full bg-emerald-600" />}
+                    </span>
                   </button>
                 )
               })}
@@ -898,8 +985,8 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
           )}
         </div>
 
-        {/* Footer — only on form step */}
-        {step === 'form' && (
+        {/* Footer — form and subscription steps */}
+        {step !== 'category' && (
           <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-stone-200 dark:border-stone-800">
             <button
               onClick={resetAndClose}
@@ -907,17 +994,31 @@ export function AddIncidentModal({ isOpen, onClose }: AddIncidentModalProps) {
             >
               {t.cancel}
             </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!isFormValid()}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
-                isFormValid()
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-                  : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
-              }`}
-            >
-              {category === 'challan' ? t.payNow : t.submit}
-            </button>
+            {step === 'form' ? (
+              <button
+                onClick={() => setStep('subscription')}
+                disabled={!isFormValid()}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
+                  isFormValid()
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
+                }`}
+              >
+                {t.continue}
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                disabled={!subscriptionId}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors shadow-sm ${
+                  subscriptionId
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    : 'bg-stone-200 dark:bg-stone-700 text-stone-400 dark:text-stone-500 cursor-not-allowed'
+                }`}
+              >
+                {category === 'challan' ? t.payNow : t.submit}
+              </button>
+            )}
           </div>
         )}
       </div>
